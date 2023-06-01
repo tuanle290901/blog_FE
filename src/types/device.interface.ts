@@ -6,6 +6,7 @@ export interface IDevice {
   groupCode?: string
   connectPoint?: string
   status?: string
+  groupName?: string
 }
 
 export interface IDeviceForm {
