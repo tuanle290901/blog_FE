@@ -4,6 +4,7 @@ import { setUserInfo } from '../features/auth/auth.slice'
 import { useAppDispatch, useAppSelector } from '../hook'
 import useLocalStorage from './useLocaStorage'
 import { UserProfile } from '~/types/user-profile.interface'
+import { IUser } from '~/types/user.interface.ts'
 
 const initialState = {}
 const KEY = LOCAL_STORAGE.AUTH_INFO
@@ -19,7 +20,7 @@ export const useUserInfo = () => {
     }
   }, [local, userInfo, dispatch])
 
-  const setUserProfileInfo = (userProfileInfo: UserProfile) => {
+  const setUserProfileInfo = (userProfileInfo: IUser) => {
     setLocal(userProfileInfo)
     setUserInfo(userProfileInfo)
   }

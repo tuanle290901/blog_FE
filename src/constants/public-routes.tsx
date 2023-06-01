@@ -1,11 +1,12 @@
 import Initialize from '~/pages/Initialize'
 import LoginComponent from '~/pages/login'
+import { ROLE } from '~/constants/app.constant.ts'
 
 export interface IRoutes {
   path: string
   name: string
   component: any
-  allowedRoles: Array<string>
+  allowedRoles: ROLE[]
 }
 
 export const PUBLIC_PATH = {

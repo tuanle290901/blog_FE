@@ -1,10 +1,11 @@
 import { Col, Row } from 'antd'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { IAttendance } from '~/types/attendance.interface'
+import { IPaging } from '~/types/api-response.interface'
+// import { IAttendance } from '~/types/attendance.interface'
 // import dayjs from 'dayjs'
 
-const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
+const DaySelected: React.FC<{ meta: IPaging }> = ({ meta }) => {
   const [t] = useTranslation()
   // const handleGenderColor = (status: string) => {
   //   switch (status) {
@@ -56,7 +57,7 @@ const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
         <Col xs={24} lg={12}>
           <div className='timesheet-workday'>
             <p>{t('timesheet.totalWorkingDay')}</p>
-            <span>{data?.length}</span>
+            <span>{meta?.total}</span>
           </div>
         </Col>
         <Col xs={24} lg={12} className='tw-flex'>

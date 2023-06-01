@@ -1,14 +1,18 @@
-import React, { Children, memo } from 'react'
-import { LocalStorage } from '~/utils/local-storage.ts'
+import React, { memo } from 'react'
 import { Navigate } from 'react-router-dom'
-import { LOCAL_STORAGE } from './Constant'
-const RequireAuth: React.FC<{ allowedRoles: Array<string>; children: any }> = ({ allowedRoles, children }) => {
-  // TODO use state
-  const user = LocalStorage.getObject<{ role: string }>(LOCAL_STORAGE.AUTH_INFO)
-  if ((user && allowedRoles?.includes(user?.role)) || (allowedRoles.length === 0 && !!user)) {
+import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { hasPermission } from '~/utils/helper.ts'
+import { ROLE } from '~/constants/app.constant.ts'
+import { LOCAL_STORAGE } from '~/utils/Constant.tsx'
+import { LocalStorage } from '~/utils/local-storage.ts'
+import { IUser } from '~/types/user.interface.ts'
+
+const RequireAuth: React.FC<{ allowedRoles: ROLE[]; children: any }> = ({ allowedRoles, children }) => {
+  const userInfo = LocalStorage.getObject<IUser>(LOCAL_STORAGE.AUTH_INFO)
+  if (userInfo && hasPermission(allowedRoles, userInfo.groupProfiles)) {
     return children
   }
-  if (user) {
+  if (userInfo) {
     return <Navigate to='/unauthorized' replace />
   }
   return <Navigate to='/auth/login' replace />

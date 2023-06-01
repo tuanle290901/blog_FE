@@ -29,7 +29,11 @@ HttpService.interceptors.request.use((config: any) => {
 HttpService.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error instanceof AxiosError &&
+      error.response?.status === 401 &&
+      !error.response?.config.url?.includes('login')
+    ) {
       if (!isShowModal) {
         isShowModal = true
         Modal.warning({

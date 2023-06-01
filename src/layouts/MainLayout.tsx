@@ -12,6 +12,7 @@ import menuIconDepartment from '../assets/images/menu/department.png'
 import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
+import menuIconReport from '../assets/images/menu/icon-report.png'
 
 import defaultImg from '~/assets/images/default-img.png'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -22,6 +23,8 @@ import { PUBLIC_PATH } from '~/constants/public-routes'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
 import ChangePassword from '~/pages/change-password/change-password'
+import { hasPermission } from '~/utils/helper'
+import { ROLE } from '~/constants/app.constant'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -98,56 +101,111 @@ const MainLayout: React.FC = () => {
   }, [])
 
   const menuItems: MenuItem[] = useMemo(() => {
+    const getItemIfAllowed = (roles: ROLE[], title: any, key: string, icon?: any, subMenu?: any, group?: any) => {
+      const hasRole = hasPermission(roles, userInfo?.groupProfiles)
+      if (!hasRole) return null
+      return getItem(title, key, icon, subMenu, group)
+    }
+
     return [
-      getItem('Trang chủ', '/', <img src={menuIconStatistical} alt='' className='menu-image' />),
-      getItem(
+      getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
         <Tooltip placement='topLeft' title='Chức năng chính'>
           Chức năng chính
         </Tooltip>,
         'mainFunction',
         null,
         [
-          getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
-            getItem('Lịch sử chấm công', 'timesheet'),
-            getItem('Lịch sử yêu cầu', 'requestHistory'),
-            getItem('Danh sách yêu cầu', 'requestList')
-          ])
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+            'Chấm công',
+            'timeKeeping',
+            <img src={menuIconTimeKeeping} alt='' className='menu-image' />,
+            [
+              getItemIfAllowed(
+                [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+                'Lịch sử chấm công',
+                'timesheet'
+              )
+            ]
+          )
         ],
         'group'
       ),
 
-      getItem(
+      getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
         <Tooltip placement='topLeft' title='Chức năng quản lý'>
           Chức năng quản lý
         </Tooltip>,
         'manageFunction',
         null,
         [
-          getItem('Thành viên', 'users', <img src={menuIconMember} alt='' className='menu-image' />),
-          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />),
-          getItem('Chức vụ', 'positions', <img src={menuIconDepartment} alt='' className='menu-image' />)
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+            'Thành viên',
+            'users',
+            <img src={menuIconMember} alt='' className='menu-image' />
+          ),
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
+            'Phòng ban',
+            'department',
+            <img src={menuIconDepartment} alt='' className='menu-image' />
+          ),
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
+            'Chức vụ',
+            'positions',
+            <img src={menuIconDepartment} alt='' className='menu-image' />
+          )
         ],
         'group'
       ),
 
-      getItem(
+      getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
+        <Tooltip placement='topLeft' title='Chức năng báo cáo'>
+          Chức năng báo cáo
+        </Tooltip>,
+        'reportFunction',
+        null,
+        [
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
+            'Báo cáo',
+            'report',
+            <img src={menuIconReport} alt='' className='menu-image' />
+          )
+        ],
+        'group'
+      ),
+
+      getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN],
         <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
           Cấu hình hệ thống
         </Tooltip>,
         'systemConfig',
         null,
         [
-          getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
-            getItem('Thời gian làm việc', 'timeWorking'),
-            getItem('Danh sách thiết bị chấm công', 'devices'),
-            getItem('Quy trình phê duyệt phép', 'ticket-process-definition'),
-            getItem('Loại nghỉ phép', 'types-of-leave')
-          ])
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN],
+            'Cấu hình',
+            'setting',
+            <img src={menuIconSetting} alt='' className='menu-image' />,
+            [
+              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
+              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách thiết bị chấm công', 'devices'),
+              // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
+              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
+            ]
+          )
         ],
         'group'
       )
     ]
-  }, [])
+  }, [userInfo])
 
   const handleMenuClick = (menu: MenuItem) => {
     if (menu?.key) {

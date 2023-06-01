@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Input, Row, Segmented, Select, Table } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notification } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
-import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
-import { IAttendance } from '~/types/attendance.interface'
+// import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
+
+import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
-import TimesheetCalendar from './component/TimesheetCalendar'
+// import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
 import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { filterTimesheet, getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
+import {
+  filterTimesheet,
+  getAllGroup,
+  getUserInGroup,
+  updateAttendanceStatistic
+} from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
@@ -20,6 +26,7 @@ import { IUser } from '~/types/user.interface'
 // import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 import ExcelExportButton from '~/components/ExportExcel/ExcelExportButton'
+import ViolateAction from './component/ViolateAction'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -39,10 +46,17 @@ const Timesheet: React.FC = () => {
   )
   const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
-  const [mode, setMode] = useState('calendar')
+  const [mode, setMode] = useState('list')
+  const [clickUpdateButton, setClickUpdateButton] = useState(false)
+  let confirmAttendanceStatisticList: any[] = []
   const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
     return { value: item?.code, label: item?.name }
   })
+  const weightOptions: { value: number; label: string }[] = [
+    { value: 0.0, label: '0' },
+    { value: 0.5, label: '0.5' },
+    { value: 1, label: '1' }
+  ]
 
   const [searchValue, setSearchValue] = useState<{
     query: string
@@ -72,9 +86,9 @@ const Timesheet: React.FC = () => {
     ]
   })
 
-  const handleClickAddReason = () => {
-    setIsOpenModal(true)
-  }
+  // const handleClickAddReason = () => {
+  //   setIsOpenModal(true)
+  // }
 
   const handleCloseTimesheetModal = () => {
     setIsOpenModal(false)
@@ -162,6 +176,116 @@ const Timesheet: React.FC = () => {
     }
   }
 
+  const findViolate = (data: IViolate[] | null, violateType: string) => {
+    if (!data) return false
+    if (data?.findIndex((item: IViolate) => item?.violateType === violateType) > -1) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const handleUpdateAttendanceStatistic = async () => {
+    console.log('confirmAttendanceStatisticList', confirmAttendanceStatisticList)
+    const response = await dispatch(updateAttendanceStatistic(confirmAttendanceStatisticList)).unwrap()
+    if (response) {
+      notification.success({
+        message: response?.message
+      })
+    }
+    setClickUpdateButton(!clickUpdateButton)
+    confirmAttendanceStatisticList = []
+  }
+
+  const handleSelectTypesOfLeave = (data: IAttendance, typesOfLeave: string) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data.id)
+    let payload = {}
+    if (index > -1) {
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          typesOfLeave: typesOfLeave
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          absenceType: typesOfLeave,
+          absenceAmount: 1 - data?.reportData?.workingAmount
+        }
+      }
+    }
+    confirmAttendanceStatisticList.push(payload)
+  }
+
+  const handleSelectAbsenceAmount = (data: IAttendance, absenceAmount: number) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
+    let payload = {}
+    if (index > -1) {
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          absenceAmount:
+            confirmAttendanceStatisticList[index]?.reportData?.workingAmount + absenceAmount < 1.5
+              ? absenceAmount
+              : 1 - confirmAttendanceStatisticList[index]?.reportData?.workingAmount
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          absenceAmount:
+            data?.reportData?.workingAmount + absenceAmount < 1.5 ? absenceAmount : 1 - data?.reportData?.workingAmount
+        }
+      }
+    }
+    confirmAttendanceStatisticList.push(payload)
+  }
+
+  const handleAddNote = (data: IAttendance, newNote: string) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
+    let payload = {}
+    if (index > -1) {
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          note: newNote
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          note: newNote
+        }
+      }
+    }
+    confirmAttendanceStatisticList.push(payload)
+  }
+
   const columns: ColumnsType<IAttendance> = [
     {
       title: t('timesheet.fullName'),
@@ -182,7 +306,8 @@ const Timesheet: React.FC = () => {
         return (
           <span
             className={
-              record?.reportData?.violate?.includes('LATE_COME') || record?.reportData?.violate?.includes('EARLY_BACK')
+              findViolate(record?.reportData?.violate, 'LATE_COME') ||
+              findViolate(record?.reportData?.violate, 'EARLY_BACK')
                 ? 'tw-text-[#D46B08]'
                 : ''
             }
@@ -203,8 +328,8 @@ const Timesheet: React.FC = () => {
         return (
           <span
             className={
-              record?.reportData?.violate?.includes('LATE_COME') ||
-              record?.reportData?.violate?.includes('FORGET_TIME_ATTENDANCE')
+              findViolate(record?.reportData?.violate, 'LATE_COME') ||
+              findViolate(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
                 ? 'tw-text-[#D46B08]'
                 : ''
             }
@@ -223,69 +348,56 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('endTime'),
       render: (endTime, record) => {
         return (
-          <span className={record?.reportData?.violate?.includes('EARLY_BACK') ? 'tw-text-[#D46B08]' : ''}>
+          <span className={findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#D46B08]' : ''}>
             {endTime || '--'}
           </span>
         )
       }
     },
     {
-      title: t('Ngày công (ngày)'),
+      title: t('Ngày công'),
       dataIndex: 'reportData',
-      key: 'reportData',
       ellipsis: true,
+      width: '102px',
       render: (reportData) => {
+        return reportData ? reportData?.workingAmount : ''
+      }
+    },
+    {
+      title: t('Công nghỉ'),
+      dataIndex: 'reportData',
+      ellipsis: true,
+      render: (reportData, record) => {
         return (
-          <Select
-            className='tw-w-full'
-            onChange={() => void {}}
-            defaultValue={reportData?.workingAmount}
-            options={[
-              { value: 0.0, label: '0' },
-              { value: 0.5, label: '0.5' },
-              { value: 1, label: '1' }
-            ]}
-          />
+          reportData?.workingAmount < 1 && (
+            <Select
+              onChange={(value) => handleSelectTypesOfLeave(record, value)}
+              defaultValue={reportData?.absenceType}
+              options={typesOfLeaveOptions}
+              className='tw-w-full'
+              showSearch
+              filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
+              allowClear
+            />
+          )
         )
       }
     },
     {
-      title: t('Loại phép'),
+      title: t('Ngày phép'),
       dataIndex: 'reportData',
-      key: 'reportData',
       ellipsis: true,
-      render: (reportData) => {
-        return reportData ? (
-          <Select
-            onChange={() => void {}}
-            defaultValue={reportData?.absenceType}
-            options={typesOfLeaveOptions}
-            className='tw-w-full'
-          />
-        ) : (
-          '--'
-        )
-      }
-    },
-    {
-      title: t('Ngày phép (ngày)'),
-      dataIndex: 'reportData',
-      key: 'reportData.absenceAmount',
-      ellipsis: true,
-      render: (reportData) => {
-        return reportData ? (
-          <Select
-            className='tw-w-full'
-            onChange={() => void {}}
-            defaultValue={reportData?.absenceAmount}
-            options={[
-              { value: 0.0, label: '0' },
-              { value: 0.5, label: '0.5' },
-              { value: 1, label: '1' }
-            ]}
-          />
-        ) : (
-          '--'
+      width: '102px',
+      render: (reportData, record) => {
+        return (
+          reportData?.workingAmount < 1 && (
+            <Select
+              className='tw-w-full'
+              onChange={(value) => handleSelectAbsenceAmount(record, value)}
+              defaultValue={parseFloat(reportData?.absenceAmount) || 0.0}
+              options={weightOptions}
+            />
+          )
         )
       }
     },
@@ -294,26 +406,9 @@ const Timesheet: React.FC = () => {
       dataIndex: '',
       key: '',
       ellipsis: true,
+      width: '250px',
       render: (record) => {
-        return record?.reportData ? (
-          <div className='timesheet-violate'>
-            {record?.reportData?.violate?.includes('LATE_COME') && (
-              <p className='timesheet-violate__lable'>{t('timesheet.lateForWork') || '--'}</p>
-            )}
-            {record?.reportData?.violate?.includes('EARLY_BACK') && (
-              <p className='timesheet-violate__lable timesheet-violate__lable--early'>
-                {t('timesheet.leavingTheCompanyEarly') || '--'}
-              </p>
-            )}
-            {record?.reportData?.violate?.includes('FORGET_TIME_ATTENDANCE') && (
-              <p className='timesheet-violate__lable timesheet-violate__lable--forget'>
-                {t('timesheet.forgetTimeAttendance') || '--'}
-              </p>
-            )}
-          </div>
-        ) : (
-          ''
-        )
+        return record?.reportData ? <ViolateAction data={record?.reportData} /> : ''
       }
     },
     {
@@ -321,8 +416,14 @@ const Timesheet: React.FC = () => {
       dataIndex: '',
       key: '',
       ellipsis: true,
-      render: () => {
-        return <Input onChange={() => void {}} defaultValue='' className='tw-w-full' />
+      render: (record) => {
+        return (
+          <Input
+            onChange={(e) => handleAddNote(record, e?.target?.value)}
+            defaultValue={record?.reportData?.note || ''}
+            className='tw-w-full'
+          />
+        )
       }
     }
     // {
@@ -376,12 +477,6 @@ const Timesheet: React.FC = () => {
       if (sorter.order) {
         sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
       }
-      //  else {
-      //   sorts.push({
-      //     direction: 'DESC',
-      //     field: 'date'
-      //   })
-      // }
       return { ...prevState, paging, sorts }
     })
   }
@@ -391,14 +486,17 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
-    dispatch(
+    const promiseFilterTypesOfLeave = dispatch(
       filterTypesOfLeave({
         paging: null,
         sorts: null,
         query: null
       })
     )
-    return () => promiseGetAllGroup.abort()
+    return () => {
+      promiseGetAllGroup.abort()
+      promiseFilterTypesOfLeave.abort()
+    }
   }, [])
 
   useEffect(() => {
@@ -430,7 +528,7 @@ const Timesheet: React.FC = () => {
     return () => {
       promise.abort()
     }
-  }, [searchValue])
+  }, [searchValue, clickUpdateButton])
 
   const sheetsData = [
     {
@@ -453,11 +551,16 @@ const Timesheet: React.FC = () => {
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
-        <TimesheetInfo data={timesheetSate.timesheetList} userInfo={currentAuth} handleOpenModal={setIsOpenModal} />
+        <TimesheetInfo
+          data={timesheetSate.timesheetList}
+          meta={timesheetSate?.meta}
+          userInfo={currentAuth}
+          handleOpenModal={setIsOpenModal}
+        />
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
-          <Col xs={24} lg={16}>
+          <Col xs={24} lg={18}>
             {mode === 'list' && (
               <Row gutter={[16, 16]}>
                 <Col xs={24} lg={6}>
@@ -535,11 +638,11 @@ const Timesheet: React.FC = () => {
             )}
           </Col>
           {mode === 'list' && (
-            <Col xs={24} lg={4} className='tw-flex tw-justify-end'>
+            <Col xs={24} lg={6} className='tw-flex'>
               <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
             </Col>
           )}
-          <Col xs={24} lg={4} className='timesheet-filter-tab'>
+          {/* <Col xs={24} lg={4} className='timesheet-filter-tab'>
             <Segmented
               options={[
                 { label: t('timesheet.calendar'), value: 'calendar' },
@@ -548,11 +651,48 @@ const Timesheet: React.FC = () => {
               defaultValue='calendar'
               onChange={(v) => setMode(v.toString())}
             />
-          </Col>
+          </Col> */}
         </Row>
         {mode === 'list' && (
           <>
-            <DaySelected data={timesheetSate.timesheetList} />
+            {/* <DaySelected meta={timesheetSate?.meta} /> */}
+            <div className='tw-mt-6'>
+              {/* <div className='timesheet-listday'>
+                {data.map((item) => (
+                  <div key={item.id} className={`${handleGenderColor(item.status)} timesheet-listday-item`}>
+                    <p className='tw-mb-1'>{handleGenderDayOfWeek(dayjs(item.date).day())}</p>
+                    <p className='tw-text-[18px]'>{dayjs(item.date).date()}</p>
+                  </div>
+                ))}
+              </div> */}
+              <Row gutter={[16, 16]}>
+                <Col xs={24} lg={12}>
+                  <div className='timesheet-workday'>
+                    <p>{t('timesheet.totalWorkingDay')}</p>
+                    <span>{timesheetSate?.meta?.total}</span>
+                  </div>
+                </Col>
+                <Col xs={24} lg={12} className='tw-flex'>
+                  <div className='tw-flex tw-ml-auto'>
+                    <div className='tw-mr-[30px]'>
+                      <Button onClick={() => handleUpdateAttendanceStatistic()}>Cập nhật</Button>
+                    </div>
+                    <div className='timesheet-statistic'>
+                      <p>{t('timesheet.leavingTheCompanyEarly')}</p>
+                      {/* <span>2</span> */}
+                    </div>
+                    <div className='timesheet-statistic timesheet-statistic__violate'>
+                      <p>{t('timesheet.lateForWork')}</p>
+                      {/* <span>1</span> */}
+                    </div>
+                    <div className='timesheet-statistic timesheet-statistic__waiting'>
+                      <p>{t('timesheet.forgetTimeAttendance')}</p>
+                      {/* <span>1</span> */}
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </div>
             <div className='tw-mt-6'>
               <Table
                 rowKey='id'
@@ -567,9 +707,9 @@ const Timesheet: React.FC = () => {
             </div>
           </>
         )}
-        {mode === 'calendar' && (
+        {/* {mode === 'calendar' && (
           <TimesheetCalendar data={timesheetSate.timesheetList} handleOpenModal={setIsOpenModal} />
-        )}
+        )} */}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>
