@@ -18,15 +18,18 @@ import CommonButton from '~/components/Button/CommonButton'
 import { getListDepartments } from '~/stores/features/department/department.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
-import { ACTION_TYPE } from '~/utils/helper'
+import { ACTION_TYPE, hasPermissionAndGroup } from '~/utils/helper'
 
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
+import { ROLE } from '~/constants/app.constant'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { userInfo } = useUserInfo()
   const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
   const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
@@ -388,6 +391,13 @@ const Department: React.FC = () => {
       dataParent: []
     })
   }
+  console.log(
+    hasPermissionAndGroup(
+      [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+      userInfo?.groupProfiles,
+      dataRender.listDataTitle
+    )
+  )
 
   return (
     <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
@@ -421,7 +431,15 @@ const Department: React.FC = () => {
             classNameProps='btn-add'
             typeProps={{
               type: 'primary',
-              size: 'middle'
+              size: 'middle',
+              display:
+                hasPermissionAndGroup(
+                  [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+                  userInfo?.groupProfiles,
+                  dataRender.listDataTitle
+                ) === false
+                  ? 'block'
+                  : 'none'
             }}
             onClick={() => {
               setShowModal({

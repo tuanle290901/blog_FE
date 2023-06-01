@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { ROLE } from '~/constants/app.constant.ts'
 import { IGroup } from '~/stores/features/master-data/master-data.slice.ts'
+import { IDepartmentTitle } from '~/types/department.interface'
 import { GroupProfile } from '~/types/user.interface.ts'
 dayjs.extend(utc)
 
@@ -46,5 +47,38 @@ export const hasPermission = (allowedRoles: ROLE[], groupProfiles?: GroupProfile
       break
     }
   }
+  return isHasPermission
+}
+
+export const hasPermissionAndGroup = (
+  allowedRoles: ROLE[],
+  groupProfiles?: GroupProfile[],
+  groupParrent?: IDepartmentTitle[]
+) => {
+  let isHasPermission = false
+  if (allowedRoles.length === 0) {
+    isHasPermission = false
+  }
+  console.log(groupParrent)
+  if (!groupParrent) {
+    isHasPermission = false
+  }
+  for (const role of allowedRoles) {
+    const foundRole = groupProfiles?.find((group) => group.role === role)
+    console.log(foundRole)
+    if (foundRole) {
+      console.log(
+        groupParrent?.find((data) => data?.code === foundRole.groupCode),
+        '11'
+      )
+      if (groupParrent?.find((data) => data?.code === foundRole.groupCode)) {
+        isHasPermission = true
+        break
+      }
+      break
+    }
+  }
+  console.log('groupProfiles', groupProfiles)
+  console.log('groupParrent', groupParrent)
   return isHasPermission
 }
