@@ -1,3 +1,4 @@
+## This project use node version 18.16.0
 
 ## Commit conventional
 - Commit message base on format:
