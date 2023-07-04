@@ -11,7 +11,11 @@ const initialState: AuthStateInterface = {
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    getUserInfo: () => {
+      //   TODO implement
+    }
+  },
   extraReducers: {}
 })
 
