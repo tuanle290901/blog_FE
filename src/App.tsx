@@ -1,7 +1,9 @@
 import React from 'react'
 import './App.scss'
-import MainLayout from './layouts/MainLayout'
+import { MainRoutes } from '~/routes/mainRoutes.tsx'
 
-const App: React.FC = () => <MainLayout>ABC</MainLayout>
+const App: React.FC = () => {
+  return <MainRoutes />
+}
 
 export default App
