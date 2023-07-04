@@ -1,8 +1,7 @@
 import React from 'react'
 import './App.scss'
+import MainLayout from './layouts/MainLayout'
 
-const App: React.FC = () => (
-  <h1 className='tw-text-3xl tw-text-center tw-text-red-500 tw-mt-10 tw-w-full tw-font-bold tw-underline'>app work!</h1>
-)
+const App: React.FC = () => <MainLayout>ABC</MainLayout>
 
 export default App

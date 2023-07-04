@@ -1,0 +1,45 @@
+.app-container {
+  .logo-vertical {
+    height: 57px;
+  }
+
+  .header-container {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .header-container__right {
+      margin-left: auto;
+    }
+  }
+
+  .content-container {
+    background-color: #f5f5f5;
+  }
+
+  .bell-icon-custom {
+    font-size: 24px;
+  }
+
+  .space-custom {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .menu-image {
+    width: 20px;
+  }
+
+  .hr-custom {
+    border: 1px solid #f5f5f5;
+    width: 80%;
+  }
+
+  .logo-title-container {
+    .logo-text-color {
+      color: #69c0ff;
+    }
+  }
+}
