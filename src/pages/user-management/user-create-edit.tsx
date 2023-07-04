@@ -67,8 +67,8 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void }> = ({ 
                 alt='avatar'
               />
             )}
+            <Button type='primary' shape='circle' icon={<EditOutlined />} className='tw-absolute tw-right-0 tw-top-0' />
           </div>
-          <Button type='primary' shape='circle' icon={<EditOutlined />} className='tw-absolute tw-right-0 tw-top-0' />
         </Upload>
         {/*<Radio.Group className='tw-mt-2'>*/}
         {/*  <Radio.Button className='tw-w-16' value='male'>*/}
