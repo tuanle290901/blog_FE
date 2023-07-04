@@ -3,7 +3,7 @@ import { API_URL } from '~/config/config.ts'
 import { LocalStorage } from '~/utils/local-storage.ts'
 
 const HttpService = axios.create({
-  baseURL: process.env.REACT_APP_API_KEY || API_URL,
+  baseURL: API_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -26,4 +26,4 @@ HttpService.interceptors.response.use(
     return error.response
   }
 )
-export default { HttpService }
+export default HttpService

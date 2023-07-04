@@ -1,3 +1,5 @@
+import LoginComponent from '~/pages/login'
+
 export interface IRoutes {
   path: string
   name: string
@@ -11,4 +13,11 @@ export const PUBLIC_PATH = {
   unauthorized: '/unauthorized'
 }
 
-export const PUBLIC_ROUTES: IRoutes[] = []
+export const PUBLIC_ROUTES: IRoutes[] = [
+  {
+    name: 'login',
+    path: PUBLIC_PATH.login,
+    component: LoginComponent,
+    allowedRoles: []
+  }
+]
