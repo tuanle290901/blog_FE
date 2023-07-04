@@ -1,0 +1,25 @@
+{
+  "userList": {
+    "member": "Thành viên",
+    "memberList": "Danh sách tất cả các thành viên",
+    "searchMember": "Tìm kiếm thành viên",
+    "addMember": "Thêm thành viên",
+    "fullName": "Họ và tên",
+    "dateOfBirth": "Ngày sinh",
+    "gender": "Giới tính",
+    "department": "Phòng ban",
+    "phoneNumber": "Số điện thoại",
+    "email": "Email",
+    "action": "Hành động",
+    "male": "Nam",
+    "female": "Nữ"
+  },
+  "userModal": {
+    "enterMemberName": "Nhập họ tên thành viên",
+    "selectDOB": "Chọn ngày sinh thành viên",
+    "selectDepartment": "Chọn phòng ban thành viên",
+    "enterPhoneNumber": "Nhập số điện thoại thành viên",
+    "enterEmail": "Nhập email thành viên",
+    "selectGender": "Chọn giới tính"
+  }
+}
