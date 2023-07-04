@@ -3,7 +3,7 @@ import { LocalStorage } from '~/utils/local-storage.ts'
 import { Navigate } from 'react-router-dom'
 const RequireAuth: React.FC<{ allowedRoles: Array<string>; children: any }> = ({ allowedRoles, children }) => {
   // TODO use state
-  const user = LocalStorage.getObject<{ role: string }>('user')
+  const user = LocalStorage.getObject<{ role: string }>('user') || { role: 'Guest' }
   if ((user && allowedRoles?.includes(user?.role)) || (allowedRoles.length === 0 && !!user)) {
     return children
   }

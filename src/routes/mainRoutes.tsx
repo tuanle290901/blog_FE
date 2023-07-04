@@ -3,6 +3,7 @@ import { PRIVATE_ROUTES } from '~/constants/private-routes.tsx'
 import { Suspense } from 'react'
 import { PUBLIC_ROUTES } from '~/constants/public-routes.tsx'
 import RequireAuth from '~/utils/RequiredAuth.tsx'
+import MainLayout from '~/layouts/MainLayout.tsx'
 
 export const MainRoutes = () => {
   return (
@@ -20,20 +21,21 @@ export const MainRoutes = () => {
           />
         )
       })}
-      {PRIVATE_ROUTES.map((item, index) => {
-        return (
-          <RequireAuth key={index} allowedRoles={item.allowedRoles}>
+      <Route path='/' element={<MainLayout />}>
+        {PRIVATE_ROUTES.map((item, index) => {
+          return (
             <Route
               path={item.path}
+              key={index}
               element={
-                <Suspense>
+                <RequireAuth allowedRoles={item.allowedRoles}>
                   <item.component />
-                </Suspense>
+                </RequireAuth>
               }
             />
-          </RequireAuth>
-        )
-      })}
+          )
+        })}
+      </Route>
     </Routes>
   )
 }

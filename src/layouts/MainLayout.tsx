@@ -11,12 +11,10 @@ import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
 import './style.scss'
+import { Outlet } from 'react-router-dom'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
-interface MyLayoutProps {
-  children: ReactNode
-}
 
 function getItem(
   label: React.ReactNode,
@@ -99,7 +97,7 @@ const dropdownItems = [
   }
 ]
 
-const MainLayout: React.FC<MyLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -138,7 +136,9 @@ const MainLayout: React.FC<MyLayoutProps> = ({ children }) => {
             </Dropdown>
           </div>
         </Header>
-        <Content className='content-container'>{children}</Content>
+        <Content className='content-container'>
+          <Outlet />
+        </Content>
       </Layout>
     </Layout>
   )
