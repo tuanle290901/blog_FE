@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { AuthStateInterface } from '~/stores/types/auth-state.interface.ts'
 
-const initialState = {
+const initialState: AuthStateInterface = {
   loading: false,
   userInfo: {}, // for user object
   userToken: null, // for storing the JWT
@@ -10,7 +11,11 @@ const initialState = {
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    getUserInfo: () => {
+      //   TODO implement
+    }
+  },
   extraReducers: {}
 })
 
