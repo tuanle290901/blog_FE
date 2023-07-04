@@ -1,7 +1,7 @@
 import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
-import React, { ReactNode, useState } from 'react'
+import React, { useState } from 'react'
 
 import logo from '../assets/images/logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/carry-out.png'
@@ -10,8 +10,8 @@ import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
-import './style.scss'
 import { Outlet } from 'react-router-dom'
+import './style.scss'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]

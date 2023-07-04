@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('./assets/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Roboto', sans-serif !important;
+}
+
 html,
 body,
 div,

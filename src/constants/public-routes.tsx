@@ -8,9 +8,9 @@ export interface IRoutes {
 }
 
 export const PUBLIC_PATH = {
-  login: '/login',
-  notfound: '/404',
-  unauthorized: '/unauthorized'
+  login: 'login',
+  notfound: '404',
+  unauthorized: 'unauthorized'
 }
 
 export const PUBLIC_ROUTES: IRoutes[] = [
