@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
-import { useAppSelector } from '~/stores/hook.ts'
-import HttpService from '~/config/api.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
+import { mockUserData } from '~/stores/features/user/mock-user-data.ts'
 
 export interface IUserState {
   userList: IUser[]
@@ -17,11 +16,17 @@ const initialState: IUserState = {
   currentRequestId: null
 }
 
-const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) => {
-  const response = await HttpService.get<IUser[]>('/api/user/getall', {
-    signal: thunkAPI.signal
+export const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) => {
+  // const response = await HttpService.get<IUser[]>('/api/user/getall', {
+  //   signal: thunkAPI.signal
+  // })
+  // return response.data
+  const fakeApi = new Promise<IUser[]>((resolve, reject) => {
+    setTimeout(() => {
+      resolve(mockUserData)
+    }, 1000)
   })
-  return response.data
+  return await fakeApi
 })
 
 const userSlice = createSlice({
