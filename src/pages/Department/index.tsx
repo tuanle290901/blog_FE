@@ -14,6 +14,7 @@ import CommonButton from '~/components/Button/CommonButton'
 import { ACTION_TYPE } from '~/utils/helper'
 import './index.scss'
 import DepartmentModal from './DepartmentModal'
+import CommondTable from '~/components/Table/CommonTable'
 
 interface DataType {
   key: React.Key
@@ -116,6 +117,7 @@ const Department: React.FC = () => {
   }
   const treeData = renderTreeRows(dataRender.listData)
 
+  console.log(treeData)
   const handleAction = async (action: object) => {
     console.log(action)
   }
@@ -350,13 +352,13 @@ const Department: React.FC = () => {
         data={showModal.data}
       />
       <Row className='tw-w-100' gutter={[12, 12]}>
-        <Table
+        <CommondTable
           dataSource={treeData}
           columns={columns}
           expandable={{ defaultExpandAllRows: false }}
-          style={{
-            width: '100%'
-          }}
+          isLoading={false}
+          meta={{ page: 1, total: 0, size: 10 }}
+          // hiddenPagination={true}
         />
       </Row>
     </div>
