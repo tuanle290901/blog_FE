@@ -19,7 +19,7 @@ const initialState: AuthStateInterface = {
   success: false // for monitoring the registration process.
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
-  const response = await HttpService.post<{ token: string }>('/videoinsight/api/auth/login', payload, {
+  const response = await HttpService.post<{ token: string }>('/api/auth/login', payload, {
     signal: thunkAPI.signal
   })
   return response.data

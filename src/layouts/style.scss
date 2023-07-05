@@ -52,27 +52,23 @@
   background-color: #e6f7ff;
 
   .auth-inner-container {
-    width: 75%;
-    height: 80%;
     display: flex;
     margin: auto;
 
     .auth-container__left {
-      width: 50%;
+      // width: 50%;
       background: linear-gradient(213.66deg, #69c0ff 38.11%, rgba(255, 204, 105, 0.4) 116.79%);
+      // background: url('../assets//images//login/sticker.png');
       background-repeat: no-repeat;
       background-position: bottom left, bottom right;
-
-      display: flex;
-      align-items: center;
 
       .inner-container {
         width: 70%;
         height: 70%;
         margin: auto;
-        padding: 60px;
+        // padding: 20px;
         box-sizing: border-box;
-        background-color: rgba(255, 255, 255, 0.3);
+        // background-color: rgba(255, 255, 255, 0.3);
 
         .text-title__one,
         .text-title__two {
@@ -99,7 +95,7 @@
     }
 
     .auth-container__right {
-      width: 50%;
+      // width: 50%;
       background-color: white;
     }
   }
