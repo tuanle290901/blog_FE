@@ -53,6 +53,7 @@
     "codeTooltip": "Vui lòng xem mã khởi tạo trong file",
     "confirmPassword": "Xác nhận mật khẩu",
     "requiredInput": "Vui lòng nhập",
+    "requiredSelect": "Vui lòng chọn",
     "group": "Nhóm",
     "loginInformation": "Thông tin đăng nhập",
     "detailInformation": "Thông tin chi tiết",
@@ -74,6 +75,11 @@
     "createRootAccountSuccess": "Thiết lập thông tin quản trị viên thành công",
     "createRootAccountError": "Thiết lập thông tin quản trị viên thất bại",
     "missOfInfo": "Vui lòng nhập thông tin cá nhân",
-    "needChangePassword": "Vui lòng đổi mật khẩu trước khi sử dụng"
+    "needChangePassword": "Vui lòng đổi mật khẩu trước khi sử dụng",
+    "type": "Phân loại",
+    "publishDate": "Ngày khởi tạo",
+    "invalidEmail": "Email không hợp lệ hoặc thừa khoảng trắng",
+    "invalidPhoneNumber": "Số điện thoại không hợp lệ",
+    "trim": "Vui lòng xóa khoảng trắng dư thừa"
   }
 }

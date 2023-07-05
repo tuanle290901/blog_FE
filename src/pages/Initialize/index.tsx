@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { InfoCircleOutlined, MailFilled } from '@ant-design/icons'
-import { Button, Col, Form, Tooltip, Row, Input } from 'antd'
+import { Button, Col, Form, Tooltip, Row, Input, Select, DatePicker } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 // import { REGEX_EMAIL, REGEX_PASSWORD, REGEX_TRIM, REGEX_ONLYTEXT, LOCAL_STORAGE } from '../../utils/Constants'
@@ -9,14 +9,21 @@ import './style.scss'
 // import CommonInput from '../../commons/components/Input/CommonInput'
 // import CommonInputPassword from '../../commons/components/Input/CommonInputPassword'
 
-interface Payload {
+interface IPayload {
   email: string
   address: string
   contactPhoneNumber: string
   password: string
   confirmPassword: string
   token: string
+  type: string
+  publishDate: string
 }
+
+const REGEX_PHONE_NUMBER = /^(?!(?:\D*0)+\D*$)\(?([0-9]{3})\)?[-. ]?[0-9]{4}[-. ]?[0-9]{3,4}$/
+const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%&])[A-Za-z\d@#$%&]{8,20}$/
+const REGEX_EMAIL = /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/
+const REGEX_TRIM = /^[^\s]+(\s+[^\s]+)*$/
 
 const Initialize: React.FC = () => {
   const { t } = useTranslation()
@@ -32,31 +39,31 @@ const Initialize: React.FC = () => {
       {
         required: true,
         message: `${t('rootInit.requiredInput')} ${t('rootInit.email')}`
+      },
+      {
+        pattern: REGEX_EMAIL,
+        message: `${t('rootInit.invalidEmail')}`
       }
-      // {
-      //   pattern: REGEX_EMAIL,
-      //   message: `${t('validation.auth.invalidEmail')}`
-      // }
     ],
     password: [
       {
         required: true,
         message: `${t('rootInit.requiredInput')} ${t('rootInit.password')}`
+      },
+      {
+        pattern: REGEX_PASSWORD,
+        message: t('rootInit.passwordRegex')
       }
-      // {
-      //   pattern: REGEX_PASSWORD,
-      //   message: t('validation.auth.passwordRegex')
-      // }
     ],
     confirmPassword: [
       {
         required: true,
         message: `${t('rootInit.requiredInput')} ${t('rootInit.confirmPassword')}`
+      },
+      {
+        pattern: REGEX_PASSWORD,
+        message: t('rootInit.passwordRegex')
       }
-      // {
-      //   pattern: REGEX_PASSWORD,
-      //   message: t('validation.auth.passwordRegex')
-      // }
     ]
   }
 
@@ -65,7 +72,7 @@ const Initialize: React.FC = () => {
   //   localStorage.setItem(LOCAL_STORAGE.USER_PROFILE, JSON.stringify(data))
   // }
 
-  const onSubmit = async (data: Payload) => {
+  const onSubmit = async (data: IPayload) => {
     try {
       if (data?.password !== data?.confirmPassword) {
         alert(t('changePassword.passwordNotMatch'))
@@ -75,7 +82,9 @@ const Initialize: React.FC = () => {
           address: data?.address,
           contactPhoneNumber: data?.contactPhoneNumber,
           password: data?.password,
-          token: data?.token
+          token: data?.token,
+          type: data?.type,
+          publishDate: data?.publishDate
         }
         console.log('initData', initData)
         // const resData = await RootInitializationService.initAdmin(initData)
@@ -94,12 +103,12 @@ const Initialize: React.FC = () => {
     <div className='root-initialization'>
       {/* <div className='root-banner' /> */}
       <div className='root-detail'>
-        <div className='root-detail-logo'>
+        {/* <div className='root-detail-logo'>
           <div className='root-detail-logo__img'>
             <img src={Logo} alt='' />
           </div>
           <div className='root-detail-logo__title'>HTIME</div>
-        </div>
+        </div> */}
         <div className='root-detail-form'>
           {!disableSubmit && <div className='root-detail-form__warning'>{t('rootInit.accountAvailable')}</div>}
           <div className='root-detail-form__title'>{t('rootInit.title')}</div>
@@ -123,11 +132,11 @@ const Initialize: React.FC = () => {
                 {
                   required: true,
                   message: `${t('rootInit.requiredInput')} ${t('rootInit.code')}`
+                },
+                {
+                  pattern: REGEX_TRIM,
+                  message: t('validation.trim')
                 }
-                // {
-                //   pattern: REGEX_TRIM,
-                //   message: t('validation.trim')
-                // }
               ]}
             >
               <Input
@@ -170,6 +179,58 @@ const Initialize: React.FC = () => {
             <div className='root-detail-form-main__title'>{t('rootInit.detailInformation')}</div>
             <Row gutter={16} align='middle'>
               <Col span={24} md={{ span: 12 }}>
+                <div className='root-detail-form-main__label required'>{t('rootInit.type')}</div>
+                <Form.Item
+                  name='type'
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('rootInit.requiredSelect')} ${t('rootInit.type')}`
+                    }
+                  ]}
+                >
+                  <Select
+                    className='root-detail-form-main__input'
+                    showSearch
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.type')}`}
+                    optionFilterProp='children'
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    options={[
+                      {
+                        value: 'group',
+                        label: 'Tập đoàn'
+                      },
+                      {
+                        value: 'company',
+                        label: 'Công ty'
+                      },
+                      {
+                        value: 'department',
+                        label: 'Phòng ban'
+                      }
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24} md={{ span: 12 }}>
+                <div className='root-detail-form-main__label required'>{t('rootInit.publishDate')}</div>
+                <Form.Item
+                  name='publishDate'
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('rootInit.requiredSelect')} ${t('rootInit.publishDate')}`
+                    }
+                  ]}
+                >
+                  <DatePicker
+                    className='root-detail-form-main__input'
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.publishDate')}`}
+                    format='DD/MM/YYYY'
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24} md={{ span: 12 }}>
                 <div className='root-detail-form-main__label required'>{t('rootInit.address')}</div>
                 <Form.Item
                   name='address'
@@ -177,11 +238,11 @@ const Initialize: React.FC = () => {
                     {
                       required: true,
                       message: `${t('rootInit.requiredInput')} ${t('rootInit.address')}`
+                    },
+                    {
+                      pattern: REGEX_TRIM,
+                      message: `${t('rootInit.address')} ${t('rootInit.trim')}`
                     }
-                    // {
-                    //   pattern: REGEX_ONLYTEXT,
-                    //   message: `${t('rootInit.address')} ${t('validation.onlyText')}`
-                    // }
                   ]}
                 >
                   <Input
@@ -198,11 +259,11 @@ const Initialize: React.FC = () => {
                     {
                       required: true,
                       message: `${t('rootInit.requiredInput')} ${t('rootInit.phoneNumber')}`
+                    },
+                    {
+                      pattern: REGEX_PHONE_NUMBER,
+                      message: t('rootInit.invalidPhoneNumber')
                     }
-                    // {
-                    //   pattern: REGEX_TRIM,
-                    //   message: t('validation.trim')
-                    // },
                   ]}
                 >
                   <Input

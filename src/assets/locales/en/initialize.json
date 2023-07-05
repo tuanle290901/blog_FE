@@ -53,6 +53,7 @@
     "codeTooltip": "Please check token in the file",
     "confirmPassword": "Confirm password",
     "requiredInput": "Please enter",
+    "requiredSelect": "Please select",
     "group": "Group",
     "loginInformation": "Login information",
     "detailInformation": "Details",
@@ -74,6 +75,11 @@
     "createRootAccountSuccess": "Successfully set up information for system admin",
     "createRootAccountError": "Failed  to set up information for system admin",
     "missOfInfo": "Please enter personal information",
-    "needChangePassword": "You should change your password before using"
+    "needChangePassword": "You should change your password before using",
+    "type": "Type",
+    "publishDate": "Publish date",
+    "invalidEmail": "Invalid email address or extra spaces",
+    "invalidPhoneNumber": "Invalid phone number",
+    "trim": "Please remove excess whitespace"
   }
 }
