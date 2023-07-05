@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import logo from '../assets/images/logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/carry-out.png'
@@ -10,8 +12,11 @@ import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import './style.scss'
+import { useAppDispatch } from '~/stores/hook'
+import { logout } from '~/stores/features/auth/auth.slice'
+import { PUBLIC_PATH } from '~/constants/public-routes'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -78,27 +83,36 @@ const menuItems: MenuItem[] = [
   )
 ]
 
-const dropdownItems = [
-  {
-    key: 'profile',
-    label: (
-      <div className='tw-flex tw-items-center'>
-        <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
-      </div>
-    )
-  },
-  {
-    key: 'signOut',
-    label: (
-      <div className='tw-flex tw-items-center tw-text-red-500'>
-        <LoginOutlined /> <span className='tw-ml-[8px] '>Đăng xuất</span>
-      </div>
-    )
-  }
-]
-
 const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate(`auth/${PUBLIC_PATH.login}`)
+  }
+
+  const dropdownItems = useMemo(() => {
+    return [
+      {
+        key: 'profile',
+        label: (
+          <div className='tw-flex tw-items-center'>
+            <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
+          </div>
+        )
+      },
+      {
+        key: 'signOut',
+        label: (
+          <div className='tw-flex tw-items-center tw-text-red-500' onClick={handleLogout}>
+            <LoginOutlined /> <span className='tw-ml-[8px] '>Đăng xuất</span>
+          </div>
+        )
+      }
+    ]
+  }, [])
 
   return (
     <Layout className='app-container tw-min-h-screen'>
