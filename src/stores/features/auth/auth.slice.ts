@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import HttpService from '~/config/api.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { fetchUserInfo } from '../user/user.slice'
 
 export interface AuthStateInterface {
   loading: boolean
@@ -23,7 +22,6 @@ const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunk
   const response = await HttpService.post<{ token: string }>('/api/auth/login', payload, {
     signal: thunkAPI.signal
   })
-  thunkAPI.dispatch(fetchUserInfo())
   return response.data
 })
 
