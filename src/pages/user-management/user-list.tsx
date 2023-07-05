@@ -7,7 +7,7 @@ import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { getListUser } from '~/stores/features/user/user.slice.ts'
+import { cancelEditingUser, getListUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 
 const { Search } = Input
 
@@ -18,12 +18,17 @@ const UserList: React.FC = () => {
   const userState = useAppSelector((state) => state.user)
   const handleClickEditUser = (user: IUser) => {
     //   TODO
+    dispatch(startEditingUser(user.id as string))
   }
   const handleClickDeleteUser = (user: IUser) => {
     //   TODO
   }
   const handleClickViewUserHistory = (user: IUser) => {
     //   TODO
+  }
+  const handleCloseUserModal = () => {
+    setIsOpenUserModal(false)
+    dispatch(cancelEditingUser())
   }
   const columns: ColumnsType<IUser> = [
     {
@@ -70,6 +75,7 @@ const UserList: React.FC = () => {
     {
       title: t('userList.action'),
       key: 'action',
+      align: 'center',
       render: (_, record) => {
         return (
           <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
@@ -92,13 +98,18 @@ const UserList: React.FC = () => {
 
   useEffect(() => {
     const promise = dispatch(getListUser())
+    promise.finally(() => console.log('final'))
     return () => {
       promise.abort()
     }
   }, [])
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <UserCreateEdit open={isOpenUserModal} handleClose={() => setIsOpenUserModal(false)} />
+      <UserCreateEdit
+        open={isOpenUserModal || !!userState.editingUser}
+        userData={userState.editingUser}
+        handleClose={handleCloseUserModal}
+      />
       <div>
         <h1 className='tw-text-3xl tw-font-semibold'>{t('userList.member')}(100)</h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
@@ -111,6 +122,7 @@ const UserList: React.FC = () => {
       </div>
       <div className='tw-mt-6'>
         <Table
+          rowKey='id'
           columns={columns}
           dataSource={userState.userList}
           loading={userState.loading}

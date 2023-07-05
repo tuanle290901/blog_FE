@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, DatePicker, Form, Input, message, Modal, Select, Upload, UploadFile, UploadProps } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
-import { useForm } from 'antd/es/form/Form'
 import { useTranslation } from 'react-i18next'
 import { RcFile, UploadChangeParam } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
+import dayjs, { Dayjs } from 'dayjs'
 
 const beforeUpload = (file: RcFile) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
@@ -19,20 +19,33 @@ const beforeUpload = (file: RcFile) => {
   }
   return isJpgOrPng && isLt2M
 }
-const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void }> = ({ open, handleClose }) => {
+const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userData?: IUser | null }> = ({
+  open,
+  handleClose,
+  userData
+}) => {
   const [t] = useTranslation()
   const [loading, setLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>()
-  const [form] = useForm<Partial<IUser>>()
+  const [form] = Form.useForm<Omit<IUser, 'dateOfBirth'> & { dateOfBirth: Dayjs }>()
   const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
     getBase64(info.file.originFileObj as RcFile, (url) => {
       setLoading(false)
       setImageUrl(url)
     })
   }
+  useEffect(() => {
+    if (userData) {
+      form.setFieldsValue({
+        ...userData,
+        dateOfBirth: dayjs(userData.dateOfBirth)
+      })
+    } else {
+      form.resetFields()
+    }
+  }, [userData])
   const handleSubmit = () => {
     const value = form.getFieldsValue()
-    console.log(value.dateOfBirth)
     handleClose()
   }
   return (
@@ -43,7 +56,8 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void }> = ({ 
       onOk={handleSubmit}
       okText={t('common.save')}
       cancelText={t('common.cancel')}
-      closable={false}
+      maskClosable={false}
+      forceRender
     >
       <div className='user-modal tw-flex tw-flex-col tw-justify-center tw-items-center '>
         <Upload
