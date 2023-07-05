@@ -62,27 +62,7 @@ const authSlice = createSlice({
             console.log(action.meta)
           }
         }
-      ),
-      builder
-        .addCase(fetchUserInfo.fulfilled, (state: AuthStateInterface, action) => {
-          state.userInfo = action.payload.userInfo
-        })
-        .addMatcher<PendingAction>(
-          (action): action is PendingAction => action.type.endsWith('/pending'),
-          (state, _) => {
-            state.loading = true
-          }
-        )
-        .addMatcher<RejectedAction | FulfilledAction>(
-          (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
-          (state, action) => {
-            if (state.loading) {
-              state.loading = false
-              // TODO handle error
-              console.log(action.meta)
-            }
-          }
-        )
+      )
   }
 })
 export { login }
