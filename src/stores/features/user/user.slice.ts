@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { mockUserData } from '~/stores/features/user/mock-user-data.ts'
+import HttpService from '~/config/api'
 
 export interface IUserState {
   userList: IUser[]
