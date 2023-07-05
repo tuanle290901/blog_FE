@@ -92,13 +92,13 @@ const Initialize: React.FC = () => {
 
   return (
     <div className='root-initialization'>
-      <div className='root-banner' />
+      {/* <div className='root-banner' /> */}
       <div className='root-detail'>
         <div className='root-detail-logo'>
           <div className='root-detail-logo__img'>
             <img src={Logo} alt='' />
           </div>
-          <div className='root-detail-logo__title'>{t('common.title')}</div>
+          <div className='root-detail-logo__title'>HTIME</div>
         </div>
         <div className='root-detail-form'>
           {!disableSubmit && <div className='root-detail-form__warning'>{t('rootInit.accountAvailable')}</div>}

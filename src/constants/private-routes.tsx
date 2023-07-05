@@ -1,4 +1,5 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
+import UserList from '~/pages/user-management/user-list.tsx'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -9,4 +10,11 @@ export const PRIVATE_PATH = {
     detail: 'user/detail'
   }
 }
-export const PRIVATE_ROUTES: IRoutes[] = []
+export const PRIVATE_ROUTES: IRoutes[] = [
+  {
+    name: 'users',
+    path: PRIVATE_PATH.user.prefix,
+    component: UserList,
+    allowedRoles: []
+  }
+]

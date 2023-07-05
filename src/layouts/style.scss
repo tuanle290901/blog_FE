@@ -43,3 +43,64 @@
     }
   }
 }
+
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background-color: #e6f7ff;
+
+  .auth-inner-container {
+    width: 75%;
+    height: 80%;
+    display: flex;
+    margin: auto;
+
+    .auth-container__left {
+      width: 50%;
+      background: linear-gradient(213.66deg, #69c0ff 38.11%, rgba(255, 204, 105, 0.4) 116.79%);
+      background-repeat: no-repeat;
+      background-position: bottom left, bottom right;
+
+      display: flex;
+      align-items: center;
+
+      .inner-container {
+        width: 70%;
+        height: 70%;
+        margin: auto;
+        padding: 60px;
+        box-sizing: border-box;
+        background-color: rgba(255, 255, 255, 0.3);
+
+        .text-title__one,
+        .text-title__two {
+          font-size: 32px;
+          font-weight: 500;
+          color: white;
+          letter-spacing: 0.06em;
+        }
+
+        .text-title__three {
+          font-size: 32px;
+          font-weight: 500;
+          color: #0050b3;
+          letter-spacing: 0.06em;
+        }
+
+        .text-title__four {
+          font-size: 14px;
+          font-weight: 300;
+          color: white;
+          letter-spacing: 0.04em;
+        }
+      }
+    }
+
+    .auth-container__right {
+      width: 50%;
+      background-color: white;
+    }
+  }
+}

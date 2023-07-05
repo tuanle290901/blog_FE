@@ -42,7 +42,7 @@
 
       &__img {
         img {
-          width: 100px;
+          width: 50px;
         }
       }
 
@@ -118,19 +118,19 @@
 
 @media (min-width: 768px) {
   .root-initialization {
-    .root-banner {
-      background-image: url('../../assets/images/root_bg.png');
-      background-repeat: no-repeat;
-      background-size: cover;
-      height: 100vh;
-      display: block;
-      width: 40%;
-    }
+    // .root-banner {
+    //   background-image: url('../../assets/images/root_bg.png');
+    //   background-repeat: no-repeat;
+    //   background-size: cover;
+    //   height: 100vh;
+    //   display: block;
+    //   width: 40%;
+    // }
 
     .root-detail {
       padding: 30px 50px;
       background-image: none;
-      width: 60%;
+      width: 90%;
       max-width: 1000px;
       margin: auto;
 
