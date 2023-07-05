@@ -2,7 +2,6 @@ import React from 'react'
 import { login } from '~/stores/features/auth/auth.slice.ts'
 import { useAppDispatch } from '~/stores/hook.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
-import { useTranslation } from 'react-i18next'
 
 import logo from '~/assets/images/logo.png'
 import iconHand from '~/assets/images/login/icon-hand.png'
@@ -12,20 +11,13 @@ import './style.scss'
 
 const LoginComponent: React.FC = () => {
   const dispatch = useAppDispatch()
-  const { t } = useTranslation()
 
   const onFinish = (formValues: LoginPayload) => {
-    console.log(formValues)
-    const payload: LoginPayload = { username: formValues.username, password: formValues.password }
-    dispatch(login(payload))
+    dispatch(login(formValues))
   }
 
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo)
-  }
-
-  const validateMessages = {
-    required: t('${name}-required')
   }
 
   return (
@@ -56,12 +48,11 @@ const LoginComponent: React.FC = () => {
           wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
-          validateMessages={validateMessages}
         >
           <Form.Item
             label={<div className='tw-font-semibold'>Tên đăng nhập</div>}
             name='username'
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: 'Please input your username!' }]}
           >
             <Input placeholder='Tên đăng nhập' className='login-input-custom' />
           </Form.Item>
@@ -69,7 +60,7 @@ const LoginComponent: React.FC = () => {
           <Form.Item
             label={<div className='tw-font-semibold'>Mật khẩu</div>}
             name='password'
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: 'Please input your password!' }]}
           >
             <Input.Password placeholder='Mật khẩu' className='login-input-custom' />
           </Form.Item>

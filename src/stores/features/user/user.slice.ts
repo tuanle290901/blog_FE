@@ -24,6 +24,13 @@ const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) => {
   return response.data
 })
 
+const fetchUserInfo = createAsyncThunk('user/userProfile', async (_, thunkAPI) => {
+  const response = await HttpService.get('/api/system-user/profile', {
+    signal: thunkAPI.signal
+  })
+  return response.data
+})
+
 const userSlice = createSlice({
   name: 'users',
   initialState,
@@ -64,4 +71,5 @@ const userSlice = createSlice({
       })
   }
 })
+export { fetchUserInfo }
 export default userSlice.reducer

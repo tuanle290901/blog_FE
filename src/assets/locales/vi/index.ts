@@ -1,6 +1,8 @@
 import common from './common.json'
 import userManagement from './user-management.json'
+import auth from './auth.json'
 export const vi = {
   ...common,
-  ...userManagement
+  ...userManagement,
+  ...auth
 }
