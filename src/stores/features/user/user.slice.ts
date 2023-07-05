@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { mockUserData } from '~/stores/features/user/mock-user-data.ts'
+import HttpService from '~/config/api'
 
 export interface IUserState {
   userList: IUser[]
@@ -27,6 +28,13 @@ export const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) 
     }, 1000)
   })
   return await fakeApi
+})
+
+const fetchUserInfo = createAsyncThunk('user/userProfile', async (_, thunkAPI) => {
+  const response = await HttpService.get('/api/system-user/profile', {
+    signal: thunkAPI.signal
+  })
+  return response.data
 })
 
 const userSlice = createSlice({
@@ -69,4 +77,5 @@ const userSlice = createSlice({
       })
   }
 })
+export { fetchUserInfo }
 export default userSlice.reducer

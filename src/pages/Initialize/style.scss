@@ -2,6 +2,7 @@
 
 .root-initialization {
   display: flex;
+  align-items: center;
 
   // .ant-form-item-label>label {
   //     font-weight: bold;
@@ -130,7 +131,7 @@
     // }
 
     .root-detail {
-      padding: 15px 50px;
+      padding: 30px 50px;
       background-image: none;
       width: 90%;
       max-width: 1000px;
