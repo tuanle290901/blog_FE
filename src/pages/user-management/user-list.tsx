@@ -8,6 +8,7 @@ import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { cancelEditingUser, getListUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import { useNavigate } from 'react-router-dom'
 
 const { Search } = Input
 
@@ -15,6 +16,7 @@ const UserList: React.FC = () => {
   const [t] = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const handleClickEditUser = (user: IUser) => {
     //   TODO
@@ -24,7 +26,7 @@ const UserList: React.FC = () => {
     //   TODO
   }
   const handleClickViewUserHistory = (user: IUser) => {
-    //   TODO
+    navigate('/user/history/' + user.id)
   }
   const handleCloseUserModal = () => {
     setIsOpenUserModal(false)
