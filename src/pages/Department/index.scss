@@ -1,0 +1,14 @@
+.page-department {
+  .btn-add {
+    border-radius: 0px !important;
+    .anticon.anticon-plus {
+      color: black !important;
+    }
+  }
+
+  .btn-add:hover {
+    .anticon.anticon-plus {
+      color: white !important;
+    }
+  }
+}

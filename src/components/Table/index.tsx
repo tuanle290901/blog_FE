@@ -88,8 +88,8 @@ const TableRead: React.FC = (props: any) => {
         // Thead style selector
         const allHeaderElement = document.querySelectorAll('.ant-table-thead>tr>th')
         allHeaderElement.forEach((element: any) => {
-          element.style.backgroundColor = isLightMode ? variablesColor.mainColor : 'red'
-          element.style.color = isLightMode ? variablesColor.colorWhite : '#B4E9FF'
+          element.style.backgroundColor = isLightMode ? variablesColor.mainColor : '#fafafa'
+          element.style.color = isLightMode ? variablesColor.colorWhite : 'black'
         })
         break
       }
@@ -142,7 +142,7 @@ const TableRead: React.FC = (props: any) => {
         }
       }}
       {...tableProps}
-      rowSelection={disabledRowSelection ? null : rowSelection}
+      rowSelection={disabledRowSelection ? undefined : rowSelection}
       pagination={
         hiddenPagination
           ? false

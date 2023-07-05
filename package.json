@@ -42,6 +42,7 @@
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
     "@types/react-i18next": "^8.1.0",
+    "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
     "@vitejs/plugin-react-swc": "^3.0.0",
