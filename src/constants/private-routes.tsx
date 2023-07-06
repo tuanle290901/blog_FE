@@ -3,6 +3,7 @@ import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import { lazy } from 'react'
+import Timesheet from '~/pages/timesheet/timesheet'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -12,7 +13,8 @@ export const PRIVATE_PATH = {
     update: 'user/update',
     detail: 'user/detail',
     history: 'user/history/:id'
-  }
+  },
+  timesheet: '/timesheet'
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
@@ -32,6 +34,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'userHistory',
     path: PRIVATE_PATH.user.history,
     component: UserHistory,
+    allowedRoles: []
+  },
+  {
+    name: 'timesheet',
+    path: PRIVATE_PATH.timesheet,
+    component: Timesheet,
     allowedRoles: []
   }
 ]

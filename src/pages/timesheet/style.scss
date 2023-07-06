@@ -1,0 +1,70 @@
+.timesheet {
+  &-listday {
+    color: #fff;
+    display: flex;
+    margin-bottom: 10px;
+    &-item {
+      text-align: center;
+      padding: 8px 10px;
+      margin-right: 6px;
+    }
+  }
+  &-workday {
+    display: flex;
+    align-items: center;
+
+    p {
+      margin-right: 8px;
+    }
+
+    span {
+      font-weight: bold;
+      font-size: 25px;
+      padding-left: 8px;
+      border-left: solid 1px #d9d9d9;
+    }
+  }
+
+  &-statistic {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-right: 23px;
+    border-right: solid 1px #d9d9d9;
+    &:last-child {
+      border-right: none;
+      margin-right: 0;
+    }
+
+    p {
+      margin-right: 8px;
+    }
+
+    span {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    &::before {
+      background-color: #73d13d;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -8px;
+      transform: translate(-50%, -50%);
+    }
+
+    &__violate::before {
+      background-color: #ff4d4f;
+      content: '';
+    }
+
+    &__waiting::before {
+      background-color: #096dd9;
+      content: '';
+    }
+  }
+}
