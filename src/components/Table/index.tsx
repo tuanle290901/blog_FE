@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Table } from 'antd'
 import { useTranslation } from 'react-i18next'
+import { SizeType } from 'antd/es/config-provider/SizeContext'
 
 const defaultTitle = () => 'Here is title'
 const defaultFooter = () => 'Here is footer'
@@ -27,7 +28,7 @@ const TableRead: React.FC = (props: any) => {
   } = props
   const { t } = useTranslation()
   const [bordered, setBordered] = useState<boolean>(false)
-  const [size, setSize] = useState<string>('large')
+  const [size, setSize] = useState<SizeType>('large')
   const [showTitle, setShowTitle] = useState<boolean>(false)
   const [showHeader, setShowHeader] = useState<boolean>(true)
   const [showfooter, setShowFooter] = useState<boolean>(false)
@@ -142,6 +143,7 @@ const TableRead: React.FC = (props: any) => {
         }
       }}
       {...tableProps}
+      size={size || undefined}
       rowSelection={disabledRowSelection ? undefined : rowSelection}
       pagination={
         hiddenPagination
@@ -163,7 +165,7 @@ const TableRead: React.FC = (props: any) => {
                 page: t('pagination.page')
               },
 
-              position: ['none', 'bottomRight'],
+              position: ['bottomRight'],
               onChange: (page: number, pageSize: number) => handlePropsChange(page, pageSize)
             }
       }

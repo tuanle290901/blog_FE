@@ -19,8 +19,8 @@ export const PRIVATE_PATH = {
     approvalProcess: 'approval-process'
   },
   department: {
-    prefix: 'departments',
-    prefixmany: 'departments/:departmentId'
+    prefix: 'department',
+    prefixmany: 'department/:departmentId'
   }
 }
 
