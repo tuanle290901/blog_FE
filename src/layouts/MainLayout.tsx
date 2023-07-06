@@ -37,52 +37,6 @@ function getItem(
   } as MenuItem
 }
 
-const menuItems: MenuItem[] = [
-  getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
-  getItem(
-    <Tooltip placement='topLeft' title='Chức năng chính'>
-      Chức năng chính
-    </Tooltip>,
-    'mainFunction',
-    null,
-    [
-      getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
-        getItem('Lịch sử chấm công', 'timeKeepingHistory'),
-        getItem('Lịch sử yêu cầu', 'requestHistory'),
-        getItem('Danh sách yêu cầu', 'requestList')
-      ])
-    ],
-    'group'
-  ),
-
-  getItem(
-    <Tooltip placement='topLeft' title='Chức năng quản lý'>
-      Chức năng quản lý
-    </Tooltip>,
-    'manageFunction',
-    null,
-    [
-      getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
-      getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
-    ],
-    'group'
-  ),
-
-  getItem(
-    <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
-      Cấu hình hệ thống
-    </Tooltip>,
-    'systemConfig',
-    null,
-    [
-      getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
-        getItem('Thời gian làm việc', 'timeWorking')
-      ])
-    ],
-    'group'
-  )
-]
-
 const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
   const dispatch = useAppDispatch()
@@ -114,6 +68,61 @@ const MainLayout: React.FC = () => {
     ]
   }, [])
 
+  const menuItems: MenuItem[] = useMemo(() => {
+    return [
+      getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
+      getItem(
+        <Tooltip placement='topLeft' title='Chức năng chính'>
+          Chức năng chính
+        </Tooltip>,
+        'mainFunction',
+        null,
+        [
+          getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
+            getItem('Lịch sử chấm công', 'timeKeepingHistory'),
+            getItem('Lịch sử yêu cầu', 'requestHistory'),
+            getItem('Danh sách yêu cầu', 'requestList')
+          ])
+        ],
+        'group'
+      ),
+
+      getItem(
+        <Tooltip placement='topLeft' title='Chức năng quản lý'>
+          Chức năng quản lý
+        </Tooltip>,
+        'manageFunction',
+        null,
+        [
+          getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
+          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
+        ],
+        'group'
+      ),
+
+      getItem(
+        <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
+          Cấu hình hệ thống
+        </Tooltip>,
+        'systemConfig',
+        null,
+        [
+          getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
+            getItem('Thời gian làm việc', 'timeWorking'),
+            getItem('Quy trình phê duyệt phép', 'approval-process')
+          ])
+        ],
+        'group'
+      )
+    ]
+  }, [])
+
+  const handleMenuClick = (menu: MenuItem) => {
+    if (menu?.key) {
+      navigate(menu.key.toString())
+    }
+  }
+
   return (
     <Layout className='app-container tw-min-h-screen'>
       <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -126,7 +135,7 @@ const MainLayout: React.FC = () => {
           )}
         </div>
         <hr className='hr-custom' />
-        <Menu theme='light' defaultSelectedKeys={['1']} mode='inline' items={menuItems} />
+        <Menu theme='light' defaultSelectedKeys={['1']} mode='inline' items={menuItems} onClick={handleMenuClick} />
       </Sider>
       <Layout>
         <Header className='header-container'>
