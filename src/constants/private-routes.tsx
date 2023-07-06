@@ -4,6 +4,7 @@ import UserList from '~/pages/user-management/user-list.tsx'
 import ApprovalProcess from '~/pages/setting/approval-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import { lazy } from 'react'
+import Department from '~/pages/Department'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -16,6 +17,10 @@ export const PRIVATE_PATH = {
   },
   setting: {
     approvalProcess: 'approval-process'
+  },
+  department: {
+    prefix: 'department',
+    prefixmany: 'department/:departmentId'
   }
 }
 
@@ -42,6 +47,18 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'userHistory',
     path: PRIVATE_PATH.user.history,
     component: UserHistory,
+    allowedRoles: []
+  },
+  {
+    path: PRIVATE_PATH.department.prefix,
+    name: 'department',
+    component: Department,
+    allowedRoles: []
+  },
+  {
+    path: PRIVATE_PATH.department.prefixmany,
+    name: 'department',
+    component: Department,
     allowedRoles: []
   }
 ]

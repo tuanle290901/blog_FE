@@ -1,15 +1,62 @@
-import React, { useEffect, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table } from 'antd'
-import { useTranslation } from 'react-i18next'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
+import { ColumnType, ColumnGroupType, Key } from 'antd/es/table/interface'
+import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const defaultTitle = () => 'Here is title'
 const defaultFooter = () => 'Here is footer'
 
-const TableRead: React.FC = (props: any) => {
+interface IColumn {
+  title?: string | (() => React.ReactNode)
+  dataIndex?: string
+  key?: React.ReactNode | undefined
+  render?: (value: string, record: any) => React.ReactNode
+  width?: number | undefined
+  className?: string | ''
+  ellipsis?: boolean | undefined
+}
+
+interface IMeta {
+  page: number | 1
+  total: number | undefined
+  size: number | 10
+}
+
+interface expandable {
+  defaultExpandAllRows: boolean | false
+}
+interface IPropsTableCommon {
+  columns: IColumn[]
+  dataSource: any[]
+  isLoading?: boolean | false
+  mode?: string | ''
+  meta?: IMeta
+  handleSelectedRowsKeyChange?: (newSelectedRowKeys: any) => React.ReactNode | undefined
+  handlePropsChange?: (page: number, pageSize: number) => React.ReactNode | undefined
+  handleDoubleClickRow?: (record: any, rowIndex: any, event: any) => React.ReactNode | undefined
+  checkedList?: string[]
+  disabledRowSelection?: boolean | false
+  hiddenPagination?: boolean | true
+  yScrollProp?: string
+  xScrollProp?: number
+  triggerDesc?: string
+  triggerAsc?: string
+  cancelSort?: string
+  rowKey?: string
+  expandable?: expandable | null
+}
+
+interface IScroll {
+  y?: number
+  x?: string
+}
+
+const CommondTable: React.FC<IPropsTableCommon> = (props) => {
   const {
     columns,
-    listOfData,
+    dataSource,
     isLoading,
     mode,
     meta,
@@ -24,22 +71,24 @@ const TableRead: React.FC = (props: any) => {
     triggerDesc,
     triggerAsc,
     cancelSort,
-    rowKey
+    rowKey,
+    expandable
   } = props
   const { t } = useTranslation()
-  const [bordered, setBordered] = useState<boolean>(false)
-  const [size, setSize] = useState<SizeType>('large')
-  const [showTitle, setShowTitle] = useState<boolean>(false)
-  const [showHeader, setShowHeader] = useState<boolean>(true)
-  const [showfooter, setShowFooter] = useState<boolean>(false)
-  const [tableLayout, setTableLayout] = useState<undefined>(undefined)
-  const [ellipsis, setEllipsis] = useState<boolean>(false)
-  const [yScroll, setYScroll] = useState<boolean>(false)
-  const [xScroll, setXScroll] = useState<string>('fixed')
+  const [bordered] = useState<boolean>(false)
+  const [size] = useState<SizeType>('large')
+  const [showTitle] = useState<boolean>(false)
+  const [showHeader] = useState<boolean>(true)
+  const [showfooter] = useState<boolean>(false)
+  const [tableLayout] = useState<undefined>(undefined)
+  const [ellipsis] = useState<boolean>(false)
+  const [yScroll] = useState<boolean>(false)
+  const [xScroll] = useState<string>('fixed')
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
   const variablesColor: any = {}
-  const scroll: any = {}
+  const scroll: IScroll = {}
+
   if (yScroll) {
     scroll.y = 240
   } else if (yScrollProp) {
@@ -51,16 +100,9 @@ const TableRead: React.FC = (props: any) => {
     scroll.y = xScrollProp
   }
 
-  const tableColumns = columns.map((item: any) => {
-    return {
-      ...item,
-      ellipsis
-    }
-  })
   const tableProps = {
     bordered,
     loading: isLoading,
-    size,
     title: showTitle ? defaultTitle : undefined,
     showHeader,
     footer: showfooter ? defaultFooter : undefined,
@@ -70,7 +112,9 @@ const TableRead: React.FC = (props: any) => {
 
   const onSelectChange = (newSelectedRowKeys: any) => {
     setSelectedRowKeys(newSelectedRowKeys)
-    handleSelectedRowsKeyChange(newSelectedRowKeys)
+    if (handleSelectedRowsKeyChange) {
+      handleSelectedRowsKeyChange(newSelectedRowKeys)
+    }
   }
   const rowSelection = {
     fixed: true,
@@ -82,11 +126,10 @@ const TableRead: React.FC = (props: any) => {
     onModeChange('head')
   }, [mode, checkedList])
 
-  const onModeChange = (type: any) => {
+  const onModeChange = (type: string) => {
     const isLightMode = mode === 'light'
     switch (type) {
       case 'head': {
-        // Thead style selector
         const allHeaderElement = document.querySelectorAll('.ant-table-thead>tr>th')
         allHeaderElement.forEach((element: any) => {
           element.style.backgroundColor = isLightMode ? variablesColor.mainColor : '#fafafa'
@@ -102,8 +145,19 @@ const TableRead: React.FC = (props: any) => {
   }
 
   const onDoubleClickRow = (record: any, rowIndex: any, event: any) => {
-    handleDoubleClickRow(record, rowIndex, event)
+    if (handleDoubleClickRow) {
+      handleDoubleClickRow(record, rowIndex, event)
+    }
   }
+
+  const tableColumns: (ColumnType<any> | ColumnGroupType<any>)[] = columns.map((item: IColumn) => {
+    const { key, ...rest } = item
+    return {
+      ...rest,
+      ellipsis,
+      key: key !== false ? (key as Key) : undefined
+    }
+  })
 
   return (
     <Table
@@ -111,29 +165,6 @@ const TableRead: React.FC = (props: any) => {
         triggerDesc: triggerDesc || t('sort.triggerDesc'),
         triggerAsc: triggerAsc || t('sort.triggerAsc'),
         cancelSort: cancelSort || t('sort.cancelSort')
-        // emptyText: (
-        //   <div>
-        //     <svg
-        //       className='ant-empty-img-simple'
-        //       width='64'
-        //       height='41'
-        //       viewBox='0 0 64 41'
-        //       xmlns='http://www.w3.org/2000/svg'
-        //     >
-        //       <g transform='translate(0 1)' fill='none' fillRule='evenodd'>
-        //         <ellipse className='ant-empty-img-simple-ellipse' cx='32' cy='33' rx='32' ry='7' />
-        //         <g className='ant-empty-img-simple-g' fillRule='nonzero'>
-        //           <path d='M55 12.76L44.854 1.258C44.367.474 43.656 0 42.907 0H21.093c-.749 0-1.46.474-1.947 1.257L9 12.761V22h46v-9.24z' />
-        //           <path
-        //             d='M41.613 15.931c0-1.605.994-2.93 2.227-2.931H55v18.137C55 33.26 53.68 35 52.05 35h-40.1C10.32 35 9 33.259 9 31.137V13h11.16c1.233 0 2.227 1.323 2.227 2.928v.022c0 1.605 1.005 2.901 2.237 2.901h14.752c1.232 0 2.237-1.308 2.237-2.913v-.007z'
-        //             className='ant-empty-img-simple-path'
-        //           />
-        //         </g>
-        //       </g>
-        //     </svg>
-        //     <div>{t('noData')}</div>
-        //   </div>
-        // )
       }}
       onRow={(record: any, rowIndex: any) => {
         return {
@@ -142,15 +173,15 @@ const TableRead: React.FC = (props: any) => {
           }
         }
       }}
-      {...tableProps}
       size={size || undefined}
+      {...tableProps}
       rowSelection={disabledRowSelection ? undefined : rowSelection}
       pagination={
         hiddenPagination
           ? false
           : {
               className: 'd-flex justify-content-end align-items-center',
-              current: meta?.page + 1,
+              current: meta && meta.page + 1,
               total: meta?.total,
               defaultPageSize: meta?.size,
               pageSize: meta?.size,
@@ -166,15 +197,20 @@ const TableRead: React.FC = (props: any) => {
               },
 
               position: ['bottomRight'],
-              onChange: (page: number, pageSize: number) => handlePropsChange(page, pageSize)
+              onChange: (page: number, pageSize: number) => {
+                if (handlePropsChange) {
+                  handlePropsChange(page, pageSize)
+                }
+              }
             }
       }
       columns={tableColumns}
-      dataSource={listOfData?.length > 0 ? listOfData : []}
+      expandable={expandable ? { ...expandable } : undefined}
+      dataSource={dataSource?.length > 0 ? dataSource : []}
       scroll={scroll}
       rowKey={rowKey}
     />
   )
 }
 
-export default TableRead
+export default CommondTable
