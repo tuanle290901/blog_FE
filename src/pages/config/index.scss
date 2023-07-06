@@ -1,0 +1,214 @@
+.configure-working-time {
+  .header {
+    h1 {
+      color: var(--neutral-10, #262626);
+      font-size: 30px;
+      font-family: Roboto;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 50px;
+    }
+  }
+
+  .content {
+    padding-top: 16px;
+
+    .common-time {
+      width: 100%;
+
+      .common-time-content {
+        max-width: 1100px;
+
+        .timelines,
+        .working-time-together {
+          display: flex;
+
+          .layble-page-time {
+            width: 300px;
+          }
+        }
+
+        .working-time-together {
+          height: 450px;
+          overflow-x: auto;
+          padding-right: 20px;
+
+          .list-day-working {
+            width: 800px;
+          }
+        }
+
+        p {
+          font-weight: 600;
+        }
+
+        .monthly-closing-date {
+          display: flex;
+          margin: 10px 0;
+
+          p {
+            display: flex;
+            width: 250px;
+          }
+
+          .ant-input-number,
+          .ant-picker {
+            margin: -10px 10px 10px 10px;
+          }
+        }
+
+        .monthly-closing-date-default {
+          .ant-input-number,
+          .ant-picker {
+            margin-left: 0px !important;
+          }
+        }
+
+        .config-day {
+          display: flex;
+          align-items: center;
+          position: relative;
+          margin: 10px 0;
+          border: 1px solid #595959;
+          padding: 1% 2%;
+          padding-right: 5%;
+          width: calc(100% - 50px);
+
+          .ant-switch {
+            margin-right: 16px;
+          }
+
+          .separation-point {
+            width: 9px;
+            height: 8px;
+            display: block;
+            background: #595959;
+            border-radius: 4px;
+            margin: 0 16px;
+          }
+
+          .activated {
+            width: 300px;
+            display: flex;
+          }
+
+          .button-extend {
+            margin-left: 8px;
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 12px;
+          }
+
+          .action-shift {
+            position: absolute;
+            bottom: 12px;
+            right: 5px;
+
+            button {
+              margin: 0 5px;
+            }
+          }
+
+          .first-shift,
+          .sercond-shift {
+            display: flex;
+            align-items: center;
+            width: 100%;
+          }
+
+          .item-shift {
+            width: 170px;
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        .config-day-grid {
+          display: grid;
+
+          .activated,
+          .first-shift,
+          .sercond-shift {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+          }
+
+          .first-shift p {
+            display: block;
+            width: 100px;
+          }
+
+          .first-shift i {
+            margin: 0 10px;
+          }
+
+          .custom {
+            margin: 0 5px;
+          }
+        }
+      }
+
+      .common-time-button {
+        display: flex;
+        justify-content: flex-end;
+
+        .ant-btn {
+          margin: 0 10px;
+        }
+      }
+    }
+
+    .common-holiday {
+      padding: 2% 5%;
+
+      .header {
+        display: flex;
+        background-color: #e6f7ff;
+        justify-content: space-between;
+        padding: 2% 20px;
+
+        h1 {
+          font-size: 28px;
+        }
+      }
+
+      .content {
+        padding: 2% 0;
+
+        .ant-picker-body {
+          background-color: #f5f5f5;
+        }
+
+        .ant-picker-calendar-header {
+          display: none;
+        }
+
+        thead {
+          border-bottom: 1px solid blue;
+
+          th {
+            text-align: center;
+          }
+        }
+
+        .ant-picker-calendar-date {
+          display: flex;
+          height: 50px;
+          justify-content: center;
+          border-top: none;
+
+          .ant-picker-calendar-date-content {
+            height: auto;
+            margin: -5px 0 0 4px;
+          }
+        }
+      }
+
+      .create-holiday {
+      }
+    }
+  }
+}

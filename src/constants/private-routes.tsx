@@ -5,6 +5,7 @@ import ApprovalProcess from '~/pages/setting/approval-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import Department from '~/pages/Department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
+import Config from '~/pages/config/index.tsx'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -22,7 +23,10 @@ export const PRIVATE_PATH = {
     prefix: 'department',
     prefixmany: 'department/:departmentId'
   },
-  devices: '/devices'
+  devices: '/devices',
+  config: {
+    prefix: '/timeWorking'
+  }
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
@@ -66,6 +70,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     path: PRIVATE_PATH.department.prefixmany,
     name: 'department',
     component: Department,
+    allowedRoles: []
+  },
+  {
+    name: 'config',
+    path: PRIVATE_PATH.config.prefix,
+    component: Config,
     allowedRoles: []
   }
 ]
