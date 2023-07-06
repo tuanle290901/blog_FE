@@ -1,0 +1,71 @@
+.box-item {
+  height: 40px;
+  background-color: white;
+  border: 1px solid rgb(189, 182, 182);
+  border-radius: 2px;
+  padding: 10px 20px;
+  cursor: move;
+  min-width: 100px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.dropped-box-item {
+  height: 11rem;
+  width: 11rem;
+  color: black;
+  float: left;
+  background-color: white;
+  border: 1px dashed #b9bec7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-item-target {
+  .item-tartget__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    .button-start-end {
+      height: 26px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+    }
+  }
+
+  .item-tartget__bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 200px;
+  }
+
+  .drop-box__name {
+    width: 150px;
+    height: 36px;
+    background-color: #d8dadd;
+    color: black;
+    padding: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    position: relative;
+
+    .icon-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}

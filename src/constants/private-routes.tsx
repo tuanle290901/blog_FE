@@ -1,6 +1,9 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
+import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
+import ApprovalProcess from '~/pages/setting/approval-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
+import Department from '~/pages/Department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 
 export const PRIVATE_PATH = {
@@ -12,14 +15,33 @@ export const PRIVATE_PATH = {
     detail: 'user/detail',
     history: 'user/history/:id'
   },
+  setting: {
+    approvalProcess: 'approval-process'
+  },
+  department: {
+    prefix: 'department',
+    prefixmany: 'department/:departmentId'
+  },
   devices: '/devices'
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
   {
+    name: 'dashboard',
+    path: PRIVATE_PATH.home,
+    component: Dashboard,
+    allowedRoles: []
+  },
+  {
     name: 'users',
     path: PRIVATE_PATH.user.prefix,
     component: UserList,
+    allowedRoles: []
+  },
+  {
+    name: PRIVATE_PATH.setting.approvalProcess,
+    path: PRIVATE_PATH.setting.approvalProcess,
+    component: ApprovalProcess,
     allowedRoles: []
   },
   {
@@ -32,6 +54,18 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'devices',
     path: PRIVATE_PATH.devices,
     component: DeviceList,
+    allowedRoles: []
+  },
+  {
+    path: PRIVATE_PATH.department.prefix,
+    name: 'department',
+    component: Department,
+    allowedRoles: []
+  },
+  {
+    path: PRIVATE_PATH.department.prefixmany,
+    name: 'department',
+    component: Department,
     allowedRoles: []
   }
 ]
