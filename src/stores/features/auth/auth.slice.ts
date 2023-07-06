@@ -19,7 +19,7 @@ const initialState: AuthStateInterface = {
   success: false // for monitoring the registration process.
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
-  const response = await HttpService.post<{ token: string }>('/videoinsight/api/auth/login', payload, {
+  const response = await HttpService.post<{ token: string }>('/api/auth/login', payload, {
     signal: thunkAPI.signal
   })
   return response.data
@@ -28,7 +28,18 @@ const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunk
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    setAccessToken: (state, action) => {
+      state.accessToken = action.payload.accessToken
+    },
+    logout: (state) => {
+      state.accessToken = null
+      state.userInfo = {}
+      state.loading = false
+      state.error = null
+      state.success = false
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state: AuthStateInterface, action) => {
@@ -53,4 +64,5 @@ const authSlice = createSlice({
   }
 })
 export { login }
+export const { logout, setAccessToken } = authSlice.actions
 export default authSlice.reducer

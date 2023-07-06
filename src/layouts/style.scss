@@ -43,3 +43,60 @@
     }
   }
 }
+
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background-color: #e6f7ff;
+
+  .auth-inner-container {
+    display: flex;
+    margin: auto;
+
+    .auth-container__left {
+      // width: 50%;
+      background: linear-gradient(213.66deg, #69c0ff 38.11%, rgba(255, 204, 105, 0.4) 116.79%);
+      // background: url('../assets//images//login/sticker.png');
+      background-repeat: no-repeat;
+      background-position: bottom left, bottom right;
+
+      .inner-container {
+        width: 70%;
+        height: 70%;
+        margin: auto;
+        // padding: 20px;
+        box-sizing: border-box;
+        // background-color: rgba(255, 255, 255, 0.3);
+
+        .text-title__one,
+        .text-title__two {
+          font-size: 32px;
+          font-weight: 500;
+          color: white;
+          letter-spacing: 0.06em;
+        }
+
+        .text-title__three {
+          font-size: 32px;
+          font-weight: 500;
+          color: #0050b3;
+          letter-spacing: 0.06em;
+        }
+
+        .text-title__four {
+          font-size: 14px;
+          font-weight: 300;
+          color: white;
+          letter-spacing: 0.04em;
+        }
+      }
+    }
+
+    .auth-container__right {
+      // width: 50%;
+      background-color: white;
+    }
+  }
+}

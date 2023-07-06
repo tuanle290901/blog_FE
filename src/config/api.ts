@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API_URL } from '~/config/config.ts'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 import { LocalStorage } from '~/utils/local-storage.ts'
 
 const HttpService = axios.create({
@@ -11,8 +12,8 @@ const HttpService = axios.create({
   }
 })
 HttpService.interceptors.request.use((config: any) => {
-  const token = LocalStorage.get('token')
-  return { ...config, headers: { ...config.headers, Authorization: `Bearer ${token}` } }
+  const accessToken = LocalStorage.get(LOCAL_STORAGE.ACCESS_TOKEN)
+  return { ...config, headers: { ...config.headers, Authorization: `Bearer ${accessToken}` } }
 })
 HttpService.interceptors.response.use(
   (response) => response,

@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
-import React, { ReactNode, useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import logo from '../assets/images/logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/carry-out.png'
@@ -10,8 +12,11 @@ import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
+import { Outlet, useNavigate } from 'react-router-dom'
 import './style.scss'
-import { Outlet } from 'react-router-dom'
+import { useAppDispatch } from '~/stores/hook'
+import { logout } from '~/stores/features/auth/auth.slice'
+import { PUBLIC_PATH } from '~/constants/public-routes'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -32,73 +37,91 @@ function getItem(
   } as MenuItem
 }
 
-const menuItems: MenuItem[] = [
-  getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
-  getItem(
-    <Tooltip placement='topLeft' title='Chức năng chính'>
-      Chức năng chính
-    </Tooltip>,
-    'mainFunction',
-    null,
-    [
-      getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
-        getItem('Lịch sử chấm công', 'timeKeepingHistory'),
-        getItem('Lịch sử yêu cầu', 'requestHistory'),
-        getItem('Danh sách yêu cầu', 'requestList')
-      ])
-    ],
-    'group'
-  ),
-
-  getItem(
-    <Tooltip placement='topLeft' title='Chức năng quản lý'>
-      Chức năng quản lý
-    </Tooltip>,
-    'manageFunction',
-    null,
-    [
-      getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
-      getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
-    ],
-    'group'
-  ),
-
-  getItem(
-    <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
-      Cấu hình hệ thống
-    </Tooltip>,
-    'systemConfig',
-    null,
-    [
-      getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
-        getItem('Thời gian làm việc', 'timeWorking')
-      ])
-    ],
-    'group'
-  )
-]
-
-const dropdownItems = [
-  {
-    key: 'profile',
-    label: (
-      <div className='tw-flex tw-items-center'>
-        <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
-      </div>
-    )
-  },
-  {
-    key: 'signOut',
-    label: (
-      <div className='tw-flex tw-items-center tw-text-red-500'>
-        <LoginOutlined /> <span className='tw-ml-[8px] '>Đăng xuất</span>
-      </div>
-    )
-  }
-]
-
 const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate(`auth/${PUBLIC_PATH.login}`)
+  }
+
+  const dropdownItems = useMemo(() => {
+    return [
+      {
+        key: 'profile',
+        label: (
+          <div className='tw-flex tw-items-center'>
+            <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
+          </div>
+        )
+      },
+      {
+        key: 'signOut',
+        label: (
+          <div className='tw-flex tw-items-center tw-text-red-500' onClick={handleLogout}>
+            <LoginOutlined /> <span className='tw-ml-[8px] '>Đăng xuất</span>
+          </div>
+        )
+      }
+    ]
+  }, [])
+
+  const menuItems: MenuItem[] = useMemo(() => {
+    return [
+      getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
+      getItem(
+        <Tooltip placement='topLeft' title='Chức năng chính'>
+          Chức năng chính
+        </Tooltip>,
+        'mainFunction',
+        null,
+        [
+          getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
+            getItem('Lịch sử chấm công', 'timeKeepingHistory'),
+            getItem('Lịch sử yêu cầu', 'requestHistory'),
+            getItem('Danh sách yêu cầu', 'requestList')
+          ])
+        ],
+        'group'
+      ),
+
+      getItem(
+        <Tooltip placement='topLeft' title='Chức năng quản lý'>
+          Chức năng quản lý
+        </Tooltip>,
+        'manageFunction',
+        null,
+        [
+          getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
+          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
+        ],
+        'group'
+      ),
+
+      getItem(
+        <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
+          Cấu hình hệ thống
+        </Tooltip>,
+        'systemConfig',
+        null,
+        [
+          getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
+            getItem('Thời gian làm việc', 'timeWorking'),
+            getItem('Quy trình phê duyệt phép', 'approval-process')
+          ])
+        ],
+        'group'
+      )
+    ]
+  }, [])
+
+  const handleMenuClick = (menu: MenuItem) => {
+    if (menu?.key) {
+      navigate(menu.key.toString())
+    }
+  }
 
   return (
     <Layout className='app-container tw-min-h-screen'>
@@ -112,7 +135,7 @@ const MainLayout: React.FC = () => {
           )}
         </div>
         <hr className='hr-custom' />
-        <Menu theme='light' defaultSelectedKeys={['1']} mode='inline' items={menuItems} />
+        <Menu theme='light' defaultSelectedKeys={['1']} mode='inline' items={menuItems} onClick={handleMenuClick} />
       </Sider>
       <Layout>
         <Header className='header-container'>

@@ -2,14 +2,8 @@ import { DatePicker, Form, Input, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE, REGEX_TRIM } from '~/utils/helper'
-interface IDepartmentModal {
-  onClose: () => void
-  onOk: () => void
-  showModal: boolean
-  typeModel: string
-  data: any
-}
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data } = props

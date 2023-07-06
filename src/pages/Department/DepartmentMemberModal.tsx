@@ -8,29 +8,7 @@ import { useTranslation } from 'react-i18next'
 import IconStartSVG from '~/assets/svg/iconStart'
 import IconUserDownSVG from '~/assets/svg/iconUserDown'
 import IconUserUpSVG from '~/assets/svg/iconUserUp'
-interface IDepartmentModal {
-  onClose: () => void
-  onOk: () => void
-  showModal: boolean
-  typeModel: string
-  data: any
-}
-
-interface ListDataType {
-  name: string
-  email?: string
-  picture: string
-  loading: boolean
-  role: string
-  id?: number
-}
-
-interface DataMemberRender {
-  listDataUp: ListDataType[]
-  listDataDown: ListDataType[]
-  listDataUpFilter?: ListDataType[]
-  listDataDownFilter?: ListDataType[]
-}
+import { DataMemberRender, IDepartmentModal, ListDataType } from '~/types/department.interface'
 
 const { Search } = Input
 const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
@@ -82,7 +60,7 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
         }
       })
     } else {
-      setListDataRender((prev) => ({
+      setListDataRender((prev: DataMemberRender) => ({
         ...prev,
         listDataUpFilter: prev.listDataUp,
         listDataDownFilter: prev.listDataDown
@@ -125,7 +103,7 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   }
 
   const onCancel = async () => {
-    setListDataRender((prev) => ({
+    setListDataRender((prev: DataMemberRender) => ({
       ...prev,
       listDataUpFilter: prev.listDataUp,
       listDataDownFilter: prev.listDataDown

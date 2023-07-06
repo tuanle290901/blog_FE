@@ -16,6 +16,7 @@ import './index.scss'
 import DepartmentModal from './DepartmentModal'
 import CommondTable from '~/components/Table/CommonTable'
 import DepartmentMemberModal from './DepartmentMemberModal'
+import { IModelState } from '~/types/department.interface'
 
 interface DataType {
   key: React.Key
@@ -30,11 +31,7 @@ const Department: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const [showModal, setShowModal] = useState<{
-    openModal: boolean
-    type: string
-    data: any
-  }>({
+  const [showModal, setShowModal] = useState<IModelState>({
     openModal: false,
     type: '',
     data: null
@@ -301,7 +298,6 @@ const Department: React.FC = () => {
   return (
     <div className='tw-p-[20px] tw-bg-white page-department'>
       <Row className='tw-w-100'>
-        {/* <div className='d-flex align-items-center'> */}
         <div
           className='tw-cursor-pointer tw-w-[42px] tw-h-[42px] tw-rounded-sm tw-border-solid 
           tw-border-[1px] tw-border-[#d9d9d9] tw-flex tw-items-center tw-justify-center tw-mr-[15px]'

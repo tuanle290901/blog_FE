@@ -1,3 +1,24 @@
+.user-list {
+  .ant-table-body {
+    overflow: auto !important;
+  }
+}
+.ant-modal-content {
+  padding: 0 !important;
+  .ant-modal-header {
+    padding: 16px 24px;
+    margin: 0;
+  }
+  .ant-modal-body {
+    @apply tw-border-y tw-border-solid tw-border-[#eee];
+    padding: 16px 24px;
+  }
+  .ant-modal-footer {
+    padding: 16px 24px;
+    margin: 0;
+  }
+}
+
 /* width */
 ::-webkit-scrollbar {
   height: 5px; /* height of horizontal scrollbar ← You're missing this */
