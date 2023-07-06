@@ -1,24 +1,52 @@
 import { Col, Row } from 'antd'
 import React from 'react'
 import { IAttendance } from '~/types/attendance.interface'
+import dayjs from 'dayjs'
 
 const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
+  const handleGenderColor = (status: string) => {
+    switch (status) {
+      case 'ontime':
+        return 'tw-bg-[#389E0D]'
+      case 'waiting':
+        return 'tw-bg-[#096DD9]'
+      case 'early':
+        return 'tw-bg-[#D46B08]'
+      case 'late':
+        return 'tw-bg-[#D46B08]'
+      default:
+        return 'tw-bg-[#BFBFBF]'
+    }
+  }
+
+  const handleGenderDayOfWeek = (day: number) => {
+    switch (day) {
+      case 0:
+        return 'CN'
+      case 1:
+        return 'T2'
+      case 2:
+        return 'T3'
+      case 3:
+        return 'T4'
+      case 4:
+        return 'T5'
+      case 5:
+        return 'T6'
+      case 6:
+        return 'T7'
+      default:
+        return '--'
+    }
+  }
+
   return (
     <div>
       <div className='timesheet-listday'>
         {data.map((item) => (
-          <div
-            key={item.id}
-            className={`${
-              item.status === 'ontime'
-                ? 'tw-bg-[#389E0D]'
-                : item.status === 'waiting'
-                ? 'tw-bg-[#096DD9]'
-                : 'tw-bg-[#D46B08]'
-            } timesheet-listday-item`}
-          >
-            <p className='tw-mb-1'>{item.date}</p>
-            <p className='tw-text-[18px]'>{item.date}</p>
+          <div key={item.id} className={`${handleGenderColor(item.status)} timesheet-listday-item`}>
+            <p className='tw-mb-1'>{handleGenderDayOfWeek(dayjs(item.date).day())}</p>
+            <p className='tw-text-[18px]'>{dayjs(item.date).date()}</p>
           </div>
         ))}
       </div>

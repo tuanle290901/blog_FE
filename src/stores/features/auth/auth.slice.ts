@@ -19,10 +19,48 @@ const initialState: AuthStateInterface = {
   success: false // for monitoring the registration process.
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
-  const response = await HttpService.post<{ token: string }>('/api/auth/login', payload, {
+  const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
     signal: thunkAPI.signal
   })
   return response.data
+})
+
+const fetchUserInfo = createAsyncThunk('auth/userInfo', async (_, thunkAPI) => {
+  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
+  //   signal: thunkAPI.signal
+  // })
+  const response = new Promise<any>((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          id: '64717d50114e783f00873888',
+          userName: 'admin',
+          email: 'demo@htigroup.vn',
+          fullName: 'Quản trị viên',
+          phoneNumber: '0373130002',
+          isChangedPass: true,
+          role: 'Admin',
+          status: 'Active',
+          createdAt: '2023-05-27T10:47:28.417',
+          createdBy: {
+            fullName: 'SYSTEM'
+          },
+          updatedAt: '2023-06-19T17:11:40.978',
+          updatedBy: {
+            fullName: 'Root',
+            email: 'demo.gps@htigroup.vn',
+            username: 'root',
+            phoneNumber: '0373130002',
+            workUnitName: 'HTSC',
+            role: 'SystemAdmin'
+          }
+        },
+        message: 'Lấy dữ liệu thành công.',
+        status: 200
+      })
+    }, 1000)
+  })
+  return await response
 })
 
 const authSlice = createSlice({
@@ -43,7 +81,11 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(login.fulfilled, (state: AuthStateInterface, action) => {
-        state.accessToken = action.payload.token
+        state.accessToken = action.payload.accessToken
+        state.success = true
+      })
+      .addCase(fetchUserInfo.fulfilled, (state: AuthStateInterface, action) => {
+        state.userInfo = action.payload.data
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
@@ -63,6 +105,7 @@ const authSlice = createSlice({
       )
   }
 })
-export { login }
+
+export { login, fetchUserInfo }
 export const { logout, setAccessToken } = authSlice.actions
 export default authSlice.reducer

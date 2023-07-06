@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 import { IAttendance } from '~/types/attendance.interface'
+import dayjs from 'dayjs'
 
 const Timesheet: React.FC = () => {
   const { RangePicker } = DatePicker
@@ -19,22 +20,25 @@ const Timesheet: React.FC = () => {
       title: t('Ngày điểm danh'),
       dataIndex: 'date',
       key: 'date',
-      ellipsis: true
+      ellipsis: true,
+      render: (date) => {
+        return dayjs(date).format('DD/MM/YYYY')
+      }
     },
     {
       title: t('Thời gian đến'),
       dataIndex: 'timeStart',
       key: 'timeStart',
-      render: (text) => {
-        return text || '--'
+      render: (timeStart, record) => {
+        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{timeStart || '--'}</span>
       }
     },
     {
       title: t('Thời gian về'),
       dataIndex: 'timeEnd',
       key: 'timeEnd',
-      render: (text) => {
-        return text || '--'
+      render: (timeEnd, record) => {
+        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{timeEnd || '--'}</span>
       }
     },
     {
@@ -71,11 +75,17 @@ const Timesheet: React.FC = () => {
   ]
 
   const attendanceList: IAttendance[] = [
-    { id: '123abc', date: '20/06/2023', timeStart: '08:25', timeEnd: '17:26', status: 'early' },
-    { id: '234abc', date: '21/06/2023', timeStart: '08:20', timeEnd: '17:35', status: 'ontime' },
-    { id: '345abc', date: '22/06/2023', timeStart: '08:35', timeEnd: '17:32', status: 'late' },
-    { id: '456abc', date: '23/06/2023', timeStart: '09:10', timeEnd: '17:55', status: 'waiting' },
-    { id: '567abc', date: '24/06/2023', timeStart: '', timeEnd: '', status: '' }
+    { id: '1abc', date: '2023-07-20', timeStart: '08:25', timeEnd: '17:26', status: 'early' },
+    { id: '2abc', date: '2023-07-21', timeStart: '08:20', timeEnd: '17:35', status: 'ontime' },
+    { id: '3abc', date: '2023-07-22', timeStart: '08:35', timeEnd: '17:32', status: 'late' },
+    { id: '4abc', date: '2023-07-23', timeStart: '', timeEnd: '', status: '' },
+    { id: '5abc', date: '2023-07-24', timeStart: '08:10', timeEnd: '17:45', status: 'ontime' },
+    { id: '6abc', date: '2023-07-25', timeStart: '07:10', timeEnd: '17:56', status: 'ontime' },
+    { id: '7abc', date: '2023-07-26', timeStart: '08:10', timeEnd: '17:51', status: 'ontime' },
+    { id: '8abc', date: '2023-07-27', timeStart: '07:10', timeEnd: '17:52', status: 'ontime' },
+    { id: '9abc', date: '2023-07-28', timeStart: '08:10', timeEnd: '17:55', status: 'ontime' },
+    { id: '10abc', date: '2023-07-29', timeStart: '09:10', timeEnd: '17:55', status: 'waiting' },
+    { id: '567abc', date: '2023-07-30', timeStart: '', timeEnd: '', status: '' }
   ]
 
   return (

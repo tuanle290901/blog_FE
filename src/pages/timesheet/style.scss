@@ -3,6 +3,8 @@
     color: #fff;
     display: flex;
     margin-bottom: 10px;
+    max-width: 100%;
+    overflow-x: scroll;
     &-item {
       text-align: center;
       padding: 8px 10px;
