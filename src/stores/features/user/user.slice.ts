@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { mockUserData } from '~/stores/features/user/mock-user-data.ts'
-import HttpService from '~/config/api'
 
 export interface IUserState {
   userList: IUser[]
@@ -30,13 +29,21 @@ export const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) 
   return await fakeApi
 })
 
-const fetchUserInfo = createAsyncThunk('user/userProfile', async (_, thunkAPI) => {
-  const response = await HttpService.get('/api/system-user/profile', {
-    signal: thunkAPI.signal
-  })
-  return response.data
+export const getUserById = createAsyncThunk('users/getById', async (userId: string, thunkAPI) => {
+  // TODO implement
+  return userId
 })
-
+export const createUser = createAsyncThunk('users/create', (body: IUser, thunkAPI) => {
+  // TODO implement
+  return body
+})
+export const updateUser = createAsyncThunk('users/create', (body: { userId: string; newUser: IUser }, thunkAPI) => {
+  // TODO implement
+  return body
+})
+export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
+  return userId
+})
 const userSlice = createSlice({
   name: 'users',
   initialState,
@@ -77,5 +84,5 @@ const userSlice = createSlice({
       })
   }
 })
-export { fetchUserInfo }
+export const { startEditingUser, cancelEditingUser } = userSlice.actions
 export default userSlice.reducer
