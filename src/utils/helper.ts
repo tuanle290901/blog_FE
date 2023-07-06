@@ -1,6 +1,7 @@
 export const ACTION_TYPE = {
   Created: 'created',
-  Updated: 'updated'
+  Updated: 'updated',
+  View: 'view'
 }
 
 export const REGEX_TRIM = /^[^\s]+(\s+[^\s]+)*$/

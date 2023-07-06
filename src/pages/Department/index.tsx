@@ -15,6 +15,7 @@ import { ACTION_TYPE } from '~/utils/helper'
 import './index.scss'
 import DepartmentModal from './DepartmentModal'
 import CommondTable from '~/components/Table/CommonTable'
+import DepartmentMemberModal from './DepartmentMemberModal'
 
 interface DataType {
   key: React.Key
@@ -38,6 +39,7 @@ const Department: React.FC = () => {
     type: '',
     data: null
   })
+
   const onSearch = (value: string) => {
     console.log(value)
   }
@@ -116,11 +118,6 @@ const Department: React.FC = () => {
     })
   }
   const treeData = renderTreeRows(dataRender.listData)
-
-  console.log(treeData)
-  const handleAction = async (action: object) => {
-    console.log(action)
-  }
 
   const [useSelect, setUseSelect] = useState<any>(null)
 
@@ -228,7 +225,16 @@ const Department: React.FC = () => {
             </span>
           </Tooltip>
           <Tooltip title={t('team')}>
-            <div style={{ cursor: 'pointer' }}>
+            <div
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                setShowModal({
+                  openModal: true,
+                  type: ACTION_TYPE.View,
+                  data: record
+                })
+              }}
+            >
               <span>
                 <IconTeamSVG width={21} height={23} fill='' />
               </span>
@@ -344,13 +350,23 @@ const Department: React.FC = () => {
           <Search placeholder='input search text' onSearch={onSearch} style={{ width: '30%' }} />
         </Col>
       </Row>
-      <DepartmentModal
-        onClose={() => onCancelModel()}
-        onOk={() => onCancelModel()}
-        showModal={showModal.openModal}
-        typeModel={showModal.type}
-        data={showModal.data}
-      />
+      {showModal.type !== ACTION_TYPE.View ? (
+        <DepartmentModal
+          onClose={() => onCancelModel()}
+          onOk={() => onCancelModel()}
+          showModal={showModal.openModal}
+          typeModel={showModal.type}
+          data={showModal.data}
+        />
+      ) : (
+        <DepartmentMemberModal
+          onClose={() => onCancelModel()}
+          onOk={() => onCancelModel()}
+          showModal={showModal.openModal}
+          typeModel={showModal.type}
+          data={showModal.data}
+        />
+      )}
       <Row className='tw-w-100' gutter={[12, 12]}>
         <CommondTable
           dataSource={treeData}

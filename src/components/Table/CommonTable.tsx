@@ -18,7 +18,6 @@ interface IColumn {
 interface IMeta {
   page?: number | 1
   total?: number | undefined
-  // defaultPageSize?: number | undefined
   size?: number | 10
 }
 
@@ -31,13 +30,13 @@ interface IPropsTableCommon {
   isLoading?: boolean | false
   mode?: string | ''
   meta?: IMeta
-  handleSelectedRowsKeyChange?: () => void
+  handleSelectedRowsKeyChange?: (newSelectedRowKeys: any) => void
   handlePropsChange?: (page: number, pageSize: number) => void
   handleDoubleClickRow?: () => void
   checkedList?: string[]
   disabledRowSelection?: boolean | false
   hiddenPagination?: boolean | true
-  yScrollProp?: number
+  yScrollProp?: string
   xScrollProp?: number
   triggerDesc?: string
   triggerAsc?: string
@@ -51,7 +50,7 @@ interface IScroll {
   x?: string
 }
 
-const CommondTable: React.FC<IPropsTableCommon> = (props: any) => {
+const CommondTable: React.FC<IPropsTableCommon> = (props) => {
   const {
     columns,
     dataSource,

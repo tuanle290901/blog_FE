@@ -3,24 +3,23 @@ import React, { ReactNode, KeyboardEvent, ClipboardEvent, ClipboardEventHandler 
 import { VALIDATE_FORM } from '~/utils/helper'
 
 interface ICommonInput {
-  id: string
-  classNameProps: string
-  placeholder: string
-  value: string
-  disabled: boolean
-  defaultValue: string
-  allowClear: boolean
-  maxLength: number
-  prefix: ReactNode
-  suffix: ReactNode
+  id?: string
+  classNameProps?: string
+  placeholder?: string
+  value?: string
+  disabled?: boolean
+  defaultValue?: string
+  allowClear?: boolean
+  maxLength?: number
+  prefix?: ReactNode
+  suffix?: ReactNode
   onPaste: (e: ClipboardEvent<HTMLInputElement>) => void
-  onChange: (e: React.FocusEvent<HTMLInputElement, Element>) => void
-  onKeyPress: (e: React.FocusEvent<HTMLInputElement, Element>) => void
-  onPressEnter: (e: KeyboardEvent<HTMLInputElement>) => void
-  typeProps: object
-  styleProps: object
-  onBlur: (e: React.FocusEvent<HTMLInputElement, Element>) => void
-  autoComplete: string
+  onChange?: (e: React.FocusEvent<HTMLInputElement, Element>) => void
+  onPressEnter?: (e: KeyboardEvent<HTMLInputElement>) => void
+  typeProps?: object
+  styleProps?: object
+  onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void
+  autoComplete?: string
 }
 
 const CommonInput: React.FC<ICommonInput> = (props) => {
@@ -37,7 +36,6 @@ const CommonInput: React.FC<ICommonInput> = (props) => {
     suffix,
     onPaste,
     onChange,
-    onKeyPress,
     onPressEnter,
     typeProps,
     styleProps,
