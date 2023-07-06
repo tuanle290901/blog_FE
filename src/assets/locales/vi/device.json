@@ -1,0 +1,15 @@
+{
+  "device": {
+    "deviceCode": "Mã thiết bị",
+    "installationLocation": "Vị trí lắp đặt",
+    "departmentManager": "Tổ chức/phòng ban quản lý",
+    "action": "Hành động",
+    "addDevice": "Thêm thiết bị",
+    "updateDevice": "Cập nhật thông tin thiết bị",
+    "deviceListTitle": "Danh sách thiết bị chấm công",
+    "deviceListSubTitle": "Quản lí các thiết bị chấm công có trong hệ thống",
+    "enterDeviceCode": "Nhập mã thiết bị",
+    "enterInstallationLocation": "Nhập vị trí lắp đặt",
+    "selectDepartment": "Chọn tổ chức/phòng ban"
+  }
+}
