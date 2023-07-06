@@ -1,6 +1,8 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
+import UserHistory from '~/pages/user-management/user-history.tsx'
+import { lazy } from 'react'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -8,9 +10,11 @@ export const PRIVATE_PATH = {
     prefix: '/users',
     create: '/user/create',
     update: 'user/update',
-    detail: 'user/detail'
+    detail: 'user/detail',
+    history: 'user/history/:id'
   }
 }
+
 export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: 'dashboard',
@@ -22,6 +26,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'users',
     path: PRIVATE_PATH.user.prefix,
     component: UserList,
+    allowedRoles: []
+  },
+  {
+    name: 'userHistory',
+    path: PRIVATE_PATH.user.history,
+    component: UserHistory,
     allowedRoles: []
   }
 ]
