@@ -1,16 +1,21 @@
-import React from 'react'
-import { login } from '~/stores/features/auth/auth.slice.ts'
-import { useAppDispatch } from '~/stores/hook.ts'
+import React, { useEffect } from 'react'
+import { fetchUserInfo, login } from '~/stores/features/auth/auth.slice.ts'
+import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
 
 import logo from '~/assets/images/logo.png'
 import iconHand from '~/assets/images/login/icon-hand.png'
-import { Button, Col, Form, Input, Row } from 'antd'
+import { Button, Col, Form, Input, Row, Spin } from 'antd'
 
 import './style.scss'
+import { useNavigate } from 'react-router-dom'
+import { LocalStorage } from '~/utils/local-storage'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 
 const LoginComponent: React.FC = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const loginState = useAppSelector((state) => state.auth)
 
   const onFinish = (formValues: LoginPayload) => {
     dispatch(login(formValues))
@@ -19,6 +24,20 @@ const LoginComponent: React.FC = () => {
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo)
   }
+
+  useEffect(() => {
+    if (loginState.accessToken && loginState.success) {
+      LocalStorage.set(LOCAL_STORAGE.ACCESS_TOKEN, loginState.accessToken)
+      dispatch(fetchUserInfo())
+    }
+  }, [dispatch, loginState.accessToken, loginState.success])
+
+  useEffect(() => {
+    if (loginState.userInfo.userName) {
+      LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
+      navigate('/')
+    }
+  }, [loginState.userInfo, navigate])
 
   return (
     <div className='login-container tw-pt-[15%]'>
@@ -70,7 +89,7 @@ const LoginComponent: React.FC = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
-            <Button className='login-button tw-w-full' type='primary' htmlType='submit'>
+            <Button className='login-button tw-w-full' type='primary' htmlType='submit' loading={loginState.loading}>
               Đăng nhập
             </Button>
           </Form.Item>

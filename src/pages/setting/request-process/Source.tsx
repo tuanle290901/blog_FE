@@ -4,26 +4,17 @@ import { useDrag } from 'react-dnd'
 import { ItemTypes } from './ItemTypes'
 
 import './style.scss'
+import { DropItem } from '~/types/setting-request-process'
 
-export interface BoxProps {
-  id: string
-  name: string
-}
-
-interface DropResult {
-  id: string
-  name: string
-}
-
-export const Box: FC<BoxProps> = function Box({ id, name }) {
+const Source: FC<DropItem> = function Source({ id, name }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
-    item: { name },
+    item: { id, name },
     end: (item, monitor) => {
-      const dropResult = monitor.getDropResult<DropResult>()
-      //   if (item && dropResult) {
-      //     console.log(item.name, dropResult, 'drag')
-      //   }
+      const dropResult = monitor.getDropResult<DropItem>()
+      if (item && dropResult) {
+        // TODO
+      }
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -42,3 +33,5 @@ export const Box: FC<BoxProps> = function Box({ id, name }) {
     </div>
   )
 }
+
+export default Source

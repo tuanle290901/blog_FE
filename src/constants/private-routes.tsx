@@ -1,7 +1,7 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
-import ApprovalProcess from '~/pages/setting/approval-process'
+import ApprovalProcess from '~/pages/setting/request-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import Department from '~/pages/Department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
@@ -17,7 +17,7 @@ export const PRIVATE_PATH = {
     history: 'user/history/:id'
   },
   setting: {
-    approvalProcess: 'approval-process'
+    requestProcess: 'request-process'
   },
   department: {
     prefix: 'department',
@@ -43,8 +43,8 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: PRIVATE_PATH.setting.approvalProcess,
-    path: PRIVATE_PATH.setting.approvalProcess,
+    name: PRIVATE_PATH.setting.requestProcess,
+    path: PRIVATE_PATH.setting.requestProcess,
     component: ApprovalProcess,
     allowedRoles: []
   },

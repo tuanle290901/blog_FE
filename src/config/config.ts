@@ -1,1 +1,1 @@
-export const API_URL = 'https://themis-50.htsc.vn:18087'
+export const API_URL = 'http://192.168.133.110:8088'
