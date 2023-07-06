@@ -1,7 +1,7 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
-import ApprovalProcess from '~/pages/setting/approval-process'
+import ApprovalProcess from '~/pages/setting/request-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import { lazy } from 'react'
 

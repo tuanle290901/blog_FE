@@ -4,19 +4,9 @@ import { useDrop } from 'react-dnd'
 import { Empty, Space, Tooltip } from 'antd'
 import { CloseCircleFilled } from '@ant-design/icons'
 import { ItemTypes } from './ItemTypes'
+import { DropItem, DustbinProps } from '~/types/setting-request-process'
 
-interface DustbinProps {
-  dustbinKey: string
-  onDrop: (item: DropItem, dustbinKey: string) => void
-  dropItem: any
-}
-
-export interface DropItem {
-  id: string
-  name: string
-}
-
-export const Dustbin: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
+const Target: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
     drop: (item: DropItem) => {
@@ -44,8 +34,8 @@ export const Dustbin: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
       )}
       {dropItem?.length > 0 && (
         <Space direction='vertical'>
-          {dropItem.map((item: any) => (
-            <div key={item.id} className='tw-relative'>
+          {dropItem.map((item: DropItem, index: number) => (
+            <div key={index} className='tw-relative'>
               <Tooltip title={item.name} placement='left'>
                 <div className='drop-box__name'>{item.name}</div>
               </Tooltip>
@@ -59,3 +49,5 @@ export const Dustbin: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
     </div>
   )
 }
+
+export default Target
