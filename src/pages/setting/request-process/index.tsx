@@ -66,6 +66,7 @@ const Index: FC = memo(function Index() {
     <DndProvider backend={HTML5Backend}>
       <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
         <div className='tw-h-1/4'>
+          <div className='department-title tw-font-semibold tw-text-xl tw-mt-2 tw-mb-2'>Title</div>
           <Space align='end' wrap>
             {sourceBoxes?.map((item, index) => {
               return (

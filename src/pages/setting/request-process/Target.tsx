@@ -13,10 +13,16 @@ const Target: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
       onDrop(item, dustbinKey)
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver() && dropItem.length === 0,
       canDrop: monitor.canDrop()
     })
   }))
+
+  function hasDuplicates(arr: any[]) {
+    console.log(arr, 'arr')
+    const uniqueValues = new Set(arr)
+    return arr.length !== uniqueValues.size
+  }
 
   const isActive = canDrop && isOver
 

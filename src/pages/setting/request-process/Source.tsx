@@ -9,7 +9,7 @@ import { DropItem } from '~/types/setting-request-process'
 const Source: FC<DropItem> = function Source({ id, name }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
-    item: { name },
+    item: { id, name },
     end: (item, monitor) => {
       const dropResult = monitor.getDropResult<DropItem>()
       if (item && dropResult) {

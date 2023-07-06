@@ -7,8 +7,8 @@ const HttpService = axios.create({
   baseURL: API_URL,
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
-    Cache: 'no-cache'
+    'Content-Type': 'application/json'
+    // Cache: 'no-cache'
   }
 })
 HttpService.interceptors.request.use((config: any) => {
@@ -16,7 +16,7 @@ HttpService.interceptors.request.use((config: any) => {
   return { ...config, headers: { ...config.headers, Authorization: `Bearer ${accessToken}` } }
 })
 HttpService.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
       //   TODO handle

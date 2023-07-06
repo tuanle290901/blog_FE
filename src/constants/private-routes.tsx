@@ -15,7 +15,7 @@ export const PRIVATE_PATH = {
     history: 'user/history/:id'
   },
   setting: {
-    approvalProcess: 'approval-process'
+    requestProcess: 'request-process'
   }
 }
 
@@ -33,8 +33,8 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: PRIVATE_PATH.setting.approvalProcess,
-    path: PRIVATE_PATH.setting.approvalProcess,
+    name: PRIVATE_PATH.setting.requestProcess,
+    path: PRIVATE_PATH.setting.requestProcess,
     component: ApprovalProcess,
     allowedRoles: []
   },
