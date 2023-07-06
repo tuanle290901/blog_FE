@@ -28,8 +28,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className='dashboard'>
-      <p className='dashboard__title'>{t('dashboard.dashboard')}</p>
-      <Row gutter={[24, 24]} className='dashboard-filter'>
+      <p className='dashboard__title'>{t('Dashboard')}</p>
+      <Row gutter={[24, 16]} className='dashboard-filter'>
         <Col xs={24} lg={8}>
           <Select
             showSearch
@@ -46,13 +46,13 @@ const Dashboard: React.FC = () => {
         <Col xs={24} lg={8}>
           <RangePicker />
         </Col>
-        <Col xs={24} lg={8} className='d-flex'>
-          <Button onClick={handleExportExcel} type='primary' icon={<DownloadOutlined />}>
+        <Col xs={24} lg={8} className='tw-flex'>
+          <Button className='tw-ml-auto' onClick={handleExportExcel} type='primary' icon={<DownloadOutlined />}>
             Xuất file Excel
           </Button>
         </Col>
       </Row>
-      <Row gutter={[24, 24]} className='dashboard-info'>
+      <Row gutter={[24, 16]} className='dashboard-info'>
         <Col xs={24} xl={8}>
           <InfoItem title='Số lần đi muộn, về sớm' count={52} unit='lần' percent={-20} image={IconWaveRed} />
         </Col>
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
           <InfoItem title='Số ngày nghỉ phép' count={2} unit='ngày' percent={10} image={IconWaveBlue} />
         </Col>
       </Row>
-      <Row gutter={[10, 10]} className='dashboard-statistic'>
+      <Row gutter={[24, 16]} className='dashboard-statistic'>
         <Col xs={24} xl={8}>
           <Rankings />
         </Col>

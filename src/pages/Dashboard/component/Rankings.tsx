@@ -2,16 +2,18 @@ import React from 'react'
 import IconRankGold from '~/assets/images/dashboard/icon_rank_gold.svg'
 import IconRankSilver from '~/assets/images/dashboard/icon_rank_silver.svg'
 import IconRankCopper from '~/assets/images/dashboard/icon_rank_copper.svg'
-interface Idata {
-  rank: number
-  fullname: number
-  image: string
-  department: string
-  totalLate: number
-  totalEarly: number
-}
+import DefaultImage from '~/assets/images/default-img.png'
 
-const Rankings: React.FC<Idata> = () => {
+// interface Idata {
+//   rank: number
+//   fullname: number
+//   image: string
+//   department: string
+//   totalLate: number
+//   totalEarly: number
+// }
+
+const Rankings: React.FC = () => {
   const rankingsData = [
     {
       rank: 1,
@@ -69,7 +71,7 @@ const Rankings: React.FC<Idata> = () => {
                 )}
               </div>
               <div className='tw-flex'>
-                <img className='tw-w-[80px]' src={IconRankGold} alt='' />
+                <img className='tw-w-[auto] tw-h-[35px]' src={DefaultImage} alt='' />
                 <div className='tw-text-left'>
                   <p className='tw-mb-[10px]'>{item?.fullname}</p>
                   <p className='tw-italic'>{item?.department}</p>
