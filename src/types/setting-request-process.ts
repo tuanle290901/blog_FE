@@ -1,7 +1,8 @@
-export interface DustbinProps {
-  dustbinKey: string
-  onDrop: (item: DropItem, dustbinKey: string) => void
+export interface TargetProps {
+  targetKey: string
+  onDrop: (item: DropItem, targetKey: string) => void
   dropItem: DropItem[]
+  canDropItem: any
 }
 
 export interface DropItem {
