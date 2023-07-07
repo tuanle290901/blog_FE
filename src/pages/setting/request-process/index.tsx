@@ -1,40 +1,25 @@
 import type { FC } from 'react'
-import React, { memo, useState, useRef } from 'react'
+import React, { memo, useEffect, useRef } from 'react'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-import Target from './Target'
 import { Button, Space } from 'antd'
+import Target from './Target'
 
 import iconAdd from '~/assets/images/setting/add.png'
 import iconHalfArrow from '~/assets/images/setting/half-arrow.png'
-import Source from './Source'
-import { SETTING } from '~/utils/Constant'
+import { addDroppedItem, fetchDepartments } from '~/stores/features/setting/request-process.slice'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DropItem } from '~/types/setting-request-process'
+import { SETTING } from '~/utils/Constant'
+import Source from './Source'
 
 const Index: FC = memo(function Index() {
-  const [droppedItems, setDroppedItems] = useState<{ [key: string]: DropItem[] }>({
-    requestOne: [],
-    requestTwo: [],
-    requestThree: []
-  })
-
-  const [sourceBoxes, setSourceBoxes] = useState<DropItem[]>([
-    {
-      id: 'manager',
-      name: 'Quản lý trực tiếp'
-    },
-    {
-      id: 'hr',
-      name: 'HCNS'
-    },
-    {
-      id: 'department1',
-      name: 'HTSC'
-    }
-  ])
-
+  const dispatch = useAppDispatch()
+  const droppedItems = useAppSelector((state) => state.requestProcess.droppedItems)
+  const sourceBoxes = useAppSelector((state) => state.requestProcess.departments)
+  const droppedRef = useRef(null)
   const targetBoxsRef = useRef([
     {
       key: SETTING.REQUEST_PROCESS.REQUEST_ONE,
@@ -50,23 +35,28 @@ const Index: FC = memo(function Index() {
     }
   ])
 
-  const handleDrop = (item: DropItem, dustbinKey: string) => {
-    setDroppedItems((prevItems) => {
-      if (prevItems[dustbinKey].includes(item)) {
-        return { ...prevItems, dustbinKey: [...prevItems[dustbinKey]] }
-      }
-      return {
-        ...prevItems,
-        [dustbinKey]: [...prevItems[dustbinKey], item]
-      }
-    })
+  const handleDrop = (item: DropItem, targetKey: string) => {
+    dispatch(addDroppedItem({ targetKey, item }))
+    // dispatch(removeDe lpartmentItem({ id: item.id }))
   }
+
+  const canDrop = (item: DropItem, targetKey: string) => {
+    return true
+  }
+
+  useEffect(() => {
+    console.log(droppedItems, 'droppedItems')
+  }, [droppedItems])
+
+  useEffect(() => {
+    dispatch(fetchDepartments())
+  }, [])
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
         <div className='tw-h-1/4'>
-          <div className='department-title tw-font-semibold tw-text-xl tw-mt-2 tw-mb-2'>Title</div>
+          <div className='department-title tw-font-semibold tw-text-xl tw-mt-3 tw-mb-3'>Quy trình khởi tạo phép</div>
           <Space align='end' wrap>
             {sourceBoxes?.map((item, index) => {
               return (
@@ -90,9 +80,10 @@ const Index: FC = memo(function Index() {
                     <div className='tw-mb-3'>{item.title}</div>
                     <Target
                       key={item.key}
-                      dustbinKey={item.key}
+                      targetKey={item.key}
                       onDrop={handleDrop}
                       dropItem={droppedItems[item.key]}
+                      canDropItem={(sourceItem: DropItem) => canDrop(sourceItem, droppedItems)}
                     />
                   </div>
                   <img src={iconHalfArrow} alt='arrow' />
