@@ -28,13 +28,16 @@
     "enterUserName": "Nhập tên đăng nhập của thành viên",
     "enterAddress": "Nhập địa chỉ thành viên",
     "selectDOB": "Chọn ngày sinh thành viên",
-    "selectDepartment": "Chọn phòng ban thành viên",
+    "selectDepartment": "Chọn tổ chức",
+    "selectPosition": "Chức vụ",
+    "selectFunction": "Chức năng",
     "enterPhoneNumber": "Nhập số điện thoại thành viên",
     "enterEmail": "Nhập email thành viên",
     "selectGender": "Chọn giới tính",
     "enterDateJoin": "Chọn ngày gia nhập",
     "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
     "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
-    "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB."
+    "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB.",
+    "addRole": "Thêm vị trí"
   }
 }
