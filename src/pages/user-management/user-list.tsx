@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Input, Table } from 'antd'
+import { Button, Input, Select, Table } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
@@ -80,18 +80,20 @@ const UserList: React.FC = () => {
       align: 'center',
       render: (_, record) => {
         return (
-          <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
-            <Button
-              size='small'
-              onClick={() => handleClickEditUser(record)}
-              icon={<EditOutlined className='tw-text-blue-600' />}
-            />
-            <Button
-              size='small'
-              onClick={() => handleClickDeleteUser(record)}
-              icon={<DeleteOutlined className='tw-text-red-600' />}
-            />
-            <Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />
+          <div className='tw-absolute tw-left-0 tw-w-full'>
+            <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+              <Button
+                size='small'
+                onClick={() => handleClickEditUser(record)}
+                icon={<EditOutlined className='tw-text-blue-600' />}
+              />
+              <Button
+                size='small'
+                onClick={() => handleClickDeleteUser(record)}
+                icon={<DeleteOutlined className='tw-text-red-600' />}
+              />
+              <Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />
+            </div>
           </div>
         )
       }
@@ -116,11 +118,14 @@ const UserList: React.FC = () => {
         <h1 className='tw-text-3xl tw-font-semibold'>{t('userList.member')}(100)</h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
-      <div className='tw-flex tw-justify-end tw-gap-4'>
-        <Search className='tw-w-64' />
+      <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
         <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
           {t('userList.addMember')}
         </Button>
+        <div className='tw-flex tw-gap-4'>
+          <Select className='tw-w-64'></Select>
+          <Search className='tw-w-64' />
+        </div>
       </div>
       <div className='tw-mt-6'>
         <Table

@@ -4,22 +4,37 @@
     "memberList": "Danh sách tất cả các thành viên",
     "searchMember": "Tìm kiếm thành viên",
     "addMember": "Thêm thành viên",
+    "username": "Tên đăng nhập",
     "fullName": "Họ và tên",
-    "dateOfBirth": "Ngày sinh",
     "gender": "Giới tính",
-    "department": "Phòng ban",
+    "dateOfBirth": "Ngày sinh",
     "phoneNumber": "Số điện thoại",
     "email": "Email",
+    "address": "Địa chỉ",
+    "dateJoin": "Ngày gia nhập",
+    "probationDate": "Ngày kí hợp đồng thử việc",
+    "officialContractSigningDate": "Ngày kí hợp đồng chính thức",
+    "department": "Tổ chức/phòng ban",
     "action": "Hành động",
     "male": "Nam",
-    "female": "Nữ"
+    "female": "Nữ",
+    "commonInfo": "Thông tin chung",
+    "workInfo": "Thông tin làm việc"
   },
   "userModal": {
+    "updateAvatar": "Cập nhật ảnh đại diện",
+    "deleteAvatar": "Xóa ảnh đại diện",
     "enterMemberName": "Nhập họ tên thành viên",
+    "enterUserName": "Nhập tên đăng nhập của thành viên",
+    "enterAddress": "Nhập địa chỉ thành viên",
     "selectDOB": "Chọn ngày sinh thành viên",
     "selectDepartment": "Chọn phòng ban thành viên",
     "enterPhoneNumber": "Nhập số điện thoại thành viên",
     "enterEmail": "Nhập email thành viên",
-    "selectGender": "Chọn giới tính"
+    "selectGender": "Chọn giới tính",
+    "enterDateJoin": "Chọn ngày gia nhập",
+    "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
+    "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
+    "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB."
   }
 }
