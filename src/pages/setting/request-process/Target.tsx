@@ -18,12 +18,6 @@ const Target: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
     })
   }))
 
-  function hasDuplicates(arr: any[]) {
-    console.log(arr, 'arr')
-    const uniqueValues = new Set(arr)
-    return arr.length !== uniqueValues.size
-  }
-
   const isActive = canDrop && isOver
 
   const dropBoxStyle = {
