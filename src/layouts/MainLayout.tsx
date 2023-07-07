@@ -97,7 +97,7 @@ const MainLayout: React.FC = () => {
         'manageFunction',
         null,
         [
-          getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
+          getItem('Thành viên', '/users', <img src={menuIconMember} alt='' className='menu-image' />),
           getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
         'group'
