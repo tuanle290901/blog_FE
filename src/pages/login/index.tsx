@@ -12,6 +12,7 @@ import { LOCAL_STORAGE } from '~/utils/Constant'
 import { LocalStorage } from '~/utils/local-storage'
 
 import { useTranslation } from 'react-i18next'
+import '../../layouts/style.scss'
 
 const LoginComponent: React.FC = () => {
   const dispatch = useAppDispatch()
