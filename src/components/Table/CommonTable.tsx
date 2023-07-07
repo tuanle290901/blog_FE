@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table } from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
-import { ColumnType, ColumnGroupType, Key } from 'antd/es/table/interface'
+import { ColumnType, ColumnGroupType, ExpandableConfig, Key } from 'antd/es/table/interface'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -23,10 +23,6 @@ interface IMeta {
   total: number | undefined
   size: number | 10
 }
-
-interface expandable {
-  defaultExpandAllRows: boolean | false
-}
 interface IPropsTableCommon {
   columns: IColumn[]
   dataSource: any[]
@@ -37,7 +33,7 @@ interface IPropsTableCommon {
   handlePropsChange?: (page: number, pageSize: number) => React.ReactNode | undefined
   handleDoubleClickRow?: (record: any, rowIndex: any, event: any) => React.ReactNode | undefined
   checkedList?: string[]
-  disabledRowSelection?: boolean | false
+  disabledRowSelection?: boolean | true
   hiddenPagination?: boolean | true
   yScrollProp?: string
   xScrollProp?: number
@@ -45,7 +41,8 @@ interface IPropsTableCommon {
   triggerAsc?: string
   cancelSort?: string
   rowKey?: string
-  expandable?: expandable | null
+  style: any
+  expandable?: ExpandableConfig<any>
 }
 
 interface IScroll {
@@ -72,7 +69,8 @@ const CommondTable: React.FC<IPropsTableCommon> = (props) => {
     triggerAsc,
     cancelSort,
     rowKey,
-    expandable
+    expandable,
+    style
   } = props
   const { t } = useTranslation()
   const [bordered] = useState<boolean>(false)
@@ -175,6 +173,7 @@ const CommondTable: React.FC<IPropsTableCommon> = (props) => {
       }}
       size={size || undefined}
       {...tableProps}
+      style={...style}
       rowSelection={disabledRowSelection ? undefined : rowSelection}
       pagination={
         hiddenPagination
