@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import useLocalStorage from './useLocaStorage'
 import { useAppSelector } from '../hook'
 import { setAccessToken } from '../features/auth/auth.slice'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 
 const initialState = null
-const KEY = 'accessToken'
+const KEY = LOCAL_STORAGE.ACCESS_TOKEN
 
 export const useAccessToken = () => {
   const [local, setLocal] = useLocalStorage(KEY, initialState)
@@ -14,11 +15,7 @@ export const useAccessToken = () => {
     if (local && !accessToken) {
       setAccessToken(local)
     }
-
-    if (!local && accessToken) {
-      setLocal(accessToken)
-    }
-  }, [local, accessToken, setLocal])
+  }, [local, accessToken])
 
   const removeAccessToken = () => {
     setAccessToken(null)

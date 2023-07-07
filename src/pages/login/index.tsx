@@ -3,19 +3,26 @@ import { fetchUserInfo, login } from '~/stores/features/auth/auth.slice.ts'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
 
-import logo from '~/assets/images/logo.png'
+import { Button, Col, Form, Input, Row } from 'antd'
 import iconHand from '~/assets/images/login/icon-hand.png'
-import { Button, Col, Form, Input, Row, Spin } from 'antd'
+import logo from '~/assets/images/logo.png'
 
-import './style.scss'
 import { useNavigate } from 'react-router-dom'
-import { LocalStorage } from '~/utils/local-storage'
 import { LOCAL_STORAGE } from '~/utils/Constant'
+import { LocalStorage } from '~/utils/local-storage'
+
+import { useTranslation } from 'react-i18next'
+import '../../layouts/style.scss'
 
 const LoginComponent: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const loginState = useAppSelector((state) => state.auth)
+
+  const onKeyDown = (event: any) => {
+    if (event.key === ' ') event.preventDefault()
+  }
 
   const onFinish = (formValues: LoginPayload) => {
     dispatch(login(formValues))
@@ -50,10 +57,10 @@ const LoginComponent: React.FC = () => {
       <Row className='login-title-container tw-h-[12%]'>
         <Col xs={24} md={{ span: 16, offset: 4 }}>
           <div className='title-one tw-flex tw-items-center'>
-            <span>Xin chào</span>
+            <span>{t('auth.hello')}</span>
             <img src={iconHand} alt='' className='tw-ml-[10px]' />
           </div>
-          <div className='title-two tw-mt-[10px]'>Đăng nhập vào hệ thống chấm công</div>
+          <div className='title-two tw-mt-[10px]'>{t('auth.loginToSystem')}</div>
         </Col>
       </Row>
 
@@ -69,28 +76,28 @@ const LoginComponent: React.FC = () => {
           onFinishFailed={onFinishFailed}
         >
           <Form.Item
-            label={<div className='tw-font-semibold'>Tên đăng nhập</div>}
+            label={<div className='tw-font-semibold'>{t('auth.username')}</div>}
             name='username'
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[{ required: true, message: t('auth.fieldIsRequired') }]}
           >
-            <Input placeholder='Tên đăng nhập' className='login-input-custom' />
+            <Input placeholder={t('auth.username')} className='login-input-custom' onKeyDown={onKeyDown} />
           </Form.Item>
 
           <Form.Item
-            label={<div className='tw-font-semibold'>Mật khẩu</div>}
+            label={<div className='tw-font-semibold'>{t('auth.password')}</div>}
             name='password'
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: t('auth.fieldIsRequired') }]}
           >
-            <Input.Password placeholder='Mật khẩu' className='login-input-custom' />
+            <Input.Password placeholder='Mật khẩu' className='login-input-custom' maxLength={32} />
           </Form.Item>
 
           <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
-            <div className='tw-text-end tw-text-sky-500'>Quên mật khẩu</div>
+            <div className='tw-text-end tw-text-sky-500'>{t('auth.forgotPassword')}</div>
           </Form.Item>
 
           <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
             <Button className='login-button tw-w-full' type='primary' htmlType='submit' loading={loginState.loading}>
-              Đăng nhập
+              {t('auth.login')}
             </Button>
           </Form.Item>
         </Form>

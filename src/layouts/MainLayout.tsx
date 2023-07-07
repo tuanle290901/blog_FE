@@ -17,6 +17,7 @@ import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { logout } from '~/stores/features/auth/auth.slice'
 import { PUBLIC_PATH } from '~/constants/public-routes'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -42,7 +43,7 @@ const MainLayout: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const userInfoState = useAppSelector((state) => state.auth.userInfo)
+  const { userInfo } = useUserInfo()
 
   const handleLogout = () => {
     dispatch(logout())
@@ -155,7 +156,7 @@ const MainLayout: React.FC = () => {
                 </Badge>
                 <Space className='tw-cursor-pointer tw-ml-[15px]'>
                   <Avatar size='default' icon={<UserOutlined />} />
-                  <span className='tw-font-bold'>{userInfoState.fullName}</span>
+                  <span className='tw-font-bold'>{userInfo?.fullName}</span>
                 </Space>
               </div>
             </Dropdown>

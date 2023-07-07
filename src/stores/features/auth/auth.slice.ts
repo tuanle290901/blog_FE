@@ -1,7 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { notification } from 'antd'
 import HttpService from '~/config/api.ts'
-import { LoginPayload } from '~/types/login-payload.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
+import { ErrorResponse } from '~/types/error-response.interface'
+import { LoginPayload } from '~/types/login-payload.ts'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 
 export interface AuthStateInterface {
   loading: boolean
@@ -13,10 +16,10 @@ export interface AuthStateInterface {
 
 const initialState: AuthStateInterface = {
   loading: false,
-  userInfo: {}, // for user object
-  accessToken: null, // for storing the JWT
+  userInfo: {},
+  accessToken: null,
   error: null,
-  success: false // for monitoring the registration process.
+  success: false
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
@@ -63,6 +66,14 @@ const fetchUserInfo = createAsyncThunk('auth/userInfo', async (_, thunkAPI) => {
   return await response
 })
 
+const clearLocalStorage = () => {
+  Object.entries(LOCAL_STORAGE).forEach(([key, value]) => {
+    if (key) {
+      localStorage.removeItem(value)
+    }
+  })
+}
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -70,7 +81,11 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload.accessToken
     },
+    setUserInfo: (state, action) => {
+      state.userInfo = action.payload.userInfo
+    },
     logout: (state) => {
+      clearLocalStorage()
       state.accessToken = null
       state.userInfo = {}
       state.loading = false
@@ -98,14 +113,17 @@ const authSlice = createSlice({
         (state, action) => {
           if (state.loading) {
             state.loading = false
-            // TODO handle error
-            console.log(action.meta)
+
+            const { status, message } = action.payload as ErrorResponse
+            if (status === 401) {
+              notification.error({ message: message })
+            }
           }
         }
       )
   }
 })
 
-export { login, fetchUserInfo }
-export const { logout, setAccessToken } = authSlice.actions
+export { fetchUserInfo, login }
+export const { logout, setAccessToken, setUserInfo } = authSlice.actions
 export default authSlice.reducer
