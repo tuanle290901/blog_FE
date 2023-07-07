@@ -1,5 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, DatePicker, Form, Input, message, Modal, Select, Upload, UploadFile, UploadProps } from 'antd'
+import {
+  Button,
+  DatePicker,
+  Form,
+  FormListFieldData,
+  Input,
+  message,
+  Modal,
+  Select,
+  Upload,
+  UploadFile,
+  UploadProps
+} from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { RcFile, UploadChangeParam } from 'antd/es/upload'
@@ -55,6 +67,14 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
       uploadRef.current.click()
     }
   }
+  const departmentField = [
+    {
+      name: 0,
+      fieldKey: 1,
+      key: 1,
+      isListField: true
+    }
+  ]
   return (
     <Modal
       open={open}
@@ -117,7 +137,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.fullName')} name='fullName' required>
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.gender')} name='gender'>
+                <Form.Item style={{ marginBottom: 16 }} label={t('userList.gender')} required name='gender'>
                   <Select placeholder={t('userModal.selectGender')}>
                     <Select.Option value='male'>{t('userList.male')}</Select.Option>
                     <Select.Option value='female'>{t('userList.female')}</Select.Option>
@@ -134,7 +154,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                     placeholder={t('userModal.selectDOB')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.phoneNumber')} name='phoneNumber'>
+                <Form.Item style={{ marginBottom: 16 }} label={t('userList.phoneNumber')} required name='phoneNumber'>
                   <Input placeholder={t('userModal.enterPhoneNumber')} />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.email')} name='email'>
@@ -147,7 +167,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
             </div>
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
-              <div className='tw-p-4 tw-bg-[#FAFAFA] tw-h-[482px] tw-overflow-auto'>
+              <div className='tw-p-4 tw-bg-[#FAFAFA] tw-h-[530px] tw-overflow-auto'>
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateJoin')} name='dateJoin'>
                   <DatePicker
                     format='YYYY/MM/DD'
@@ -185,11 +205,15 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.List name='users'>
-                  {(fields = [], { add, remove }) => (
+                <Form.List name='users' initialValue={departmentField}>
+                  {(fields = departmentField, { add, remove }) => (
                     <>
                       {fields.map(({ key, name, ...restField }, index) => (
-                        <div key={key}>
+                        <div key={key} className='tw-relative'>
+                          <MinusCircleOutlined
+                            className='tw-absolute tw-right-1 tw-top-1 tw-z-50 tw-text-red-600'
+                            onClick={() => remove(name)}
+                          />
                           <Form.Item
                             {...restField}
                             style={{ marginBottom: 16 }}
@@ -197,10 +221,6 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                             name={[name, 'department']}
                             required
                           >
-                            <MinusCircleOutlined
-                              className='tw-absolute -tw-top-[24px] -tw-right-0 tw-z-50 tw-text-red-600'
-                              onClick={() => remove(name)}
-                            />
                             <Select placeholder={t('userModal.selectDepartment')}></Select>
                           </Form.Item>
                           <div className='tw-grid tw-grid-cols-2 tw-gap-2'>
