@@ -1,29 +1,37 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { PlusOutlined } from '@ant-design/icons'
-import { Col, Input, Popconfirm, Row, Space, Tooltip } from 'antd'
-import Table from 'antd/es/table'
-import React, { useState, useEffect } from 'react'
+import { Col, Input, Row, Space, Tooltip } from 'antd'
+import { ExpandableConfig, Key } from 'antd/es/table/interface'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import IconDeleteSVG from '~/assets/svg/iconDelete'
 import IconEditSVG from '~/assets/svg/iconEdit'
 import IconTeamSVG from '~/assets/svg/iconTeam'
 import IconBackSVG from '~/assets/svg/iconback'
 import CommonButton from '~/components/Button/CommonButton'
-import { ACTION_TYPE } from '~/utils/helper'
-import './index.scss'
-import DepartmentModal from './DepartmentModal'
 import CommondTable from '~/components/Table/CommonTable'
-import DepartmentMemberModal from './DepartmentMemberModal'
 import { IModelState } from '~/types/department.interface'
+import { ACTION_TYPE } from '~/utils/helper'
+import DepartmentMemberModal from './DepartmentMemberModal'
+import DepartmentModal from './DepartmentModal'
+import './index.scss'
+
+// interface DataType {
+//   key: React.Key
+//   name: string
+//   age: number
+//   address: string
+//   description: string
+// }
 
 interface DataType {
-  key: React.Key
+  key: Key
   name: string
   age: number
   address: string
-  description: string
+  children?: DataType[]
 }
 
 const { Search } = Input
@@ -36,10 +44,12 @@ const Department: React.FC = () => {
     type: '',
     data: null
   })
+  const [useSelect, setUseSelect] = useState<any>(null)
 
   const onSearch = (value: string) => {
     console.log(value)
   }
+
   const data = [
     {
       key: 1,
@@ -92,7 +102,31 @@ const Department: React.FC = () => {
     listData: data,
     listDataTitle: []
   })
-  const renderTreeRows = (nodes: any[]) => {
+  // const renderTreeRows = (nodes: any[]) => {
+  //   return nodes.map((node) => {
+  //     const { key, name, age, address, children, parentWorkUnitCode, parentWorkUnitName } = node
+  //     const hasChildren = children && children.length > 0
+
+  //     const row = {
+  //       key,
+  //       name,
+  //       age,
+  //       address,
+  //       children,
+  //       parentWorkUnitCode,
+  //       parentWorkUnitName
+  //     }
+
+  //     if (hasChildren) {
+  //       row.children = renderTreeRows(children)
+  //     }
+
+  //     return row
+  //   })
+  // }
+  // const treeData = renderTreeRows(dataRender.listData)
+
+  const renderTreeRows = (nodes: any[], isLastLevel = false) => {
     return nodes.map((node) => {
       const { key, name, age, address, children, parentWorkUnitCode, parentWorkUnitName } = node
       const hasChildren = children && children.length > 0
@@ -108,15 +142,31 @@ const Department: React.FC = () => {
       }
 
       if (hasChildren) {
-        row.children = renderTreeRows(children)
+        row.children = renderTreeRows(children, !isLastLevel)
       }
 
       return row
     })
   }
-  const treeData = renderTreeRows(dataRender.listData)
 
-  const [useSelect, setUseSelect] = useState<any>(null)
+  const treeData = renderTreeRows(dataRender.listData, true)
+  const expandableConfig: ExpandableConfig<DataType> = {
+    expandIcon: ({ expanded, onExpand, record }) => {
+      if (record.children && record.children.length === 0) {
+        return null
+      }
+
+      return (
+        <span
+          className={`ant-table-row-expand-icon ${
+            expanded ? 'ant-table-row-expand-icon-expanded' : 'ant-table-row-expand-icon-collapsed'
+          }`}
+          onClick={(e) => onExpand!(record, e)}
+        />
+      )
+    },
+    defaultExpandAllRows: true
+  }
 
   function getListDataByKey(data: any[], targetKey: any) {
     const filteredData: any = []
@@ -367,9 +417,11 @@ const Department: React.FC = () => {
         <CommondTable
           dataSource={treeData}
           columns={columns}
-          expandable={{ defaultExpandAllRows: false }}
+          expandable={expandableConfig}
           isLoading={false}
+          disabledRowSelection={true}
           meta={{ page: 1, total: 0, size: 10 }}
+          style={{ width: '100%' }}
           // hiddenPagination={true}
         />
       </Row>
