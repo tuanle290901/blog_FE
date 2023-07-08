@@ -73,7 +73,7 @@ const MainLayout: React.FC = () => {
 
   const menuItems: MenuItem[] = useMemo(() => {
     return [
-      getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
+      getItem('Trang chủ', '/', <img src={menuIconStatistical} alt='' className='menu-image' />),
       getItem(
         <Tooltip placement='topLeft' title='Chức năng chính'>
           Chức năng chính
@@ -82,7 +82,7 @@ const MainLayout: React.FC = () => {
         null,
         [
           getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
-            getItem('Lịch sử chấm công', 'timeKeepingHistory'),
+            getItem('Lịch sử chấm công', 'timesheet'),
             getItem('Lịch sử yêu cầu', 'requestHistory'),
             getItem('Danh sách yêu cầu', 'requestList')
           ])

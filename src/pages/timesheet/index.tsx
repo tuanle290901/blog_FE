@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Col, DatePicker, Image, Row, Table } from 'antd'
+import { Button, Col, DatePicker, Image, Row, Segmented, Table } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType } from 'antd/es/table'
@@ -10,11 +10,13 @@ import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
 import DefaultImage from '~/assets/images/default-img.png'
 import IconBag from '~/assets/images/timesheet/icon_bag.png'
+import TimesheetCalendar from './component/TimesheetCalendar'
 
 const Timesheet: React.FC = () => {
   const { RangePicker } = DatePicker
   const [t] = useTranslation()
   const [isOpenModal, setIsOpenModal] = useState(false)
+  const [mode, setMode] = useState('calendar')
 
   const handleClickAddReason = (record: IAttendance) => {
     setIsOpenModal(true)
@@ -174,22 +176,43 @@ const Timesheet: React.FC = () => {
         </div>
       </Col>
       <Col xs={24} xl={20} className=' tw-bg-white tw-p-5'>
-        <div className='tw-flex tw-items-center tw-mb-8'>
-          <div className='tw-mr-[10px]'>Thời gian thống kê:</div>
-          <RangePicker onChange={handleSelectDate} format='DD/MM/YYYY' placeholder={['Từ ngày', 'Đến ngày']} />
-        </div>
-        <DaySelected data={attendanceList} />
-        <div className='tw-mt-6'>
-          <Table
-            rowKey='id'
-            columns={columns}
-            dataSource={attendanceList}
-            // loading={userState.loading}
-            scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
-          />
-        </div>
-        <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            {mode === 'list' && (
+              <div className='tw-flex tw-items-center tw-mb-8'>
+                <div className='tw-mr-[10px]'>Thời gian thống kê:</div>
+                <RangePicker onChange={handleSelectDate} format='DD/MM/YYYY' placeholder={['Từ ngày', 'Đến ngày']} />
+              </div>
+            )}
+          </Col>
+          <Col xs={24} lg={12} className='tw-text-right'>
+            <Segmented
+              options={[
+                { label: 'Lịch', value: 'calendar' },
+                { label: 'Danh sách', value: 'list' }
+              ]}
+              defaultValue='calendar'
+              onChange={(v) => setMode(v.toString())}
+            />
+          </Col>
+        </Row>
+        {mode === 'list' && (
+          <>
+            <DaySelected data={attendanceList} />
+            <div className='tw-mt-6'>
+              <Table
+                rowKey='id'
+                columns={columns}
+                dataSource={attendanceList}
+                // loading={userState.loading}
+                scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+              />
+            </div>
+          </>
+        )}
+        {mode === 'calendar' && <TimesheetCalendar />}
       </Col>
+      <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>
   )
 }

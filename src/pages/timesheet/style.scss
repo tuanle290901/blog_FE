@@ -1,9 +1,11 @@
 .timesheet {
   display: flex;
+
   &-short {
     background-color: #fff;
     border-right: solid 1px #c7c4c4;
     padding: 20px;
+
     &__fullname,
     &__department {
       font-size: 15px;
@@ -13,35 +15,43 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     &__fullname {
       font-weight: bold;
       margin-top: 20px;
     }
+
     &-info {
       margin-top: 30px;
       display: flex;
       justify-content: space-between;
+
       &__item {
         width: 40%;
+
         p {
           font-size: 12px;
         }
+
         p:first-child {
           border-top: 2px solid #52c41a;
           padding-top: 5px;
           font-weight: bold;
           margin-bottom: 4px;
+
           span {
             font-size: 20px;
             margin-right: 6px;
           }
         }
       }
+
       &--onbussiness {
         p:first-child {
           border-color: #1890ff;
         }
       }
+
       &--violate {
         p:first-child {
           border-color: #f5222d;
@@ -49,18 +59,21 @@
       }
     }
   }
+
   &-listday {
     color: #fff;
     display: flex;
     margin-bottom: 10px;
     max-width: 100%;
     overflow-x: scroll;
+
     &-item {
       text-align: center;
       padding: 5px 10px;
       margin-right: 6px;
     }
   }
+
   &-workday {
     display: flex;
     align-items: center;
@@ -83,6 +96,7 @@
     position: relative;
     margin-right: 23px;
     border-right: solid 1px #d9d9d9;
+
     &:last-child {
       border-right: none;
       margin-right: 0;
@@ -119,4 +133,31 @@
       content: '';
     }
   }
+}
+
+.events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.events .ant-badge-status {
+  width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.notes-month {
+  font-size: 28px;
+  text-align: center;
+}
+
+.notes-month section {
+  font-size: 28px;
+}
+
+.timesheet .ant-picker-calendar-header {
+  display: none;
 }
