@@ -41,7 +41,7 @@ const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
   }
 
   return (
-    <div>
+    <div className='tw-mt-6'>
       <div className='timesheet-listday'>
         {data.map((item) => (
           <div key={item.id} className={`${handleGenderColor(item.status)} timesheet-listday-item`}>

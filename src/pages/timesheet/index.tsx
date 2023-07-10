@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Col, DatePicker, Image, Row, Segmented, Table } from 'antd'
+import { Button, Col, DatePicker, Image, Row, Segmented, Select, Table } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType } from 'antd/es/table'
@@ -8,9 +8,8 @@ import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-des
 import { IAttendance } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
-import DefaultImage from '~/assets/images/default-img.png'
-import IconBag from '~/assets/images/timesheet/icon_bag.png'
 import TimesheetCalendar from './component/TimesheetCalendar'
+import TimesheetInfo from './component/TimesheetInfo'
 
 const Timesheet: React.FC = () => {
   const { RangePicker } = DatePicker
@@ -106,86 +105,72 @@ const Timesheet: React.FC = () => {
 
   return (
     <Row className='timesheet tw-p-5'>
-      <Col xs={24} xl={4} className='timesheet-short'>
-        <div className='tw-text-center'>
-          <Image className='tw-max-w-[130px]' src={DefaultImage} alt='' />
-          <p className='timesheet-short__fullname'>Quản trị viên</p>
-          <p className='timesheet-short__department'>HTSC</p>
-          <div className='tw-flex tw-justify-center tw-items-center tw-mt-4'>
-            <img className='tw-max-w-[100%]' src={IconBag} alt='' />
-            <p>
-              <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{attendanceList?.length}</span>ngày công
-            </p>
-          </div>
-        </div>
-        <div className='timesheet-short-info'>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>23</span>giờ
-            </p>
-            <p>Làm thêm (OT)</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ bù</p>
-          </div>
-        </div>
-        <div className='timesheet-short-info timesheet-short-info--onbussiness'>
-          <div className='timesheet-short-info__item'>
-            <p className='tw-border-t-cyan-950'>
-              <span>0</span>ngày
-            </p>
-            <p>Đi công tác</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ phép</p>
-          </div>
-        </div>
-        <div className='timesheet-short-info timesheet-short-info--violate'>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>lần
-            </p>
-            <p>Vi phạm</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ không phép</p>
-          </div>
-        </div>
-        <div className='tw-mt-20'>
-          <Button className='tw-w-full tw-bg-blue-500 tw-text-white' size='middle' onClick={() => setIsOpenModal(true)}>
-            Thêm phép
-          </Button>
-        </div>
-        <div className='tw-mt-3'>
-          <Button
-            className='tw-w-full tw-border-blue-500 tw-text-blue-500'
-            size='middle'
-            onClick={() => setIsOpenModal(true)}
-          >
-            Thời gian làm việc cá nhân
-          </Button>
-        </div>
+      <Col xs={24} xl={4}>
+        <TimesheetInfo data={attendanceList} handleOpenModal={setIsOpenModal} />
       </Col>
       <Col xs={24} xl={20} className=' tw-bg-white tw-p-5'>
         <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
+          <Col xs={24} lg={18}>
             {mode === 'list' && (
-              <div className='tw-flex tw-items-center tw-mb-8'>
-                <div className='tw-mr-[10px]'>Thời gian thống kê:</div>
-                <RangePicker onChange={handleSelectDate} format='DD/MM/YYYY' placeholder={['Từ ngày', 'Đến ngày']} />
-              </div>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} lg={6}>
+                  <p className='tw-mb-2'>Lọc theo nhóm</p>
+                  <Select
+                    className='tw-w-full'
+                    showSearch
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.group')}`}
+                    optionFilterProp='children'
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                    onClear={() => console.log('delete')}
+                    options={[
+                      {
+                        value: 'htsc',
+                        label: 'HTSC'
+                      },
+                      {
+                        value: 'hti',
+                        label: 'HTI'
+                      }
+                    ]}
+                  />
+                </Col>
+                <Col xs={24} lg={6}>
+                  <p className='tw-mb-2'>Lọc theo nhân viên</p>
+                  <Select
+                    className='tw-w-full'
+                    showSearch
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('nhân viên')}`}
+                    optionFilterProp='children'
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                    onClear={() => console.log('delete')}
+                    options={[
+                      {
+                        value: '12',
+                        label: 'Nguyễn Văn A'
+                      },
+                      {
+                        value: '16',
+                        label: 'Nguyễn Văn B'
+                      }
+                    ]}
+                  />
+                </Col>
+                <Col xs={24} lg={12}>
+                  <div>
+                    <div className='tw-mb-2'>Thời gian thống kê</div>
+                    <RangePicker
+                      onChange={handleSelectDate}
+                      format='DD/MM/YYYY'
+                      placeholder={['Từ ngày', 'Đến ngày']}
+                    />
+                  </div>
+                </Col>
+              </Row>
             )}
           </Col>
-          <Col xs={24} lg={12} className='tw-text-right'>
+          <Col xs={24} lg={6} className='tw-text-right'>
             <Segmented
               options={[
                 { label: 'Lịch', value: 'calendar' },
