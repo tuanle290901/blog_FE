@@ -1,172 +1,402 @@
 /* eslint-disable prettier/prettier */
 import { DeleteOutlined, DownOutlined, InfoCircleOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons'
 import { Button, Col, InputNumber, Row, Select, Switch, TimePicker } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 
-interface Shift {
-  start: string
-  end: string
+type WorkingDay = {
+  [key: string]: {
+    always: boolean
+    weeks: number[]
+    optionExtend: boolean
+    shifts: {
+      startTimeShift: string
+      endTimeShift: string
+    }[]
+  } | null
 }
 
-interface WorkingDay {
-  work: boolean
-  optionExtend: boolean
-  repeat: string | string[]
-  shift: string[]
-}
-
-interface WorkingTime {
-  monday: WorkingDay
-  tuesday: WorkingDay
-  wednesday: WorkingDay
-  thursday: WorkingDay
-  friday: WorkingDay
-  saturday: WorkingDay
-  sunday: WorkingDay
+type WorkingData = {
+  id: string
+  groupCode: string
+  affectCompensatoryInMonth: number
+  startPayrollCutoffDay: number
+  endPayrollCutoffDay: number
+  defaultLeaveDay: number
+  workOT: {
+    startTimeOT: string
+    endTimeOT: string
+  }
+  workingDays: {
+    workDays: WorkingDay
+  }[]
 }
 
 function CommonTime() {
-  const [workingTimeTogether, setWorkingTimeTogether] = useState<WorkingTime>({
-    monday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
+  const [workingTimeTogether, setWorkingTimeTogether] = useState<WorkingData>()
+
+  const dataApi = {
+    id: 'working-time-id',
+    groupCode: 'group-code',
+    affectCompensatoryInMonth: 3,
+    startPayrollCutoffDay: 1,
+    endPayrollCutoffDay: 5,
+    defaultLeaveDay: 12,
+    workOT: {
+      startTimeOT: '17:30',
+      endTimeOT: '22:30'
     },
-    tuesday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
-    },
-    wednesday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
-    },
-    thursday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
-    },
-    friday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
-    },
-    saturday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
-    },
-    sunday: {
-      work: true,
-      optionExtend: false,
-      repeat: 'all',
-      shift: ['8:30 - 12:00', '13:30 - 17:30']
+    workingDays: [
+      {
+        workDays: {
+          MONDAY: {
+            always: true,
+            weeks: [],
+            optionExtend: false,
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          },
+          TUESDAY: {
+            always: false,
+            weeks: [1, 2],
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          },
+          WEDNESDAY: {
+            always: false,
+            weeks: [2, 4],
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          },
+          THURSDAY: {
+            always: false,
+            weeks: [3],
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          },
+          FRIDAY: {
+            always: true,
+            weeks: [],
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          },
+          SATURDAY: null,
+          SUNDAY: null
+        }
+      }
+    ]
+  }
+  useEffect(() => {
+    const updatedData: WorkingData = {
+      ...dataApi,
+      workingDays: dataApi.workingDays.map((item) => ({
+        ...item,
+        workDays: Object.fromEntries(
+          Object.entries(item.workDays).map(([day, values]) => {
+            if (values !== null) {
+              return [day, { ...values, optionExtend: false }]
+            }
+            return [day, values]
+          })
+        ) as WorkingDay
+      }))
     }
-  })
+    console.log(updatedData)
+    setWorkingTimeTogether(updatedData)
+  }, [])
 
-  const onAddShiftToWorkingTimeTogether = (day: keyof WorkingTime) => {
+  const onAddShiftToWorkingTimeTogether = <T extends keyof WorkingDay>(day: T) => {
     setWorkingTimeTogether((prevState) => {
-      if (prevState[day]) {
-        return {
-          ...prevState,
-          [day]: {
-            ...prevState[day],
-            shift: [...prevState[day].shift, '0:00 - 00:00']
-          }
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedShifts = [
+            ...currentDay.shifts,
+            {
+              startTimeShift: '08:30',
+              endTimeShift: '12:00'
+            }
+          ]
+
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: {
+                  ...currentDay,
+                  shifts: updatedShifts
+                }
+              }
+            }
+          ]
+
+          return {
+            ...(prevState || {}),
+            workingDays: updatedWorkingDays
+          } as WorkingData
         }
       }
+
       return prevState
     })
   }
 
-  const onRemoveShiftToWorkingTimeTogether = (day: keyof WorkingTime) => {
+  const onRemoveShiftToWorkingTimeTogether = <T extends keyof WorkingDay>(day: T) => {
     setWorkingTimeTogether((prevState) => {
-      if (prevState[day]) {
-        return {
-          ...prevState,
-          [day]: {
-            ...prevState[day],
-            shift: prevState[day].shift.slice(0, -1)
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedShifts = [...currentDay.shifts]
+          updatedShifts.pop() // Xóa phần tử cuối cùng
+
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: {
+                  ...currentDay,
+                  shifts: updatedShifts
+                }
+              }
+            }
+          ]
+
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
           }
         }
       }
+
       return prevState
     })
   }
 
-  const onSetOptionExtendWorkingTimeTogether = (day: keyof WorkingTime) => {
+  const onSetOptionExtendWorkingTimeTogether = <T extends keyof WorkingDay>(day: T) => {
     setWorkingTimeTogether((prevState) => {
-      if (prevState[day]) {
-        return {
-          ...prevState,
-          [day]: {
-            ...prevState[day],
-            optionExtend: !prevState[day].optionExtend
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedOptionExtend = !currentDay.optionExtend
+
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: {
+                  ...currentDay,
+                  optionExtend: updatedOptionExtend
+                }
+              }
+            }
+          ]
+
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
           }
         }
       }
+
       return prevState
     })
   }
 
-  const onOpenorCloseConfigTime = (day: keyof WorkingTime) => {
+  const onOpenorCloseConfigTime = <T extends keyof WorkingDay>(day: T) => {
     setWorkingTimeTogether((prevState) => {
-      if (prevState[day]) {
-        return {
-          ...prevState,
-          [day]: {
-            ...prevState[day],
-            work: !prevState[day].work
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: null
+              }
+            }
+          ]
+
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
           }
-        }
-      }
-      return prevState
-    })
-  }
-
-  const onChangeOptionRepeatConfigTime = (value: string, day: keyof WorkingTime) => {
-    const updatedWorkingTimeTogether = { ...workingTimeTogether }
-    if (day in updatedWorkingTimeTogether) {
-      if (value === 'custom') {
-        updatedWorkingTimeTogether[day].repeat = []
-        setWorkingTimeTogether(updatedWorkingTimeTogether)
-      } else {
-        updatedWorkingTimeTogether[day].repeat = 'all'
-        setWorkingTimeTogether(updatedWorkingTimeTogether)
-      }
-    }
-  }
-
-  const setDateCustomRepeat = (day: keyof WorkingTime, week: string) => {
-    const updatedWorkingTimeTogether = { ...workingTimeTogether }
-    if (day in updatedWorkingTimeTogether) {
-      if (Array.isArray(updatedWorkingTimeTogether[day].repeat)) {
-        const test = updatedWorkingTimeTogether[day].repeat as string[]
-        if (updatedWorkingTimeTogether[day].repeat.includes(week)) {
-          const index = updatedWorkingTimeTogether[day].repeat.indexOf(week)
-
-          test.splice(index, 1)
-          setWorkingTimeTogether(updatedWorkingTimeTogether)
         } else {
-          test.push(week)
-          setWorkingTimeTogether(updatedWorkingTimeTogether)
+          const defaultConfig = {
+            always: true,
+            weeks: [],
+            optionExtend: false,
+            shifts: [
+              {
+                startTimeShift: '08:30',
+                endTimeShift: '12:00'
+              },
+              {
+                startTimeShift: '13:00',
+                endTimeShift: '17:30'
+              }
+            ]
+          }
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: defaultConfig
+              }
+            }
+          ]
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
+          }
         }
-      } else {
-        updatedWorkingTimeTogether[day].repeat = [week]
-        setWorkingTimeTogether(updatedWorkingTimeTogether)
       }
-    }
+
+      return prevState
+    })
+  }
+
+  const onChangeOptionRepeatConfigTime = <T extends keyof WorkingDay>(value: string, day: T) => {
+    setWorkingTimeTogether((prevState) => {
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedDay = {
+            ...currentDay,
+            always: value !== 'custom',
+            weeks: value !== 'custom' ? [] : currentDay.weeks
+          }
+
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: updatedDay
+              }
+            }
+          ]
+
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
+          }
+        }
+      }
+
+      return prevState
+    })
+  }
+
+  const setDateCustomRepeat = <T extends keyof WorkingDay>(day: T, week: number) => {
+    setWorkingTimeTogether((prevState) => {
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const existingWeekIndex = currentDay.weeks.indexOf(week)
+
+          if (existingWeekIndex !== -1) {
+            // Đã tồn tại trong weeks, xóa week
+            const updatedWeeks = [...currentDay.weeks]
+            updatedWeeks.splice(existingWeekIndex, 1)
+
+            const updatedWorkingDays = [
+              {
+                ...prevState.workingDays[0],
+                workDays: {
+                  ...prevState.workingDays[0].workDays,
+                  [day]: {
+                    ...currentDay,
+                    weeks: updatedWeeks
+                  }
+                }
+              }
+            ]
+
+            return {
+              ...prevState,
+              workingDays: updatedWorkingDays
+            }
+          } else {
+            // Chưa tồn tại trong weeks, thêm week
+            const updatedWeeks = [...currentDay.weeks, week]
+
+            const updatedWorkingDays = [
+              {
+                ...prevState.workingDays[0],
+                workDays: {
+                  ...prevState.workingDays[0].workDays,
+                  [day]: {
+                    ...currentDay,
+                    weeks: updatedWeeks
+                  }
+                }
+              }
+            ]
+
+            return {
+              ...prevState,
+              workingDays: updatedWorkingDays
+            }
+          }
+        }
+      }
+
+      return prevState
+    })
   }
 
   const onChange = (value: number | null) => {
@@ -177,17 +407,53 @@ function CommonTime() {
     console.log(value)
   }
 
-  const handleShiftChange = (day: keyof WorkingTime, index: number, time: Dayjs, configTime: 'start' | 'end') => {
-    const updatedWorkingTimeTogether = { ...workingTimeTogether }
-    if (day in updatedWorkingTimeTogether) {
-      const newShifts = updatedWorkingTimeTogether[day].shift[index]
-      if (configTime === 'start') {
-        updatedWorkingTimeTogether[day].shift[index] = newShifts.replace(/(\d+:\d+)\b/, time.format('HH:mm'))
-      } else if (configTime === 'end') {
-        updatedWorkingTimeTogether[day].shift[index] = newShifts.replace(/\b(\d+:\d+)$/, time.format('HH:mm'))
+  const handleShiftChange = <T extends keyof WorkingDay>(
+    day: T,
+    index: number,
+    time: Dayjs,
+    configTime: 'start' | 'end'
+  ) => {
+    setWorkingTimeTogether((prevState) => {
+      if (prevState) {
+        const currentDay = prevState.workingDays[0].workDays[day]
+
+        if (currentDay) {
+          const updatedShifts = [...currentDay.shifts]
+          const shiftToUpdate = updatedShifts[index]
+
+          if (configTime === 'start') {
+            shiftToUpdate.startTimeShift = time.format('HH:mm')
+          } else if (configTime === 'end') {
+            shiftToUpdate.endTimeShift = time.format('HH:mm')
+          }
+
+          const updatedWorkingDays = [
+            {
+              ...prevState.workingDays[0],
+              workDays: {
+                ...prevState.workingDays[0].workDays,
+                [day]: {
+                  ...currentDay,
+                  shifts: updatedShifts
+                }
+              }
+            }
+          ]
+
+          return {
+            ...prevState,
+            workingDays: updatedWorkingDays
+          }
+        }
       }
-    }
+
+      return prevState
+    })
   }
+
+  useEffect(() => {
+    console.log(workingTimeTogether)
+  }, [workingTimeTogether])
 
   return (
     <div className='common-time'>
@@ -199,24 +465,24 @@ function CommonTime() {
           <div>
             <div className='monthly-closing-date'>
               <p>Ngày chốt công</p>
-              Từ <InputNumber min={1} max={30} defaultValue={1} onChange={onChange} />
-              đến <InputNumber min={1} max={30} defaultValue={1} onChange={onChange} />
+              Từ <InputNumber min={1} max={30} defaultValue={dataApi?.startPayrollCutoffDay} onChange={onChange} />
+              đến <InputNumber min={1} max={30} defaultValue={dataApi?.endPayrollCutoffDay} onChange={onChange} />
               hàng tháng
             </div>
             <div className='monthly-closing-date monthly-closing-date-default'>
               <p>Số ngày nghỉ phép mặc định </p>
-              <InputNumber min={1} max={30} defaultValue={12} onChange={onChange} />
+              <InputNumber min={1} max={30} defaultValue={dataApi.defaultLeaveDay} onChange={onChange} />
               ngày
             </div>
             <div className='monthly-closing-date monthly-closing-date-default'>
               <p>Thời gian nghỉ bù có hiệu lực</p>
-              <InputNumber min={1} max={30} defaultValue={3} onChange={onChange} />
+              <InputNumber min={1} max={12} defaultValue={dataApi.affectCompensatoryInMonth} onChange={onChange} />
               tháng
             </div>
             <div className='monthly-closing-date'>
               <p>Khoảng thời gian làm thêm (OT)</p>
-              Từ <TimePicker defaultOpenValue={dayjs('00:00:00', 'HH:mm:ss')} />
-              đến <TimePicker defaultOpenValue={dayjs('00:00:00', 'HH:mm:ss')} />
+              Từ <TimePicker defaultValue={dayjs('17:30', 'HH:mm')} />
+              đến <TimePicker defaultValue={dayjs('22:30', 'HH:mm')} />
               hàng ngày
             </div>
           </div>
@@ -226,22 +492,29 @@ function CommonTime() {
             <p>Thời gian làm việc chung</p>
           </div>
           <div className='list-day-working'>
-            {!workingTimeTogether.monday.optionExtend ? (
+            {/* Thứ 2 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.MONDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('monday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.MONDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('MONDAY')}
+                    />
                     Thứ 2
                   </div>
-                  {workingTimeTogether.monday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.MONDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.monday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.MONDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.monday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.MONDAY?.shifts[index].startTimeShift} -{' '}
+                                  {workingTimeTogether?.workingDays[0]?.workDays.MONDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -250,28 +523,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('monday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('MONDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.monday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.MONDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.MONDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('monday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.MONDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('MONDAY')}
+                  />
                   Thứ 2
                 </div>
-                {workingTimeTogether.monday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.MONDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.monday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.MONDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'monday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'MONDAY')}
                         options={[
                           {
                             value: 'all',
@@ -284,13 +563,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.monday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.MONDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -298,8 +581,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -307,8 +594,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -316,8 +607,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -325,8 +620,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -334,8 +633,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.monday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('monday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.MONDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('MONDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -344,14 +647,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.monday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.MONDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('monday', index, time, 'start')
+                                handleShiftChange('MONDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -360,7 +663,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('monday', index, time, 'end')
+                                handleShiftChange('MONDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -370,18 +673,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('monday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('MONDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('monday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('MONDAY')}
                       />
-                      {workingTimeTogether.monday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.MONDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('monday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('MONDAY')} />}
                         />
                       )}
                     </div>
@@ -389,23 +692,29 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {/* Thứ ba */}
-            {!workingTimeTogether.tuesday.optionExtend ? (
+            {/* Thứ 3 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.TUESDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('tuesday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.TUESDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('TUESDAY')}
+                    />
                     Thứ 3
                   </div>
-                  {workingTimeTogether.tuesday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.TUESDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.tuesday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.TUESDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.tuesday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.TUESDAY?.shifts[index].startTimeShift}{' '}
+                                  - {workingTimeTogether?.workingDays[0]?.workDays.TUESDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -414,28 +723,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('tuesday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('TUESDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.tuesday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.TUESDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.TUESDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('tuesday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.TUESDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('TUESDAY')}
+                  />
                   Thứ 3
                 </div>
-                {workingTimeTogether.tuesday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.TUESDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.tuesday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.TUESDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'tuesday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'TUESDAY')}
                         options={[
                           {
                             value: 'all',
@@ -448,13 +763,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.tuesday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.TUESDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -462,8 +781,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -471,8 +794,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -480,8 +807,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -489,8 +820,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -498,8 +833,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.tuesday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('tuesday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.TUESDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('TUESDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -508,14 +847,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.tuesday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.TUESDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('tuesday', index, time, 'start')
+                                handleShiftChange('TUESDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -524,7 +863,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('tuesday', index, time, 'end')
+                                handleShiftChange('TUESDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -534,18 +873,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('tuesday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('TUESDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('tuesday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('TUESDAY')}
                       />
-                      {workingTimeTogether.tuesday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.TUESDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('tuesday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('TUESDAY')} />}
                         />
                       )}
                     </div>
@@ -553,23 +892,33 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {/* Thứ tư */}
-            {!workingTimeTogether.wednesday.optionExtend ? (
+            {/* Thứ 4 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.WEDNESDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('wednesday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.WEDNESDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('WEDNESDAY')}
+                    />
                     Thứ 4
                   </div>
-                  {workingTimeTogether.wednesday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.wednesday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.wednesday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {
+                                    workingTimeTogether?.workingDays[0]?.workDays.WEDNESDAY?.shifts[index]
+                                      .startTimeShift
+                                  }{' '}
+                                  -{' '}
+                                  {workingTimeTogether?.workingDays[0]?.workDays.WEDNESDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -578,30 +927,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('wednesday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('WEDNESDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.wednesday.repeat !== 'all' && (
-                  <InfoCircleOutlined style={{ marginLeft: '10px' }} />
-                )}
+                {!workingTimeTogether?.workingDays[0]?.workDays.WEDNESDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.WEDNESDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('wednesday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.WEDNESDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('WEDNESDAY')}
+                  />
                   Thứ 4
                 </div>
-                {workingTimeTogether.wednesday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.wednesday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.WEDNESDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'wednesday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'WEDNESDAY')}
                         options={[
                           {
                             value: 'all',
@@ -614,13 +967,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.wednesday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -628,8 +985,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -637,8 +998,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -646,8 +1011,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -655,8 +1024,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -664,8 +1037,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.wednesday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('wednesday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.WEDNESDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('WEDNESDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -674,14 +1051,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.wednesday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('wednesday', index, time, 'start')
+                                handleShiftChange('WEDNESDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -690,7 +1067,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('wednesday', index, time, 'end')
+                                handleShiftChange('WEDNESDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -700,18 +1077,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('wednesday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('WEDNESDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('wednesday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('WEDNESDAY')}
                       />
-                      {workingTimeTogether.wednesday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.WEDNESDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('wednesday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('WEDNESDAY')} />}
                         />
                       )}
                     </div>
@@ -719,23 +1096,29 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {/* Thứ năm */}
-            {!workingTimeTogether.thursday.optionExtend ? (
+            {/* Thứ 5 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.THURSDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('thursday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.THURSDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('THURSDAY')}
+                    />
                     Thứ 5
                   </div>
-                  {workingTimeTogether.thursday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.THURSDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.thursday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.THURSDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.thursday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.THURSDAY?.shifts[index].startTimeShift}{' '}
+                                  - {workingTimeTogether?.workingDays[0]?.workDays.THURSDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -744,28 +1127,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('thursday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('THURSDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.thursday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.THURSDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.THURSDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('thursday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.THURSDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('THURSDAY')}
+                  />
                   Thứ 5
                 </div>
-                {workingTimeTogether.thursday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.THURSDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.thursday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.THURSDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'thursday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'THURSDAY')}
                         options={[
                           {
                             value: 'all',
@@ -778,13 +1167,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.thursday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.THURSDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -792,8 +1185,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -801,8 +1198,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -810,8 +1211,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -819,8 +1224,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -828,8 +1237,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.thursday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('thursday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.THURSDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('THURSDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -838,14 +1251,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.thursday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.THURSDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('thursday', index, time, 'start')
+                                handleShiftChange('THURSDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -854,7 +1267,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('thursday', index, time, 'end')
+                                handleShiftChange('THURSDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -864,18 +1277,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('thursday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('THURSDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('thursday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('THURSDAY')}
                       />
-                      {workingTimeTogether.thursday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.THURSDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('thursday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('THURSDAY')} />}
                         />
                       )}
                     </div>
@@ -883,22 +1296,29 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {!workingTimeTogether.friday.optionExtend ? (
+            {/* Thứ 6 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.FRIDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('friday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.FRIDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('FRIDAY')}
+                    />
                     Thứ 6
                   </div>
-                  {workingTimeTogether.friday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.FRIDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.friday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.FRIDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.friday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.FRIDAY?.shifts[index].startTimeShift} -{' '}
+                                  {workingTimeTogether?.workingDays[0]?.workDays.FRIDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -907,28 +1327,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('friday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('FRIDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.friday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.FRIDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.FRIDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('friday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.FRIDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('FRIDAY')}
+                  />
                   Thứ 6
                 </div>
-                {workingTimeTogether.friday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.FRIDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.friday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.FRIDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'friday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'FRIDAY')}
                         options={[
                           {
                             value: 'all',
@@ -941,13 +1367,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.friday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.FRIDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -955,8 +1385,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -964,8 +1398,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -973,8 +1411,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -982,8 +1424,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -991,8 +1437,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.friday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('friday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.FRIDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('FRIDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1001,14 +1451,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.friday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.FRIDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('friday', index, time, 'start')
+                                handleShiftChange('FRIDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -1017,7 +1467,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('friday', index, time, 'end')
+                                handleShiftChange('FRIDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -1027,18 +1477,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('friday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('FRIDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('friday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('FRIDAY')}
                       />
-                      {workingTimeTogether.friday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.FRIDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('friday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('FRIDAY')} />}
                         />
                       )}
                     </div>
@@ -1046,22 +1496,29 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {!workingTimeTogether.saturday.optionExtend ? (
+            {/* Thứ 7 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.SATURDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('saturday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.SATURDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('SATURDAY')}
+                    />
                     Thứ 7
                   </div>
-                  {workingTimeTogether.saturday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.SATURDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.saturday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.SATURDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.saturday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.SATURDAY?.shifts[index].startTimeShift}{' '}
+                                  - {workingTimeTogether?.workingDays[0]?.workDays.SATURDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -1070,28 +1527,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('saturday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('SATURDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.saturday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.SATURDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.SATURDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('saturday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.SATURDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('SATURDAY')}
+                  />
                   Thứ 7
                 </div>
-                {workingTimeTogether.saturday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.SATURDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.saturday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.SATURDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'saturday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'SATURDAY')}
                         options={[
                           {
                             value: 'all',
@@ -1104,13 +1567,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.saturday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.SATURDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1118,8 +1585,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1127,8 +1598,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1136,8 +1611,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1145,8 +1624,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1154,8 +1637,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.saturday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('saturday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SATURDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SATURDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1164,14 +1651,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.saturday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.SATURDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('saturday', index, time, 'start')
+                                handleShiftChange('SATURDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -1180,7 +1667,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('saturday', index, time, 'end')
+                                handleShiftChange('SATURDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -1190,18 +1677,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('saturday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('SATURDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('saturday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('SATURDAY')}
                       />
-                      {workingTimeTogether.saturday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.SATURDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('saturday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('SATURDAY')} />}
                         />
                       )}
                     </div>
@@ -1209,22 +1696,29 @@ function CommonTime() {
                 )}
               </div>
             )}
-            {!workingTimeTogether.sunday.optionExtend ? (
+            {/* Thứ 8 */}
+            {!workingTimeTogether?.workingDays[0]?.workDays.SUNDAY?.optionExtend ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div className='config-day'>
                   <div className='activated'>
-                    <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('sunday')} />
+                    <Switch
+                      checked={workingTimeTogether?.workingDays[0]?.workDays?.SUNDAY ? true : false}
+                      onChange={() => onOpenorCloseConfigTime('SUNDAY')}
+                    />
                     Chủ nhật
                   </div>
-                  {workingTimeTogether.sunday.work && (
+                  {workingTimeTogether?.workingDays[0].workDays.SUNDAY && (
                     <>
                       <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                        {workingTimeTogether.sunday.shift.map((shiftItem, index) => {
+                        {workingTimeTogether?.workingDays[0].workDays.SUNDAY.shifts.map((shiftItem, index) => {
                           if (index < 3) {
                             return (
                               <div className='item-shift' key={index}>
                                 <span className='separation-point' />
-                                <div className='first-shift'>{workingTimeTogether.sunday.shift[index]}</div>
+                                <div className='first-shift'>
+                                  {workingTimeTogether?.workingDays[0]?.workDays.SUNDAY?.shifts[index].startTimeShift} -{' '}
+                                  {workingTimeTogether?.workingDays[0]?.workDays.SUNDAY?.shifts[index].endTimeShift}
+                                </div>
                               </div>
                             )
                           }
@@ -1233,28 +1727,34 @@ function CommonTime() {
                       </div>
                       <UpOutlined
                         className='button-extend'
-                        onClick={() => onSetOptionExtendWorkingTimeTogether('sunday')}
+                        onClick={() => onSetOptionExtendWorkingTimeTogether('SUNDAY')}
                       />
                     </>
                   )}
                 </div>
-                {workingTimeTogether.sunday.repeat !== 'all' && <InfoCircleOutlined style={{ marginLeft: '10px' }} />}
+                {!workingTimeTogether?.workingDays[0]?.workDays.SUNDAY?.always &&
+                  workingTimeTogether?.workingDays[0]?.workDays?.SUNDAY && (
+                    <InfoCircleOutlined style={{ marginLeft: '10px' }} />
+                  )}
               </div>
             ) : (
               <div className='config-day config-day-grid'>
                 <div className='activated'>
-                  <Switch defaultChecked onChange={() => onOpenorCloseConfigTime('sunday')} />
+                  <Switch
+                    checked={workingTimeTogether?.workingDays[0]?.workDays?.SUNDAY ? true : false}
+                    onChange={() => onOpenorCloseConfigTime('SUNDAY')}
+                  />
                   Chủ nhật
                 </div>
-                {workingTimeTogether.sunday.work && (
+                {workingTimeTogether?.workingDays[0].workDays.SUNDAY && (
                   <>
                     <div className='first-shift'>
                       <p>Lặp lại:</p>
                       <Select
                         showSearch
-                        defaultValue={workingTimeTogether.sunday.repeat === 'all' ? 'all' : 'custom'}
+                        defaultValue={workingTimeTogether?.workingDays[0].workDays.SUNDAY.always ? 'all' : 'custom'}
                         optionFilterProp='children'
-                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'sunday')}
+                        onChange={(value) => onChangeOptionRepeatConfigTime(value, 'SUNDAY')}
                         options={[
                           {
                             value: 'all',
@@ -1267,13 +1767,17 @@ function CommonTime() {
                         ]}
                       />
                     </div>
-                    {workingTimeTogether?.sunday?.repeat === 'all' ? (
+                    {workingTimeTogether?.workingDays[0].workDays.SUNDAY.always ? (
                       ''
                     ) : (
                       <div>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week1') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week1')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(1)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 1)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1281,8 +1785,12 @@ function CommonTime() {
                           Tuần 1
                         </Button>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week2') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week2')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(2)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 2)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1290,8 +1798,12 @@ function CommonTime() {
                           Tuần 2
                         </Button>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week3') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week3')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(3)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 3)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1299,8 +1811,12 @@ function CommonTime() {
                           Tuần 3
                         </Button>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week4') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week4')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(4)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 4)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1308,8 +1824,12 @@ function CommonTime() {
                           Tuần 4
                         </Button>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week5') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week5')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(5)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 5)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1317,8 +1837,12 @@ function CommonTime() {
                           Tuần 5
                         </Button>
                         <Button
-                          type={workingTimeTogether?.sunday?.repeat?.includes('week6') ? 'primary' : 'ghost'}
-                          onClick={() => setDateCustomRepeat('sunday', 'week6')}
+                          type={
+                            (workingTimeTogether.workingDays[0].workDays.SUNDAY.weeks as number[]).includes(6)
+                              ? 'primary'
+                              : 'ghost'
+                          }
+                          onClick={() => setDateCustomRepeat('SUNDAY', 6)}
                           shape='round'
                           size='middle'
                           className='custom'
@@ -1327,14 +1851,14 @@ function CommonTime() {
                         </Button>
                       </div>
                     )}
-                    {workingTimeTogether.sunday.shift.map((shift, index) => {
+                    {workingTimeTogether?.workingDays[0].workDays.SUNDAY.shifts.map((shift, index) => {
                       return (
                         <div className='first-shift' key={index}>
                           <p>Ca {index + 1}:</p>
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('sunday', index, time, 'start')
+                                handleShiftChange('SUNDAY', index, time, 'start')
                               }
                             }}
                             format='HH:mm'
@@ -1343,7 +1867,7 @@ function CommonTime() {
                           <TimePicker
                             onChange={(time) => {
                               if (time !== null) {
-                                handleShiftChange('sunday', index, time, 'end')
+                                handleShiftChange('SUNDAY', index, time, 'end')
                               }
                             }}
                             format='HH:mm'
@@ -1353,18 +1877,18 @@ function CommonTime() {
                     })}
                     <DownOutlined
                       className='button-extend'
-                      onClick={() => onSetOptionExtendWorkingTimeTogether('sunday')}
+                      onClick={() => onSetOptionExtendWorkingTimeTogether('SUNDAY')}
                     />
                     <div className='action-shift'>
                       <Button
                         shape='circle'
                         icon={<PlusOutlined />}
-                        onClick={() => onAddShiftToWorkingTimeTogether('sunday')}
+                        onClick={() => onAddShiftToWorkingTimeTogether('SUNDAY')}
                       />
-                      {workingTimeTogether.sunday.shift.length > 1 && (
+                      {workingTimeTogether?.workingDays[0].workDays.SUNDAY.shifts.length > 1 && (
                         <Button
                           shape='circle'
-                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('sunday')} />}
+                          icon={<DeleteOutlined onClick={() => onRemoveShiftToWorkingTimeTogether('SUNDAY')} />}
                         />
                       )}
                     </div>
