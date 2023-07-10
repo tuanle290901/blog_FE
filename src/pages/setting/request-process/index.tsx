@@ -19,7 +19,6 @@ const Index: FC = memo(function Index() {
   const dispatch = useAppDispatch()
   const droppedItems = useAppSelector((state) => state.requestProcess.droppedItems)
   const sourceBoxes = useAppSelector((state) => state.requestProcess.departments)
-  const droppedRef = useRef(null)
   const targetBoxsRef = useRef([
     {
       key: SETTING.REQUEST_PROCESS.REQUEST_ONE,

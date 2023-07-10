@@ -1,9 +1,8 @@
-import { SETTING } from '~/utils/Constant'
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { notification } from 'antd'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { ErrorResponse } from '~/types/error-response.interface'
 import { DropItem } from '~/types/setting-request-process'
+import { SETTING } from '~/utils/Constant'
 
 export interface IRequestProcess {
   loading: boolean
