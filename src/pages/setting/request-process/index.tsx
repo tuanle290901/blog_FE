@@ -4,14 +4,20 @@ import React, { memo, useEffect } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-import { Button, Space } from 'antd'
+import { Button, Space, Tooltip } from 'antd'
+import { PlusOutlined, EditOutlined, MinusOutlined } from '@ant-design/icons'
 import Target from './Target'
 
 import iconAdd from '~/assets/images/setting/add.png'
 import iconHalfArrow from '~/assets/images/setting/half-arrow.png'
-import { addDroppedItem, fetchDepartments } from '~/stores/features/setting/ticket-process.slice'
+import {
+  addDroppedItem,
+  addNewApprovalStep,
+  fetchDepartments,
+  removeApprovalStep
+} from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { DragItem } from '~/types/setting-ticket-process'
+import { DragItem, DropItem } from '~/types/setting-ticket-process'
 import Source from './Source'
 
 const Index: FC = memo(function Index() {
@@ -25,6 +31,14 @@ const Index: FC = memo(function Index() {
 
   const canDropItem = () => {
     return true
+  }
+
+  const addNewStep = (item: DropItem, index: number) => {
+    dispatch(addNewApprovalStep({ index }))
+  }
+
+  const removeStep = (item: DropItem, index: number) => {
+    dispatch(removeApprovalStep({ index }))
   }
 
   useEffect(() => {
@@ -52,23 +66,54 @@ const Index: FC = memo(function Index() {
           <div className='item-tartget__top'>
             <div className='button-start-end'>Khởi tạo phép</div>
             <img src={iconHalfArrow} alt='arrow' />
-            {targetBoxes.map((item, index) => {
-              return (
-                <>
-                  <div className='tw-flex tw-flex-col tw-items-center tw-justify-center' key={index}>
-                    <div className='tw-mb-3'>{item.title}</div>
-                    <Target
-                      key={item.key}
-                      targetKey={item.key}
-                      onDrop={handleDrop}
-                      dropItem={item}
-                      canDropItem={canDropItem}
-                    />
-                  </div>
-                  <img src={iconHalfArrow} alt='arrow' />
-                </>
-              )
-            })}
+            <div
+              className='target-box-container'
+              style={{
+                overflowY: targetBoxes?.length > 1 ? 'auto' : 'unset'
+              }}
+            >
+              {targetBoxes.map((item, index) => {
+                return (
+                  <>
+                    <div
+                      className='tw-flex tw-flex-col tw-items-center tw-justify-center'
+                      key={index}
+                      style={{ maxWidth: '50%' }}
+                    >
+                      <div className='tw-mb-3'>{item.title}</div>
+                      <Target
+                        key={item.key}
+                        targetKey={item.key}
+                        onDrop={handleDrop}
+                        dropItem={item}
+                        canDropItem={canDropItem}
+                      />
+                      <Space className='tw-mt-3'>
+                        <Tooltip title={'Xóa bước xét duyệt'}>
+                          <Button shape='circle' onClick={() => removeStep(item, index)}>
+                            <MinusOutlined />
+                          </Button>
+                        </Tooltip>
+
+                        <Tooltip title={'Cập nhật thông tin thuộc tính'}>
+                          <Button shape='circle'>
+                            <EditOutlined />
+                          </Button>
+                        </Tooltip>
+
+                        <Tooltip title={'Thêm bước xét duyệt'}>
+                          <Button shape='circle' onClick={() => addNewStep(item, index)}>
+                            <PlusOutlined />
+                          </Button>
+                        </Tooltip>
+                      </Space>
+                    </div>
+                    {index !== targetBoxes.length - 1 && <img src={iconHalfArrow} alt='arrow' />}
+                  </>
+                )
+              })}
+            </div>
+            <img src={iconHalfArrow} alt='arrow' />
             <div className='button-start-end'>Trạng thái cuối</div>
           </div>
 

@@ -1,7 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { notification } from 'antd'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { DragItem, DropItem, ITicketDef, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
+import { DragItem, ITicketDef, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 
 const initialState: ITicketDef = {
   loading: false,
@@ -11,7 +11,7 @@ const initialState: ITicketDef = {
     {
       index: 0,
       key: 'request0',
-      title: 'Duyệt lần 0',
+      title: 'Duyệt lần 1',
       data: []
     }
   ]
@@ -56,12 +56,17 @@ const ticketProcessSlice = createSlice({
       if (itemIndex !== -1) {
         const targetData = state.approvalSteps[itemIndex].data
 
+        if (itemIndex > 1 && state.approvalSteps[itemIndex - 1].data.length === 0) {
+          notification.error({ message: 'Vui lòng cập nhật thông tin bước duyệt trước đó' })
+          return
+        }
+
         if (targetData.length >= 3) {
-          notification.error({ message: 'Lớn hơn 3' })
+          notification.error({ message: 'Giới hạn 3 đơn vị xét duyệt song song' })
           return
         }
         if (targetData.map((t) => t.id).includes(item.id)) {
-          notification.error({ message: 'Đã tồn tại' })
+          notification.error({ message: `${item.name} đã tồn tại` })
           return
         }
         state.approvalSteps[itemIndex].data.push(item)
@@ -74,6 +79,20 @@ const ticketProcessSlice = createSlice({
         const removedIndex = state.approvalSteps[itemIndex].data.findIndex((childItem) => childItem.id === id)
         state.approvalSteps[itemIndex].data.splice(removedIndex, 1)
       }
+    },
+    addNewApprovalStep: (state, action) => {
+      const { index } = action.payload
+      const nextIndexNode = index + 1
+      state.approvalSteps.push({
+        index: nextIndexNode,
+        key: `request${nextIndexNode}`,
+        title: `Duyệt lần ${nextIndexNode + 1} `,
+        data: []
+      })
+    },
+    removeApprovalStep: (state, action) => {
+      const { index } = action.payload
+      state.approvalSteps.splice(index, 1)
     }
   },
   extraReducers: (builder) => {
@@ -98,6 +117,6 @@ const ticketProcessSlice = createSlice({
   }
 })
 
-export const { addDroppedItem, removeDroppedItem } = ticketProcessSlice.actions
+export const { addDroppedItem, removeDroppedItem, addNewApprovalStep, removeApprovalStep } = ticketProcessSlice.actions
 export { fetchDepartments }
 export default ticketProcessSlice.reducer

@@ -38,6 +38,18 @@
       justify-content: center;
       background-color: white;
     }
+
+    .target-box-container {
+      display: flex;
+      align-items: center;
+      max-width: 60%;
+      padding: 20px;
+      gap: 30px;
+
+      .spacer {
+        width: 20px;
+      }
+    }
   }
 
   .item-tartget__bottom {
