@@ -20,7 +20,7 @@ export const PRIVATE_PATH = {
   },
   timesheet: '/timesheet',
   setting: {
-    requestProcess: 'request-process'
+    ticketProcessDefinition: 'ticket-process-definition'
   },
   department: {
     prefix: 'department',
@@ -46,8 +46,8 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: PRIVATE_PATH.setting.requestProcess,
-    path: PRIVATE_PATH.setting.requestProcess,
+    name: PRIVATE_PATH.setting.ticketProcessDefinition,
+    path: PRIVATE_PATH.setting.ticketProcessDefinition,
     component: ApprovalProcess,
     allowedRoles: []
   },

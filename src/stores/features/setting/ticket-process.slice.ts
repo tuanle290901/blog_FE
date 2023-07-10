@@ -1,23 +1,20 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { notification } from 'antd'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { DropItem } from '~/types/setting-request-process'
-import { SETTING } from '~/utils/Constant'
+import { DragItem, DropItem, ITicketDef, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 
-export interface IRequestProcess {
-  loading: boolean
-  departments: DropItem[]
-  droppedItems: any
-}
-
-const initialState: IRequestProcess = {
+const initialState: ITicketDef = {
   loading: false,
   departments: [],
-  droppedItems: {
-    requestOne: [],
-    requestTwo: [],
-    requestThree: []
-  }
+  ticketCreateRequest: {} as TicketDefRevisionCreateReq,
+  approvalSteps: [
+    {
+      index: 0,
+      key: 'request0',
+      title: 'Duyệt lần 0',
+      data: []
+    }
+  ]
 }
 
 const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI) => {
@@ -49,37 +46,34 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
   return await response
 })
 
-const requestProcessSlice = createSlice({
-  name: 'requestProcess',
+const ticketProcessSlice = createSlice({
+  name: 'ticketProcess',
   initialState,
   reducers: {
-    addDroppedItem: (state, action: PayloadAction<{ targetKey: string; item: DropItem }>) => {
+    addDroppedItem: (state, action: PayloadAction<{ targetKey: string; item: DragItem }>) => {
       const { targetKey, item } = action.payload
-      const droppedItems = state.droppedItems
+      const itemIndex = state.approvalSteps.findIndex((item) => item.key === targetKey)
+      if (itemIndex !== -1) {
+        const targetData = state.approvalSteps[itemIndex].data
 
-      if (
-        (targetKey === SETTING.REQUEST_PROCESS.REQUEST_THREE &&
-          droppedItems[SETTING.REQUEST_PROCESS.REQUEST_TWO].length === 0) ||
-        (targetKey === SETTING.REQUEST_PROCESS.REQUEST_TWO &&
-          droppedItems[SETTING.REQUEST_PROCESS.REQUEST_ONE].length === 0)
-      ) {
-        notification.error({ message: 'Vui lòng cập nhật các bước duyệt trước' })
-        return
+        if (targetData.length >= 3) {
+          notification.error({ message: 'Lớn hơn 3' })
+          return
+        }
+        if (targetData.map((t) => t.id).includes(item.id)) {
+          notification.error({ message: 'Đã tồn tại' })
+          return
+        }
+        state.approvalSteps[itemIndex].data.push(item)
       }
-
-      if (droppedItems[targetKey].map((item: DropItem) => item.id).includes(item.id)) {
-        notification.error({ message: `${item.name} đã tồn tại` })
-        return
-      }
-      if (droppedItems[targetKey].length >= 3) {
-        notification.error({ message: `Tối đa 3 đơn vị cho một bước duyệt` })
-        return
-      }
-      state.droppedItems[targetKey].push(item)
     },
     removeDroppedItem: (state, action) => {
       const { targetKey, id } = action.payload
-      state.droppedItems[targetKey] = state.droppedItems[targetKey].filter((item: DropItem) => item.id !== id)
+      const itemIndex = state.approvalSteps.findIndex((item) => item.key === targetKey)
+      if (itemIndex !== -1) {
+        const removedIndex = state.approvalSteps[itemIndex].data.findIndex((childItem) => childItem.id === id)
+        state.approvalSteps[itemIndex].data.splice(removedIndex, 1)
+      }
     }
   },
   extraReducers: (builder) => {
@@ -104,6 +98,6 @@ const requestProcessSlice = createSlice({
   }
 })
 
-export const { addDroppedItem, removeDroppedItem } = requestProcessSlice.actions
+export const { addDroppedItem, removeDroppedItem } = ticketProcessSlice.actions
 export { fetchDepartments }
-export default requestProcessSlice.reducer
+export default ticketProcessSlice.reducer

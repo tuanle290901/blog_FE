@@ -3,10 +3,10 @@ import { useDrag } from 'react-dnd'
 
 import { ItemTypes } from './ItemTypes'
 
-import { DropItem } from '~/types/setting-request-process'
+import { DragItem, DropItem } from '~/types/setting-ticket-process'
 import './style.scss'
 
-const Source: FC<DropItem> = function Source({ id, name }) {
+const Source: FC<DragItem> = function Source({ id, name }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.BOX,
     item: { id, name },
