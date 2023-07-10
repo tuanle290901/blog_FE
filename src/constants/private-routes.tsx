@@ -8,6 +8,7 @@ import Timesheet from '~/pages/timesheet'
 import Department from '~/pages/Department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import Config from '~/pages/config/index.tsx'
+import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -29,6 +30,10 @@ export const PRIVATE_PATH = {
   devices: '/devices',
   config: {
     prefix: '/timeWorking'
+  },
+  timeManagement: {
+    prefix: '/work-time',
+    requests: '/work-time/requests'
   }
 }
 
@@ -80,6 +85,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'config',
     path: PRIVATE_PATH.config.prefix,
     component: Config,
+    allowedRoles: []
+  },
+  {
+    name: 'requestWorkTime',
+    path: PRIVATE_PATH.timeManagement.requests,
+    component: PersonalWokingTimeRequestList,
     allowedRoles: []
   }
 ]
