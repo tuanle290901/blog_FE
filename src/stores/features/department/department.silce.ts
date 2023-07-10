@@ -16,17 +16,14 @@ const initialState: IDepartmentState = {
   currentRequestId: null
 }
 
-export const getListUser = createAsyncThunk('users/getAll', async (_, thunkAPI) => {
-  // const response = await HttpService.get<IUser[]>('/api/user/getall', {
-  //   signal: thunkAPI.signal
-  // })
-  // return response.data
-  // const fakeApi = new Promise<IDepartment[]>((resolve, reject) => {
-  //   setTimeout(() => {
-  //     resolve(mockUserData)
-  //   }, 1000)
-  // })
-  // return await fakeApi
+export const getListDepartments = createAsyncThunk('departments/getAll', async (params: any, thunkAPI) => {
+  try {
+    const response = await HttpService.get('/org/group/get-tree', params)
+    return response.data
+  } catch (error) {
+    console.log(error)
+    return thunkAPI.rejectWithValue(error)
+  }
 })
 
 export const getUserById = createAsyncThunk('users/getById', async (userId: string, thunkAPI) => {
@@ -34,19 +31,16 @@ export const getUserById = createAsyncThunk('users/getById', async (userId: stri
   return userId
 })
 
-export const createDepartment = createAsyncThunk(
-  'departments/create',
-  async (body: IDepartment, { rejectWithValue }) => {
-    try {
-      const response = await HttpService.post('/org/group/create', body)
-      return response.data
-    } catch (error) {
-      // Handle any error that occurred during the API call
-      console.log(error)
-      return rejectWithValue(error)
-    }
+export const createDepartment = createAsyncThunk('departments/create', async (body: IDepartment, thunkAPI) => {
+  try {
+    const response = await HttpService.post('/org/group/create', body)
+    return response.data
+  } catch (error) {
+    // Handle any error that occurred during the API call
+    console.log(error)
+    return thunkAPI.rejectWithValue(error)
   }
-)
+})
 // export const updateUser = createAsyncThunk('users/create', (body: { userId: string; newUser: IUser }, thunkAPI) => {
 //   // TODO implement
 //   return body
@@ -81,9 +75,9 @@ const departmentSlice = createSlice({
         state.loading = false
         // state.error = action.payload
       })
-      // .addCase(getListUser.fulfilled, (state, action) => {
-      //   state.listData = action.payload
-      // })
+      .addCase(getListDepartments.fulfilled, (state, action) => {
+        state.listData = [action.payload]
+      })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
         (state, action) => {
@@ -110,7 +104,7 @@ export const { startEditingUser, cancelEditingUser } = departmentSlice.actions
 // export const selectApiLoading = (state) => state.api.loading
 // export const selectApiError = (state) => state.api.error
 export const departmentSelectors = {
-  selectCreatedData: (state: IDepartmentState) => state.listData,
+  selectListData: (state: IDepartmentState) => state.listData,
   selectDepartmentLoading: (state: IDepartmentState) => state.loading
   // selectApiError: (state: IDepartmentState) => state.error
 }

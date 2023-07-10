@@ -40,4 +40,5 @@ export interface IDepartment {
   contactPhoneNumber: string
   status: string
   type: string
+  parentCode: string
 }

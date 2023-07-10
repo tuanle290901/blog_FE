@@ -17,6 +17,9 @@ import { ACTION_TYPE } from '~/utils/helper'
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
 import './index.scss'
+import { departmentSelectors, getListDepartments } from '~/stores/features/department/department.silce'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { useSelector } from 'react-redux'
 
 // interface DataType {
 //   key: React.Key
@@ -38,6 +41,11 @@ const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+  // const createdData = useSelector(departmentSelectors.selectListData)
+
+  const listDataDepartments = useAppSelector((state) => state.department.listData)
+  console.log(listDataDepartments)
 
   const [showModal, setShowModal] = useState<IModelState>({
     openModal: false,
@@ -51,56 +59,59 @@ const Department: React.FC = () => {
     console.log(value)
   }
 
-  const data = [
-    {
-      key: 1,
-      name: 'Node 1',
-      age: 30,
-      address: '123 Main St',
-      children: [
-        {
-          key: 2,
-          name: 'Node 1.1',
-          age: 25,
-          address: '456 Park Ave',
-          parentWorkUnitCode: 1,
-          parentWorkUnitName: 'Node 1',
-          children: [
-            {
-              key: 3,
-              name: 'Node 1.1.1',
-              age: 20,
-              address: '789 Elm St',
-              children: [],
-              parentWorkUnitCode: 2,
-              parentWorkUnitName: 'Node 1.1'
-            },
-            {
-              key: 4,
-              name: 'Node 1.1.2',
-              age: 35,
-              address: '321 Oak St',
-              children: [],
-              parentWorkUnitCode: 2,
-              parentWorkUnitName: 'Node 1.1'
-            }
-          ]
-        },
-        {
-          key: 5,
-          name: 'Node 1.2',
-          age: 40,
-          address: '987 Pine St',
-          children: [],
-          parentWorkUnitCode: 1,
-          parentWorkUnitName: 'Node 1'
-        }
-      ]
-    }
-  ]
+  // const data = [
+  //   {
+  //     key: 1,
+  //     name: 'Node 1',
+  //     age: 30,
+  //     address: '123 Main St',
+  //     children: [
+  //       {
+  //         key: 2,
+  //         name: 'Node 1.1',
+  //         age: 25,
+  //         address: '456 Park Ave',
+  //         parentWorkUnitCode: 1,
+  //         parentWorkUnitName: 'Node 1',
+  //         children: [
+  //           {
+  //             key: 3,
+  //             name: 'Node 1.1.1',
+  //             age: 20,
+  //             address: '789 Elm St',
+  //             children: [],
+  //             parentWorkUnitCode: 2,
+  //             parentWorkUnitName: 'Node 1.1'
+  //           },
+  //           {
+  //             key: 4,
+  //             name: 'Node 1.1.2',
+  //             age: 35,
+  //             address: '321 Oak St',
+  //             children: [],
+  //             parentWorkUnitCode: 2,
+  //             parentWorkUnitName: 'Node 1.1'
+  //           }
+  //         ]
+  //       },
+  //       {
+  //         key: 5,
+  //         name: 'Node 1.2',
+  //         age: 40,
+  //         address: '987 Pine St',
+  //         children: [],
+  //         parentWorkUnitCode: 1,
+  //         parentWorkUnitName: 'Node 1'
+  //       }
+  //     ]
+  //   }
+  // ]
 
-  const [dataRender, setDataRender] = useState({
-    listData: data,
+  const [dataRender, setDataRender] = useState<{
+    listData: any[]
+    listDataTitle: { name: string; code: string }[]
+  }>({
+    listData: listDataDepartments,
     listDataTitle: []
   })
   // const renderTreeRows = (nodes: any[]) => {
@@ -129,17 +140,17 @@ const Department: React.FC = () => {
 
   const renderTreeRows = (nodes: any[], isLastLevel = false) => {
     return nodes.map((node) => {
-      const { key, name, age, address, children, parentWorkUnitCode, parentWorkUnitName } = node
+      const { code, name, contactEmail, address, children, parentCode, parentName } = node
       const hasChildren = children && children.length > 0
 
       const row = {
-        key,
+        code,
         name,
-        age,
+        contactEmail,
         address,
         children,
-        parentWorkUnitCode,
-        parentWorkUnitName
+        parentCode,
+        parentName
       }
 
       if (hasChildren) {
@@ -174,7 +185,7 @@ const Department: React.FC = () => {
 
     function getListDataByKey(listData: any[]) {
       for (const item of listData) {
-        if (item.key === targetKey.key) {
+        if (item.code === targetKey.code) {
           filteredData.push(item)
           break
         } else if (item.children && item.children.length > 0) {
@@ -192,14 +203,14 @@ const Department: React.FC = () => {
     if (targetKey) {
       for (const item of listData) {
         if (item.children && item.children.length > 0) {
-          const child = item.children.find((childItem: any) => childItem.key === targetKey.key)
+          const child = item.children.find((childItem: any) => childItem.code === targetKey.code)
           if (child) {
-            parentList.push({ key: item.key, name: item.name })
+            parentList.push({ code: item.code, name: item.name })
             break
           } else {
             const result = getParentByKey(item.children, targetKey)
             if (result.length > 0) {
-              parentList.push({ key: item.key, name: item.name })
+              parentList.push({ code: item.code, name: item.name })
               parentList.push(...result)
               break
             }
@@ -210,21 +221,48 @@ const Department: React.FC = () => {
     return parentList
   }
 
+  // useEffect(() => {
+
+  // })
   useEffect(() => {
     if (useSelect) {
-      const listDataTitle: any = getParentByKey(data, useSelect)
+      const listDataTitle: any = getParentByKey(listDataDepartments, useSelect)
       setDataRender({
         listData: [useSelect],
         listDataTitle: listDataTitle
       })
     }
-  }, [useSelect])
+  }, [useSelect, listDataDepartments])
 
   useEffect(() => {
-    setDataRender({
-      listData: data,
-      listDataTitle: []
-    })
+    if (listDataDepartments.length > 0) {
+      const dataTitle = [
+        {
+          code: listDataDepartments[0].code,
+          name: listDataDepartments[0].name
+        }
+      ]
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: dataTitle
+      })
+    }
+  }, [listDataDepartments])
+
+  useEffect(() => {
+    const params: any = {}
+    dispatch(getListDepartments(params))
+    if (listDataDepartments) {
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            code: listDataDepartments[0]?.code,
+            name: listDataDepartments[0]?.name
+          }
+        ]
+      })
+    }
   }, [])
 
   const onDelete = (record: any) => {
@@ -241,9 +279,9 @@ const Department: React.FC = () => {
       }
     },
     {
-      title: 'age',
-      dataIndex: 'age',
-      key: 'age'
+      title: 'code',
+      dataIndex: 'code',
+      key: 'code'
     },
     {
       title: 'address',
@@ -316,23 +354,29 @@ const Department: React.FC = () => {
   ]
 
   const onRendered = async (item: any) => {
-    const listDataTitle: any = getParentByKey(data, item)
+    const listDataTitle: any = getParentByKey(listDataDepartments, item)
     await setDataRender({
-      listData: await getListDataByKey(data, item),
+      listData: await getListDataByKey(listDataDepartments, item),
       listDataTitle: listDataTitle
     })
   }
 
   const onBackPageSize = async () => {
     if (dataRender.listDataTitle.length > 1) {
-      const listDataTitle: any = getParentByKey(data, dataRender.listDataTitle[dataRender.listDataTitle.length - 1])
+      const listDataTitle: any = getParentByKey(
+        listDataDepartments,
+        dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
+      )
       await setDataRender({
-        listData: await getListDataByKey(data, dataRender.listDataTitle[dataRender.listDataTitle.length - 1]),
+        listData: await getListDataByKey(
+          listDataDepartments,
+          dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
+        ),
         listDataTitle: listDataTitle
       })
     } else if (dataRender.listDataTitle.length === 1) {
       await setDataRender({
-        listData: data,
+        listData: listDataDepartments,
         listDataTitle: []
       })
     } else {
@@ -362,21 +406,21 @@ const Department: React.FC = () => {
           <IconBackSVG width={11} height={16} fill='' />
         </div>
         <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-3xl'>
-          Hti group{' '}
           {dataRender?.listDataTitle.map((item: any, index) => {
             return (
               <span
-                key={item.key}
+                key={item.code}
                 onClick={() => {
                   onRendered(item)
                 }}
-              >{` -> ${item.name}`}</span>
+              >
+                {dataRender?.listDataTitle.length > 1 ? ` -> ${item.name}` : item.name}
+              </span>
             )
           })}
         </h1>
       </Row>
       <Row className='tw-w-100 tw-flex tw-justify-end tw-my-[20px]'>
-        {/* <Space size='middle'> */}
         <Col span={12}>
           <CommonButton
             loading={false}

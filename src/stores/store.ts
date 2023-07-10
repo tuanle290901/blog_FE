@@ -10,7 +10,7 @@ export const store = configureStore({
     auth: authReducer,
     user: userSlice,
     userHistory: userHistory,
-    departmanet: departmentSilce
+    department: departmentSilce
   }
 })
 

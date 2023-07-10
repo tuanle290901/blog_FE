@@ -13,8 +13,6 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { t } = useTranslation()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
-  const createdData = useSelector(departmentSelectors.selectCreatedData)
-  const loading = useSelector(departmentSelectors.selectDepartmentLoading)
 
   const onSaveData = async () => {
     const { code, address, name, id, publishDate, contactEmail, contactPhoneNumber } = form.getFieldsValue()
@@ -27,7 +25,8 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       contactEmail,
       contactPhoneNumber,
       status: 'INITIAL',
-      type: 'HEADQUARTER'
+      type: 'HEADQUARTER',
+      parentCode: ''
     }
     if (data) {
       payload = {
@@ -36,10 +35,12 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       }
     } else {
       payload = {
-        ...payload
+        ...payload,
+        parentCode: dataParent[dataParent.length - 1].code
       }
       dispatch(createDepartment(payload))
     }
+    form.resetFields()
     await onOk()
   }
 
@@ -48,19 +49,31 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   useEffect(() => {
     if (data) {
       form.setFieldsValue({
-        title: data.title,
-        dateTime: data.dateTime,
-        note: data.note
+        name: data.name,
+        code: data.code,
+        address: data.address,
+        id: data.id,
+        publishDate: data.publishDate,
+        contactEmail: data.contactEmail,
+        contactPhoneNumber: data.contactPhoneNumber,
+        status: data.status,
+        type: data.type,
+        parentCode: data.parentCode
       })
     }
   }, [])
+
+  const onCancel = async () => {
+    form.resetFields()
+    await onClose()
+  }
 
   return (
     <Modal
       open={showModal}
       forceRender
       closable
-      onCancel={() => onClose()}
+      onCancel={() => onCancel()}
       onOk={() => onSaveData()}
       title={typeModel === ACTION_TYPE.Created ? 'Thêm mới hoặc chính sửa departmanet' : 'Cập nhật ...'}
       maskClosable={false}
