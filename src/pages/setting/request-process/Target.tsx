@@ -10,7 +10,7 @@ import { useAppDispatch } from '~/stores/hook'
 import { DropItem, TargetProps } from '~/types/setting-request-process'
 import { ItemTypes } from './ItemTypes'
 
-const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) => {
+const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem }) => {
   const dispatch = useAppDispatch()
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
@@ -18,9 +18,7 @@ const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) =
     drop: (item: DropItem) => {
       onDrop(item, targetKey)
     },
-    canDrop: (item) => {
-      return canDropItem(item)
-    },
+    canDrop: () => true,
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop()

@@ -37,16 +37,7 @@ const Index: FC = memo(function Index() {
 
   const handleDrop = (item: DropItem, targetKey: string) => {
     dispatch(addDroppedItem({ targetKey, item }))
-    // dispatch(removeDe lpartmentItem({ id: item.id }))
   }
-
-  const canDrop = (item: DropItem, targetKey: string) => {
-    return true
-  }
-
-  useEffect(() => {
-    console.log(droppedItems, 'droppedItems')
-  }, [droppedItems])
 
   useEffect(() => {
     dispatch(fetchDepartments())
@@ -78,13 +69,7 @@ const Index: FC = memo(function Index() {
                 <>
                   <div className='tw-flex tw-flex-col tw-items-center tw-justify-center' key={index}>
                     <div className='tw-mb-3'>{item.title}</div>
-                    <Target
-                      key={item.key}
-                      targetKey={item.key}
-                      onDrop={handleDrop}
-                      dropItem={droppedItems[item.key]}
-                      canDropItem={(sourceItem: DropItem) => canDrop(sourceItem, droppedItems)}
-                    />
+                    <Target key={item.key} targetKey={item.key} onDrop={handleDrop} dropItem={droppedItems[item.key]} />
                   </div>
                   <img src={iconHalfArrow} alt='arrow' />
                 </>

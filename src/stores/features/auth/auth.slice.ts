@@ -99,9 +99,9 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken
         state.success = true
       })
-      .addCase(fetchUserInfo.fulfilled, (state: AuthStateInterface, action) => {
-        state.userInfo = action.payload.data
-      })
+      // .addCase(fetchUserInfo.fulfilled, (state: AuthStateInterface, action) => {
+      //   state.userInfo = action.payload.data
+      // })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
         (state, _) => {
@@ -114,10 +114,13 @@ const authSlice = createSlice({
           if (state.loading) {
             state.loading = false
 
-            const { status, message } = action.payload as ErrorResponse
-            if (status === 401) {
-              notification.error({ message: message })
+            const errorResponse = action.payload as ErrorResponse
+            if (errorResponse) {
+              if (errorResponse?.status === 401) {
+                notification.error({ message: errorResponse?.message })
+              }
             }
+            notification.error({ message: 'Đã có lỗi xảy ra' })
           }
         }
       )

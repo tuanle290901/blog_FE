@@ -99,11 +99,6 @@ const requestProcessSlice = createSlice({
         (state, action) => {
           if (state.loading) {
             state.loading = false
-
-            const { status, message } = action.payload as ErrorResponse
-            if (status === 401) {
-              notification.error({ message: message })
-            }
           }
         }
       )
