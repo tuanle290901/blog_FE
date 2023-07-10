@@ -42,7 +42,8 @@ const Department: React.FC = () => {
   const [showModal, setShowModal] = useState<IModelState>({
     openModal: false,
     type: '',
-    data: null
+    data: null,
+    dataParent: []
   })
   const [useSelect, setUseSelect] = useState<any>(null)
 
@@ -264,7 +265,8 @@ const Department: React.FC = () => {
                 setShowModal({
                   openModal: true,
                   type: ACTION_TYPE.Updated,
-                  data: record
+                  data: record,
+                  dataParent: dataRender.listDataTitle
                 })
               }}
             >
@@ -278,7 +280,8 @@ const Department: React.FC = () => {
                 setShowModal({
                   openModal: true,
                   type: ACTION_TYPE.View,
-                  data: record
+                  data: record,
+                  dataParent: dataRender.listDataTitle
                 })
               }}
             >
@@ -341,7 +344,8 @@ const Department: React.FC = () => {
     await setShowModal({
       openModal: false,
       type: '',
-      data: null
+      data: null,
+      dataParent: []
     })
   }
 
@@ -385,7 +389,8 @@ const Department: React.FC = () => {
               setShowModal({
                 openModal: !showModal.openModal,
                 type: ACTION_TYPE.Created,
-                data: null
+                data: null,
+                dataParent: dataRender.listDataTitle
               })
             }}
             icon={<PlusOutlined />}
@@ -403,6 +408,7 @@ const Department: React.FC = () => {
           showModal={showModal.openModal}
           typeModel={showModal.type}
           data={showModal.data}
+          dataParent={showModal.dataParent}
         />
       ) : (
         <DepartmentMemberModal
@@ -411,6 +417,7 @@ const Department: React.FC = () => {
           showModal={showModal.openModal}
           typeModel={showModal.type}
           data={showModal.data}
+          dataParent={[]}
         />
       )}
       <Row className='tw-w-100' gutter={[12, 12]}>

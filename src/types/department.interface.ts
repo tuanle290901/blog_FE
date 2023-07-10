@@ -2,6 +2,7 @@ export interface IModelState {
   openModal: boolean
   type: string
   data: any
+  dataParent: any[]
 }
 
 export interface IDepartmentModal {
@@ -10,6 +11,7 @@ export interface IDepartmentModal {
   showModal: boolean
   typeModel: string
   data: any
+  dataParent: any[]
 }
 
 export interface ListDataType {
@@ -26,4 +28,16 @@ export interface DataMemberRender {
   listDataDown: ListDataType[]
   listDataUpFilter?: ListDataType[]
   listDataDownFilter?: ListDataType[]
+}
+
+export interface IDepartment {
+  code: string
+  address: string
+  name: string
+  id: string
+  publishDate: Date
+  contactEmail: string
+  contactPhoneNumber: string
+  status: string
+  type: string
 }
