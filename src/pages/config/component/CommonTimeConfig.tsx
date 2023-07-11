@@ -55,7 +55,7 @@ const TabItem = () => {
           <div className='tw-w-1/5'>
             <span className='tw-font-semibold'>Thời gian làm việc</span>
           </div>
-          <div className='tw-w-1/3'>
+          <div className='tw-w-2/5'>
             <WorkingTimeOfTheWeekConfig weekConfig={fakeData.workingDays} ref={ref} />
           </div>
         </div>
