@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import '../index.scss'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
 import { Button, InputNumber, Tabs, TimePicker } from 'antd'
 import { fakeData } from '~/types/WorkingTime.interface.ts'
@@ -115,7 +116,7 @@ const CommonTimeConfig: React.FC = () => {
   }
 
   return (
-    <div className='tw-w-full working-time-config '>
+    <div className='working-time-config  tw-h-[calc(100vh-112px)] tw-overflow-auto tw-m-6 tw-p-5 tw-bg-white'>
       <div className='tw-mb-2'>
         <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
