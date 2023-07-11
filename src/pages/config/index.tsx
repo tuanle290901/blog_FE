@@ -1,8 +1,8 @@
 import React from 'react'
 import { Tabs } from 'antd'
 import './index.scss'
-import CommonTime from './component/CommonTime.tsx'
 import CommonHoliday from './component/CommonHoliday.tsx'
+import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
 
 const { TabPane } = Tabs
 
@@ -15,7 +15,7 @@ const Index: React.FC = () => {
     {
       key: '1',
       label: 'Cài đặt chung',
-      children: <CommonTime />
+      children: <CommonTimeConfig />
     },
     {
       key: '2',
@@ -25,8 +25,8 @@ const Index: React.FC = () => {
   ]
 
   return (
-    <div className='configure-working-time tw-p-[10px] tw-w-full tw-h-full'>
-      <div className='header'>
+    <div className='tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+      <div className='tw-my-2'>
         <h1>Cấu hình thời gian làm việc</h1>
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có yêu cầu thay đổi</p>
       </div>
