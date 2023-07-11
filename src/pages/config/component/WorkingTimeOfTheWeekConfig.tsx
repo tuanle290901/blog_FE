@@ -1,11 +1,12 @@
 import React, { forwardRef, ForwardRefRenderFunction, RefObject, useImperativeHandle, useRef, useState } from 'react'
-import { fakeData, IWorkingDayConfig } from '~/types/WorkingTime.interface.ts'
-import { Button, Checkbox, Select, Switch, TimePicker } from 'antd'
+import { IWorkingDayConfig } from '~/types/WorkingTime.interface.ts'
+import { Checkbox, Select, Switch, TimePicker } from 'antd'
 
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { Dayjs } from 'dayjs'
 
 import { DeleteOutlined, DownOutlined, InfoCircleOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons'
+
 export interface RefType {
   submit: () => void
 }
@@ -100,7 +101,12 @@ const DayItem: ForwardRefRenderFunction<
   return (
     <div className={`${className} tw-flex tw-items-center`}>
       <div className='tw-flex-1 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-4'>
-        <div className='tw-flex tw-gap-2 tw-items-center' onClick={handleToggleHeader}>
+        <div
+          className={`${
+            formValue.isActive ? 'tw-cursor-pointer' : 'tw-cursor-default'
+          } tw-flex tw-gap-2 tw-items-center tw-cursor-pointer`}
+          onClick={handleToggleHeader}
+        >
           <div onClick={(event) => event.stopPropagation()}>
             <Switch checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
           </div>

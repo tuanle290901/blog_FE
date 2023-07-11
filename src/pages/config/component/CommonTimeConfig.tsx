@@ -1,21 +1,17 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
-import { Button, InputNumber, TimePicker } from 'antd'
+import { Button, InputNumber, Tabs, TimePicker } from 'antd'
 import { fakeData } from '~/types/WorkingTime.interface.ts'
-
-const CommonTimeConfig: React.FC = () => {
+type TargetKey = React.MouseEvent | React.KeyboardEvent | string
+const TabItem = () => {
   const ref = useRef<RefType>(null)
   const save = () => {
     ref.current?.submit()
   }
   return (
-    <div className='tw-w-full'>
-      <div className='tw-mb-2'>
-        <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
-        <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
-      </div>
-      <div className='tw-h-[calc(100vh-300px)] tw-overflow-auto'>
-        <div className='tw-flex tw-my-4'>
+    <div className='tw-px-4 tw-py-4 tw-border tw-border-t-0 tw-border-[#eee] tw-border-solid'>
+      <div className='tw-h-[calc(100vh-350px)] tw-overflow-auto'>
+        <div className='tw-flex'>
           <div className='tw-w-1/5'>
             <span className='tw-font-semibold'>Các mốc thời gian</span>
           </div>
@@ -68,6 +64,64 @@ const CommonTimeConfig: React.FC = () => {
         <Button type='primary' onClick={save}>
           Lưu cấu hình
         </Button>
+      </div>
+    </div>
+  )
+}
+
+const CommonTimeConfig: React.FC = () => {
+  const initialItems = [{ label: 'Cấu hình chung', children: <TabItem />, key: '1', closable: false }]
+  const [activeKey, setActiveKey] = useState(initialItems[0].key)
+  const [items, setItems] = useState(initialItems)
+  const newTabIndex = useRef(0)
+  const onChange = (newActiveKey: string) => {
+    setActiveKey(newActiveKey)
+  }
+
+  const add = () => {
+    const newActiveKey = `newTab${newTabIndex.current++}`
+    const newPanes = [...items]
+    newPanes.push({ label: 'New Tab', children: <TabItem />, key: newActiveKey, closable: false })
+    setItems(newPanes)
+    setActiveKey(newActiveKey)
+  }
+
+  const remove = (targetKey: TargetKey) => {
+    let newActiveKey = activeKey
+    let lastIndex = -1
+    items.forEach((item, i) => {
+      if (item.key === targetKey) {
+        lastIndex = i - 1
+      }
+    })
+    const newPanes = items.filter((item) => item.key !== targetKey)
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key
+      } else {
+        newActiveKey = newPanes[0].key
+      }
+    }
+    setItems(newPanes)
+    setActiveKey(newActiveKey)
+  }
+
+  const onEdit = (targetKey: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove') => {
+    if (action === 'add') {
+      add()
+    } else {
+      remove(targetKey)
+    }
+  }
+
+  return (
+    <div className='tw-w-full working-time-config '>
+      <div className='tw-mb-2'>
+        <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
+        <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
+      </div>
+      <div className='tw-mt-4'>
+        <Tabs type='editable-card' onChange={onChange} activeKey={activeKey} onEdit={onEdit} items={items} />
       </div>
     </div>
   )

@@ -57,7 +57,7 @@ export const fakeData: IWorkingTimeConfig = {
       day: WEEK_DAY.TUESDAY,
       always: true,
       weeks: [],
-      isActive: false,
+      isActive: true,
       shifts: [
         {
           startTimeShift: '08:30',
@@ -73,7 +73,7 @@ export const fakeData: IWorkingTimeConfig = {
       day: WEEK_DAY.WEDNESDAY,
       always: true,
       weeks: [],
-      isActive: false,
+      isActive: true,
       shifts: [
         {
           startTimeShift: '08:30',
@@ -89,7 +89,7 @@ export const fakeData: IWorkingTimeConfig = {
       day: WEEK_DAY.THURSDAY,
       always: true,
       weeks: [],
-      isActive: false,
+      isActive: true,
       shifts: [
         {
           startTimeShift: '08:30',
@@ -105,7 +105,7 @@ export const fakeData: IWorkingTimeConfig = {
       day: WEEK_DAY.FRIDAY,
       always: true,
       weeks: [],
-      isActive: false,
+      isActive: true,
       shifts: [
         {
           startTimeShift: '08:30',
