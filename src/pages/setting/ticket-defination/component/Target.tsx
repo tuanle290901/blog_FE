@@ -8,7 +8,7 @@ import { Empty, Space, Tooltip } from 'antd'
 import { removeDroppedItem } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch } from '~/stores/hook'
 import { DragItem, TargetProps } from '~/types/setting-ticket-process'
-import { ItemTypes } from './ItemTypes'
+import { ItemTypes } from '../type/ItemTypes'
 
 const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) => {
   const dispatch = useAppDispatch()

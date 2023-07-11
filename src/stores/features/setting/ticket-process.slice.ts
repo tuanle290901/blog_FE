@@ -80,13 +80,12 @@ const ticketProcessSlice = createSlice({
         state.approvalSteps[itemIndex].data.splice(removedIndex, 1)
       }
     },
-    addNewApprovalStep: (state, action) => {
-      const { index } = action.payload
-      const nextIndexNode = index + 1
+    addNewApprovalStep: (state) => {
+      const listLength = state.approvalSteps.length
       state.approvalSteps.push({
-        index: nextIndexNode,
-        key: `request${nextIndexNode}`,
-        title: `Duyệt lần ${nextIndexNode + 1} `,
+        index: listLength,
+        key: `request${listLength}`,
+        title: `Duyệt lần ${listLength + 1} `,
         data: []
       })
     },

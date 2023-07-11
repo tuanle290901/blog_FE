@@ -1,7 +1,7 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
-import ApprovalProcess from '~/pages/setting/request-process'
+import TicketDefination from '~/pages/setting/ticket-defination'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import { lazy } from 'react'
 import Timesheet from '~/pages/timesheet'
@@ -48,7 +48,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: PRIVATE_PATH.setting.ticketProcessDefinition,
     path: PRIVATE_PATH.setting.ticketProcessDefinition,
-    component: ApprovalProcess,
+    component: TicketDefination,
     allowedRoles: []
   },
   {
