@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Col, DatePicker, Image, Row, Segmented, Select, Table } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Image, Row, Segmented, Select, Table } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType } from 'antd/es/table'
@@ -105,10 +105,10 @@ const Timesheet: React.FC = () => {
 
   return (
     <Row className='timesheet tw-p-5'>
-      <Col xs={24} xl={4}>
+      <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo data={attendanceList} handleOpenModal={setIsOpenModal} />
       </Col>
-      <Col xs={24} xl={20} className=' tw-bg-white tw-p-5'>
+      <Col xs={24} xl={18} xxl={20} className=' tw-bg-white tw-p-5'>
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={18}>
             {mode === 'list' && (
@@ -192,10 +192,11 @@ const Timesheet: React.FC = () => {
                 // loading={userState.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
               />
+              <Checkbox onChange={() => void {}}>Chỉ hiển thị ngày vi phạm chưa có phép</Checkbox>
             </div>
           </>
         )}
-        {mode === 'calendar' && <TimesheetCalendar />}
+        {mode === 'calendar' && <TimesheetCalendar data={attendanceList} />}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>

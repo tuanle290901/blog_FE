@@ -64,16 +64,12 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any }> = (
         </div>
       </div>
       <div className='tw-mt-20'>
-        <Button className='tw-w-full tw-bg-blue-500 tw-text-white' size='middle' onClick={() => handleOpenModal(true)}>
+        <Button className='timesheet-short-info__add' size='middle' onClick={() => handleOpenModal(true)}>
           Thêm phép
         </Button>
       </div>
       <div className='tw-mt-3'>
-        <Button
-          className='tw-w-full tw-border-blue-500 tw-text-blue-500'
-          size='middle'
-          onClick={() => handleOpenModal(true)}
-        >
+        <Button className='timesheet-short-info__config' size='middle' onClick={() => handleOpenModal(true)}>
           Thời gian làm việc cá nhân
         </Button>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Col, DatePicker, Form, Input, message, Modal, Row, Segmented, Select, TimePicker } from 'antd'
 import { useTranslation } from 'react-i18next'
+import dayjs from 'dayjs'
 
 const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ open, handleClose }) => {
   const [t] = useTranslation()
@@ -9,7 +10,34 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
 
   const handleSubmit = () => {
     const formValue = { ...form.getFieldsValue(), typeOfReason }
-    console.log('formValue', formValue)
+    let payload = {}
+    if (typeOfReason === 'violate') {
+      payload = {
+        date: dayjs(formValue?.date).format('DD/MM/YYYY'),
+        workingTime: {
+          startTime: dayjs(formValue?.workingTime[0]).format('HH:mm:ss'),
+          endTime: dayjs(formValue?.workingTime[1]).format('HH:mm:ss')
+        }
+      }
+    }
+    if (typeOfReason === 'onBussiness') {
+      payload = {
+        startDate: dayjs(formValue?.startDate).format('DD/MM/YYYY'),
+        endDate: dayjs(formValue?.endDate).format('DD/MM/YYYY'),
+        startTime: dayjs(formValue?.startTime).format('HH:mm:ss'),
+        endTime: dayjs(formValue?.endTime).format('HH:mm:ss')
+      }
+    }
+    if (typeOfReason === 'onLeave') {
+      payload = {
+        startDate: dayjs(formValue?.startDate).format('DD/MM/YYYY'),
+        endDate: dayjs(formValue?.endDate).format('DD/MM/YYYY'),
+        startTime: dayjs(formValue?.startTime).format('HH:mm:ss'),
+        endTime: dayjs(formValue?.endTime).format('HH:mm:ss'),
+        type: formValue?.type
+      }
+    }
+    // console.log('payload', { typeOfReason, reason: formValue?.reason || '', ...payload })
     void message.success('Success')
     // handleClose()
   }
@@ -50,7 +78,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                   placeholder={t('Ngày phép')}
                 />
               </Form.Item>
-              <Form.Item className='tw-mb-3' label={t('Thời gian làm')} name='time'>
+              <Form.Item className='tw-mb-3' label={t('Thời gian làm')} name='workingTime'>
                 <TimePicker.RangePicker placeholder={['Giờ đến', 'Giờ về']} className='tw-w-full' />
               </Form.Item>
             </>
@@ -68,9 +96,9 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                       <Form.Item className='tw-mb-0' name='startDate'>
                         <DatePicker
                           format='DD/MM/YYYY'
-                          // disabledDate={(date) => {
-                          //   return date.isAfter(new Date())
-                          // }}
+                          disabledDate={(date) => {
+                            return date.isAfter(new Date(form.getFieldValue('endDate')))
+                          }}
                           showToday={false}
                           className='tw-w-full'
                           placeholder={t('Chọn ngày')}
@@ -79,7 +107,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                     </Col>
                     <Col xs={12}>
                       <Form.Item className='tw-mb-0' name='startTime'>
-                        <TimePicker placeholder='Chọn giờ' className='tw-w-full' />
+                        <TimePicker showNow={false} placeholder='Chọn giờ' className='tw-w-full' />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -95,9 +123,9 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                       <Form.Item className='tw-mb-0' name='endDate'>
                         <DatePicker
                           format='DD/MM/YYYY'
-                          // disabledDate={(date) => {
-                          //   return date.isAfter(new Date())
-                          // }}
+                          disabledDate={(date) => {
+                            return date.isBefore(new Date(form.getFieldValue('startDate')))
+                          }}
                           showToday={false}
                           className='tw-w-full'
                           placeholder={t('Chọn ngày')}
@@ -106,7 +134,14 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                     </Col>
                     <Col xs={12}>
                       <Form.Item className='tw-mb-0' name='endTime'>
-                        <TimePicker placeholder='Chọn giờ' className='tw-w-full' />
+                        <TimePicker
+                          // disabledDate={(time) => {
+                          //   return time.isBefore(form.getFieldValue('startTime'))
+                          // }}
+                          showNow={false}
+                          placeholder='Chọn giờ'
+                          className='tw-w-full'
+                        />
                       </Form.Item>
                     </Col>
                   </Row>

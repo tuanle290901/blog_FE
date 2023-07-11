@@ -5,39 +5,46 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import type { CellRenderInfo } from 'rc-picker/lib/interface'
+import { IAttendance } from '~/types/attendance.interface'
+interface ITimeKeepingNote {
+  type: string
+  content: string
+}
+interface ITimeKeeping {
+  date: string
+  data: ITimeKeepingNote[]
+}
 
-const TimesheetCalendar: React.FC = () => {
+const TimesheetCalendar: React.FC<{ data: IAttendance[] }> = () => {
   // const [t] = useTranslation()
-  const [currentMonth, setCurrentMonth] = useState(dayjs('2023-07-01'))
+  const [currentMonth, setCurrentMonth] = useState(dayjs())
 
-  const getListData = (value: Dayjs) => {
-    let listData
-    switch (value.date()) {
-      case 8:
-        listData = [{ type: 'success', content: 'Đúng giờ' }]
-        break
-      case 10:
-        listData = [{ type: 'error', content: 'Về sớm' }]
-        break
-      case 15:
-        listData = [{ type: 'error', content: 'Đến muộn' }]
-        break
-      default:
-    }
-    return listData || []
-  }
+  const listTimeKeeping = [
+    { date: '2023-06-15', data: [{ type: 'success', content: 'Đúng giờ' }] },
+    { date: '2023-07-03', data: [{ type: 'success', content: 'Đúng giờ' }] },
+    {
+      date: '2023-07-11',
+      data: [
+        { type: 'error', content: 'Đến muộn' },
+        { type: 'error', content: 'Về sớm' }
+      ]
+    },
+    { date: '2023-07-20', data: [{ type: 'error', content: 'Đến muộn' }] },
+    { date: '2023-08-12', data: [{ type: 'success', content: 'Đúng giờ' }] }
+  ]
 
   const dateCellRender = (value: Dayjs) => {
-    console.log('value', value)
-    const listData = getListData(value)
-    return (
-      <ul className='events'>
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge status={item.type as BadgeProps['status']} text={item.content} />
-          </li>
-        ))}
-      </ul>
+    return listTimeKeeping.map(
+      (renderCell: ITimeKeeping) =>
+        renderCell?.date === dayjs(value).format('YYYY-MM-DD') && (
+          <ul key={renderCell?.date} className='events'>
+            {renderCell?.data?.map((cellContent: ITimeKeepingNote) => (
+              <li key={cellContent.content}>
+                <Badge status={cellContent?.type as BadgeProps['status']} text={cellContent?.content} />
+              </li>
+            ))}
+          </ul>
+        )
     )
   }
 
