@@ -1,14 +1,16 @@
-import React, { forwardRef, ForwardRefRenderFunction, useImperativeHandle, useState } from 'react'
-import { IWorkingDayConfig } from '~/types/WorkingTime.interface.ts'
+import React, { forwardRef, ForwardRefRenderFunction, RefObject, useImperativeHandle, useRef, useState } from 'react'
+import { fakeData, IWorkingDayConfig } from '~/types/WorkingTime.interface.ts'
+import { Button, Checkbox, Select, Switch, TimePicker } from 'antd'
+
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
 import { Dayjs } from 'dayjs'
-import { Checkbox, Select, Switch, TimePicker } from 'antd'
+
 import { DeleteOutlined, DownOutlined, InfoCircleOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons'
 export interface RefType {
   submit: () => void
 }
 
-const DayConfigItem: ForwardRefRenderFunction<
+const DayItem: ForwardRefRenderFunction<
   RefType,
   {
     config: IWorkingDayConfig
@@ -179,4 +181,37 @@ const DayConfigItem: ForwardRefRenderFunction<
     </div>
   )
 }
-export default forwardRef(DayConfigItem)
+const DayConfigItem = forwardRef(DayItem)
+const WorkingTimeOfTheWeekConfig: React.FC<{ fieldName: string }> = ({ fieldName }) => {
+  const [data, setData] = useState(fakeData.workingDays)
+  const refList = useRef<any>(new Array(7).fill(useRef<RefType>(null)))
+
+  const handleDataChange = (data: IWorkingDayConfig) => {
+    console.log(data)
+  }
+
+  const save = () => {
+    console.log(refList)
+    refList.current.forEach((ref: RefObject<RefType>) => {
+      ref.current?.submit()
+    })
+  }
+
+  return (
+    <div>
+      {data.map((item, index) => {
+        return (
+          <DayConfigItem
+            ref={refList.current[index]}
+            key={index}
+            className='tw-w-full tw-my-2'
+            config={item}
+            onFinish={handleDataChange}
+          />
+        )
+      })}
+      <Button onClick={save}>Submit</Button>
+    </div>
+  )
+}
+export default WorkingTimeOfTheWeekConfig
