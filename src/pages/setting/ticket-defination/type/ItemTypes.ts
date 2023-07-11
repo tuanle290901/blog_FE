@@ -5,6 +5,12 @@ export const ItemTypes = {
   NO_DROP: 'no-drop'
 }
 
+export interface TicketInitial {
+  name: string
+  description?: string
+  isFinished: boolean
+}
+
 export interface FormValues {
   [fieldName: string]: any
 }
@@ -16,4 +22,9 @@ export interface ModalInitAttrProp {
   onFinishInitAttr: (formValues: FormValues) => void
   onFinishInitAttrFail: (formValues: FormValues) => void
   onChangeType: (value: string, index: number) => void
+}
+
+export interface FormInitProp {
+  form: FormInstance
+  onContinue: (formValue: TicketInitial) => void
 }

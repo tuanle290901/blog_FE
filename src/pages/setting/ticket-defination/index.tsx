@@ -24,12 +24,8 @@ import Source from './component/Source'
 import TextArea from 'antd/es/input/TextArea'
 import { INPUT_TYPE } from '~/utils/Constant'
 import ModalInitAttr from './component/ModalInitAttrr'
-
-interface TicketInitial {
-  name: string
-  description?: string
-  isFinished: boolean
-}
+import FormInitName from './component/FormInitName'
+import { TicketInitial } from './type/ItemTypes'
 
 const Index: FC = memo(function Index() {
   const dispatch = useAppDispatch()
@@ -109,31 +105,7 @@ const Index: FC = memo(function Index() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
-        {!ticketInfo?.isFinished && (
-          <div className='tw-w-1/3 tw-m-auto'>
-            <div className='tw-text-xl tw-font-semibold tw-mb-4 tw-mt-4'>Thiết lập quy trình đăng ký biểu mẫu</div>
-            <Form form={form} onFinish={onContinue} layout='vertical'>
-              <Row align='middle' gutter={[0, 16]}>
-                <Col span={24}>
-                  <Form.Item label='Tên biểu mẫu' name='name'>
-                    <Input placeholder='Tên biểu mẫu' size='large' />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item label='Mô tả' name='description'>
-                    <Input placeholder='Mô tả' size='large' />
-                  </Form.Item>
-                </Col>
-
-                <Col span={24} push={20}>
-                  <Button type='primary' size='large' className='tw-ml-auto' htmlType='submit'>
-                    Tiếp tục
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-          </div>
-        )}
+        {!ticketInfo?.isFinished && <FormInitName form={form} onContinue={onContinue} />}
 
         {ticketInfo?.isFinished && (
           <>

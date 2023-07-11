@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { MinusCircleFilled, PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Divider, Form, Input, Modal, Row, Select } from 'antd'
+import { Button, Col, Divider, Form, Input, Modal, Row, Select, Space } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import type { FC } from 'react'
 import { INPUT_TYPE } from '~/utils/Constant'
@@ -138,9 +138,14 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
 
         <Divider />
         <Form.Item>
-          <Button type='primary' htmlType='submit' className='tw-float-right'>
-            Tiếp tục
-          </Button>
+          <Space className='tw-float-right'>
+            <Button htmlType='button' onClick={handleCancelModalInitAttr}>
+              Quay lại
+            </Button>
+            <Button type='primary' htmlType='submit'>
+              Tiếp tục
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
     </Modal>
