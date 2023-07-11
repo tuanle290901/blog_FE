@@ -25,20 +25,8 @@ const Index: React.FC = () => {
   ]
 
   return (
-    <div className='tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <div className='tw-my-2'>
-        <h1>Cấu hình thời gian làm việc</h1>
-        <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có yêu cầu thay đổi</p>
-      </div>
-      <div className='content'>
-        <Tabs defaultActiveKey='1' onChange={onChange}>
-          {items.map((item) => (
-            <TabPane tab={item.label} key={item.key}>
-              {item.children}
-            </TabPane>
-          ))}
-        </Tabs>
-      </div>
+    <div className='tw-h-[calc(100vh-112px)] tw-overflow-auto tw-m-6 tw-p-5 tw-bg-white'>
+      <CommonTimeConfig />
     </div>
   )
 }

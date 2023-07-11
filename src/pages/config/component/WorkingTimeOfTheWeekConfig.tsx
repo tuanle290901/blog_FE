@@ -87,6 +87,9 @@ const DayItem: ForwardRefRenderFunction<
     })
   }
   const removeShift = (index: number) => {
+    if (formValue.shifts.length <= 1) {
+      return
+    }
     setFormValue((prevState) => {
       const shifts = [...prevState.shifts]
       shifts.splice(index)
@@ -97,7 +100,7 @@ const DayItem: ForwardRefRenderFunction<
   return (
     <div className={`${className} tw-flex tw-items-center`}>
       <div className='tw-flex-1 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-4'>
-        <div className='tw-flex tw-gap-2 tw-items-center' onClick={() => handleToggleHeader}>
+        <div className='tw-flex tw-gap-2 tw-items-center' onClick={handleToggleHeader}>
           <div onClick={(event) => event.stopPropagation()}>
             <Switch checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
           </div>
@@ -159,10 +162,12 @@ const DayItem: ForwardRefRenderFunction<
                   {index + 1 === formValue.shifts.length && (
                     <div className='tw-flex tw-gap-2 tw-items-center'>
                       <PlusOutlined onClick={addShift} className='tw-text-blue-600 tw-cursor-pointer' />
-                      <DeleteOutlined
-                        onClick={() => removeShift(index)}
-                        className='tw-text-red-600 tw-cursor-pointer'
-                      />
+                      {formValue.shifts.length > 1 && (
+                        <DeleteOutlined
+                          onClick={() => removeShift(index)}
+                          className='tw-text-red-600 tw-cursor-pointer'
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -182,16 +187,24 @@ const DayItem: ForwardRefRenderFunction<
   )
 }
 const DayConfigItem = forwardRef(DayItem)
-const WorkingTimeOfTheWeekConfig: React.FC<{ fieldName: string }> = ({ fieldName }) => {
-  const [data, setData] = useState(fakeData.workingDays)
-  const refList = useRef<any>(new Array(7).fill(useRef<RefType>(null)))
+const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDayConfig[] }> = (props, ref) => {
+  const [data, setData] = useState(props.weekConfig)
+  const refList = useRef<any>([
+    useRef<RefType>(null),
+    useRef<RefType>(null),
+    useRef<RefType>(null),
+    useRef<RefType>(null),
+    useRef<RefType>(null),
+    useRef<RefType>(null),
+    useRef<RefType>(null)
+  ])
+  useImperativeHandle(ref, () => ({ submit }))
 
   const handleDataChange = (data: IWorkingDayConfig) => {
     console.log(data)
   }
 
-  const save = () => {
-    console.log(refList)
+  const submit = () => {
     refList.current.forEach((ref: RefObject<RefType>) => {
       ref.current?.submit()
     })
@@ -210,8 +223,7 @@ const WorkingTimeOfTheWeekConfig: React.FC<{ fieldName: string }> = ({ fieldName
           />
         )
       })}
-      <Button onClick={save}>Submit</Button>
     </div>
   )
 }
-export default WorkingTimeOfTheWeekConfig
+export default forwardRef(WeekConfig)
