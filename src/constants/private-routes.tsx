@@ -3,11 +3,11 @@ import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
 import ApprovalProcess from '~/pages/setting/request-process'
 import UserHistory from '~/pages/user-management/user-history.tsx'
-import { lazy } from 'react'
 import Timesheet from '~/pages/timesheet'
 import Department from '~/pages/Department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
-import Config from '~/pages/config/index.tsx'
+import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
+import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -29,6 +29,10 @@ export const PRIVATE_PATH = {
   devices: '/devices',
   config: {
     prefix: '/timeWorking'
+  },
+  timeManagement: {
+    prefix: '/work-time',
+    requests: '/work-time/requests'
   }
 }
 
@@ -79,7 +83,13 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: 'config',
     path: PRIVATE_PATH.config.prefix,
-    component: Config,
+    component: CommonTimeConfig,
+    allowedRoles: []
+  },
+  {
+    name: 'requestWorkTime',
+    path: PRIVATE_PATH.timeManagement.requests,
+    component: PersonalWokingTimeRequestList,
     allowedRoles: []
   }
 ]
