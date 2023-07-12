@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import HttpService from '~/config/api.ts'
-import { IApiResponse, Meta } from '~/types/api-response.interface.ts'
+import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
 
 export interface IUserState {
@@ -10,7 +10,7 @@ export interface IUserState {
   editingUser: IUser | null
   loading: boolean
   currentRequestId: string | null
-  meta: Meta
+  meta: IPaging
 }
 const initialState: IUserState = {
   userList: [],
@@ -32,19 +32,92 @@ export const getListUser = createAsyncThunk('users/getAll', async (payload: any,
   })
   return await fakeApi
 })
-export const searchUser = createAsyncThunk('users/search', async (payload: any, thunkAPI) => {
-  try {
-    const response: IApiResponse<IUser[]> = await HttpService.post('/system-user/filter', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
-  } catch (error: any) {
-    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
-      return thunkAPI.rejectWithValue(error.response.data)
+export const searchUser = createAsyncThunk(
+  'users/search',
+  async (params: { query: string; groupCode?: string | null; paging: IPaging; sorts: ISort[] }, thunkAPI) => {
+    try {
+      const body: any = {
+        page: params.paging.page,
+        size: params.paging.size,
+        sort: params.sorts
+      }
+      if (params.query && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                operator: 'OR_MULTIPLES',
+                children: [
+                  {
+                    field: 'full_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'phone_number',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'email',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  }
+                ]
+              },
+              {
+                field: 'group_profiles.group_code',
+                operator: 'IS',
+                value: params.groupCode
+              }
+            ]
+          }
+        ]
+      } else if (params.query && !params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'OR_MULTIPLES',
+            children: [
+              {
+                field: 'full_name',
+                operator: 'LIKE_IGNORE_CASE',
+                value: params.query
+              },
+              {
+                field: 'phone_number',
+                operator: 'LIKE_IGNORE_CASE',
+                value: params.query
+              },
+              {
+                field: 'email',
+                operator: 'LIKE_IGNORE_CASE',
+                value: params.query
+              }
+            ]
+          }
+        ]
+      } else if (params.groupCode && !params.query) {
+        body.criteria = [
+          {
+            field: 'group_profiles.group_code',
+            operator: 'IS',
+            value: params.groupCode
+          }
+        ]
+      }
+      const response: IApiResponse<IUser[]> = await HttpService.post('/system-user/filter', body, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
     }
-    throw error
   }
-})
+)
 
 export const getUserById = createAsyncThunk('users/getById', async (userId: string, thunkAPI) => {
   // TODO implement
