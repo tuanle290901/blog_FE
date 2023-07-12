@@ -12,6 +12,7 @@ export interface AuthStateInterface {
   accessToken: string | null // for storing the JWT
   error: any
   success: boolean
+  switchGroup: any
 }
 
 const initialState: AuthStateInterface = {
@@ -19,7 +20,8 @@ const initialState: AuthStateInterface = {
   userInfo: {},
   accessToken: null,
   error: null,
-  success: false
+  success: false, // for monitoring the registration process.
+  switchGroup: {}
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
@@ -29,41 +31,17 @@ const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunk
 })
 
 const fetchUserInfo = createAsyncThunk('auth/userInfo', async (_, thunkAPI) => {
-  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
-  //   signal: thunkAPI.signal
-  // })
-  const response = new Promise<any>((resolve, reject) => {
-    setTimeout(() => {
-      resolve({
-        data: {
-          id: '64717d50114e783f00873888',
-          userName: 'admin',
-          email: 'demo@htigroup.vn',
-          fullName: 'Quản trị viên',
-          phoneNumber: '0373130002',
-          isChangedPass: true,
-          role: 'Admin',
-          status: 'Active',
-          createdAt: '2023-05-27T10:47:28.417',
-          createdBy: {
-            fullName: 'SYSTEM'
-          },
-          updatedAt: '2023-06-19T17:11:40.978',
-          updatedBy: {
-            fullName: 'Root',
-            email: 'demo.gps@htigroup.vn',
-            username: 'root',
-            phoneNumber: '0373130002',
-            workUnitName: 'HTSC',
-            role: 'SystemAdmin'
-          }
-        },
-        message: 'Lấy dữ liệu thành công.',
-        status: 200
-      })
-    }, 1000)
+  const response = await HttpService.get('/system-user/profile', {
+    signal: thunkAPI.signal
   })
   return await response
+})
+
+const switchGroup = createAsyncThunk('auth/switchGroup', async (parmas: any, thunkAPI) => {
+  const response = await HttpService.post('/system-user/switch-group', parmas, {
+    signal: thunkAPI.signal
+  })
+  return response.data
 })
 
 const clearLocalStorage = () => {
@@ -102,6 +80,9 @@ const authSlice = createSlice({
       .addCase(fetchUserInfo.fulfilled, (state: AuthStateInterface, action) => {
         state.userInfo = action.payload.data
       })
+      .addCase(switchGroup.fulfilled, (state: AuthStateInterface, action) => {
+        state.switchGroup = action.payload.data
+      })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
         (state, _) => {
@@ -127,6 +108,6 @@ const authSlice = createSlice({
   }
 })
 
-export { fetchUserInfo, login }
+export { login, fetchUserInfo, switchGroup }
 export const { logout, setAccessToken, setUserInfo } = authSlice.actions
 export default authSlice.reducer

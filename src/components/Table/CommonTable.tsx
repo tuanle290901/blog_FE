@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table } from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
-import { ColumnType, ColumnGroupType, ExpandableConfig, Key } from 'antd/es/table/interface'
+import { ColumnType, ColumnGroupType, ExpandableConfig, Key, GetRowKey } from 'antd/es/table/interface'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -40,7 +40,7 @@ interface IPropsTableCommon {
   triggerDesc?: string
   triggerAsc?: string
   cancelSort?: string
-  rowKey?: string
+  rowKey?: string | undefined
   style: any
   expandable?: ExpandableConfig<any>
 }
