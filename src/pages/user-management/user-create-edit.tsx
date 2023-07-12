@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   DatePicker,
@@ -19,6 +19,9 @@ import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
+import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
+import { ROLE } from '~/constants/app.constant.ts'
+import { createUser } from '~/stores/features/user/user.slice.ts'
 
 const beforeUpload = (file: RcFile) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
@@ -37,10 +40,38 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
   userData
 }) => {
   const [t] = useTranslation()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [avatarBase64, setAvatarBase64] = useState<string>()
   const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
   const uploadRef = useRef<HTMLDivElement>(null)
+  const groups = useAppSelector((state) => state.masterData.groups)
+  const userTitle = useAppSelector((state) => state.masterData.listUserTitle)
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    return groups.map((item) => {
+      return { value: item.code, label: item.name }
+    })
+  }, [groups])
+  const titleOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    return userTitle.map((item) => {
+      return { value: item.code, label: item.nameTitle }
+    })
+  }, [userTitle])
+
+  const roleOptions: { value: string; label: string }[] = [
+    {
+      value: ROLE.OFFICER,
+      label: ROLE.OFFICER
+    },
+    {
+      value: ROLE.SUB_MANAGER,
+      label: ROLE.SUB_MANAGER
+    },
+    {
+      value: ROLE.MANAGER,
+      label: ROLE.MANAGER
+    }
+  ]
   const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
     getBase64(info.file.originFileObj as RcFile, (url) => {
       setLoading(false)
@@ -57,10 +88,23 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
       form.resetFields()
     }
   }, [userData])
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const value = form.getFieldsValue()
-    // handleClose()
-    console.log(value)
+    const groupProfiles = value.groupProfiles.map((item) => ({
+      groupCode: item.groupCode,
+      role: item.role,
+      title: item.title
+    }))
+    const payload: IUser = { ...value, groupProfiles, birthday: value.birthday.format('YYYY-MM-DD') }
+    try {
+      console.log('aa')
+      setLoading(true)
+      await dispatch(createUser(payload))
+      handleClose()
+    } finally {
+      setLoading(false)
+      handleClose()
+    }
   }
   const handleClickButtonUpdateAvatar = () => {
     if (uploadRef?.current) {
@@ -80,9 +124,16 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
       open={open}
       title={t('userList.addMember')}
       onCancel={handleClose}
-      onOk={handleSubmit}
-      okText={t('common.save')}
-      cancelText={t('common.cancel')}
+      // okText={t('common.save')}
+      // cancelText={t('common.cancel')}
+      footer={
+        <div className={'tw-flex tw-justify-end'}>
+          <Button onClick={handleClose}>{t('common.cancel')}</Button>
+          <Button type='primary' onClick={handleSubmit} loading={loading}>
+            {t('common.save')}
+          </Button>
+        </div>
+      }
       maskClosable={false}
       forceRender
       width={1000}
@@ -176,7 +227,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                     }}
                     showToday={false}
                     className='tw-w-full'
-                    placeholder={t('userModal.probationDate')}
+                    placeholder={t('userModal.enterDateJoin')}
                   />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.probationDate')} name='probationDate'>
@@ -205,15 +256,17 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.List name='groupProfile' initialValue={departmentField}>
+                <Form.List name='groupProfiles' initialValue={departmentField}>
                   {(fields = departmentField, { add, remove }) => (
                     <>
                       {fields.map(({ key, name, ...restField }, index) => (
                         <div key={key} className='tw-relative'>
-                          <MinusCircleOutlined
-                            className='tw-absolute tw-right-1 tw-top-1 tw-z-50 tw-text-red-600'
-                            onClick={() => remove(name)}
-                          />
+                          {fields.length > 1 && (
+                            <MinusCircleOutlined
+                              className='tw-absolute tw-right-1 tw-top-1 tw-z-50 tw-text-red-600'
+                              onClick={() => remove(name)}
+                            />
+                          )}
                           <Form.Item
                             {...restField}
                             style={{ marginBottom: 16 }}
@@ -221,7 +274,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                             name={[name, 'groupCode']}
                             required
                           >
-                            <Select placeholder={t('userModal.selectDepartment')}></Select>
+                            <Select options={groupOptions} placeholder={t('userModal.selectDepartment')}></Select>
                           </Form.Item>
                           <div className='tw-grid tw-grid-cols-2 tw-gap-2'>
                             <Form.Item
@@ -230,7 +283,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                               name={[name, 'title']}
                               rules={[{ required: true, message: 'Missing first name' }]}
                             >
-                              <Select placeholder={t('userModal.selectPosition')}></Select>
+                              <Select options={titleOptions} placeholder={t('userModal.selectPosition')}></Select>
                             </Form.Item>
                             <Form.Item
                               {...restField}
@@ -238,7 +291,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                               name={[name, 'role']}
                               rules={[{ required: true, message: 'Missing last name' }]}
                             >
-                              <Select placeholder={t('userModal.selectFunction')}></Select>
+                              <Select options={roleOptions} placeholder={t('userModal.selectFunction')}></Select>
                             </Form.Item>
                           </div>
                         </div>

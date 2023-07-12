@@ -1,5 +1,5 @@
 import React, { forwardRef, ForwardRefRenderFunction, RefObject, useImperativeHandle, useRef, useState } from 'react'
-import { IWorkingDayConfig } from '~/types/WorkingTime.interface.ts'
+import { IWorkingDayConfig } from '~/types/working-time.interface.ts'
 import { Checkbox, Select, Switch, TimePicker } from 'antd'
 
 import { CheckboxValueType } from 'antd/es/checkbox/Group'

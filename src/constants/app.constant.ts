@@ -9,3 +9,10 @@ export enum WEEK_DAY {
 }
 
 export const COMMON_ERROR_CODE = [0, 401, 500]
+
+export enum ROLE {
+  MANAGER = 'MANAGER',
+  SUB_MANAGER = 'SUB_MANAGER',
+  OFFICER = 'OFFICER',
+  SYSTEM_ADMIN = 'SYSTEM_ADMIN'
+}

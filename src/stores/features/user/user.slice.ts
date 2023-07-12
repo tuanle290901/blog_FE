@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import HttpService from '~/config/api.ts'
-import { IApiResponse, Meta } from '~/types/IApiResponse.interface.ts'
+import { IApiResponse, Meta } from '~/types/api-response.interface.ts'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
 
 export interface IUserState {
@@ -50,9 +50,18 @@ export const getUserById = createAsyncThunk('users/getById', async (userId: stri
   // TODO implement
   return userId
 })
-export const createUser = createAsyncThunk('users/create', (body: IUser, thunkAPI) => {
-  // TODO implement
-  return body
+export const createUser = createAsyncThunk('users/create', async (body: IUser, thunkAPI) => {
+  try {
+    const response: IApiResponse<IUser[]> = await HttpService.post('/system-user/create', body, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
 })
 export const updateUser = createAsyncThunk('users/create', (body: { userId: string; newUser: IUser }, thunkAPI) => {
   // TODO implement

@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { cancelEditingUser, getListUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { getAllGroup } from '~/stores/features/group/group.slice.ts'
+import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 
 const { Search } = Input
 
@@ -20,13 +20,13 @@ const UserList: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
-  const groups = useAppSelector((state) => state.group.groups)
+  const groups = useAppSelector((state) => state.masterData.groups)
   const [searchValue, setSearchValue] = useState<{ query: string; group?: string | null }>({ query: '' })
   const timerId = useRef<any>(null)
   useEffect(() => {
-    const promise = dispatch(getAllGroup())
+    const promise = [dispatch(getAllGroup()), dispatch(getTitle())]
     return () => {
-      promise.abort()
+      promise.forEach((item) => item.abort())
     }
   }, [])
   const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {

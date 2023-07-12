@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import HttpService from '~/config/api.ts'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
-import { IApiResponse } from '~/types/IApiResponse.interface.ts'
+import { IApiResponse } from '~/types/api-response.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
+import { IUserTitle } from '~/types/user.interface.ts'
 
 export interface IGroup {
   code: string
@@ -10,17 +11,19 @@ export interface IGroup {
 }
 export interface IGroupState {
   groups: IGroup[]
+  listUserTitle: IUserTitle[]
   loading: boolean
   currentRequestId: string | null
   error: Record<string, any> | null
 }
 const initialState: IGroupState = {
   groups: [],
+  listUserTitle: [],
   loading: false,
   currentRequestId: null,
   error: null
 }
-export const getAllGroup = createAsyncThunk('group/getAll', async (_, thunkAPI) => {
+export const getAllGroup = createAsyncThunk('master-data/getAll', async (_, thunkAPI) => {
   try {
     const response: IApiResponse<IGroup[]> = await HttpService.get('/org/group/groups', {
       signal: thunkAPI.signal
@@ -33,14 +36,26 @@ export const getAllGroup = createAsyncThunk('group/getAll', async (_, thunkAPI) 
     throw error
   }
 })
-const groupSlice = createSlice({
-  name: 'group',
+export const getTitle = createAsyncThunk('masterData/getAllTitle', async (_, thunkAPI) => {
+  return (await HttpService.post(
+    'org/title/filter',
+    {},
+    {
+      signal: thunkAPI.signal
+    }
+  )) as IApiResponse<IUserTitle[]>
+})
+const masterDataSlice = createSlice({
+  name: 'masterData',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getAllGroup.fulfilled, (state, action) => {
         state.groups = action.payload.data
+      })
+      .addCase(getTitle.fulfilled, (state, action) => {
+        state.listUserTitle = action.payload.data
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
@@ -64,4 +79,4 @@ const groupSlice = createSlice({
       })
   }
 })
-export default groupSlice.reducer
+export default masterDataSlice.reducer

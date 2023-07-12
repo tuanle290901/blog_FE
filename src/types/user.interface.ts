@@ -25,3 +25,13 @@ export interface GroupProfile {
 export interface OwnWeekWorkingTimeSetup {
   workDays: []
 }
+export interface IUserTitle {
+  id?: string
+  createdAt?: string
+  createdBy?: any
+  updatedAt?: string
+  updatedBy?: string
+  code: string
+  nameTitle: string
+  description?: string
+}
