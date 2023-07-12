@@ -5,6 +5,7 @@ import userHistory from '~/stores/features/user/user-history.slice.ts'
 
 import requestProcess from '~/stores/features/setting/request-process.slice'
 import departmentSilce from './features/department/department.silce'
+import timesheetSlice from './features/timesheet/timesheet.slice'
 
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -13,7 +14,8 @@ export const store = configureStore({
     user: userSlice,
     userHistory: userHistory,
     requestProcess: requestProcess,
-    department: departmentSilce
+    department: departmentSilce,
+    timesheet: timesheetSlice
   }
 })
 

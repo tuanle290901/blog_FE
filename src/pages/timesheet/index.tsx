@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Image, Row, Segmented, Select, Table } from 'antd'
-import DaySelected from './component/DaySelected'
+import React, { useEffect, useState } from 'react'
+import { Button, Checkbox, Col, DatePicker, Row, Segmented, Select, Table } from 'antd'
+// import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
@@ -10,11 +10,20 @@ import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
 import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
+import localeVI from 'antd/es/date-picker/locale/vi_VN'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
 
 const Timesheet: React.FC = () => {
+  const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
+  const { Option } = Select
   const [t] = useTranslation()
+  const groupsData = useAppSelector((state) => state.timesheet.groups)
+  const usersData = useAppSelector((state) => state.timesheet.userInGroup)
   const [isOpenModal, setIsOpenModal] = useState(false)
+  const [currentGroup, setCurrentGroup] = useState('')
+  const [currentUser, setCurrentUser] = useState('')
   const [mode, setMode] = useState('calendar')
 
   const handleClickAddReason = (record: IAttendance) => {
@@ -36,8 +45,12 @@ const Timesheet: React.FC = () => {
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
-      render: (date) => {
-        return dayjs(date).format('DD/MM/YYYY')
+      render: (date, record) => {
+        return (
+          <span className={`${record.status === 'late' || record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
+            {dayjs(date).format('DD/MM/YYYY')}
+          </span>
+        )
       }
     },
     {
@@ -103,12 +116,33 @@ const Timesheet: React.FC = () => {
     { id: '56abc', date: '2023-07-30', timeStart: '', timeEnd: '', status: '' }
   ]
 
+  // const usersData = [
+  //   {
+  //     fullName: '',
+  //     userName: 'Nguyễn Văn A'
+  //   },
+  //   {
+  //     fullName: '',
+  //     userName: 'Nguyễn Văn B'
+  //   }
+  // ]
+
+  useEffect(() => {
+    const promise = dispatch(getAllGroup())
+    return () => promise.abort()
+  }, [dispatch])
+
+  useEffect(() => {
+    const promise = dispatch(getUserInGroup(currentGroup as string))
+    return () => promise.abort()
+  }, [currentGroup, dispatch])
+
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo data={attendanceList} handleOpenModal={setIsOpenModal} />
       </Col>
-      <Col xs={24} xl={18} xxl={20} className=' tw-bg-white tw-p-5'>
+      <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={18}>
             {mode === 'list' && (
@@ -122,18 +156,16 @@ const Timesheet: React.FC = () => {
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                     allowClear
-                    onClear={() => console.log('delete')}
-                    options={[
-                      {
-                        value: 'htsc',
-                        label: 'HTSC'
-                      },
-                      {
-                        value: 'hti',
-                        label: 'HTI'
-                      }
-                    ]}
-                  />
+                    onClear={() => setCurrentGroup('')}
+                    onChange={(value) => setCurrentGroup(value)}
+                  >
+                    {groupsData &&
+                      groupsData?.map((i) => (
+                        <Option key={i?.code} label={i?.name} value={i?.code}>
+                          {i?.name}
+                        </Option>
+                      ))}
+                  </Select>
                 </Col>
                 <Col xs={24} lg={6}>
                   <p className='tw-mb-2'>Lọc theo nhân viên</p>
@@ -144,33 +176,39 @@ const Timesheet: React.FC = () => {
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                     allowClear
-                    onClear={() => console.log('delete')}
-                    options={[
-                      {
-                        value: '12',
-                        label: 'Nguyễn Văn A'
-                      },
-                      {
-                        value: '16',
-                        label: 'Nguyễn Văn B'
-                      }
-                    ]}
-                  />
+                    onClear={() => setCurrentUser('')}
+                    onChange={(value) => setCurrentUser(value)}
+                  >
+                    {usersData &&
+                      usersData?.map((i) => (
+                        <Option key={i?.userName} label={i?.userName} value={i?.userName}>
+                          {i?.userName}
+                        </Option>
+                      ))}
+                  </Select>
                 </Col>
                 <Col xs={24} lg={12}>
-                  <div>
+                  <div className='timesheet-filter-time'>
                     <div className='tw-mb-2'>Thời gian thống kê</div>
                     <RangePicker
                       onChange={handleSelectDate}
                       format='DD/MM/YYYY'
                       placeholder={['Từ ngày', 'Đến ngày']}
+                      locale={localeVI}
+                      renderExtraFooter={() => (
+                        <div className='timesheet-filter-time__button'>
+                          <Button size='small'>Hôm nay</Button>
+                          <Button size='small'>Tháng này</Button>
+                          <Button size='small'>Tháng trước</Button>
+                        </div>
+                      )}
                     />
                   </div>
                 </Col>
               </Row>
             )}
           </Col>
-          <Col xs={24} lg={6} className='tw-text-right'>
+          <Col xs={24} lg={6} className='timesheet-filter-tab'>
             <Segmented
               options={[
                 { label: 'Lịch', value: 'calendar' },
@@ -183,7 +221,7 @@ const Timesheet: React.FC = () => {
         </Row>
         {mode === 'list' && (
           <>
-            <DaySelected data={attendanceList} />
+            {/* <DaySelected data={attendanceList} /> */}
             <div className='tw-mt-6'>
               <Table
                 rowKey='id'
@@ -196,7 +234,7 @@ const Timesheet: React.FC = () => {
             </div>
           </>
         )}
-        {mode === 'calendar' && <TimesheetCalendar data={attendanceList} />}
+        {mode === 'calendar' && <TimesheetCalendar data={attendanceList} handleOpenModal={setIsOpenModal} />}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>
