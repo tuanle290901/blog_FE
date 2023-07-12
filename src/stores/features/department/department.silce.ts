@@ -16,12 +16,13 @@ const initialState: IDepartmentState = {
   currentRequestId: null
 }
 
-export const getListDepartments = createAsyncThunk('departments/getAll', async (params: any, thunkAPI) => {
+export const getListDepartments = createAsyncThunk('departments/getAll', async (_, thunkAPI) => {
   try {
-    const response = await HttpService.get('/org/group/get-tree', params)
-    return response.data
+    const response = await HttpService.get('/org/group/get-tree', {
+      signal: thunkAPI.signal
+    })
+    return response?.data
   } catch (error) {
-    console.log(error)
     return thunkAPI.rejectWithValue(error)
   }
 })
@@ -33,31 +34,35 @@ export const getUserById = createAsyncThunk('users/getById', async (userId: stri
 
 export const createDepartment = createAsyncThunk('departments/create', async (body: IDepartment, thunkAPI) => {
   try {
-    const response = await HttpService.post('/org/group/create', body)
+    const response = await HttpService.post('/org/group/create', body, {
+      signal: thunkAPI.signal
+    })
     return response.data
   } catch (error) {
-    // Handle any error that occurred during the API call
-    console.log(error)
     return thunkAPI.rejectWithValue(error)
   }
 })
-// export const updateUser = createAsyncThunk('users/create', (body: { userId: string; newUser: IUser }, thunkAPI) => {
-//   // TODO implement
-//   return body
-// })
-// export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
-//   return userId
-// })
+export const updateDepartment = createAsyncThunk('departments/update', async (body: IDepartment, thunkAPI) => {
+  try {
+    const response = await HttpService.post('/org/group/update', body, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
 const departmentSlice = createSlice({
   name: 'departments',
   initialState,
   reducers: {
-    startEditingUser: (state, action: PayloadAction<string>) => {
-      const userId = action.payload
-      const foundUser = state.listData.find((data) => data.id === userId)
+    startEditingDepartment: (state, action: PayloadAction<string>) => {
+      const code = action.payload
+      const foundUser = state.listData.find((data) => data.code === code)
       state.editingUser = foundUser as IDepartment
     },
-    cancelEditingUser: (state) => {
+    cancelEditingDepartment: (state) => {
       state.editingUser = null
     }
   },
@@ -65,18 +70,20 @@ const departmentSlice = createSlice({
     builder
       .addCase(createDepartment.pending, (state) => {
         state.loading = true
-        // state.error = null
       })
       .addCase(createDepartment.fulfilled, (state, action) => {
         state.loading = false
-        // state.createdData = action.payload
       })
       .addCase(createDepartment.rejected, (state, action) => {
         state.loading = false
-        // state.error = action.payload
       })
       .addCase(getListDepartments.fulfilled, (state, action) => {
         state.listData = [action.payload]
+      })
+      .addCase(updateDepartment.fulfilled, (state, action) => {
+        const code = action.payload
+        const foundUser = state.listData.find((data) => data.code === code)
+        state.editingUser = foundUser as IDepartment
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
@@ -99,13 +106,9 @@ const departmentSlice = createSlice({
       })
   }
 })
-export const { startEditingUser, cancelEditingUser } = departmentSlice.actions
-// export const selectCreatedData = (state) => state.api.createdData
-// export const selectApiLoading = (state) => state.api.loading
-// export const selectApiError = (state) => state.api.error
+export const { startEditingDepartment, cancelEditingDepartment } = departmentSlice.actions
 export const departmentSelectors = {
   selectListData: (state: IDepartmentState) => state.listData,
   selectDepartmentLoading: (state: IDepartmentState) => state.loading
-  // selectApiError: (state: IDepartmentState) => state.error
 }
 export default departmentSlice.reducer

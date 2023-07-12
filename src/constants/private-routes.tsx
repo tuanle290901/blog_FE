@@ -23,8 +23,7 @@ export const PRIVATE_PATH = {
     requestProcess: 'request-process'
   },
   department: {
-    prefix: 'department',
-    prefixmany: 'department/:departmentId'
+    prefix: 'department'
   },
   devices: '/devices',
   config: {
@@ -66,12 +65,6 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   { name: 'devices', path: PRIVATE_PATH.devices, component: DeviceList, allowedRoles: [] },
   {
     path: PRIVATE_PATH.department.prefix,
-    name: 'department',
-    component: Department,
-    allowedRoles: []
-  },
-  {
-    path: PRIVATE_PATH.department.prefixmany,
     name: 'department',
     component: Department,
     allowedRoles: []

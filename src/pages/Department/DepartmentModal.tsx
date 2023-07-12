@@ -1,9 +1,7 @@
 import { DatePicker, Form, Input, Modal } from 'antd'
-import TextArea from 'antd/es/input/TextArea'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { createDepartment, departmentSelectors } from '~/stores/features/department/department.silce'
+import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE, REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_TRIM } from '~/utils/helper'
@@ -15,36 +13,34 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const dispatch = useAppDispatch()
 
   const onSaveData = async () => {
-    const { code, address, name, id, publishDate, contactEmail, contactPhoneNumber } = form.getFieldsValue()
+    const { code, address, name, publishDate, contactEmail, contactPhoneNumber } = form.getFieldsValue()
     let payload: IDepartment = {
       code,
       address,
       name,
-      id,
       publishDate,
       contactEmail,
       contactPhoneNumber,
-      status: 'INITIAL',
-      type: 'HEADQUARTER',
       parentCode: ''
     }
     if (data) {
       payload = {
         ...payload,
-        id: data.id
+        parentCode: data?.parentCode,
+        code: data.code
       }
+      await dispatch(updateDepartment(payload))
     } else {
       payload = {
         ...payload,
-        parentCode: dataParent[dataParent.length - 1].code
+        parentCode: dataParent && dataParent[dataParent.length - 1].code
       }
-      dispatch(createDepartment(payload))
+      await dispatch(createDepartment(payload))
+      dispatch(getListDepartments())
     }
     form.resetFields()
     await onOk()
   }
-
-  console.log(data)
 
   useEffect(() => {
     if (data) {
@@ -52,16 +48,14 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
         name: data.name,
         code: data.code,
         address: data.address,
-        id: data.id,
         publishDate: data.publishDate,
         contactEmail: data.contactEmail,
         contactPhoneNumber: data.contactPhoneNumber,
-        status: data.status,
-        type: data.type,
         parentCode: data.parentCode
       })
     }
-  }, [])
+    return () => form.resetFields()
+  }, [data])
 
   const onCancel = async () => {
     form.resetFields()
@@ -79,12 +73,9 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       maskClosable={false}
     >
       <Form form={form} layout='vertical'>
-        <Form.Item name='id' label={t('Mã phòng ban')} hidden={true}>
-          <Input />
-        </Form.Item>
         <Form.Item
-          name='name'
-          label={t('Tên phòng ban')}
+          name='code'
+          label={t('Mã phòng ban')}
           rules={[
             {
               required: true,
@@ -96,11 +87,11 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
             }
           ]}
         >
-          <Input />
+          <Input disabled={typeModel === ACTION_TYPE.Created ? false : true} />
         </Form.Item>
         <Form.Item
-          name='code'
-          label={t('Mã phòng ban')}
+          name='name'
+          label={t('Tên phòng ban')}
           rules={[
             {
               required: true,

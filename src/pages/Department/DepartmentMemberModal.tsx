@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next'
 import IconStartSVG from '~/assets/svg/iconStart'
 import IconUserDownSVG from '~/assets/svg/iconUserDown'
 import IconUserUpSVG from '~/assets/svg/iconUserUp'
+import HttpService from '~/config/api'
+import { END_POINT_API } from '~/config/endpointapi'
 import { DataMemberRender, IDepartmentModal, ListDataType } from '~/types/department.interface'
 
 const { Search } = Input
@@ -36,6 +38,32 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
     listDataDownFilter: dataList1
   })
 
+  const getDetpartmentsByCode = async (code: string) => {
+    try {
+      const response = await HttpService.get(END_POINT_API.Department.getByCode(code))
+      if (response.status === 200) {
+        setListDataRender({
+          listDataUp: [],
+          listDataDown: [],
+          listDataUpFilter: [],
+          listDataDownFilter: []
+        })
+      }
+    } catch (error) {
+      setListDataRender({
+        listDataUp: [],
+        listDataDown: [],
+        listDataUpFilter: [],
+        listDataDownFilter: []
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (data) {
+      getDetpartmentsByCode(data.code)
+    }
+  }, [data])
   const onSaveData = async () => {
     onOk()
   }
