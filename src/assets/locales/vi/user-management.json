@@ -19,7 +19,8 @@
     "male": "Nam",
     "female": "Nữ",
     "commonInfo": "Thông tin chung",
-    "workInfo": "Thông tin làm việc"
+    "workInfo": "Thông tin làm việc",
+    "allGroup": "Tất cả phòng ban"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",

@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { mockUserData } from '~/stores/features/user/mock-user-data.ts'
 import HttpService from '~/config/api.ts'
 import { IApiResponse, Meta } from '~/types/IApiResponse.interface.ts'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
@@ -28,7 +27,7 @@ export const getListUser = createAsyncThunk('users/getAll', async (payload: any,
   // return response.data
   const fakeApi = new Promise<IUser[]>((resolve, reject) => {
     setTimeout(() => {
-      resolve(mockUserData)
+      resolve([])
     }, 1000)
   })
   return await fakeApi

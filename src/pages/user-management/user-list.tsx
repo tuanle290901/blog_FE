@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, Select, Table } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { cancelEditingUser, getListUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
+import { getAllGroup } from '~/stores/features/group/group.slice.ts'
 
 const { Search } = Input
 
@@ -19,19 +20,21 @@ const UserList: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
+  const groups = useAppSelector((state) => state.group.groups)
+  const [searchValue, setSearchValue] = useState<{ query: string; group?: string | null }>({ query: '' })
+  const timerId = useRef<any>(null)
   useEffect(() => {
-    const promise = dispatch(
-      searchUser({
-        criteria: [],
-        page: 0,
-        size: 10,
-        sort: []
-      })
-    )
+    const promise = dispatch(getAllGroup())
     return () => {
       promise.abort()
     }
   }, [])
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    const options = groups.map((item) => {
+      return { value: item.code, label: item.name }
+    })
+    return [{ value: null, label: t('userList.allGroup') }, ...options]
+  }, [groups])
   const handleClickEditUser = (user: IUser) => {
     //   TODO
     dispatch(startEditingUser(user.id as string))
@@ -119,7 +122,37 @@ const UserList: React.FC = () => {
       }
     }
   ]
-
+  const handleDepartmentChange = (value: string | null) => {
+    setSearchValue((prevState) => {
+      if (value) {
+        return { ...prevState, group: value }
+      } else {
+        return { query: prevState.query }
+      }
+    })
+  }
+  const handleSearchValueChange = (value: string) => {
+    if (timerId.current) {
+      clearTimeout(timerId.current)
+    }
+    // Debounce time 500ms
+    timerId.current = setTimeout(() => {
+      setSearchValue((prevState) => ({ ...prevState, query: value }))
+    }, 500)
+  }
+  useEffect(() => {
+    const promise = dispatch(
+      searchUser({
+        criteria: [],
+        page: 0,
+        size: 10,
+        sort: []
+      })
+    )
+    return () => {
+      promise.abort()
+    }
+  }, [searchValue])
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <UserCreateEdit
@@ -136,8 +169,13 @@ const UserList: React.FC = () => {
           {t('userList.addMember')}
         </Button>
         <div className='tw-flex tw-gap-4'>
-          <Select className='tw-w-64'></Select>
-          <Search className='tw-w-64' />
+          <Select
+            onChange={handleDepartmentChange}
+            defaultValue={null}
+            options={groupOptions}
+            className='tw-w-64'
+          ></Select>
+          <Search onChange={(event) => handleSearchValueChange(event.target.value)} className='tw-w-64' />
         </div>
       </div>
       <div className='tw-mt-6'>
