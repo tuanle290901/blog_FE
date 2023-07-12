@@ -34,11 +34,11 @@ const beforeUpload = (file: RcFile) => {
   }
   return isJpgOrPng && isLt2M
 }
-const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userData?: IUser | null }> = ({
-  open,
-  handleClose,
-  userData
-}) => {
+const UserCreateEdit: React.FC<{
+  open: boolean
+  handleClose: (isCreateUserSuccess: boolean) => void
+  userData?: IUser | null
+}> = ({ open, handleClose, userData }) => {
   const [t] = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
@@ -100,10 +100,11 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
       console.log('aa')
       setLoading(true)
       await dispatch(createUser(payload))
-      handleClose()
+      handleClose(true)
+    } catch (e) {
+      handleClose(false)
     } finally {
       setLoading(false)
-      handleClose()
     }
   }
   const handleClickButtonUpdateAvatar = () => {
@@ -123,12 +124,12 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
     <Modal
       open={open}
       title={t('userList.addMember')}
-      onCancel={handleClose}
+      onCancel={() => handleClose(false)}
       // okText={t('common.save')}
       // cancelText={t('common.cancel')}
       footer={
         <div className={'tw-flex tw-justify-end'}>
-          <Button onClick={handleClose}>{t('common.cancel')}</Button>
+          <Button onClick={() => handleClose(false)}>{t('common.cancel')}</Button>
           <Button type='primary' onClick={handleSubmit} loading={loading}>
             {t('common.save')}
           </Button>

@@ -36,7 +36,12 @@ const UserList: React.FC = () => {
       total: 0,
       totalPage: 0
     },
-    sorts: []
+    sorts: [
+      {
+        direction: 'DESC',
+        field: 'created_at'
+      }
+    ]
   })
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
@@ -70,9 +75,16 @@ const UserList: React.FC = () => {
   const handleClickViewUserHistory = (user: IUser) => {
     navigate('/user/history/' + user.id)
   }
-  const handleCloseUserModal = () => {
+  const handleCloseUserModal = (isCreateUserSuccess: boolean) => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
+    if (isCreateUserSuccess) {
+      setSearchValue((prevState) => {
+        return {
+          ...prevState
+        }
+      })
+    }
   }
   const columns: ColumnsType<IUser> = [
     {
