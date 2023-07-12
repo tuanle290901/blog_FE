@@ -7,8 +7,9 @@ import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, getListUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import { cancelEditingUser, getListUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
 
 const { Search } = Input
 
@@ -18,6 +19,19 @@ const UserList: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
+  useEffect(() => {
+    const promise = dispatch(
+      searchUser({
+        criteria: [],
+        page: 0,
+        size: 10,
+        sort: []
+      })
+    )
+    return () => {
+      promise.abort()
+    }
+  }, [])
   const handleClickEditUser = (user: IUser) => {
     //   TODO
     dispatch(startEditingUser(user.id as string))
@@ -49,13 +63,19 @@ const UserList: React.FC = () => {
     },
     {
       title: t('userList.dateOfBirth'),
-      dataIndex: 'dateOfBirth',
-      key: 'dateOfBirth'
+      dataIndex: 'birthday',
+      key: 'birthday',
+      render: (text, record) => {
+        if (text) {
+          const date = dayjs(text).format('DD/MM/YYYY')
+          return date
+        }
+      }
     },
     {
       title: t('userList.gender'),
-      dataIndex: 'gender',
-      key: 'gender'
+      dataIndex: 'genderType',
+      key: 'genderType'
     },
     {
       title: t('userList.department'),
@@ -100,13 +120,6 @@ const UserList: React.FC = () => {
     }
   ]
 
-  useEffect(() => {
-    const promise = dispatch(getListUser())
-    promise.finally(() => console.log('final'))
-    return () => {
-      promise.abort()
-    }
-  }, [])
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <UserCreateEdit

@@ -38,20 +38,20 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
 }) => {
   const [t] = useTranslation()
   const [loading, setLoading] = useState(false)
-  const [imageUrl, setImageUrl] = useState<string>()
-  const [form] = Form.useForm<Omit<IUser, 'dateOfBirth'> & { dateOfBirth: Dayjs }>()
+  const [avatarBase64, setAvatarBase64] = useState<string>()
+  const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
   const uploadRef = useRef<HTMLDivElement>(null)
   const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
     getBase64(info.file.originFileObj as RcFile, (url) => {
       setLoading(false)
-      setImageUrl(url)
+      setAvatarBase64(url)
     })
   }
   useEffect(() => {
     if (userData) {
       form.setFieldsValue({
         ...userData,
-        dateOfBirth: dayjs(userData.dateOfBirth)
+        birthday: dayjs(userData.birthday)
       })
     } else {
       form.resetFields()
@@ -98,10 +98,10 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
             onChange={handleChange}
           >
             <div ref={uploadRef}>
-              {imageUrl ? (
+              {avatarBase64 ? (
                 <img
                   className='tw-w-28 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-28 tw-rounded-full tw-object-cover'
-                  src={imageUrl}
+                  src={avatarBase64}
                   alt='avatar'
                 />
               ) : (
@@ -118,7 +118,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
               <Button onClick={handleClickButtonUpdateAvatar} type='primary'>
                 {t('userModal.updateAvatar')}
               </Button>
-              <Button onClick={() => setImageUrl('')}>{t('userModal.deleteAvatar')}</Button>
+              <Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>
             </div>
             <div className='tw-mt-1'>
               <p className='tw-text-[#BFBFBF]'>{t('userModal.avatarAccept')}</p>
@@ -137,13 +137,13 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.fullName')} name='fullName' required>
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.gender')} required name='gender'>
+                <Form.Item style={{ marginBottom: 16 }} label={t('userList.gender')} required name='genderType'>
                   <Select placeholder={t('userModal.selectGender')}>
                     <Select.Option value='male'>{t('userList.male')}</Select.Option>
                     <Select.Option value='female'>{t('userList.female')}</Select.Option>
                   </Select>
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateOfBirth')} name='dateOfBirth'>
+                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
                     format='YYYY/MM/DD'
                     disabledDate={(date) => {
@@ -168,7 +168,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
               <div className='tw-p-4 tw-bg-[#FAFAFA] tw-h-[530px] tw-overflow-auto'>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateJoin')} name='dateJoin'>
+                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateJoin')} name='joinDate'>
                   <DatePicker
                     format='YYYY/MM/DD'
                     disabledDate={(date) => {
@@ -193,7 +193,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                 <Form.Item
                   style={{ marginBottom: 16 }}
                   label={t('userList.officialContractSigningDate')}
-                  name='officialContractSigningDate'
+                  name='formalDate'
                 >
                   <DatePicker
                     format='YYYY/MM/DD'
@@ -205,7 +205,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.List name='users' initialValue={departmentField}>
+                <Form.List name='groupProfile' initialValue={departmentField}>
                   {(fields = departmentField, { add, remove }) => (
                     <>
                       {fields.map(({ key, name, ...restField }, index) => (
@@ -218,7 +218,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                             {...restField}
                             style={{ marginBottom: 16 }}
                             label={t('userList.department') + ' ' + index}
-                            name={[name, 'department']}
+                            name={[name, 'groupCode']}
                             required
                           >
                             <Select placeholder={t('userModal.selectDepartment')}></Select>
@@ -227,7 +227,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                             <Form.Item
                               {...restField}
                               style={{ marginBottom: 16 }}
-                              name={[name, 'first']}
+                              name={[name, 'title']}
                               rules={[{ required: true, message: 'Missing first name' }]}
                             >
                               <Select placeholder={t('userModal.selectPosition')}></Select>
@@ -235,7 +235,7 @@ const UserCreateEdit: React.FC<{ open: boolean; handleClose: () => void; userDat
                             <Form.Item
                               {...restField}
                               style={{ marginBottom: 16 }}
-                              name={[name, 'last']}
+                              name={[name, 'role']}
                               rules={[{ required: true, message: 'Missing last name' }]}
                             >
                               <Select placeholder={t('userModal.selectFunction')}></Select>

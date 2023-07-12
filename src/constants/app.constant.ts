@@ -7,3 +7,5 @@ export enum WEEK_DAY {
   SATURDAY = 'SATURDAY',
   SUNDAY = 'SUNDAY'
 }
+
+export const COMMON_ERROR_CODE = [0, 401, 500]
