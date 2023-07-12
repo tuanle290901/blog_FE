@@ -1,13 +1,13 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { FC } from 'react'
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useState, useRef } from 'react'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-import { Button, Col, Divider, Form, Input, Modal, Row, Select, Space, Tooltip, notification } from 'antd'
-import { PlusOutlined, EditOutlined, MinusOutlined, MinusCircleFilled } from '@ant-design/icons'
+import { EditOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Form, Space, Tooltip, notification } from 'antd'
 import Target from './component/Target'
 
 import iconAdd from '~/assets/images/setting/add.png'
@@ -19,12 +19,11 @@ import {
   removeApprovalStep
 } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { DragItem, DropItem } from '~/types/setting-ticket-process'
-import Source from './component/Source'
-import TextArea from 'antd/es/input/TextArea'
-import { INPUT_TYPE } from '~/utils/Constant'
-import ModalInitAttr from './component/ModalInitAttrr'
+import { DragItem, DropItem, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
+import BottomControl from './component/BottomControl'
 import FormInitName from './component/FormInitName'
+import ModalInitAttr from './component/ModalInitAttrr'
+import Source from './component/Source'
 import { TicketInitial } from './type/ItemTypes'
 
 const Index: FC = memo(function Index() {
@@ -35,7 +34,28 @@ const Index: FC = memo(function Index() {
   const targetBoxes = useAppSelector((state) => state.ticketProcess.approvalSteps)
 
   const [ticketInfo, setTicketInfo] = useState<TicketInitial>({ name: '', description: '', isFinished: false })
-  const [isModalInitAttrOpen, setIsModalInitAttrOpen] = useState<boolean>(false)
+  const [isModalInitAttrOpen, setIsModalInitAttrOpen] = useState<{ key: string; status: boolean }>({
+    key: '0',
+    status: false
+  })
+  const ticketRequestPayloadRef = useRef<TicketDefRevisionCreateReq>({
+    name: '',
+    description: '',
+    revision: {
+      processFlow: [],
+      processNodes: [
+        {
+          groupCode: '',
+          attributes: []
+        },
+        {
+          groupCode: '',
+          attributes: []
+        }
+      ]
+    }
+  })
+  const ticketNodeIndexRef = useRef<number>(0)
 
   const onContinue = (formValue: TicketInitial) => {
     const { name, description } = formValue
@@ -59,8 +79,12 @@ const Index: FC = memo(function Index() {
     })
   }
 
-  const openModalInitAttr = () => {
-    setIsModalInitAttrOpen(true)
+  const openModalInitAttr = (indexNode: number) => {
+    ticketNodeIndexRef.current = indexNode
+    setIsModalInitAttrOpen({
+      key: `${indexNode}`,
+      status: true
+    })
   }
 
   const onChangeType = (value: string, index: number) => {
@@ -70,7 +94,20 @@ const Index: FC = memo(function Index() {
   }
 
   const onFinishInitAttr = (initFormValues: any) => {
-    setIsModalInitAttrOpen(false)
+    if (ticketNodeIndexRef.current === 0) {
+      ticketRequestPayloadRef.current.revision.processNodes[ticketNodeIndexRef.current].groupCode = 'INIT'
+    } else {
+      ticketRequestPayloadRef.current.revision.processNodes[ticketNodeIndexRef.current].groupCode =
+        targetBoxes[ticketNodeIndexRef.current - 1].data[0].id
+    }
+    ticketRequestPayloadRef.current.revision.processNodes[ticketNodeIndexRef.current].attributes =
+      initFormValues.initAttr
+    setIsModalInitAttrOpen((prev) => {
+      return {
+        ...prev,
+        status: false
+      }
+    })
   }
 
   const onFinishInitAttrFail = (initFormValues: any) => {
@@ -78,8 +115,12 @@ const Index: FC = memo(function Index() {
   }
 
   const handleCancelModalInitAttr = () => {
-    setIsModalInitAttrOpen(false)
-    initAttrForm.resetFields()
+    setIsModalInitAttrOpen((prev) => {
+      return {
+        ...prev,
+        status: false
+      }
+    })
   }
 
   const handleDrop = (item: DragItem, targetKey: string) => {
@@ -91,16 +132,46 @@ const Index: FC = memo(function Index() {
   }
 
   const addNewStep = () => {
+    const newNode = { groupCode: '', attributes: [] }
+    ticketRequestPayloadRef.current.revision.processNodes.push(newNode)
     dispatch(addNewApprovalStep())
   }
 
   const removeStep = (item: DropItem, index: number) => {
+    if (index >= 0 && index < ticketRequestPayloadRef.current.revision.processNodes.length) {
+      ticketRequestPayloadRef.current.revision.processNodes.splice(index, 1)
+    }
     dispatch(removeApprovalStep({ index }))
   }
 
   useEffect(() => {
     dispatch(fetchDepartments())
   }, [dispatch])
+
+  useEffect(() => {
+    if (ticketInfo.name && ticketInfo.isFinished) {
+      ticketRequestPayloadRef.current.name = ticketInfo.name
+      ticketRequestPayloadRef.current.description = ticketInfo.description
+    }
+  }, [ticketInfo])
+
+  useEffect(() => {
+    if (!isModalInitAttrOpen.status) {
+      initAttrForm.resetFields()
+    }
+
+    if (isModalInitAttrOpen.status) {
+      const modalFormData = ticketRequestPayloadRef.current.revision.processNodes.find(
+        (item, index) => Number(index) === Number(isModalInitAttrOpen.key)
+      )
+      if (modalFormData?.groupCode) {
+        const dataForm = {
+          initAttr: modalFormData?.attributes
+        }
+        initAttrForm.setFieldsValue(dataForm)
+      }
+    }
+  }, [isModalInitAttrOpen])
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -130,7 +201,7 @@ const Index: FC = memo(function Index() {
 
             <div className='list-item-target tw-h-3/4'>
               <div className='item-tartget__top'>
-                <div className='button-start-end' onClick={openModalInitAttr}>
+                <div className='button-start-end' onClick={() => openModalInitAttr(0)}>
                   Khởi tạo phép
                 </div>
                 <img src={iconHalfArrow} alt='arrow' />
@@ -157,20 +228,26 @@ const Index: FC = memo(function Index() {
                             canDropItem={canDropItem}
                           />
                           <Space className='tw-mt-3'>
-                            <Tooltip title={'Xóa bước xét duyệt'}>
-                              <Button shape='circle' onClick={() => removeStep(item, index)}>
-                                <MinusOutlined />
-                              </Button>
-                            </Tooltip>
+                            {index !== 0 && (
+                              <Tooltip title={'Xóa bước duyệt'}>
+                                <Button shape='circle' onClick={() => removeStep(item, index)}>
+                                  <MinusOutlined />
+                                </Button>
+                              </Tooltip>
+                            )}
 
                             <Tooltip title={'Cập nhật thông tin thuộc tính'}>
-                              <Button shape='circle'>
+                              <Button
+                                shape='circle'
+                                onClick={() => openModalInitAttr(index + 1)}
+                                disabled={targetBoxes[index].data.length === 0}
+                              >
                                 <EditOutlined />
                               </Button>
                             </Tooltip>
 
                             {index === targetBoxes.length - 1 && (
-                              <Tooltip title={'Thêm bước xét duyệt'}>
+                              <Tooltip title={'Thêm bước duyệt'}>
                                 <Button shape='circle' onClick={addNewStep}>
                                   <PlusOutlined />
                                 </Button>
@@ -188,22 +265,7 @@ const Index: FC = memo(function Index() {
                 <div className='button-start-end'>Trạng thái cuối</div>
               </div>
 
-              <div className='item-tartget__bottom'>
-                <Space direction='vertical' size={'large'}>
-                  <div>
-                    <div className='tw-font-medium'>
-                      * Chú thích: Kéo các thẻ tên vào các ô vuông có nét gạch đứt tương ứng với thứ tự duyệt phép của
-                      từng vị trí
-                    </div>
-                    <div className='tw-mt-2 tw-italic'>(Bỏ trống để bỏ qua bước duyệt)</div>
-                  </div>
-
-                  <Space>
-                    <Button type='primary'>Lưu cấu hình</Button>
-                    <Button>Đặt lại mặc định</Button>
-                  </Space>
-                </Space>
-              </div>
+              <BottomControl />
             </div>
           </>
         )}

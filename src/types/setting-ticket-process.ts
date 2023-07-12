@@ -47,18 +47,19 @@ export interface TicketTransfer {
 }
 
 export interface TicketProcessNode {
-  orgUnitCode: string
+  groupCode: string
   attributes: TicketAttribute[]
 }
 
 export interface TicketProcessRevision {
   rev?: number
+  startNodeIndex?: number
+  endNodeIndex?: number
   continueTransferStrategy?: string[]
   stopTransferStrategy?: string[]
   strategy?: string[]
   createdAt?: string
   createdBy?: string
-  initialAttrs: TicketAttribute[]
   processFlow: TicketTransfer[]
   processNodes: TicketProcessNode[]
 }

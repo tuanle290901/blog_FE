@@ -3,7 +3,7 @@
 import { MinusCircleFilled, PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Divider, Form, Input, Modal, Row, Select, Space } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import type { FC } from 'react'
+import { useState, type FC } from 'react'
 import { INPUT_TYPE } from '~/utils/Constant'
 import { ModalInitAttrProp } from '../type/ItemTypes'
 
@@ -16,12 +16,15 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
     onFinishInitAttrFail,
     onChangeType
   } = props
+
+  const [collapsed, setCollapsed] = useState<boolean[]>([true])
+
   return (
     <Modal
       title='Khởi tạo thuộc tính'
       width='40%'
       style={{ minWidth: 500, top: 50 }}
-      open={isModalInitAttrOpen}
+      open={isModalInitAttrOpen.status}
       footer={null}
       onCancel={handleCancelModalInitAttr}
     >
@@ -40,7 +43,6 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
       >
         <Form.List name='initAttr'>
           {(fields, { add, remove }) => {
-            console.log(fields)
             return (
               <>
                 <div className='form-array-container'>
@@ -102,31 +104,77 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
                             name={[name, 'options']}
                             rules={[{ required: true, message: 'Trường bắt buộc' }]}
                           >
-                            <Input placeholder='Các giá trị cho phép' />
+                            <Select
+                              placeholder='Các giá trị cho phép'
+                              mode='tags'
+                              style={{ width: '100%' }}
+                              tokenSeparators={[',']}
+                              open={false}
+                            />
                           </Form.Item>
                         )}
                       </Col>
+
                       <Col span={24}>
-                        {initAttrForm.getFieldsValue().initAttr?.[index]?.type === INPUT_TYPE.TEXT && (
-                          <Form.Item label='Gợi ý ' {...restField} name={[name, 'suggestion']}>
-                            <Input placeholder='Gợi ý' />
-                          </Form.Item>
-                        )}
+                        <span
+                          className='tw-float-right tw-text-blue-400 tw-cursor-pointer'
+                          onClick={() => {
+                            const newCollapsed = [...collapsed]
+                            newCollapsed[index] = !newCollapsed[index]
+                            setCollapsed(newCollapsed)
+                          }}
+                        >
+                          {collapsed[index] ? 'Mở rộng' : 'Thu gọn'}
+                        </span>
                       </Col>
-                      <Col span={24}>
-                        <Form.Item label='Mô tả' {...restField} name={[name, 'description']}>
-                          <TextArea placeholder='Mô tả' />
-                        </Form.Item>
-                      </Col>
+
+                      {!collapsed[index] && (
+                        <>
+                          <Col span={24}>
+                            {initAttrForm.getFieldsValue().initAttr?.[index]?.type === INPUT_TYPE.TEXT && (
+                              <Form.Item label='Gợi ý ' {...restField} name={[name, 'suggestion']}>
+                                <Select
+                                  placeholder='Gợi ý'
+                                  mode='tags'
+                                  style={{ width: '100%' }}
+                                  tokenSeparators={[',']}
+                                  open={false}
+                                />
+                              </Form.Item>
+                            )}
+                          </Col>
+                          <Col span={24}>
+                            <Form.Item label='Mô tả' {...restField} name={[name, 'description']}>
+                              <TextArea placeholder='Mô tả' />
+                            </Form.Item>
+                          </Col>
+                        </>
+                      )}
+
                       {index !== 0 && (
-                        <div className='dynamic-form-item-icon-close' onClick={() => remove(name)}>
+                        <div
+                          className='dynamic-form-item-icon-close'
+                          onClick={() => {
+                            remove(name)
+                            setCollapsed((prevState) => prevState.filter((item, idx) => idx !== index))
+                          }}
+                        >
                           <MinusCircleFilled className='tw-text-xl tw-text-red-600' />
                         </div>
                       )}
                     </Row>
                   ))}
                   <Form.Item>
-                    <Button ghost type='primary' onClick={() => add()} block icon={<PlusOutlined />}>
+                    <Button
+                      ghost
+                      type='primary'
+                      onClick={() => {
+                        add()
+                        setCollapsed((prevState) => [...prevState, true])
+                      }}
+                      block
+                      icon={<PlusOutlined />}
+                    >
                       Thêm thuộc tính
                     </Button>
                   </Form.Item>

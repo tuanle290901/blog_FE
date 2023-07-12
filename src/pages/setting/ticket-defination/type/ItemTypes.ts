@@ -16,7 +16,7 @@ export interface FormValues {
 }
 
 export interface ModalInitAttrProp {
-  isModalInitAttrOpen: boolean
+  isModalInitAttrOpen: { key: string; status: boolean }
   initAttrForm: FormInstance
   handleCancelModalInitAttr: () => void
   onFinishInitAttr: (formValues: FormValues) => void
