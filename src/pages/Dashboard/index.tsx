@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
           />
         </Col>
         <Col xs={24} lg={8}>
-          <RangePicker />
+          <RangePicker placeholder={['Từ ngày', 'Đến ngày']} />
         </Col>
         <Col xs={24} lg={8} className='tw-flex'>
           <Button className='tw-ml-auto' onClick={handleExportExcel} type='primary' icon={<DownloadOutlined />}>

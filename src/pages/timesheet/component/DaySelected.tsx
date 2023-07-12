@@ -54,7 +54,7 @@ const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
         <Col xs={24} lg={12}>
           <div className='timesheet-workday'>
             <p>Số ngày công</p>
-            <span>22</span>
+            <span>{data?.length}</span>
           </div>
         </Col>
         <Col xs={24} lg={12} className='tw-flex'>

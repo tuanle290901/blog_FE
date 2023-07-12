@@ -1,37 +1,47 @@
-import type { FC } from 'react'
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+import { useMemo, type FC } from 'react'
 import { useDrop } from 'react-dnd'
 
-import { Empty, Space, Tooltip } from 'antd'
 import { CloseCircleFilled } from '@ant-design/icons'
+import { Empty, Space, Tooltip } from 'antd'
+import { removeDroppedItem } from '~/stores/features/setting/request-process.slice'
+import { useAppDispatch } from '~/stores/hook'
+import { DropItem, TargetProps } from '~/types/setting-request-process'
 import { ItemTypes } from './ItemTypes'
-import { DropItem, DustbinProps } from '~/types/setting-request-process'
 
-const Target: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
+const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) => {
+  const dispatch = useAppDispatch()
+
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
     drop: (item: DropItem) => {
-      onDrop(item, dustbinKey)
+      onDrop(item, targetKey)
+    },
+    canDrop: (item) => {
+      return canDropItem(item)
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver() && dropItem.length === 0,
+      isOver: monitor.isOver(),
       canDrop: monitor.canDrop()
     })
   }))
 
-  function hasDuplicates(arr: any[]) {
-    console.log(arr, 'arr')
-    const uniqueValues = new Set(arr)
-    return arr.length !== uniqueValues.size
-  }
-
-  const isActive = canDrop && isOver
+  const isActive = useMemo(() => {
+    return canDrop && isOver
+  }, [canDrop, isOver])
 
   const dropBoxStyle = {
-    backgroundColor: isActive ? '#69c0ff' : canDrop ? '#e7f5ff' : '#ffffff'
+    backgroundColor: isActive ? '#69c0ff' : canDrop ? '#e7f5ff' : isOver ? '#d5d5d5' : '#ffffff'
+  }
+
+  const handleRemoveDroppedItem = (item: DropItem) => {
+    const { id, name } = item
+    dispatch(removeDroppedItem({ targetKey, id }))
   }
 
   return (
-    <div ref={drop} id={dustbinKey} data-testid={dustbinKey} className='dropped-box-item' style={dropBoxStyle}>
+    <div ref={drop} id={targetKey} data-testid={targetKey} className='dropped-box-item' style={dropBoxStyle}>
       {dropItem?.length === 0 && (
         <Empty
           imageStyle={{ height: 60 }}
@@ -45,7 +55,10 @@ const Target: FC<DustbinProps> = ({ dustbinKey, onDrop, dropItem }) => {
               <Tooltip title={item.name} placement='left'>
                 <div className='drop-box__name'>{item.name}</div>
               </Tooltip>
-              <div className='tw-absolute tw-top-[-5px] tw-right-[-5px] tw-cursor-pointer'>
+              <div
+                className='tw-absolute tw-top-[-5px] tw-right-[-5px] tw-cursor-pointer'
+                onClick={() => handleRemoveDroppedItem(item)}
+              >
                 <CloseCircleFilled />
               </div>
             </div>

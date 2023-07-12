@@ -173,7 +173,7 @@ const CommondTable: React.FC<IPropsTableCommon> = (props) => {
       }}
       size={size || undefined}
       {...tableProps}
-      style={...style}
+      style={style}
       rowSelection={disabledRowSelection ? undefined : rowSelection}
       pagination={
         hiddenPagination

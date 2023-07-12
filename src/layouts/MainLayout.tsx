@@ -17,6 +17,7 @@ import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { logout } from '~/stores/features/auth/auth.slice'
 import { PUBLIC_PATH } from '~/constants/public-routes'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -42,7 +43,7 @@ const MainLayout: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
-  const userInfoState = useAppSelector((state) => state.auth.userInfo)
+  const { userInfo } = useUserInfo()
 
   const handleLogout = () => {
     dispatch(logout())
@@ -72,7 +73,7 @@ const MainLayout: React.FC = () => {
 
   const menuItems: MenuItem[] = useMemo(() => {
     return [
-      getItem('Trang chủ', 'dashboard', <img src={menuIconStatistical} alt='' className='menu-image' />),
+      getItem('Trang chủ', '/', <img src={menuIconStatistical} alt='' className='menu-image' />),
       getItem(
         <Tooltip placement='topLeft' title='Chức năng chính'>
           Chức năng chính
@@ -81,7 +82,7 @@ const MainLayout: React.FC = () => {
         null,
         [
           getItem('Chấm công', 'timeKeeping', <img src={menuIconTimeKeeping} alt='' className='menu-image' />, [
-            getItem('Lịch sử chấm công', 'timeKeepingHistory'),
+            getItem('Lịch sử chấm công', 'timesheet'),
             getItem('Lịch sử yêu cầu', 'requestHistory'),
             getItem('Danh sách yêu cầu', 'requestList')
           ])
@@ -96,7 +97,7 @@ const MainLayout: React.FC = () => {
         'manageFunction',
         null,
         [
-          getItem('Thành viên', 'member', <img src={menuIconMember} alt='' className='menu-image' />),
+          getItem('Thành viên', '/users', <img src={menuIconMember} alt='' className='menu-image' />),
           getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
         'group'
@@ -155,7 +156,7 @@ const MainLayout: React.FC = () => {
                 </Badge>
                 <Space className='tw-cursor-pointer tw-ml-[15px]'>
                   <Avatar size='default' icon={<UserOutlined />} />
-                  <span className='tw-font-bold'>{userInfoState.fullName}</span>
+                  <span className='tw-font-bold'>{userInfo?.fullName}</span>
                 </Space>
               </div>
             </Dropdown>
