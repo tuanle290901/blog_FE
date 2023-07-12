@@ -1,155 +1,97 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import './index.scss'
+
 import { PlusOutlined } from '@ant-design/icons'
-import { Col, Input, Row, Space, Tooltip } from 'antd'
+import { Col, Input, Row, Space, Table, Tooltip } from 'antd'
 import { ExpandableConfig, Key } from 'antd/es/table/interface'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
+import IconBackSVG from '~/assets/svg/iconback'
 import IconDeleteSVG from '~/assets/svg/iconDelete'
 import IconEditSVG from '~/assets/svg/iconEdit'
 import IconTeamSVG from '~/assets/svg/iconTeam'
-import IconBackSVG from '~/assets/svg/iconback'
 import CommonButton from '~/components/Button/CommonButton'
 import CommondTable from '~/components/Table/CommonTable'
-import { IModelState } from '~/types/department.interface'
+import { getListDepartments } from '~/stores/features/department/department.silce'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
+
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
-import './index.scss'
-
-// interface DataType {
-//   key: React.Key
-//   name: string
-//   age: number
-//   address: string
-//   description: string
-// }
-
-interface DataType {
-  key: Key
-  name: string
-  age: number
-  address: string
-  children?: DataType[]
-}
 
 const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
+  const listDataDepartments: DataType[] = useAppSelector((state) => state.department.listData)
+  const isLoading = useAppSelector((state) => state.department.loading)
+  const [dataRender, setDataRender] = useState<{
+    listData: DataType[]
+    listDataTitle: IDepartmentTitle[]
+  }>({
+    listData: listDataDepartments,
+    listDataTitle: []
+  })
 
   const [showModal, setShowModal] = useState<IModelState>({
     openModal: false,
     type: '',
-    data: null
+    data: null,
+    dataParent: []
   })
-  const [useSelect, setUseSelect] = useState<any>(null)
+  const [useSelect, setUseSelect] = useState<DataType>()
 
   const onSearch = (value: string) => {
-    console.log(value)
+    if (value) {
+      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, value)
+      setDataRender({
+        listData: data,
+        listDataTitle: [
+          {
+            name: data[0]?.name,
+            code: data[0]?.code
+          }
+        ]
+      })
+    } else {
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            name: listDataDepartments[0]?.name,
+            code: listDataDepartments[0]?.code
+          }
+        ]
+      })
+    }
   }
 
-  const data = [
-    {
-      key: 1,
-      name: 'Node 1',
-      age: 30,
-      address: '123 Main St',
-      children: [
-        {
-          key: 2,
-          name: 'Node 1.1',
-          age: 25,
-          address: '456 Park Ave',
-          parentWorkUnitCode: 1,
-          parentWorkUnitName: 'Node 1',
-          children: [
-            {
-              key: 3,
-              name: 'Node 1.1.1',
-              age: 20,
-              address: '789 Elm St',
-              children: [],
-              parentWorkUnitCode: 2,
-              parentWorkUnitName: 'Node 1.1'
-            },
-            {
-              key: 4,
-              name: 'Node 1.1.2',
-              age: 35,
-              address: '321 Oak St',
-              children: [],
-              parentWorkUnitCode: 2,
-              parentWorkUnitName: 'Node 1.1'
-            }
-          ]
-        },
-        {
-          key: 5,
-          name: 'Node 1.2',
-          age: 40,
-          address: '987 Pine St',
-          children: [],
-          parentWorkUnitCode: 1,
-          parentWorkUnitName: 'Node 1'
-        }
-      ]
-    }
-  ]
-
-  const [dataRender, setDataRender] = useState({
-    listData: data,
-    listDataTitle: []
-  })
-  // const renderTreeRows = (nodes: any[]) => {
-  //   return nodes.map((node) => {
-  //     const { key, name, age, address, children, parentWorkUnitCode, parentWorkUnitName } = node
-  //     const hasChildren = children && children.length > 0
-
-  //     const row = {
-  //       key,
-  //       name,
-  //       age,
-  //       address,
-  //       children,
-  //       parentWorkUnitCode,
-  //       parentWorkUnitName
-  //     }
-
-  //     if (hasChildren) {
-  //       row.children = renderTreeRows(children)
-  //     }
-
-  //     return row
-  //   })
-  // }
-  // const treeData = renderTreeRows(dataRender.listData)
-
-  const renderTreeRows = (nodes: any[], isLastLevel = false) => {
+  const renderTreeRows = (nodes: DataType[], isLastLevel = false) => {
     return nodes.map((node) => {
-      const { key, name, age, address, children, parentWorkUnitCode, parentWorkUnitName } = node
+      const { code, name, contactEmail, address, children, parentCode, parentName, contactPhoneNumber } = node
       const hasChildren = children && children.length > 0
-
       const row = {
-        key,
+        code,
         name,
-        age,
+        contactEmail,
         address,
         children,
-        parentWorkUnitCode,
-        parentWorkUnitName
+        parentCode,
+        parentName,
+        contactPhoneNumber
       }
-
       if (hasChildren) {
         row.children = renderTreeRows(children, !isLastLevel)
       }
-
       return row
     })
   }
 
-  const treeData = renderTreeRows(dataRender.listData, true)
   const expandableConfig: ExpandableConfig<DataType> = {
     expandIcon: ({ expanded, onExpand, record }) => {
       if (record.children && record.children.length === 0) {
@@ -168,12 +110,12 @@ const Department: React.FC = () => {
     defaultExpandAllRows: true
   }
 
-  function getListDataByKey(data: any[], targetKey: any) {
-    const filteredData: any = []
+  function getListDataByKey(data: DataType[], targetKey: any) {
+    const filteredData: DataType[] = []
 
-    function getListDataByKey(listData: any[]) {
+    function getListDataByKey(listData: DataType[]) {
       for (const item of listData) {
-        if (item.key === targetKey.key) {
+        if (item.code === targetKey.code) {
           filteredData.push(item)
           break
         } else if (item.children && item.children.length > 0) {
@@ -181,24 +123,40 @@ const Department: React.FC = () => {
         }
       }
     }
-
     getListDataByKey(data)
     return filteredData
   }
 
-  function getParentByKey(listData: any[], targetKey: any): any[] {
-    const parentList: any[] = []
+  function getListDataByNameOrCodeOrEmail(data: DataType[], keyword: string) {
+    const filteredData: DataType[] = []
+
+    function getListDataByKey(listData: DataType[]) {
+      for (const item of listData) {
+        if (item.code.includes(keyword) || item.name?.includes(keyword)) {
+          filteredData.push(item)
+          break
+        } else if (item.children && item.children.length > 0) {
+          getListDataByKey(item.children)
+        }
+      }
+    }
+    getListDataByKey(data)
+    return filteredData
+  }
+  const getParentByKey = (listData: DataType[], targetKey: IDepartmentTitle) => {
+    const parentList: IDepartmentTitle[] = []
     if (targetKey) {
       for (const item of listData) {
         if (item.children && item.children.length > 0) {
-          const child = item.children.find((childItem: any) => childItem.key === targetKey.key)
+          const child = item.children.find((childItem: DataType) => childItem.code === targetKey.code)
           if (child) {
-            parentList.push({ key: item.key, name: item.name })
+            parentList.push({ code: item.code, name: item.name })
+            parentList.push({ code: targetKey.code, name: targetKey.name })
             break
           } else {
             const result = getParentByKey(item.children, targetKey)
             if (result.length > 0) {
-              parentList.push({ key: item.key, name: item.name })
+              parentList.push({ code: item.code, name: item.name })
               parentList.push(...result)
               break
             }
@@ -211,129 +169,216 @@ const Department: React.FC = () => {
 
   useEffect(() => {
     if (useSelect) {
-      const listDataTitle: any = getParentByKey(data, useSelect)
+      const listDataTitle: IDepartmentTitle[] = getParentByKey(listDataDepartments, useSelect)
       setDataRender({
         listData: [useSelect],
-        listDataTitle: listDataTitle
+        listDataTitle: [...listDataTitle]
+      })
+    } else {
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            name: listDataDepartments[0]?.name,
+            code: listDataDepartments[0]?.code
+          }
+        ]
       })
     }
-  }, [useSelect])
+  }, [useSelect, listDataDepartments])
 
   useEffect(() => {
-    setDataRender({
-      listData: data,
-      listDataTitle: []
-    })
+    if (isLoading === false && listDataDepartments.length > 0) {
+      const dataTitle = [
+        {
+          code: listDataDepartments[0].code,
+          name: listDataDepartments[0].name
+        }
+      ]
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: dataTitle
+      })
+    }
+  }, [listDataDepartments, isLoading])
+
+  useEffect(() => {
+    const promise = dispatch(getListDepartments())
+    if (listDataDepartments) {
+      setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            code: listDataDepartments[0]?.code,
+            name: listDataDepartments[0]?.name
+          }
+        ]
+      })
+    }
+    return () => {
+      promise.abort()
+    }
   }, [])
 
-  const onDelete = (record: any) => {
+  const onDelete = (record: DataType) => {
     console.log(record.name)
   }
 
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (value: string, record: any) => {
-        return <span onClick={() => setUseSelect(record)}>{value}</span>
-      }
-    },
-    {
-      title: 'age',
-      dataIndex: 'age',
-      key: 'age'
-    },
-    {
-      title: 'address',
-      dataIndex: 'address',
-      key: 'address'
-    },
-    {
-      title: () => {
-        return <div className='tw-text-center'>Actions</div>
+  const columns = useMemo(() => {
+    const dataRenderColumns = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        render: (value: string, record: DataType) => {
+          return (
+            <span
+              onClick={() => {
+                setUseSelect(record)
+              }}
+            >
+              {value}
+            </span>
+          )
+        }
       },
-      key: 'actions',
-      width: 200,
-      className: 'tw-text-center',
-      render: (text: string, record: object) => (
-        <Space size='middle'>
-          <Tooltip title={t('edit')}>
-            <span
-              onClick={() => {
-                setShowModal({
-                  openModal: true,
-                  type: ACTION_TYPE.Updated,
-                  data: record
-                })
-              }}
-            >
-              <IconEditSVG width={21} height={23} fill='' />
-            </span>
-          </Tooltip>
-          <Tooltip title={t('team')}>
-            <div
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                setShowModal({
-                  openModal: true,
-                  type: ACTION_TYPE.View,
-                  data: record
-                })
-              }}
-            >
-              <span>
-                <IconTeamSVG width={21} height={23} fill='' />
+      {
+        title: 'code',
+        dataIndex: 'code',
+        key: 'code'
+      },
+      {
+        title: 'address',
+        dataIndex: 'address',
+        key: 'address'
+      },
+      {
+        title: 'contactPhoneNumber',
+        dataIndex: 'contactPhoneNumber',
+        key: 'contactPhoneNumber'
+      },
+      {
+        title: 'contactEmail',
+        dataIndex: 'contactEmail',
+        key: 'contactEmail'
+      },
+      {
+        title: 'publishDate',
+        dataIndex: 'publishDate',
+        key: 'publishDate'
+      },
+      {
+        title: () => {
+          return <div className='tw-text-center'>Actions</div>
+        },
+        key: 'actions',
+        width: 200,
+        className: 'tw-text-center',
+        render: (text: string, record: DataType) => (
+          <Space size='middle'>
+            <Tooltip title={t('edit')}>
+              <span
+                onClick={() => {
+                  setShowModal({
+                    openModal: true,
+                    type: ACTION_TYPE.Updated,
+                    data: record,
+                    dataParent: dataRender.listDataTitle
+                  })
+                }}
+              >
+                <IconEditSVG width={21} height={23} fill='' />
               </span>
-            </div>
-          </Tooltip>
-          <Tooltip title={t('delete')}>
-            {/* <Popconfirm
-              title={t('xóa')}
-              description={t('xóa')}
-              onConfirm={() => {
-                console.log('â')
-                onDelete(record)
-              }}
-              okText={t('delete')}
-              cancelText={t('cancel')}
-            > */}
-            <span
-              onClick={() => {
-                onDelete(record)
-              }}
-            >
-              <IconDeleteSVG width={21} height={23} fill='' />
-            </span>
-            {/* </Popconfirm> */}
-          </Tooltip>
-        </Space>
-      )
-    }
-  ]
+            </Tooltip>
+            <Tooltip title={t('team')}>
+              <div
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setShowModal({
+                    openModal: true,
+                    type: ACTION_TYPE.View,
+                    data: record,
+                    dataParent: dataRender.listDataTitle
+                  })
+                }}
+              >
+                <span>
+                  <IconTeamSVG width={21} height={23} fill='' />
+                </span>
+              </div>
+            </Tooltip>
+            <Tooltip title={t('delete')}>
+              {/* <Popconfirm
+            title={t('xóa')}
+            description={t('xóa')}
+            onConfirm={() => {
+              console.log('â')
+              onDelete(record)
+            }}
+            okText={t('delete')}
+            cancelText={t('cancel')}
+          > */}
+              <span
+                onClick={() => {
+                  onDelete(record)
+                }}
+              >
+                <IconDeleteSVG width={21} height={23} fill='' />
+              </span>
+              {/* </Popconfirm> */}
+            </Tooltip>
+          </Space>
+        )
+      }
+    ]
+    return dataRenderColumns
+  }, [setShowModal, onDelete])
 
-  const onRendered = async (item: any) => {
-    const listDataTitle: any = getParentByKey(data, item)
-    await setDataRender({
-      listData: await getListDataByKey(data, item),
-      listDataTitle: listDataTitle
-    })
+  const onRendered = async (item: DataType) => {
+    if (item.code === listDataDepartments[0].code) {
+      await setDataRender({
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            name: listDataDepartments[0].name,
+            code: listDataDepartments[0].code
+          }
+        ]
+      })
+    } else {
+      const listDataTitle: IDepartmentTitle[] = getParentByKey(listDataDepartments, item)
+      await setDataRender({
+        listData: await getListDataByKey(listDataDepartments, item),
+        listDataTitle: listDataTitle
+      })
+    }
   }
 
   const onBackPageSize = async () => {
     if (dataRender.listDataTitle.length > 1) {
-      const listDataTitle: any = getParentByKey(data, dataRender.listDataTitle[dataRender.listDataTitle.length - 1])
+      const listDataTitle: IDepartmentTitle[] = getParentByKey(
+        listDataDepartments,
+        dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
+      )
       await setDataRender({
-        listData: await getListDataByKey(data, dataRender.listDataTitle[dataRender.listDataTitle.length - 1]),
+        listData: await getListDataByKey(
+          listDataDepartments,
+          dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
+        ),
         listDataTitle: listDataTitle
       })
     } else if (dataRender.listDataTitle.length === 1) {
       await setDataRender({
-        listData: data,
-        listDataTitle: []
+        listData: listDataDepartments,
+        listDataTitle: [
+          {
+            code: listDataDepartments[0].code,
+            name: listDataDepartments[0]?.name
+          }
+        ]
       })
     } else {
-      navigate(-1)
+      window.history.back()
     }
   }
 
@@ -341,7 +386,8 @@ const Department: React.FC = () => {
     await setShowModal({
       openModal: false,
       type: '',
-      data: null
+      data: null,
+      dataParent: []
     })
   }
 
@@ -358,21 +404,21 @@ const Department: React.FC = () => {
           <IconBackSVG width={11} height={16} fill='' />
         </div>
         <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-3xl'>
-          Hti group{' '}
           {dataRender?.listDataTitle.map((item: any, index) => {
             return (
               <span
-                key={item.key}
+                key={item.code}
                 onClick={() => {
                   onRendered(item)
                 }}
-              >{` -> ${item.name}`}</span>
+              >
+                {`${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? '->' : ''}`}
+              </span>
             )
           })}
         </h1>
       </Row>
       <Row className='tw-w-100 tw-flex tw-justify-end tw-my-[20px]'>
-        {/* <Space size='middle'> */}
         <Col span={12}>
           <CommonButton
             loading={false}
@@ -385,7 +431,8 @@ const Department: React.FC = () => {
               setShowModal({
                 openModal: !showModal.openModal,
                 type: ACTION_TYPE.Created,
-                data: null
+                data: null,
+                dataParent: dataRender.listDataTitle
               })
             }}
             icon={<PlusOutlined />}
@@ -403,6 +450,7 @@ const Department: React.FC = () => {
           showModal={showModal.openModal}
           typeModel={showModal.type}
           data={showModal.data}
+          dataParent={showModal.dataParent}
         />
       ) : (
         <DepartmentMemberModal
@@ -411,18 +459,18 @@ const Department: React.FC = () => {
           showModal={showModal.openModal}
           typeModel={showModal.type}
           data={showModal.data}
+          dataParent={[]}
         />
       )}
       <Row className='tw-w-100' gutter={[12, 12]}>
-        <CommondTable
-          dataSource={treeData}
+        <Table
+          dataSource={renderTreeRows(dataRender.listData, true)}
           columns={columns}
           expandable={expandableConfig}
-          isLoading={false}
-          disabledRowSelection={true}
-          meta={{ page: 1, total: 0, size: 10 }}
+          pagination={false}
           style={{ width: '100%' }}
-          // hiddenPagination={true}
+          scroll={{ y: '650px' }}
+          rowKey={(record: DataType) => record.code}
         />
       </Row>
     </div>

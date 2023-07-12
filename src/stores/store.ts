@@ -3,6 +3,8 @@ import authReducer from '~/stores/features/auth/auth.slice.ts'
 import userSlice from '~/stores/features/user/user.slice.ts'
 import userHistory from '~/stores/features/user/user-history.slice.ts'
 import requestProcess from '~/stores/features/setting/request-process.slice'
+import departmentSlice from './features/department/department.silce'
+
 import masterDataSlice from '~/stores/features/master-data/master-data.slice.ts'
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -10,6 +12,7 @@ export const store = configureStore({
     auth: authReducer,
     user: userSlice,
     userHistory: userHistory,
+    department: departmentSlice,
     requestProcess,
     masterData: masterDataSlice
   }
