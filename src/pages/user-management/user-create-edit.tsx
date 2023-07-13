@@ -351,17 +351,13 @@ const UserCreateEdit: React.FC<{
                               name={[name, 'role']}
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
-                              <Select
-                                defaultValue={ROLE.OFFICER}
-                                options={roleOptions}
-                                placeholder={t('userModal.selectFunction')}
-                              ></Select>
+                              <Select options={roleOptions} placeholder={t('userModal.selectFunction')}></Select>
                             </Form.Item>
                           </div>
                         </div>
                       ))}
                       <Form.Item>
-                        <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
+                        <Button type='dashed' onClick={() => add({ role: ROLE.OFFICER })} block icon={<PlusOutlined />}>
                           {t('userModal.addRole')}
                         </Button>
                       </Form.Item>
