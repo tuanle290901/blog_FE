@@ -112,7 +112,7 @@ const MainLayout: React.FC = () => {
         [
           getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
             getItem('Thời gian làm việc', 'timeWorking'),
-            getItem('Quy trình phê duyệt phép', 'request-process')
+            getItem('Quy trình phê duyệt phép', 'ticket-process-definition')
           ])
         ],
         'group'

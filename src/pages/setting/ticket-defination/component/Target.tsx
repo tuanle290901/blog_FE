@@ -1,26 +1,24 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { useMemo, type FC } from 'react'
+import { useEffect, useMemo, type FC } from 'react'
 import { useDrop } from 'react-dnd'
 
 import { CloseCircleFilled } from '@ant-design/icons'
 import { Empty, Space, Tooltip } from 'antd'
-import { removeDroppedItem } from '~/stores/features/setting/request-process.slice'
+import { removeDroppedItem } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch } from '~/stores/hook'
-import { DropItem, TargetProps } from '~/types/setting-request-process'
-import { ItemTypes } from './ItemTypes'
+import { DragItem, TargetProps } from '~/types/setting-ticket-process'
+import { ItemTypes } from '../type/ItemTypes'
 
 const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) => {
   const dispatch = useAppDispatch()
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
-    drop: (item: DropItem) => {
+    drop: (item: DragItem) => {
       onDrop(item, targetKey)
     },
-    canDrop: (item) => {
-      return canDropItem(item)
-    },
+    canDrop: () => canDropItem(),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop()
@@ -35,22 +33,22 @@ const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) =
     backgroundColor: isActive ? '#69c0ff' : canDrop ? '#e7f5ff' : isOver ? '#d5d5d5' : '#ffffff'
   }
 
-  const handleRemoveDroppedItem = (item: DropItem) => {
+  const handleRemoveDroppedItem = (item: DragItem) => {
     const { id, name } = item
     dispatch(removeDroppedItem({ targetKey, id }))
   }
 
   return (
     <div ref={drop} id={targetKey} data-testid={targetKey} className='dropped-box-item' style={dropBoxStyle}>
-      {dropItem?.length === 0 && (
+      {dropItem?.data.length === 0 && (
         <Empty
           imageStyle={{ height: 60 }}
           description={<span className='tw-text-slate-4D00'>Kéo và thả các thẻ tên vào vị trí này</span>}
         />
       )}
-      {dropItem?.length > 0 && (
+      {dropItem?.data.length > 0 && (
         <Space direction='vertical'>
-          {dropItem.map((item: DropItem, index: number) => (
+          {dropItem.data.map((item, index) => (
             <div key={index} className='tw-relative'>
               <Tooltip title={item.name} placement='left'>
                 <div className='drop-box__name'>{item.name}</div>

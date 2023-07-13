@@ -97,12 +97,15 @@ const authSlice = createSlice({
         (state, action) => {
           if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
+
+            const errorResponse = action.payload as ErrorResponse
+            if (errorResponse) {
+              if (errorResponse?.status === 401) {
+                notification.error({ message: errorResponse?.message })
+              }
+            }
             state.currentRequestId = null
           }
-          // const { status, message } = action.payload as ErrorResponse
-          // if (status === 401) {
-          //   notification.error({ message: message })
-          // }
         }
       )
   }

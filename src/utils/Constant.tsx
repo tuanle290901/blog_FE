@@ -10,3 +10,12 @@ export const SETTING = {
     REQUEST_THREE: 'requestThree'
   }
 }
+
+export const INPUT_TYPE = {
+  TEXT: 'TEXT',
+  NUMBER: 'NUMBER',
+  DATETIME: 'DATE_TIME',
+  BOOLEAN: 'BOOLEAN',
+  SINGLE_SELECT: 'SINGLE_CHOICE',
+  MULTIPLE_SELECT: 'MULTIPLE_CHOICE'
+}

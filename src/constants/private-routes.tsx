@@ -1,7 +1,7 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import UserList from '~/pages/user-management/user-list.tsx'
-import ApprovalProcess from '~/pages/setting/request-process'
+import TicketDefination from '~/pages/setting/ticket-defination'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import Timesheet from '~/pages/timesheet'
 import Department from '~/pages/Department'
@@ -20,7 +20,7 @@ export const PRIVATE_PATH = {
   },
   timesheet: '/timesheet',
   setting: {
-    requestProcess: 'request-process'
+    ticketProcessDefinition: 'ticket-process-definition'
   },
   department: {
     prefix: 'department'
@@ -49,9 +49,9 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: PRIVATE_PATH.setting.requestProcess,
-    path: PRIVATE_PATH.setting.requestProcess,
-    component: ApprovalProcess,
+    name: PRIVATE_PATH.setting.ticketProcessDefinition,
+    path: PRIVATE_PATH.setting.ticketProcessDefinition,
+    component: TicketDefination,
     allowedRoles: []
   },
   {
