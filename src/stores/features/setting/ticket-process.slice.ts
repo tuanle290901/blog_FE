@@ -8,6 +8,7 @@ const initialState: ITicketDef = {
   loading: false,
   departments: [],
   createRevisionSuccess: false,
+  currentRequestId: null,
   approvalSteps: [
     {
       index: 0,
@@ -116,15 +117,17 @@ const ticketProcessSlice = createSlice({
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
-        (state, _) => {
+        (state, action) => {
           state.loading = true
+          state.currentRequestId = action.meta.requestId
         }
       )
       .addMatcher<RejectedAction | FulfilledAction>(
         (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
         (state, action) => {
-          if (state.loading) {
+          if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
+            state.currentRequestId = null
           }
         }
       )

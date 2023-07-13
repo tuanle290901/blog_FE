@@ -13,6 +13,7 @@ export interface AuthStateInterface {
   error: any
   success: boolean
   switchGroup: any
+  currentRequestId: string | null
 }
 
 const initialState: AuthStateInterface = {
@@ -21,7 +22,8 @@ const initialState: AuthStateInterface = {
   accessToken: null,
   error: null,
   success: false, // for monitoring the registration process.
-  switchGroup: {}
+  switchGroup: {},
+  currentRequestId: null
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
@@ -85,14 +87,15 @@ const authSlice = createSlice({
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
-        (state, _) => {
+        (state, action) => {
           state.loading = true
+          state.currentRequestId = action.meta.requestId
         }
       )
       .addMatcher<RejectedAction | FulfilledAction>(
         (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
         (state, action) => {
-          if (state.loading) {
+          if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
 
             const errorResponse = action.payload as ErrorResponse
@@ -101,7 +104,7 @@ const authSlice = createSlice({
                 notification.error({ message: errorResponse?.message })
               }
             }
-            // notification.error({ message: 'Đã có lỗi xảy ra' })
+            state.currentRequestId = null
           }
         }
       )

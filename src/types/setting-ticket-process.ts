@@ -17,6 +17,7 @@ export interface ITicketDef {
   createRevisionSuccess: boolean
   departments: DragItem[]
   approvalSteps: IApprovalStep[]
+  currentRequestId: string | null
 }
 
 export interface DragItem {

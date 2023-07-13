@@ -5,6 +5,7 @@ import userHistory from '~/stores/features/user/user-history.slice.ts'
 import ticketProcess from '~/stores/features/setting/ticket-process.slice'
 import departmentSilce from './features/department/department.silce'
 
+import masterDataSlice from '~/stores/features/master-data/master-data.slice.ts'
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
   reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
     user: userSlice,
     userHistory: userHistory,
     department: departmentSilce,
-    ticketProcess
+    ticketProcess,
+    masterData: masterDataSlice
   }
 })
 
