@@ -13,6 +13,8 @@ import dayjs from 'dayjs'
 import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { GENDER } from '~/constants/app.constant.ts'
 
 const { Search } = Input
 
@@ -20,6 +22,7 @@ const UserList: React.FC = () => {
   const [t] = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
+  const { userInfo, setUserProfileInfo } = useUserInfo()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
@@ -43,6 +46,19 @@ const UserList: React.FC = () => {
       }
     ]
   })
+  const hasPermissionAddNewUser = useMemo(() => {
+    const groupProfiles = userInfo?.groupProfiles
+    if (groupProfiles) {
+      for (const group of groupProfiles) {
+        if (group.groupCode === 'ADMIN') {
+          return true
+        } else {
+          //   TODO
+        }
+      }
+    }
+    return false
+  }, [userInfo])
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
   //     page: 0,
@@ -81,9 +97,18 @@ const UserList: React.FC = () => {
     if (isCreateUserSuccess) {
       setSearchValue((prevState) => {
         return {
-          ...prevState
+          ...prevState,
+          sorts: []
         }
       })
+    }
+  }
+  const getSortOrder = (filed: string) => {
+    const sort = searchValue.sorts[0]
+    if (sort && sort.field === filed) {
+      return searchValue.sorts[0].direction === 'ASC' ? 'ascend' : 'descend'
+    } else {
+      return null
     }
   }
   const columns: ColumnsType<IUser> = [
@@ -93,10 +118,15 @@ const UserList: React.FC = () => {
       key: 'fullName',
       sorter: true,
       showSorterTooltip: false,
+      sortOrder: getSortOrder('fullName'),
       render: (text, record) => {
         return (
           <div className='tw-relative'>
-            <img className='tw-w-8 tw-h-8 tw-absolute -tw-top-1 tw-left-0' alt='avatar' src={defaultImg} />
+            <img
+              className='tw-w-8 tw-h-8 tw-absolute -tw-top-1 tw-left-0 tw-rounded-full'
+              alt='avatar'
+              src={record.avatarBase64 ? `data:image/png;base64,${record.avatarBase64}` : defaultImg}
+            />
             <span className='tw-pl-10'>{text}</span>
           </div>
         )
@@ -104,11 +134,23 @@ const UserList: React.FC = () => {
       ellipsis: true
     },
     {
+      title: t('userList.userName'),
+      dataIndex: 'userName',
+      key: 'userName',
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('userName'),
+      ellipsis: true
+    },
+    {
       title: t('userList.dateOfBirth'),
       dataIndex: 'birthday',
       key: 'birthday',
       sorter: true,
+      sortOrder: getSortOrder('birthday'),
       showSorterTooltip: false,
+      width: '150px',
+      align: 'center',
       render: (text, record) => {
         if (text) {
           const date = dayjs(text).format('DD/MM/YYYY')
@@ -121,12 +163,25 @@ const UserList: React.FC = () => {
       dataIndex: 'genderType',
       key: 'genderType',
       sorter: true,
-      showSorterTooltip: false
+      width: '120px',
+      align: 'center',
+      sortOrder: getSortOrder('genderType'),
+      showSorterTooltip: false,
+      render: (text, _) => {
+        return text ? t(text === GENDER.MALE ? 'userList.male' : 'userList.female') : ''
+      }
     },
     {
       title: t('userList.department'),
-      dataIndex: 'department',
-      key: 'department',
+      dataIndex: 'groupProfiles',
+      key: 'groupProfiles',
+      render: (text, record) => {
+        const value = record.groupProfiles.map((item) => {
+          return item.groupName
+        })
+
+        return <span>{value.join(',')}</span>
+      },
       ellipsis: true
     },
     {
@@ -134,6 +189,8 @@ const UserList: React.FC = () => {
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       sorter: true,
+      width: '150px',
+      sortOrder: getSortOrder('phoneNumber'),
       showSorterTooltip: false
     },
     {
@@ -142,12 +199,14 @@ const UserList: React.FC = () => {
       key: 'email',
       sorter: true,
       showSorterTooltip: false,
+      sortOrder: getSortOrder('email'),
       ellipsis: true
     },
     {
       title: t('userList.action'),
       key: 'action',
       align: 'center',
+      width: '120px',
       render: (_, record) => {
         return (
           <div className='tw-absolute tw-left-0 tw-w-full'>
@@ -255,6 +314,7 @@ const UserList: React.FC = () => {
           columns={columns}
           dataSource={userState.userList}
           loading={userState.loading}
+          pagination={{ total: searchValue.paging.total }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />

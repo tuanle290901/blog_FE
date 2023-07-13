@@ -1,39 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Button,
-  DatePicker,
-  Form,
-  FormListFieldData,
-  Input,
-  message,
-  Modal,
-  Select,
-  Upload,
-  UploadFile,
-  UploadProps
-} from 'antd'
+import { Button, DatePicker, Form, Input, message, Modal, Radio, Select, Upload } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { RcFile, UploadChangeParam } from 'antd/es/upload'
+import { RcFile } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { ROLE } from '~/constants/app.constant.ts'
+import { GENDER, ROLE } from '~/constants/app.constant.ts'
 import { createUser } from '~/stores/features/user/user.slice.ts'
+import { EMAIL_REG, PHONE_NUMBER_REG } from '~/constants/regex.constant.ts'
 
-const beforeUpload = (file: RcFile) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-  if (!isJpgOrPng) {
-    void message.error('You can only upload JPG/PNG file!')
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2
-  if (!isLt2M) {
-    void message.error('Image must smaller than 2MB!')
-  }
-  return isJpgOrPng && isLt2M
-}
 const UserCreateEdit: React.FC<{
   open: boolean
   handleClose: (isCreateUserSuccess: boolean) => void
@@ -42,7 +20,8 @@ const UserCreateEdit: React.FC<{
   const [t] = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [avatarBase64, setAvatarBase64] = useState<string>()
+  const [avatarBase64, setAvatarBase64] = useState<string>('')
+  const [avtError, setAvtError] = useState(false)
   const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
@@ -60,23 +39,59 @@ const UserCreateEdit: React.FC<{
 
   const roleOptions: { value: string; label: string }[] = [
     {
-      value: ROLE.OFFICER,
-      label: ROLE.OFFICER
+      label: t('common.role.officer'),
+      value: ROLE.OFFICER
     },
     {
-      value: ROLE.SUB_MANAGER,
-      label: ROLE.SUB_MANAGER
+      label: t('common.role.subManager'),
+      value: ROLE.SUB_MANAGER
     },
     {
-      value: ROLE.MANAGER,
-      label: ROLE.MANAGER
+      label: t('common.role.manager'),
+      value: ROLE.MANAGER
     }
   ]
-  const handleChange: UploadProps['onChange'] = (info: UploadChangeParam<UploadFile>) => {
-    getBase64(info.file.originFileObj as RcFile, (url) => {
-      setLoading(false)
-      setAvatarBase64(url)
-    })
+  const groupProfiles: any[] = useMemo(() => {
+    if (userData?.groupProfiles) {
+      return userData.groupProfiles.map((item, index) => {
+        return {
+          name: index,
+          fieldKey: index,
+          key: index,
+          isListField: true,
+          role: item.role,
+          groupCode: item.groupCode,
+          title: item.title
+        }
+      })
+    }
+    return [
+      {
+        name: 0,
+        fieldKey: 1,
+        key: 1,
+        isListField: true,
+        role: ROLE.OFFICER
+      }
+    ]
+  }, [userData])
+  const beforeUpload = (file: RcFile) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+    if (!isJpgOrPng) {
+      void message.error('You can only upload JPG/PNG file!')
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2
+    if (!isLt2M) {
+      void message.error('Image must smaller than 2MB!')
+    }
+    if (isJpgOrPng && isLt2M) {
+      getBase64(file, (url) => {
+        setLoading(false)
+        setAvatarBase64(url)
+        setAvtError(false)
+      })
+    }
+    return false
   }
   useEffect(() => {
     if (userData) {
@@ -84,52 +99,60 @@ const UserCreateEdit: React.FC<{
         ...userData,
         birthday: dayjs(userData.birthday)
       })
+      setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
     } else {
       form.resetFields()
+      setAvatarBase64('')
     }
   }, [userData])
   const handleSubmit = async () => {
-    const value = form.getFieldsValue()
-    const groupProfiles = value.groupProfiles.map((item) => ({
-      groupCode: item.groupCode,
-      role: item.role,
-      title: item.title
-    }))
-    const payload: IUser = { ...value, groupProfiles, birthday: value.birthday.format('YYYY-MM-DD') }
     try {
-      console.log('aa')
-      setLoading(true)
-      await dispatch(createUser(payload))
-      handleClose(true)
+      setAvtError(!avatarBase64)
+      await form.validateFields()
+      if (!avatarBase64) {
+        return
+      }
+      const value = form.getFieldsValue()
+      const groupProfiles = value.groupProfiles.map((item) => ({
+        groupCode: item.groupCode,
+        role: item.role,
+        title: item.title
+      }))
+      const index = avatarBase64.indexOf(',')
+      value.avatarBase64 = avatarBase64.slice(index + 1)
+      const payload: IUser = { ...value, groupProfiles, birthday: value.birthday?.format('YYYY-MM-DD') }
+      try {
+        setLoading(true)
+        await dispatch(createUser(payload))
+        finishAndClose(true)
+      } catch (e) {
+        finishAndClose(false)
+      } finally {
+        setLoading(false)
+      }
     } catch (e) {
-      handleClose(false)
-    } finally {
-      setLoading(false)
+      console.log(e)
     }
+  }
+  const finishAndClose = (isSuccess: boolean) => {
+    handleClose(isSuccess)
+    form.resetFields()
+    setAvtError(false)
+    setAvatarBase64('')
   }
   const handleClickButtonUpdateAvatar = () => {
     if (uploadRef?.current) {
       uploadRef.current.click()
     }
   }
-  const departmentField = [
-    {
-      name: 0,
-      fieldKey: 1,
-      key: 1,
-      isListField: true
-    }
-  ]
   return (
     <Modal
       open={open}
       title={t('userList.addMember')}
-      onCancel={() => handleClose(false)}
-      // okText={t('common.save')}
-      // cancelText={t('common.cancel')}
+      onCancel={() => finishAndClose(false)}
       footer={
         <div className={'tw-flex tw-justify-end'}>
-          <Button onClick={() => handleClose(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
           <Button type='primary' onClick={handleSubmit} loading={loading}>
             {t('common.save')}
           </Button>
@@ -140,15 +163,9 @@ const UserCreateEdit: React.FC<{
       width={1000}
       centered
     >
-      <div className='tw-max-h-[calc(100vh-214px)] tw-min-w-[800px] tw-overflow-auto'>
+      <div className=' tw-min-w-[800px] tw-overflow-auto'>
         <div className='tw-flex tw-items-center tw-gap-4'>
-          <Upload
-            name='avatar'
-            showUploadList={false}
-            action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
-          >
+          <Upload name='avatar' accept='image/png, image/jpeg' showUploadList={false} beforeUpload={beforeUpload}>
             <div ref={uploadRef}>
               {avatarBase64 ? (
                 <img
@@ -168,12 +185,13 @@ const UserCreateEdit: React.FC<{
           <div className='tw-h-auto'>
             <div className='tw-flex tw-gap-2'>
               <Button onClick={handleClickButtonUpdateAvatar} type='primary'>
-                {t('userModal.updateAvatar')}
+                {t(avatarBase64 ? 'userModal.updateAvatar' : 'userModal.chooseAvatar')}
               </Button>
-              <Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>
+              {/*<Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>*/}
             </div>
             <div className='tw-mt-1'>
               <p className='tw-text-[#BFBFBF]'>{t('userModal.avatarAccept')}</p>
+              {avtError && <p className='tw-text-red-600'>{t('userModal.errorMessage.avatarEmpty')}</p>}
             </div>
           </div>
         </div>
@@ -183,19 +201,38 @@ const UserCreateEdit: React.FC<{
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.commonInfo')}</h3>
               <div className='tw-p-4 tw-bg-[#FAFAFA]'>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.username')} name='username' required>
-                  <Input placeholder={t('userModal.enterUserName')} />
-                </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.fullName')} name='fullName' required>
+                {userData?.userName && (
+                  <Form.Item style={{ marginBottom: 24 }} label={t('userList.username')} name='username'>
+                    <Input defaultValue={userData?.userName} disabled />
+                  </Form.Item>
+                )}
+                <Form.Item
+                  style={{ marginBottom: 24 }}
+                  label={t('userList.fullName')}
+                  name='fullName'
+                  required
+                  rules={[
+                    {
+                      required: true,
+                      message: t('userModal.errorMessage.fullNameIsEmpty')
+                    }
+                  ]}
+                >
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.gender')} required name='genderType'>
-                  <Select placeholder={t('userModal.selectGender')}>
-                    <Select.Option value='male'>{t('userList.male')}</Select.Option>
-                    <Select.Option value='female'>{t('userList.female')}</Select.Option>
-                  </Select>
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
+                  {/*<Select placeholder={t('userModal.selectGender')}>*/}
+                  {/*  <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>*/}
+                  {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
+                  {/*</Select>*/}
+                  <Radio.Group name='genderType' className='tw-w-full'>
+                    <div className='tw-flex tw-gap-32 tw-border tw-border-gray-300 tw-border-solid  tw-bg-white tw-py-1 tw-px-2 tw-rounded-md'>
+                      <Radio value={GENDER.MALE}>{t('userList.male')}</Radio>
+                      <Radio value={GENDER.FEMALE}>{t('userList.female')}</Radio>
+                    </div>
+                  </Radio.Group>
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateOfBirth')} name='birthday'>
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
                     format='YYYY/MM/DD'
                     disabledDate={(date) => {
@@ -206,10 +243,35 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.selectDOB')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.phoneNumber')} required name='phoneNumber'>
+                <Form.Item
+                  style={{ marginBottom: 24 }}
+                  label={t('userList.phoneNumber')}
+                  required
+                  name='phoneNumber'
+                  rules={[
+                    {
+                      required: true,
+                      message: t('userModal.errorMessage.phoneNumberEmpty')
+                    },
+                    {
+                      pattern: PHONE_NUMBER_REG,
+                      message: t('userModal.errorMessage.invalidPhoneNumber')
+                    }
+                  ]}
+                >
                   <Input placeholder={t('userModal.enterPhoneNumber')} />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.email')} name='email'>
+                <Form.Item
+                  style={{ marginBottom: 24 }}
+                  label={t('userList.email')}
+                  name='email'
+                  rules={[
+                    {
+                      pattern: EMAIL_REG,
+                      message: t('userModal.errorMessage.invalidEmail')
+                    }
+                  ]}
+                >
                   <Input placeholder={t('userModal.enterEmail')} />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 0 }} label={t('userList.address')} name='address'>
@@ -219,8 +281,12 @@ const UserCreateEdit: React.FC<{
             </div>
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
-              <div className='tw-p-4 tw-bg-[#FAFAFA] tw-h-[530px] tw-overflow-auto'>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.dateJoin')} name='joinDate'>
+              <div
+                className={`tw-p-4 tw-bg-[#FAFAFA] ${
+                  userData?.userName ? 'tw-h-[578px]' : 'tw-h-[492px]'
+                }   tw-overflow-auto`}
+              >
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
                   <DatePicker
                     format='YYYY/MM/DD'
                     disabledDate={(date) => {
@@ -231,7 +297,7 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterDateJoin')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.probationDate')} name='probationDate'>
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>
                   <DatePicker
                     format='YYYY/MM/DD'
                     disabledDate={(date) => {
@@ -243,7 +309,7 @@ const UserCreateEdit: React.FC<{
                   />
                 </Form.Item>
                 <Form.Item
-                  style={{ marginBottom: 16 }}
+                  style={{ marginBottom: 24 }}
                   label={t('userList.officialContractSigningDate')}
                   name='formalDate'
                 >
@@ -257,8 +323,8 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.List name='groupProfiles' initialValue={departmentField}>
-                  {(fields = departmentField, { add, remove }) => (
+                <Form.List name='groupProfiles' initialValue={groupProfiles}>
+                  {(fields = groupProfiles, { add, remove }) => (
                     <>
                       {fields.map(({ key, name, ...restField }, index) => (
                         <div key={key} className='tw-relative'>
@@ -270,27 +336,28 @@ const UserCreateEdit: React.FC<{
                           )}
                           <Form.Item
                             {...restField}
-                            style={{ marginBottom: 16 }}
+                            style={{ marginBottom: 24 }}
                             label={t('userList.department') + ' ' + index}
                             name={[name, 'groupCode']}
                             required
+                            rules={[{ required: true, message: t('userModal.errorMessage.groupEmpty') }]}
                           >
                             <Select options={groupOptions} placeholder={t('userModal.selectDepartment')}></Select>
                           </Form.Item>
                           <div className='tw-grid tw-grid-cols-2 tw-gap-2'>
                             <Form.Item
                               {...restField}
-                              style={{ marginBottom: 16 }}
+                              style={{ marginBottom: 24 }}
                               name={[name, 'title']}
-                              rules={[{ required: true, message: 'Missing first name' }]}
+                              rules={[{ required: true, message: t('userModal.errorMessage.titleEmpty') }]}
                             >
                               <Select options={titleOptions} placeholder={t('userModal.selectPosition')}></Select>
                             </Form.Item>
                             <Form.Item
                               {...restField}
-                              style={{ marginBottom: 16 }}
+                              style={{ marginBottom: 24 }}
                               name={[name, 'role']}
-                              rules={[{ required: true, message: 'Missing last name' }]}
+                              rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
                               <Select options={roleOptions} placeholder={t('userModal.selectFunction')}></Select>
                             </Form.Item>
@@ -298,7 +365,7 @@ const UserCreateEdit: React.FC<{
                         </div>
                       ))}
                       <Form.Item>
-                        <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
+                        <Button type='dashed' onClick={() => add({ role: ROLE.OFFICER })} block icon={<PlusOutlined />}>
                           {t('userModal.addRole')}
                         </Button>
                       </Form.Item>
