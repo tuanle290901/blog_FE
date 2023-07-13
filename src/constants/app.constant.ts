@@ -19,3 +19,7 @@ export enum ROLE {
 export enum GROUP {
   ADMIN = 'ADMIN'
 }
+export enum GENDER {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE'
+}
