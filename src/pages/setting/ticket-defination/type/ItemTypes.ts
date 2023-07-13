@@ -2,6 +2,7 @@ import { FormInstance } from 'antd'
 
 export const ItemTypes = {
   BOX: 'box',
+  ITEM: 'item',
   NO_DROP: 'no-drop'
 }
 

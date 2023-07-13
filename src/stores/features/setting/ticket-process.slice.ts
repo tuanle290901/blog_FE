@@ -1,12 +1,13 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { notification } from 'antd'
+import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { DragItem, ITicketDef, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 
 const initialState: ITicketDef = {
   loading: false,
   departments: [],
-  ticketCreateRequest: {} as TicketDefRevisionCreateReq,
+  createRevisionSuccess: false,
   approvalSteps: [
     {
       index: 0,
@@ -46,6 +47,16 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
   return await response
 })
 
+const createRevision = createAsyncThunk(
+  'tickets/definitions',
+  async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
+    const response = await HttpService.post<ITicketDef>('/tickets/definitions', payload, {
+      signal: thunkAPI.signal
+    })
+    return await response
+  }
+)
+
 const ticketProcessSlice = createSlice({
   name: 'ticketProcess',
   initialState,
@@ -61,8 +72,9 @@ const ticketProcessSlice = createSlice({
           return
         }
 
-        if (targetData.length >= 3) {
-          notification.error({ message: 'Giới hạn 3 đơn vị xét duyệt song song' })
+        if (targetData.length >= 1) {
+          state.approvalSteps[itemIndex].data[0] = item
+          // notification.error({ message: 'Giới hạn 1 đơn vị xét duyệt song song' })
           return
         }
         if (targetData.map((t) => t.id).includes(item.id)) {
@@ -81,11 +93,11 @@ const ticketProcessSlice = createSlice({
       }
     },
     addNewApprovalStep: (state) => {
-      const listLength = state.approvalSteps.length
+      const nextNodeIndex = state.approvalSteps[state.approvalSteps.length - 1]?.index | 0
       state.approvalSteps.push({
-        index: listLength,
-        key: `request${listLength}`,
-        title: `Duyệt lần ${listLength + 1} `,
+        index: nextNodeIndex + 1,
+        key: `request${nextNodeIndex + 1}`,
+        title: `Duyệt lần ${nextNodeIndex + 1} `,
         data: []
       })
     },
@@ -98,6 +110,9 @@ const ticketProcessSlice = createSlice({
     builder
       .addCase(fetchDepartments.fulfilled, (state: any, action) => {
         state.departments = action.payload.data
+      })
+      .addCase(createRevision.fulfilled, (state: ITicketDef, action) => {
+        state.createRevisionSuccess = true
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
@@ -117,5 +132,5 @@ const ticketProcessSlice = createSlice({
 })
 
 export const { addDroppedItem, removeDroppedItem, addNewApprovalStep, removeApprovalStep } = ticketProcessSlice.actions
-export { fetchDepartments }
+export { fetchDepartments, createRevision }
 export default ticketProcessSlice.reducer

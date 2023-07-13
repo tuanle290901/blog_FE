@@ -1,7 +1,8 @@
 import { Button, Space } from 'antd'
 import { FC } from 'react'
 
-const BottomControl: FC = () => {
+const BottomControl: FC<{ onSave: () => void }> = (props) => {
+  const { onSave } = props
   return (
     <div className='item-tartget__bottom'>
       <Space direction='vertical' size={'large'}>
@@ -13,7 +14,9 @@ const BottomControl: FC = () => {
         </div>
 
         <Space>
-          <Button type='primary'>Lưu cấu hình</Button>
+          <Button type='primary' onClick={onSave}>
+            Lưu cấu hình
+          </Button>
           <Button>Đặt lại mặc định</Button>
         </Space>
       </Space>

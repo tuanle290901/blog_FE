@@ -15,6 +15,7 @@ import iconHalfArrow from '~/assets/images/setting/half-arrow.png'
 import {
   addDroppedItem,
   addNewApprovalStep,
+  createRevision,
   fetchDepartments,
   removeApprovalStep
 } from '~/stores/features/setting/ticket-process.slice'
@@ -41,6 +42,7 @@ const Index: FC = memo(function Index() {
   const ticketRequestPayloadRef = useRef<TicketDefRevisionCreateReq>({
     name: '',
     description: '',
+    ticketDefId: '',
     revision: {
       processFlow: [],
       processNodes: [
@@ -144,6 +146,24 @@ const Index: FC = memo(function Index() {
     dispatch(removeApprovalStep({ index }))
   }
 
+  const onSaveAll = () => {
+    const targetBoxLen = targetBoxes.length
+    let startNode = 0
+    let endNode = 1
+    const processFlowTemp = []
+    for (let i = 0; i < targetBoxLen; i++) {
+      processFlowTemp.push({ destIdx: startNode, srcIdx: endNode })
+      startNode++
+      endNode++
+    }
+    ticketRequestPayloadRef.current.revision.processFlow = processFlowTemp
+    ticketRequestPayloadRef.current.revision.rev = 0
+    ticketRequestPayloadRef.current.revision.stopTransferStrategy = 'BY_ONE_RESULT'
+    ticketRequestPayloadRef.current.revision.strategy = 'JUDGEMENT_IMMEDIATELY'
+    ticketRequestPayloadRef.current.ticketDefId = '12345678'
+    dispatch(createRevision(ticketRequestPayloadRef.current))
+  }
+
   useEffect(() => {
     dispatch(fetchDepartments())
   }, [dispatch])
@@ -187,7 +207,7 @@ const Index: FC = memo(function Index() {
                   <EditOutlined />
                 </span>
               </div>
-              <Space align='end' wrap>
+              <Space align='start' wrap>
                 {sourceBoxes?.map((item, index) => {
                   return (
                     <React.Fragment key={index}>
@@ -202,9 +222,9 @@ const Index: FC = memo(function Index() {
             <div className='list-item-target tw-h-3/4'>
               <div className='item-tartget__top'>
                 <div className='button-start-end' onClick={() => openModalInitAttr(0)}>
-                  Khởi tạo phép
+                  <span className='dot' style={{ backgroundColor: '#1890ff' }} /> Khởi tạo phép
                 </div>
-                <img src={iconHalfArrow} alt='arrow' />
+                <span className='tw-text-blue-600'>----------</span>
                 <div
                   className='target-box-container'
                   style={{
@@ -256,16 +276,21 @@ const Index: FC = memo(function Index() {
                           </Space>
                         </div>
 
-                        {index !== targetBoxes.length - 1 && <img src={iconHalfArrow} alt='arrow' />}
+                        {index !== targetBoxes.length - 1 && (
+                          <span className='tw-text-blue-600 tw-min-w-[60px]'>----------</span>
+                        )}
                       </>
                     )
                   })}
                 </div>
-                <img src={iconHalfArrow} alt='arrow' />
-                <div className='button-start-end'>Trạng thái cuối</div>
+                <span className='tw-text-blue-600'>----------</span>
+                {/* <img src={iconHalfArrow} alt='arrow' /> */}
+                <div className='button-start-end tw-flex tw-items-center tw-justify-center'>
+                  <span className='dot' style={{ backgroundColor: '#52c41a' }} /> Trạng thái cuối
+                </div>
               </div>
 
-              <BottomControl />
+              <BottomControl onSave={onSaveAll} />
             </div>
           </>
         )}

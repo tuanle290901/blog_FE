@@ -14,8 +14,8 @@ export interface IApprovalStep {
 
 export interface ITicketDef {
   loading: boolean
+  createRevisionSuccess: boolean
   departments: DragItem[]
-  ticketCreateRequest: TicketDefRevisionCreateReq
   approvalSteps: IApprovalStep[]
 }
 
@@ -56,8 +56,8 @@ export interface TicketProcessRevision {
   startNodeIndex?: number
   endNodeIndex?: number
   continueTransferStrategy?: string[]
-  stopTransferStrategy?: string[]
-  strategy?: string[]
+  stopTransferStrategy?: string
+  strategy?: string
   createdAt?: string
   createdBy?: string
   processFlow: TicketTransfer[]
@@ -68,4 +68,5 @@ export interface TicketDefRevisionCreateReq {
   name: string
   description?: string
   revision: TicketProcessRevision
+  ticketDefId: string
 }
