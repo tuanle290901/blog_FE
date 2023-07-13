@@ -6,11 +6,13 @@ import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-t
 import { ErrorResponse } from '~/types/error-response.interface'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
 import dayjs from 'dayjs'
+import { IUser } from '~/types/user.interface'
+import { IGroup } from '../master-data/master-data.slice'
 
 export interface TimesheetStateInterface {
   loading: boolean
-  groups: []
-  userInGroup: []
+  groups: IGroup[]
+  userInGroup: IUser[]
   timesheetList: []
   meta: IPaging
 }
