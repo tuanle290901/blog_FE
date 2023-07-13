@@ -71,6 +71,15 @@ const PositionList: React.FC = () => {
       ellipsis: true
     },
     {
+      title: 'Tên chức vụ',
+      dataIndex: 'description',
+      key: 'description',
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('description'),
+      ellipsis: true
+    },
+    {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
