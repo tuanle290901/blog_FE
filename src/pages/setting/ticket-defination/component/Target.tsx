@@ -10,7 +10,7 @@ import { useAppDispatch } from '~/stores/hook'
 import { DragItem, TargetProps } from '~/types/setting-ticket-process'
 import { ItemTypes } from '../type/ItemTypes'
 
-const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) => {
+const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem, isValidStep }) => {
   const dispatch = useAppDispatch()
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
@@ -30,7 +30,8 @@ const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem }) =
   }, [canDrop, isOver])
 
   const dropBoxStyle = {
-    backgroundColor: isActive ? '#69c0ff' : canDrop ? '#e7f5ff' : isOver ? '#d5d5d5' : '#ffffff'
+    backgroundColor: isActive ? '#69c0ff' : canDrop ? '#e7f5ff' : isOver ? '#d5d5d5' : '#ffffff',
+    border: isValidStep() ? '1px dashed #0100ff' : '1px dashed #b9bec7'
   }
 
   const handleRemoveDroppedItem = (item: DragItem) => {

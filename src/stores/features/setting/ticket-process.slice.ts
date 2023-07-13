@@ -48,6 +48,43 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
   return await response
 })
 
+const fetchListTicket = createAsyncThunk('tickets/getTickets', async (_, thunkAPI) => {
+  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
+  //   signal: thunkAPI.signal
+  // })
+  const response = new Promise<any>((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        data: [
+          {
+            id: '1',
+            title: 'Đăng ký nghỉ phép'
+          },
+          {
+            id: '2',
+            name: 'Đăng ký xin xe'
+          },
+          {
+            id: '3',
+            name: 'Đăng ký mua thiết bị'
+          },
+          {
+            id: '4',
+            name: 'Đăng ký công tác trong nước'
+          },
+          {
+            id: '5',
+            name: 'Đăng ký công tác nước ngoài'
+          }
+        ],
+        message: 'Lấy dữ liệu thành công.',
+        status: 200
+      })
+    }, 1000)
+  })
+  return await response
+})
+
 const createRevision = createAsyncThunk(
   'tickets/definitions',
   async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
@@ -115,6 +152,9 @@ const ticketProcessSlice = createSlice({
       .addCase(createRevision.fulfilled, (state: ITicketDef, action) => {
         state.createRevisionSuccess = true
       })
+      .addCase(fetchListTicket.fulfilled, (state: ITicketDef, action) => {
+        state.createRevisionSuccess = true
+      })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
         (state, action) => {
@@ -135,5 +175,5 @@ const ticketProcessSlice = createSlice({
 })
 
 export const { addDroppedItem, removeDroppedItem, addNewApprovalStep, removeApprovalStep } = ticketProcessSlice.actions
-export { fetchDepartments, createRevision }
+export { fetchDepartments, createRevision, fetchListTicket }
 export default ticketProcessSlice.reducer
