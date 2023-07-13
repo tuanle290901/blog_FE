@@ -9,6 +9,7 @@ export interface IRequestProcess {
   loading: boolean
   departments: DropItem[]
   droppedItems: any
+  currentRequestId: string | null
 }
 
 const initialState: IRequestProcess = {
@@ -18,7 +19,8 @@ const initialState: IRequestProcess = {
     requestOne: [],
     requestTwo: [],
     requestThree: []
-  }
+  },
+  currentRequestId: null
 }
 
 const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI) => {
@@ -90,21 +92,25 @@ const requestProcessSlice = createSlice({
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
-        (state, _) => {
+        (state, action) => {
           state.loading = true
+          state.currentRequestId = action.meta.requestId
         }
       )
       .addMatcher<RejectedAction | FulfilledAction>(
         (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
         (state, action) => {
-          if (state.loading) {
+          if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
-
-            const { status, message } = action.payload as ErrorResponse
-            if (status === 401) {
-              notification.error({ message: message })
-            }
+            state.currentRequestId = null
           }
+          // if (state.loading) {
+          //   state.loading = false
+          // const { status, message } = action.payload as ErrorResponse
+          // if (status === 401) {
+          //   notification.error({ message: message })
+          // }
+          // }
         }
       )
   }

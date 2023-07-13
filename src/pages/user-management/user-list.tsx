@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Input, Select, Table } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Input, Select, Table, TablePaginationConfig } from 'antd'
+import { DeleteOutlined, EditOutlined, HistoryOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, getListUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import { cancelEditingUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
+import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
+import { IPaging, ISort } from '~/types/api-response.interface.ts'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
 
 const { Search } = Input
 
@@ -18,6 +22,49 @@ const UserList: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
+  const groups = useAppSelector((state) => state.masterData.groups)
+  const [searchValue, setSearchValue] = useState<{
+    query: string
+    group?: string | null
+    paging: IPaging
+    sorts: ISort[]
+  }>({
+    query: '',
+    paging: {
+      page: 0,
+      size: 10,
+      total: 0,
+      totalPage: 0
+    },
+    sorts: [
+      {
+        direction: 'DESC',
+        field: 'created_at'
+      }
+    ]
+  })
+  // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
+  //   paging: {
+  //     page: 0,
+  //     size: 10,
+  //     total: 0,
+  //     totalPage: 0
+  //   },
+  //   sorts: []
+  // })
+  const timerId = useRef<any>(null)
+  useEffect(() => {
+    const promise = [dispatch(getAllGroup()), dispatch(getTitle())]
+    return () => {
+      promise.forEach((item) => item.abort())
+    }
+  }, [])
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    const options = groups.map((item) => {
+      return { value: item.code, label: item.name }
+    })
+    return [{ value: null, label: t('userList.allGroup') }, ...options]
+  }, [groups])
   const handleClickEditUser = (user: IUser) => {
     //   TODO
     dispatch(startEditingUser(user.id as string))
@@ -28,15 +75,24 @@ const UserList: React.FC = () => {
   const handleClickViewUserHistory = (user: IUser) => {
     navigate('/user/history/' + user.id)
   }
-  const handleCloseUserModal = () => {
+  const handleCloseUserModal = (isCreateUserSuccess: boolean) => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
+    if (isCreateUserSuccess) {
+      setSearchValue((prevState) => {
+        return {
+          ...prevState
+        }
+      })
+    }
   }
   const columns: ColumnsType<IUser> = [
     {
       title: t('userList.fullName'),
       dataIndex: 'fullName',
       key: 'fullName',
+      sorter: true,
+      showSorterTooltip: false,
       render: (text, record) => {
         return (
           <div className='tw-relative'>
@@ -49,13 +105,23 @@ const UserList: React.FC = () => {
     },
     {
       title: t('userList.dateOfBirth'),
-      dataIndex: 'dateOfBirth',
-      key: 'dateOfBirth'
+      dataIndex: 'birthday',
+      key: 'birthday',
+      sorter: true,
+      showSorterTooltip: false,
+      render: (text, record) => {
+        if (text) {
+          const date = dayjs(text).format('DD/MM/YYYY')
+          return date
+        }
+      }
     },
     {
       title: t('userList.gender'),
-      dataIndex: 'gender',
-      key: 'gender'
+      dataIndex: 'genderType',
+      key: 'genderType',
+      sorter: true,
+      showSorterTooltip: false
     },
     {
       title: t('userList.department'),
@@ -66,12 +132,16 @@ const UserList: React.FC = () => {
     {
       title: t('userList.phoneNumber'),
       dataIndex: 'phoneNumber',
-      key: 'phoneNumber'
+      key: 'phoneNumber',
+      sorter: true,
+      showSorterTooltip: false
     },
     {
       title: t('userList.email'),
       dataIndex: 'email',
       key: 'email',
+      sorter: true,
+      showSorterTooltip: false,
       ellipsis: true
     },
     {
@@ -99,14 +169,61 @@ const UserList: React.FC = () => {
       }
     }
   ]
-
+  const handleDepartmentChange = (value: string | null) => {
+    setSearchValue((prevState) => {
+      if (value) {
+        return { ...prevState, group: value }
+      } else {
+        return { ...prevState, query: prevState.query }
+      }
+    })
+  }
+  const handleSearchValueChange = (value: string) => {
+    if (timerId.current) {
+      clearTimeout(timerId.current)
+    }
+    timerId.current = setTimeout(() => {
+      setSearchValue((prevState) => ({ ...prevState, query: value, paging: { ...prevState.paging, page: 0 } }))
+    }, 500)
+  }
   useEffect(() => {
-    const promise = dispatch(getListUser())
-    promise.finally(() => console.log('final'))
+    const promise = dispatch(
+      searchUser({
+        paging: searchValue.paging,
+        sorts: searchValue.sorts,
+        query: searchValue.query,
+        groupCode: searchValue.group
+      })
+    )
     return () => {
       promise.abort()
     }
-  }, [])
+  }, [searchValue])
+
+  function handleTableChange(
+    pagination: TablePaginationConfig,
+    filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<IUser> | any
+  ) {
+    setSearchValue((prevState) => {
+      const paging: IPaging = {
+        ...prevState.paging,
+        page: Number(pagination.current) - 1,
+        size: pagination.pageSize as number
+      }
+      const sorts: ISort[] = []
+      if (sorter.order) {
+        sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
+      } else {
+        sorts.push({
+          direction: 'DESC',
+          field: 'created_at'
+        })
+      }
+      return { ...prevState, paging, sorts }
+    })
+  }
+
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <UserCreateEdit
@@ -123,8 +240,13 @@ const UserList: React.FC = () => {
           {t('userList.addMember')}
         </Button>
         <div className='tw-flex tw-gap-4'>
-          <Select className='tw-w-64'></Select>
-          <Search className='tw-w-64' />
+          <Select
+            onChange={handleDepartmentChange}
+            defaultValue={null}
+            options={groupOptions}
+            className='tw-w-64'
+          ></Select>
+          <Search onChange={(event) => handleSearchValueChange(event.target.value)} className='tw-w-64' />
         </div>
       </div>
       <div className='tw-mt-6'>
@@ -134,6 +256,7 @@ const UserList: React.FC = () => {
           dataSource={userState.userList}
           loading={userState.loading}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+          onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />
       </div>
     </div>

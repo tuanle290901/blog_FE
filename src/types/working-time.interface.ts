@@ -27,7 +27,7 @@ export interface IWorkingDayConfig {
 
 export const fakeData: IWorkingTimeConfig = {
   id: 'working-time-id',
-  groupCode: 'group-code',
+  groupCode: 'master-data-code',
   affectCompensatoryInMonth: 3,
   startPayrollCutoffDay: 1,
   endPayrollCutoffDay: 5,

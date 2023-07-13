@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import '../index.scss'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
 import { Button, InputNumber, Tabs, TimePicker } from 'antd'
-import { fakeData } from '~/types/WorkingTime.interface.ts'
+import { fakeData } from '~/types/working-time.interface.ts'
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
 const TabItem = () => {
   const ref = useRef<RefType>(null)
@@ -55,7 +55,7 @@ const TabItem = () => {
           <div className='tw-w-1/5'>
             <span className='tw-font-semibold'>Thời gian làm việc</span>
           </div>
-          <div className='tw-w-1/3'>
+          <div className='tw-w-2/5'>
             <WorkingTimeOfTheWeekConfig weekConfig={fakeData.workingDays} ref={ref} />
           </div>
         </div>
