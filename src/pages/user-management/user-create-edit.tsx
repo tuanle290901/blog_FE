@@ -1,20 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Button,
-  DatePicker,
-  Form,
-  FormListFieldData,
-  Input,
-  message,
-  Modal,
-  Select,
-  Upload,
-  UploadFile,
-  UploadProps
-} from 'antd'
+import { Button, DatePicker, Form, Input, message, Modal, Select, Upload } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { RcFile, UploadChangeParam } from 'antd/es/upload'
+import { RcFile } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
@@ -24,17 +12,6 @@ import { GENDER, ROLE } from '~/constants/app.constant.ts'
 import { createUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, PHONE_NUMBER_REG } from '~/constants/regex.constant.ts'
 
-const beforeUpload = (file: RcFile) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-  if (!isJpgOrPng) {
-    void message.error('You can only upload JPG/PNG file!')
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2
-  if (!isLt2M) {
-    void message.error('Image must smaller than 2MB!')
-  }
-  return isJpgOrPng && isLt2M
-}
 const UserCreateEdit: React.FC<{
   open: boolean
   handleClose: (isCreateUserSuccess: boolean) => void
@@ -74,6 +51,30 @@ const UserCreateEdit: React.FC<{
       value: ROLE.MANAGER
     }
   ]
+  const groupProfiles: any[] = useMemo(() => {
+    if (userData?.groupProfiles) {
+      return userData.groupProfiles.map((item, index) => {
+        return {
+          name: index,
+          fieldKey: index,
+          key: index,
+          isListField: true,
+          role: item.role,
+          groupCode: item.groupCode,
+          title: item.title
+        }
+      })
+    }
+    return [
+      {
+        name: 0,
+        fieldKey: 1,
+        key: 1,
+        isListField: true,
+        role: ROLE.OFFICER
+      }
+    ]
+  }, [userData])
   const beforeUpload = (file: RcFile) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
     if (!isJpgOrPng) {
@@ -142,15 +143,6 @@ const UserCreateEdit: React.FC<{
       uploadRef.current.click()
     }
   }
-  const departmentField = [
-    {
-      name: 0,
-      fieldKey: 1,
-      key: 1,
-      isListField: true,
-      role: ROLE.OFFICER
-    }
-  ]
   return (
     <Modal
       open={open}
@@ -169,7 +161,7 @@ const UserCreateEdit: React.FC<{
       width={1000}
       centered
     >
-      <div className='tw-max-h-[calc(100vh-214px)] tw-min-w-[800px] tw-overflow-auto'>
+      <div className=' tw-min-w-[800px] tw-overflow-auto'>
         <div className='tw-flex tw-items-center tw-gap-4'>
           <Upload name='avatar' accept='image/png, image/jpeg' showUploadList={false} beforeUpload={beforeUpload}>
             <div ref={uploadRef}>
@@ -281,7 +273,11 @@ const UserCreateEdit: React.FC<{
             </div>
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
-              <div className='tw-p-4 tw-bg-[#FAFAFA] tw-h-[492px] tw-overflow-auto'>
+              <div
+                className={`tw-p-4 tw-bg-[#FAFAFA] ${
+                  userData?.userName ? 'tw-h-[578px]' : 'tw-h-[492px]'
+                }   tw-overflow-auto`}
+              >
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
                   <DatePicker
                     format='YYYY/MM/DD'
@@ -319,8 +315,8 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.List name='groupProfiles' initialValue={departmentField}>
-                  {(fields = departmentField, { add, remove }) => (
+                <Form.List name='groupProfiles' initialValue={groupProfiles}>
+                  {(fields = groupProfiles, { add, remove }) => (
                     <>
                       {fields.map(({ key, name, ...restField }, index) => (
                         <div key={key} className='tw-relative'>
@@ -355,7 +351,11 @@ const UserCreateEdit: React.FC<{
                               name={[name, 'role']}
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
-                              <Select options={roleOptions} placeholder={t('userModal.selectFunction')}></Select>
+                              <Select
+                                defaultValue={ROLE.OFFICER}
+                                options={roleOptions}
+                                placeholder={t('userModal.selectFunction')}
+                              ></Select>
                             </Form.Item>
                           </div>
                         </div>
