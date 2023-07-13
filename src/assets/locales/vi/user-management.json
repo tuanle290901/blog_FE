@@ -24,6 +24,7 @@
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
+    "chooseAvatar": "Chọn ảnh đại diện",
     "deleteAvatar": "Xóa ảnh đại diện",
     "enterMemberName": "Nhập họ tên thành viên",
     "enterUserName": "Nhập tên đăng nhập của thành viên",

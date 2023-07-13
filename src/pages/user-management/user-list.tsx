@@ -13,6 +13,7 @@ import dayjs from 'dayjs'
 import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 
 const { Search } = Input
 
@@ -20,6 +21,7 @@ const UserList: React.FC = () => {
   const [t] = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
+  const { userInfo, setUserProfileInfo } = useUserInfo()
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
@@ -43,6 +45,19 @@ const UserList: React.FC = () => {
       }
     ]
   })
+  const hasPermissionAddNewUser = useMemo(() => {
+    const groupProfiles = userInfo?.groupProfiles
+    if (groupProfiles) {
+      for (const group of groupProfiles) {
+        if (group.groupCode === 'ADMIN') {
+          return true
+        } else {
+          //   TODO
+        }
+      }
+    }
+    return false
+  }, [userInfo])
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
   //     page: 0,

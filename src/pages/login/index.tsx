@@ -40,7 +40,7 @@ const LoginComponent: React.FC = () => {
   }, [dispatch, loginState.accessToken, loginState.success])
 
   useEffect(() => {
-    if (loginState.userInfo.userName) {
+    if (loginState?.userInfo?.userName) {
       LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
       navigate('/')
     }

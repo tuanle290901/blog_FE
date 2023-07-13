@@ -16,3 +16,6 @@ export enum ROLE {
   OFFICER = 'OFFICER',
   SYSTEM_ADMIN = 'SYSTEM_ADMIN'
 }
+export enum GROUP {
+  ADMIN = 'ADMIN'
+}

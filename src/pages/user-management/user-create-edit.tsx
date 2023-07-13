@@ -42,7 +42,7 @@ const UserCreateEdit: React.FC<{
   const [t] = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [avatarBase64, setAvatarBase64] = useState<string | null>(null)
+  const [avatarBase64, setAvatarBase64] = useState<string>('')
   const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
@@ -95,19 +95,22 @@ const UserCreateEdit: React.FC<{
       role: item.role,
       title: item.title
     }))
-    if (avatarBase64) {
-      value.avatarBase64 = avatarBase64
-    }
-    const payload: IUser = { ...value, groupProfiles, birthday: value.birthday.format('YYYY-MM-DD') }
+    value.avatarBase64 = avatarBase64.replace('data:image/png;base64,', '')
+    const payload: IUser = { ...value, groupProfiles, birthday: value.birthday?.format('YYYY-MM-DD') }
     try {
       setLoading(true)
       await dispatch(createUser(payload))
-      handleClose(true)
+      finishAndClose(true)
     } catch (e) {
-      handleClose(false)
+      finishAndClose(false)
     } finally {
       setLoading(false)
     }
+  }
+  const finishAndClose = (isSuccess: boolean) => {
+    handleClose(isSuccess)
+    form.resetFields()
+    setAvatarBase64('')
   }
   const handleClickButtonUpdateAvatar = () => {
     if (uploadRef?.current) {
@@ -126,12 +129,10 @@ const UserCreateEdit: React.FC<{
     <Modal
       open={open}
       title={t('userList.addMember')}
-      onCancel={() => handleClose(false)}
-      // okText={t('common.save')}
-      // cancelText={t('common.cancel')}
+      onCancel={() => finishAndClose(false)}
       footer={
         <div className={'tw-flex tw-justify-end'}>
-          <Button onClick={() => handleClose(false)}>{t('common.cancel')}</Button>
+          <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
           <Button type='primary' onClick={handleSubmit} loading={loading}>
             {t('common.save')}
           </Button>
@@ -146,8 +147,8 @@ const UserCreateEdit: React.FC<{
         <div className='tw-flex tw-items-center tw-gap-4'>
           <Upload
             name='avatar'
+            accept='image/png, image/jpeg'
             showUploadList={false}
-            action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
             beforeUpload={beforeUpload}
             onChange={handleChange}
           >
@@ -170,9 +171,9 @@ const UserCreateEdit: React.FC<{
           <div className='tw-h-auto'>
             <div className='tw-flex tw-gap-2'>
               <Button onClick={handleClickButtonUpdateAvatar} type='primary'>
-                {t('userModal.updateAvatar')}
+                {t(avatarBase64 ? 'userModal.updateAvatar' : 'userModal.chooseAvatar')}
               </Button>
-              <Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>
+              {/*<Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>*/}
             </div>
             <div className='tw-mt-1'>
               <p className='tw-text-[#BFBFBF]'>{t('userModal.avatarAccept')}</p>
@@ -185,9 +186,12 @@ const UserCreateEdit: React.FC<{
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.commonInfo')}</h3>
               <div className='tw-p-4 tw-bg-[#FAFAFA]'>
-                <Form.Item style={{ marginBottom: 16 }} label={t('userList.username')} name='username' required>
-                  <Input placeholder={t('userModal.enterUserName')} />
-                </Form.Item>
+                {userData?.userName && (
+                  <Form.Item style={{ marginBottom: 16 }} label={t('userList.username')} name='username'>
+                    <Input defaultValue={userData?.userName} disabled />
+                  </Form.Item>
+                )}
+
                 <Form.Item style={{ marginBottom: 16 }} label={t('userList.fullName')} name='fullName' required>
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>

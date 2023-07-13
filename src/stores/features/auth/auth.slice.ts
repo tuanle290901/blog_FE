@@ -5,10 +5,11 @@ import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-t
 import { ErrorResponse } from '~/types/error-response.interface'
 import { LoginPayload } from '~/types/login-payload.ts'
 import { LOCAL_STORAGE } from '~/utils/Constant'
+import { IUser } from '~/types/user.interface.ts'
 
 export interface AuthStateInterface {
   loading: boolean
-  userInfo: Record<string, any> // for user object
+  userInfo: IUser | null // for user object
   accessToken: string | null // for storing the JWT
   error: any
   success: boolean
@@ -18,7 +19,7 @@ export interface AuthStateInterface {
 
 const initialState: AuthStateInterface = {
   loading: false,
-  userInfo: {},
+  userInfo: null,
   accessToken: null,
   error: null,
   success: false, // for monitoring the registration process.
@@ -67,7 +68,7 @@ const authSlice = createSlice({
     logout: (state) => {
       clearLocalStorage()
       state.accessToken = null
-      state.userInfo = {}
+      state.userInfo = null
       state.loading = false
       state.error = null
       state.success = false
