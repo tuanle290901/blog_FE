@@ -81,9 +81,18 @@ const UserList: React.FC = () => {
     if (isCreateUserSuccess) {
       setSearchValue((prevState) => {
         return {
-          ...prevState
+          ...prevState,
+          sorts: []
         }
       })
+    }
+  }
+  const getSortOrder = (filed: string) => {
+    const sort = searchValue.sorts[0]
+    if (sort && sort.field === filed) {
+      return searchValue.sorts[0].direction === 'ASC' ? 'ascend' : 'descend'
+    } else {
+      return null
     }
   }
   const columns: ColumnsType<IUser> = [
@@ -93,6 +102,7 @@ const UserList: React.FC = () => {
       key: 'fullName',
       sorter: true,
       showSorterTooltip: false,
+      sortOrder: getSortOrder('fullName'),
       render: (text, record) => {
         return (
           <div className='tw-relative'>
@@ -108,6 +118,7 @@ const UserList: React.FC = () => {
       dataIndex: 'birthday',
       key: 'birthday',
       sorter: true,
+      sortOrder: getSortOrder('birthday'),
       showSorterTooltip: false,
       render: (text, record) => {
         if (text) {
@@ -121,6 +132,7 @@ const UserList: React.FC = () => {
       dataIndex: 'genderType',
       key: 'genderType',
       sorter: true,
+      sortOrder: getSortOrder('genderType'),
       showSorterTooltip: false
     },
     {
@@ -134,6 +146,7 @@ const UserList: React.FC = () => {
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       sorter: true,
+      sortOrder: getSortOrder('phoneNumber'),
       showSorterTooltip: false
     },
     {
@@ -142,6 +155,7 @@ const UserList: React.FC = () => {
       key: 'email',
       sorter: true,
       showSorterTooltip: false,
+      sortOrder: getSortOrder('email'),
       ellipsis: true
     },
     {
@@ -255,6 +269,7 @@ const UserList: React.FC = () => {
           columns={columns}
           dataSource={userState.userList}
           loading={userState.loading}
+          pagination={{ total: searchValue.paging.total }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />
