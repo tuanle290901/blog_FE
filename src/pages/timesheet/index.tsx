@@ -238,7 +238,7 @@ const Timesheet: React.FC = () => {
                     showSearch
                     placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.group')}`}
                     optionFilterProp='children'
-                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
                     // allowClear
                     onClear={() => setSelectedGroup(userGroup)}
                     onChange={(value) => setSelectedGroup(value)}
@@ -259,7 +259,9 @@ const Timesheet: React.FC = () => {
                     showSearch
                     placeholder={`${t('rootInit.requiredSelect')} ${t('nhân viên')}`}
                     optionFilterProp='children'
-                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    filterOption={(input, option) => {
+                      return (option?.label + '').toLowerCase().includes(input.toLowerCase())
+                    }}
                     allowClear
                     // onClear={() => setUserOptions([])}
                     onChange={(value) => setSelectedUser(value)}
