@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, DatePicker, Form, Input, message, Modal, Select, Upload } from 'antd'
+import { Button, DatePicker, Form, Input, message, Modal, Radio, Select, Upload } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
@@ -221,10 +221,24 @@ const UserCreateEdit: React.FC<{
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
-                  <Select placeholder={t('userModal.selectGender')}>
-                    <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>
-                    <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>
-                  </Select>
+                  {/*<Select placeholder={t('userModal.selectGender')}>*/}
+                  {/*  <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>*/}
+                  {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
+                  {/*</Select>*/}
+                  <Radio.Group name='genderType' className='tw-w-full'>
+                    <div className='tw-flex tw-gap-4 tw-justify-center tw-w-full'>
+                      <div className=' tw-bg-white tw-rounded-md tw-border tw-w-1/2 tw-border-solid tw-px-1 tw-py-1 tw-border-gray-300'>
+                        <Radio className='tw-w-full' value={GENDER.MALE}>
+                          {t('userList.male')}
+                        </Radio>
+                      </div>
+                      <div className=' tw-bg-white tw-rounded-md tw-border tw-w-1/2 tw-border-solid tw-px-1 tw-py-1 tw-border-gray-300'>
+                        <Radio className='tw-w-full' value={GENDER.FEMALE}>
+                          {t('userList.female')}
+                        </Radio>
+                      </div>
+                    </div>
+                  </Radio.Group>
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
