@@ -1,6 +1,11 @@
 {
   "common": {
     "save": "Lưu",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "role": {
+      "officer": "Nhân viên",
+      "subManager": "Quản lí trực tiếp",
+      "manager": "Quản lí"
+    }
   }
 }

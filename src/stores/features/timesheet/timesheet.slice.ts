@@ -5,6 +5,7 @@ import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { ErrorResponse } from '~/types/error-response.interface'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
+import dayjs from 'dayjs'
 
 export interface TimesheetStateInterface {
   loading: boolean
@@ -51,40 +52,93 @@ const getUserInGroup = createAsyncThunk('system-user/groups', async (groupCode: 
 })
 
 export const filterTimesheet = createAsyncThunk(
-  'users/search',
-  async (params: { query: string; groupCode?: string | null; paging: IPaging; sorts: ISort[] }, thunkAPI) => {
+  'time-attendance/filter',
+  async (
+    params: {
+      query: string
+      groupCode?: string | null
+      userId?: string | null
+      startDate?: string | null
+      endDate?: string | null
+      paging: IPaging
+      sorts: ISort[]
+    },
+    thunkAPI
+  ) => {
     try {
       const body: any = {
         page: params.paging.page,
         size: params.paging.size,
         sort: params.sorts
       }
-      // if (params.query && params.groupCode) {
-      body.criteria = [
-        {
-          operator: 'AND_MULTIPLES',
-          children: [
-            {
-              field: 'group_code',
-              operator: 'IS',
-              value: params.groupCode
-            },
-            {
-              field: 'user_id',
-              operator: 'IS',
-              value: params.query
-            },
-            {
-              field: 'date',
-              type: 'INSTANT',
-              operator: 'BETWEEN',
-              min: '2023-07-10T17:00:00Z',
-              max: '2023-07-14T16:59:59Z'
-            }
-          ]
-        }
-      ]
-      // }
+      if (params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              {
+                field: 'date',
+                type: 'INSTANT',
+                operator: 'BETWEEN',
+                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+              }
+            ]
+          }
+        ]
+      }
+      if (params.userId) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'user_id',
+                operator: 'IS',
+                value: params.userId
+              },
+              {
+                field: 'date',
+                type: 'INSTANT',
+                operator: 'BETWEEN',
+                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+              }
+            ]
+          }
+        ]
+      }
+      if (params.userId && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              {
+                field: 'user_id',
+                operator: 'IS',
+                value: params.userId
+              },
+              {
+                field: 'date',
+                type: 'INSTANT',
+                operator: 'BETWEEN',
+                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+              }
+            ]
+          }
+        ]
+      }
       const response: IApiResponse<[]> = await HttpService.post('/time-attendance/filter', body, {
         signal: thunkAPI.signal
       })

@@ -4,7 +4,7 @@ import './index.scss'
 
 import { PlusOutlined } from '@ant-design/icons'
 import { Col, Input, Row, Space, Table, Tooltip } from 'antd'
-import { ExpandableConfig, Key } from 'antd/es/table/interface'
+import { ExpandableConfig } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
@@ -13,7 +13,6 @@ import IconDeleteSVG from '~/assets/svg/iconDelete'
 import IconEditSVG from '~/assets/svg/iconEdit'
 import IconTeamSVG from '~/assets/svg/iconTeam'
 import CommonButton from '~/components/Button/CommonButton'
-import CommondTable from '~/components/Table/CommonTable'
 import { getListDepartments } from '~/stores/features/department/department.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
@@ -25,7 +24,6 @@ import DepartmentModal from './DepartmentModal'
 const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const listDataDepartments: DataType[] = useAppSelector((state) => state.department.listData)
@@ -95,9 +93,8 @@ const Department: React.FC = () => {
   const expandableConfig: ExpandableConfig<DataType> = {
     expandIcon: ({ expanded, onExpand, record }) => {
       if (record.children && record.children.length === 0) {
-        return null
+        return <span className='tw-ml-[10px]'> </span>
       }
-
       return (
         <span
           className={`ant-table-row-expand-icon ${
@@ -221,7 +218,7 @@ const Department: React.FC = () => {
   }, [])
 
   const onDelete = (record: DataType) => {
-    console.log(record.name)
+    // console.log(record.name)
   }
 
   const columns = useMemo(() => {
@@ -245,7 +242,8 @@ const Department: React.FC = () => {
       {
         title: 'code',
         dataIndex: 'code',
-        key: 'code'
+        key: 'code',
+        width: '100px'
       },
       {
         title: 'address',
@@ -466,6 +464,7 @@ const Department: React.FC = () => {
         <Table
           dataSource={renderTreeRows(dataRender.listData, true)}
           columns={columns}
+          loading={isLoading}
           expandable={expandableConfig}
           pagination={false}
           style={{ width: '100%' }}

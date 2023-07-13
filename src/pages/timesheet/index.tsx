@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, Col, DatePicker, Row, Segmented, Select, Table } from 'antd'
-// import DaySelected from './component/DaySelected'
+import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +24,7 @@ const Timesheet: React.FC = () => {
   const authSate = useAppSelector((state) => state.auth)
   const userGroup = authSate?.userInfo?.groupProfiles ? authSate?.userInfo?.groupProfiles[0]?.groupCode : ''
   const groupsSate = useAppSelector((state) => state.timesheet.groups)
+  const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
@@ -33,6 +34,9 @@ const Timesheet: React.FC = () => {
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
+    userId?: string | null
+    startDate?: string | null
+    endDate?: string | null
     paging: IPaging
     sorts: ISort[]
   }>({
@@ -60,11 +64,24 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectDate = (dataSelected: any) => {
-    console.log(dayjs(dataSelected[0]).format('DD/MM/YYYY'))
-    console.log(dayjs(dataSelected[1]).format('DD/MM/YYYY'))
+    setSearchValue((prevState) => {
+      return {
+        ...prevState,
+        startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
+        endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T00:00:00Z`
+      }
+    })
   }
 
   const columns: ColumnsType<IAttendance> = [
+    {
+      title: t('Họ tên'),
+      dataIndex: 'userName',
+      key: 'userName',
+      render: (userName) => {
+        return userName || 'Nguyễn Đức Anh'
+      }
+    },
     {
       title: t('Ngày điểm danh'),
       dataIndex: 'date',
@@ -80,18 +97,18 @@ const Timesheet: React.FC = () => {
     },
     {
       title: t('Thời gian đến'),
-      dataIndex: 'timeStart',
-      key: 'timeStart',
-      render: (timeStart, record) => {
-        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{timeStart || '--'}</span>
+      dataIndex: 'startTime',
+      key: 'startTime',
+      render: (startTime, record) => {
+        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{startTime || '--'}</span>
       }
     },
     {
       title: t('Thời gian về'),
-      dataIndex: 'timeEnd',
-      key: 'timeEnd',
-      render: (timeEnd, record) => {
-        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{timeEnd || '--'}</span>
+      dataIndex: 'endTime',
+      key: 'endTime',
+      render: (endTime, record) => {
+        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{endTime || '--'}</span>
       }
     },
     {
@@ -167,13 +184,25 @@ const Timesheet: React.FC = () => {
 
   useEffect(() => {
     const promise = dispatch(getAllGroup())
+    setSearchValue((prevState) => {
+      return { ...prevState, group: selectedGroup }
+    })
     return () => promise.abort()
   }, [])
 
   useEffect(() => {
     const promise = dispatch(getUserInGroup(selectedGroup))
+    setSearchValue((prevState) => {
+      return { ...prevState, group: selectedGroup }
+    })
     return () => promise.abort()
   }, [selectedGroup])
+
+  useEffect(() => {
+    setSearchValue((prevState) => {
+      return { ...prevState, userId: selectedUser }
+    })
+  }, [selectedUser])
 
   useEffect(() => {
     const promise = dispatch(
@@ -181,7 +210,10 @@ const Timesheet: React.FC = () => {
         paging: searchValue.paging,
         sorts: searchValue.sorts,
         query: searchValue.query,
-        groupCode: searchValue.group
+        groupCode: searchValue.group,
+        startDate: searchValue.startDate,
+        endDate: searchValue.endDate,
+        userId: searchValue.userId
       })
     )
     return () => {
@@ -192,7 +224,7 @@ const Timesheet: React.FC = () => {
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
-        <TimesheetInfo data={attendanceList} handleOpenModal={setIsOpenModal} />
+        <TimesheetInfo data={timesheetSate.timesheetList} handleOpenModal={setIsOpenModal} />
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
@@ -207,8 +239,8 @@ const Timesheet: React.FC = () => {
                     placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.group')}`}
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
-                    allowClear
-                    onClear={() => void {}}
+                    // allowClear
+                    onClear={() => setSelectedGroup(userGroup)}
                     onChange={(value) => setSelectedGroup(value)}
                     defaultValue={userGroup}
                   >
@@ -248,6 +280,8 @@ const Timesheet: React.FC = () => {
                       format='DD/MM/YYYY'
                       placeholder={['Từ ngày', 'Đến ngày']}
                       locale={localeVI}
+                      defaultValue={[dayjs(), dayjs()]}
+                      allowClear={false}
                       renderExtraFooter={() => (
                         <div className='timesheet-filter-time__button'>
                           <Button size='small'>Hôm nay</Button>
@@ -274,13 +308,13 @@ const Timesheet: React.FC = () => {
         </Row>
         {mode === 'list' && (
           <>
-            {/* <DaySelected data={attendanceList} /> */}
+            <DaySelected data={timesheetSate.timesheetList} />
             <div className='tw-mt-6'>
               <Table
                 rowKey='id'
                 columns={columns}
-                dataSource={attendanceList}
-                // loading={userState.loading}
+                dataSource={timesheetSate.timesheetList}
+                loading={timesheetSate.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
               />

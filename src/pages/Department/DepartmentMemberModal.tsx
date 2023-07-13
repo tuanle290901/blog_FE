@@ -2,54 +2,54 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Col, Form, Input, List, Modal, Row } from 'antd'
-import React, { useEffect, useState, ChangeEvent } from 'react'
+import { Col, Input, List, Modal, Row, notification } from 'antd'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconStartSVG from '~/assets/svg/iconStart'
 import IconUserDownSVG from '~/assets/svg/iconUserDown'
 import IconUserUpSVG from '~/assets/svg/iconUserUp'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
-import { DataMemberRender, IDepartmentModal, ListDataType } from '~/types/department.interface'
+import {
+  DataInfoDepartment,
+  DataMemberRender,
+  IDepartmentModal,
+  ListDataUserGroup,
+  updateUserRole
+} from '~/types/department.interface'
+import { ROlE_STORAGE } from '~/utils/Constant'
 
 const { Search } = Input
 const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data } = props
   const { t } = useTranslation()
   const [initLoading, setInitLoading] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const dataList = [
-    { id: 1, name: 'dev', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 2, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 3, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 4, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' }
-  ]
-  const dataList1 = [
-    { id: 5, name: 'dev', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 6, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 7, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' },
-    { id: 8, name: 'dev-1', email: 'a@gmail.com', picture: 'url', loading: false, role: 'MANAGER' }
-  ]
-  // const [data, setData] = useState<DataType[]>([]);
   const [listDataRender, setListDataRender] = useState<DataMemberRender>({
-    listDataUp: dataList,
-    listDataDown: dataList1,
-    listDataUpFilter: dataList,
-    listDataDownFilter: dataList1
+    listDataUp: [],
+    listDataDown: [],
+    listDataUpFilter: [], // sub-managers
+    listDataDownFilter: [] // managers
   })
 
+  const [dataInfoDepartment, setDataInfoDepartment] = useState<DataInfoDepartment>()
+
   const getDetpartmentsByCode = async (code: string) => {
+    setInitLoading(true)
     try {
-      const response = await HttpService.get(END_POINT_API.Department.getByCode(code))
+      const response = await HttpService.get(END_POINT_API.Department.getBaseInfo(code))
       if (response.status === 200) {
+        console.log(response.data)
+        setDataInfoDepartment(response.data)
         setListDataRender({
-          listDataUp: [],
-          listDataDown: [],
-          listDataUpFilter: [],
-          listDataDownFilter: []
+          listDataUp: [...response.data.subManagers],
+          listDataDown: [...response.data.managers],
+          listDataUpFilter: [...response.data.subManagers], // sub-managers
+          listDataDownFilter: [...response.data.managers] // managers
         })
+        setInitLoading(false)
       }
     } catch (error) {
+      setInitLoading(false)
       setListDataRender({
         listDataUp: [],
         listDataDown: [],
@@ -64,14 +64,34 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
       getDetpartmentsByCode(data.code)
     }
   }, [data])
-  const onSaveData = async () => {
-    onOk()
-  }
 
-  // useEffect(() => {
-  //   if (data) {
-  //   }
-  // }, [])
+  const onSaveData = async () => {
+    try {
+      let dataRole: ListDataUserGroup[] = []
+      if (listDataRender.listDataUpFilter) {
+        dataRole = [...listDataRender.listDataUpFilter]
+      }
+      if (listDataRender.listDataDownFilter) {
+        dataRole = [...dataRole, ...listDataRender.listDataDownFilter]
+      }
+      const payload: updateUserRole = {
+        groupCode: (dataInfoDepartment && dataInfoDepartment.code) || (data && data.code),
+        updateRoles: dataRole.map((item) => {
+          return {
+            role: item.groupProfiles && item.groupProfiles[0].role,
+            userName: item.userName
+          }
+        })
+      }
+      const response = await HttpService.post(END_POINT_API.Department.updateUserRole(), payload)
+      if (response.status === 200) {
+        notification.success({ message: 'Updating user from department success' })
+        onOk()
+      }
+    } catch (error) {
+      notification.error({ message: 'Error updating user from department' })
+    }
+  }
 
   const onSearch = (value: ChangeEvent<HTMLInputElement>) => {
     const valueFilter = value.target.value
@@ -79,11 +99,15 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
       setListDataRender((prew) => {
         return {
           ...prew,
-          listDataUpFilter: prew?.listDataUp?.filter((item) =>
-            item.name.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase())
+          listDataUpFilter: prew?.listDataUp?.filter(
+            (item) =>
+              item.fullName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()) ||
+              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()))
           ),
-          listDataDownFilter: prew?.listDataDown?.filter((item) =>
-            item.name.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase())
+          listDataDownFilter: prew?.listDataDown?.filter(
+            (item) =>
+              item.fullName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()) ||
+              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()))
           )
         }
       })
@@ -96,36 +120,55 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
     }
   }
 
-  const onClickDown = (data: ListDataType) => {
+  const onClickDown = (data: ListDataUserGroup) => {
     const listDataUp = listDataRender.listDataUp
     const listDataDown = listDataRender?.listDataDown
-    let newListDataUp: ListDataType[] = []
+    let newListDataUp: ListDataUserGroup[] = []
     if (listDataUp) {
       newListDataUp = [...listDataUp]
     }
     if (listDataDown) {
-      newListDataUp = [...newListDataUp, ...listDataDown?.filter((item: ListDataType) => item.id === data.id)]
+      newListDataUp = [
+        ...newListDataUp,
+        ...listDataDown
+          ?.filter((item: ListDataUserGroup) => item.userName === data.userName)
+          .map((item) => {
+            if (item.groupProfiles) {
+              item.groupProfiles[0].role = ROlE_STORAGE.SUB_MANAGER
+            }
+            return item
+          })
+      ]
     }
     setListDataRender({
       ...listDataRender,
       listDataUpFilter: newListDataUp,
-      listDataDownFilter: listDataRender?.listDataDown?.filter((item: ListDataType) => item.id !== data.id)
+      listDataDownFilter: listDataRender?.listDataDown?.filter((item: ListDataUserGroup) => item.id !== data.id)
     })
   }
 
-  const onClickUp = async (data: ListDataType) => {
+  const onClickUp = async (data: ListDataUserGroup) => {
     const listDataUp = listDataRender.listDataUp
     const listDataDown = listDataRender?.listDataDown
-    let newListDataDown: ListDataType[] = []
+    let newListDataDown: ListDataUserGroup[] = []
     if (listDataUp) {
-      newListDataDown = [...listDataUp?.filter((item: ListDataType) => item.id === data.id)]
+      newListDataDown = [
+        ...listDataUp
+          ?.filter((item: ListDataUserGroup) => item.userName === data.userName)
+          .map((item) => {
+            if (item.groupProfiles) {
+              item.groupProfiles[0].role = ROlE_STORAGE.MANAGER
+            }
+            return item
+          })
+      ]
     }
     if (listDataDown) {
       newListDataDown = [...newListDataDown, ...listDataDown]
     }
     setListDataRender({
       ...listDataRender,
-      listDataUpFilter: listDataRender?.listDataUp?.filter((item) => item.id !== data.id),
+      listDataUpFilter: listDataRender?.listDataUp?.filter((item) => item.userName !== data.userName),
       listDataDownFilter: newListDataDown
     })
   }
@@ -146,7 +189,7 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
       closable
       onCancel={() => onCancel()}
       onOk={() => onSaveData()}
-      title={'Công ty ---'}
+      title={data && data.name}
       maskClosable={false}
       className='modal-content-member'
     >
@@ -158,20 +201,24 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
             loading={initLoading}
             itemLayout='horizontal'
             dataSource={listDataRender.listDataDownFilter}
-            renderItem={(item: ListDataType, index: number) => {
+            renderItem={(item: ListDataUserGroup) => {
               return (
                 <Row className='tw-my-[12px]'>
                   <Col span={3}>
                     <img
-                      src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
+                      src={item.avatarBase64 ? `data:image/png;base64,${item.avatarBase64}` : ''}
                       className='tw-h-[50px] tw-w-[50px] tw-rounded-[50%]'
                     />
                   </Col>
                   <Col span={20}>
                     <h4 className='tw-font-normal tw-text-base tw-flex tw-items-center tw-gap-[5px]'>
-                      {item.name} <IconStartSVG />
+                      {item.fullName}{' '}
+                      {((item.groupProfiles && item.groupProfiles[0].role === ROlE_STORAGE.MANAGER) ||
+                        (item.groupProfiles && item.groupProfiles[0].role === ROlE_STORAGE.SYSTEM_ADMIN)) && (
+                        <IconStartSVG />
+                      )}
                     </h4>
-                    <p> mô tả phần nào đấy </p>
+                    <p> {item.groupProfiles && item.groupProfiles[0].title}</p>
                   </Col>
                   <Col span={1} className='tw-flex tw-justify-end'>
                     <span
@@ -196,20 +243,20 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
             loading={initLoading}
             itemLayout='horizontal'
             dataSource={listDataRender.listDataUpFilter}
-            renderItem={(item: ListDataType, index: number) => {
+            renderItem={(item: ListDataUserGroup) => {
               return (
                 <Row className='tw-my-[12px]'>
                   <Col span={3}>
                     <img
-                      src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
+                      src={item.avatarBase64 ? `data:image/png;base64,${item.avatarBase64}` : ''}
                       className='tw-h-[50px] tw-w-[50px] tw-rounded-[50%]'
                     />
                   </Col>
                   <Col span={20}>
                     <h4 className='tw-font-normal tw-text-base tw-flex tw-items-center tw-gap-[5px]'>
-                      {item.name} <IconStartSVG />
+                      {item.fullName}
                     </h4>
-                    <p> mô tả phần nào đấy </p>
+                    <p> {item.groupProfiles && item.groupProfiles[0].title} </p>
                   </Col>
                   <Col span={1} className='tw-flex tw-justify-end'>
                     <span

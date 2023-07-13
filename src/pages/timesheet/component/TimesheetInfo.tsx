@@ -24,7 +24,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any }> = (
       <div className='timesheet-short-info'>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>23</span>giờ
+            <span>1</span>giờ
           </p>
           <p>Làm thêm (OT)</p>
         </div>
