@@ -4,8 +4,8 @@ import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-t
 import { DataType, IDepartment } from '~/types/department.interface'
 
 export interface IDepartmentState {
-  listData: any[]
-  editingDepartment: IDepartment | null
+  listData: DataType[]
+  editingDepartment: DataType | null
   loading: boolean
   currentRequestId: string | null
 }
@@ -25,11 +25,6 @@ export const getListDepartments = createAsyncThunk('departments/getAll', async (
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
-})
-
-export const getUserById = createAsyncThunk('users/getById', async (userId: string, thunkAPI) => {
-  // TODO implement
-  return userId
 })
 
 export const createDepartment = createAsyncThunk('departments/create', async (body: IDepartment, thunkAPI) => {
@@ -60,7 +55,7 @@ const departmentSlice = createSlice({
     startEditingDepartment: (state, action: PayloadAction<string>) => {
       const code = action.payload
       const foundDepartment = state.listData.find((data) => data.code === code)
-      state.editingDepartment = foundDepartment as IDepartment
+      state.editingDepartment = foundDepartment as DataType
     },
     cancelEditingDepartment: (state) => {
       state.editingDepartment = null
@@ -71,22 +66,21 @@ const departmentSlice = createSlice({
       .addCase(createDepartment.pending, (state) => {
         state.loading = true
       })
-      .addCase(createDepartment.fulfilled, (state, action) => {
+      .addCase(createDepartment.fulfilled, (state) => {
         state.loading = false
       })
-      .addCase(createDepartment.rejected, (state, action) => {
+      .addCase(createDepartment.rejected, (state) => {
         state.loading = false
       })
       .addCase(getListDepartments.fulfilled, (state, action) => {
         state.listData = [action.payload]
       })
-      .addCase(updateDepartment.pending, (state, action) => {
+      .addCase(updateDepartment.pending, (state) => {
         state.loading = true
       })
       .addCase(updateDepartment.fulfilled, (state, action) => {
         const updatedDepartment = action.payload
         state.listData = updateDepartmentInTree(state.listData, updatedDepartment)
-        state.editingDepartment = action.payload as IDepartment
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
@@ -104,9 +98,6 @@ const departmentSlice = createSlice({
           }
         }
       )
-      .addDefaultCase((state, action) => {
-        // console.log(`action type: ${action.type}`, current(state))
-      })
   }
 })
 

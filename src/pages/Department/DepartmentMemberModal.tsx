@@ -21,7 +21,7 @@ import { ROlE_STORAGE } from '~/utils/Constant'
 
 const { Search } = Input
 const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
-  const { onClose, onOk, showModal, typeModel, data } = props
+  const { onClose, onOk, showModal, data } = props
   const { t } = useTranslation()
   const [initLoading, setInitLoading] = useState(false)
   const [listDataRender, setListDataRender] = useState<DataMemberRender>({
@@ -38,7 +38,6 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
     try {
       const response = await HttpService.get(END_POINT_API.Department.getBaseInfo(code))
       if (response.status === 200) {
-        console.log(response.data)
         setDataInfoDepartment(response.data)
         setListDataRender({
           listDataUp: [...response.data.subManagers],
