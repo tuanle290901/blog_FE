@@ -99,8 +99,10 @@ const UserCreateEdit: React.FC<{
         ...userData,
         birthday: dayjs(userData.birthday)
       })
+      setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
     } else {
       form.resetFields()
+      setAvatarBase64('')
     }
   }, [userData])
   const handleSubmit = async () => {

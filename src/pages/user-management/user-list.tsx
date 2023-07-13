@@ -133,12 +133,23 @@ const UserList: React.FC = () => {
       ellipsis: true
     },
     {
+      title: t('userList.userName'),
+      dataIndex: 'userName',
+      key: 'userName',
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('userName'),
+      ellipsis: true
+    },
+    {
       title: t('userList.dateOfBirth'),
       dataIndex: 'birthday',
       key: 'birthday',
       sorter: true,
       sortOrder: getSortOrder('birthday'),
       showSorterTooltip: false,
+      width: '150px',
+      align: 'center',
       render: (text, record) => {
         if (text) {
           const date = dayjs(text).format('DD/MM/YYYY')
@@ -151,13 +162,21 @@ const UserList: React.FC = () => {
       dataIndex: 'genderType',
       key: 'genderType',
       sorter: true,
+      width: '120px',
+      align: 'center',
       sortOrder: getSortOrder('genderType'),
       showSorterTooltip: false
     },
     {
       title: t('userList.department'),
-      dataIndex: 'department',
-      key: 'department',
+      dataIndex: 'groupProfiles',
+      key: 'groupProfiles',
+      render: (text, record) => {
+        const value = record.groupProfiles.map((item) => {
+          return item.title
+        })
+        return <span>{value.join(',')}</span>
+      },
       ellipsis: true
     },
     {
@@ -165,6 +184,7 @@ const UserList: React.FC = () => {
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       sorter: true,
+      width: '150px',
       sortOrder: getSortOrder('phoneNumber'),
       showSorterTooltip: false
     },
@@ -181,6 +201,7 @@ const UserList: React.FC = () => {
       title: t('userList.action'),
       key: 'action',
       align: 'center',
+      width: '120px',
       render: (_, record) => {
         return (
           <div className='tw-absolute tw-left-0 tw-w-full'>
