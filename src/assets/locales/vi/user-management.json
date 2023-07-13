@@ -6,6 +6,7 @@
     "addMember": "Thêm thành viên",
     "username": "Tên đăng nhập",
     "fullName": "Họ và tên",
+    "userName": "Tên đăng nhập",
     "gender": "Giới tính",
     "dateOfBirth": "Ngày sinh",
     "phoneNumber": "Số điện thoại",
@@ -24,6 +25,7 @@
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
+    "chooseAvatar": "Chọn ảnh đại diện",
     "deleteAvatar": "Xóa ảnh đại diện",
     "enterMemberName": "Nhập họ tên thành viên",
     "enterUserName": "Nhập tên đăng nhập của thành viên",
@@ -39,6 +41,16 @@
     "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
     "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
     "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB.",
-    "addRole": "Thêm vị trí"
+    "addRole": "Thêm vị trí",
+    "errorMessage": {
+      "fullNameIsEmpty": "Họ và tên không được để trống",
+      "groupEmpty": "Tổ chức không được để trống",
+      "titleEmpty": "Chức vụ không được để trống",
+      "roleEmpty": "Chức năng không được để trống",
+      "phoneNumberEmpty": "Số điện thoại không được để trống",
+      "avatarEmpty": "Ảnh đại diện không được để trống",
+      "invalidEmail": "Email không đúng định dạng",
+      "invalidPhoneNumber": "Số điện thoại không đúng định dạng"
+    }
   }
 }

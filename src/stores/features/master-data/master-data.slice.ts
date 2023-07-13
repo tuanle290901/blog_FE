@@ -25,7 +25,7 @@ const initialState: IGroupState = {
 }
 export const getAllGroup = createAsyncThunk('master-data/getAll', async (_, thunkAPI) => {
   try {
-    const response: IApiResponse<IGroup[]> = await HttpService.get('/org/group/groups', {
+    const response: IApiResponse<IGroup[]> = await HttpService.get('/org/group/groups-by-grant', {
       signal: thunkAPI.signal
     })
     return response
