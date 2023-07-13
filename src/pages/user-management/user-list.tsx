@@ -106,7 +106,11 @@ const UserList: React.FC = () => {
       render: (text, record) => {
         return (
           <div className='tw-relative'>
-            <img className='tw-w-8 tw-h-8 tw-absolute -tw-top-1 tw-left-0' alt='avatar' src={defaultImg} />
+            <img
+              className='tw-w-8 tw-h-8 tw-absolute -tw-top-1 tw-left-0 tw-rounded-full'
+              alt='avatar'
+              src={record.avatarBase64 ? `data:image/png;base64,${record.avatarBase64}` : defaultImg}
+            />
             <span className='tw-pl-10'>{text}</span>
           </div>
         )

@@ -42,7 +42,7 @@ const UserCreateEdit: React.FC<{
   const [t] = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
-  const [avatarBase64, setAvatarBase64] = useState<string>()
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null)
   const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
@@ -95,9 +95,11 @@ const UserCreateEdit: React.FC<{
       role: item.role,
       title: item.title
     }))
+    if (avatarBase64) {
+      value.avatarBase64 = avatarBase64
+    }
     const payload: IUser = { ...value, groupProfiles, birthday: value.birthday.format('YYYY-MM-DD') }
     try {
-      console.log('aa')
       setLoading(true)
       await dispatch(createUser(payload))
       handleClose(true)
