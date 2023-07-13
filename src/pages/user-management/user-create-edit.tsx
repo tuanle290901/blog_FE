@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, DatePicker, Form, Input, message, Modal, Select, Upload } from 'antd'
+import { Button, DatePicker, Form, Input, message, Modal, Radio, Select, Upload } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
@@ -221,10 +221,16 @@ const UserCreateEdit: React.FC<{
                   <Input placeholder={t('userModal.enterMemberName')} />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
-                  <Select placeholder={t('userModal.selectGender')}>
-                    <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>
-                    <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>
-                  </Select>
+                  {/*<Select placeholder={t('userModal.selectGender')}>*/}
+                  {/*  <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>*/}
+                  {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
+                  {/*</Select>*/}
+                  <Radio.Group name='genderType' className='tw-w-full'>
+                    <div className='tw-flex tw-gap-32 tw-border tw-border-gray-300 tw-border-solid  tw-bg-white tw-py-1 tw-px-2 tw-rounded-md'>
+                      <Radio value={GENDER.MALE}>{t('userList.male')}</Radio>
+                      <Radio value={GENDER.FEMALE}>{t('userList.female')}</Radio>
+                    </div>
+                  </Radio.Group>
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker

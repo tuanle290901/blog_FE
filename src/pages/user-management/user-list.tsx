@@ -14,6 +14,7 @@ import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { GENDER } from '~/constants/app.constant.ts'
 
 const { Search } = Input
 
@@ -165,7 +166,10 @@ const UserList: React.FC = () => {
       width: '120px',
       align: 'center',
       sortOrder: getSortOrder('genderType'),
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      render: (text, _) => {
+        return text ? t(text === GENDER.MALE ? 'userList.male' : 'userList.female') : ''
+      }
     },
     {
       title: t('userList.department'),
@@ -173,8 +177,9 @@ const UserList: React.FC = () => {
       key: 'groupProfiles',
       render: (text, record) => {
         const value = record.groupProfiles.map((item) => {
-          return item.title
+          return item.groupName
         })
+
         return <span>{value.join(',')}</span>
       },
       ellipsis: true

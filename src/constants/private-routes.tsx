@@ -9,6 +9,8 @@ import Timesheet from '~/pages/timesheet'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import UserList from '~/pages/user-management/user-list.tsx'
 
+import PositionList from '~/pages/position-management/position-list.tsx'
+
 export const PRIVATE_PATH = {
   home: '/',
   user: {
@@ -32,7 +34,8 @@ export const PRIVATE_PATH = {
   timeManagement: {
     prefix: '/work-time',
     requests: '/work-time/requests'
-  }
+  },
+  position: '/positions'
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
@@ -83,6 +86,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'requestWorkTime',
     path: PRIVATE_PATH.timeManagement.requests,
     component: PersonalWokingTimeRequestList,
+    allowedRoles: []
+  },
+  {
+    name: 'requestWorkTime',
+    path: PRIVATE_PATH.position,
+    component: PositionList,
     allowedRoles: []
   }
 ]

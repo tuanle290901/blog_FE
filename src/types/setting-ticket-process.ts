@@ -3,6 +3,7 @@ export interface TargetProps {
   onDrop: (item: DragItem, targetKey: string) => void
   dropItem: DropItem
   canDropItem: () => boolean
+  isValidStep: () => boolean
 }
 
 export interface IApprovalStep {
@@ -12,12 +13,18 @@ export interface IApprovalStep {
   data: DragItem[]
 }
 
+export interface Ticket {
+  id: string
+  title: string
+}
+
 export interface ITicketDef {
   loading: boolean
   createRevisionSuccess: boolean
   departments: DragItem[]
   approvalSteps: IApprovalStep[]
   currentRequestId: string | null
+  tickets?: string | null
 }
 
 export interface DragItem {
