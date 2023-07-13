@@ -1,24 +1,61 @@
-import React, { useState } from 'react'
-import { Button, Col, DatePicker, Image, Row, Segmented, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, Checkbox, Col, DatePicker, Row, Segmented, Select, Table } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
-import { ColumnsType } from 'antd/es/table'
+import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 import { IAttendance } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
-import DefaultImage from '~/assets/images/default-img.png'
-import IconBag from '~/assets/images/timesheet/icon_bag.png'
 import TimesheetCalendar from './component/TimesheetCalendar'
+import TimesheetInfo from './component/TimesheetInfo'
+import localeVI from 'antd/es/date-picker/locale/vi_VN'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { filterTimesheet, getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
+import { IPaging, ISort } from '~/types/api-response.interface'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
 
 const Timesheet: React.FC = () => {
+  const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
+  const { Option } = Select
   const [t] = useTranslation()
+  const authSate = useAppSelector((state) => state.auth)
+  const userGroup = authSate?.userInfo?.groupProfiles ? authSate?.userInfo?.groupProfiles[0]?.groupCode : ''
+  const groupsSate = useAppSelector((state) => state.timesheet.groups)
+  const timesheetSate = useAppSelector((state) => state.timesheet)
+  const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const [isOpenModal, setIsOpenModal] = useState(false)
+  const [selectedGroup, setSelectedGroup] = useState(userGroup)
+  const [selectedUser, setSelectedUser] = useState('')
   const [mode, setMode] = useState('calendar')
 
-  const handleClickAddReason = (record: IAttendance) => {
+  const [searchValue, setSearchValue] = useState<{
+    query: string
+    group?: string | null
+    userId?: string | null
+    startDate?: string | null
+    endDate?: string | null
+    paging: IPaging
+    sorts: ISort[]
+  }>({
+    query: '',
+    paging: {
+      page: 0,
+      size: 10,
+      total: 0,
+      totalPage: 0
+    },
+    sorts: [
+      {
+        direction: 'DESC',
+        field: 'date'
+      }
+    ]
+  })
+
+  const handleClickAddReason = () => {
     setIsOpenModal(true)
   }
 
@@ -27,34 +64,51 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectDate = (dataSelected: any) => {
-    console.log(dayjs(dataSelected[0]).format('DD/MM/YYYY'))
-    console.log(dayjs(dataSelected[1]).format('DD/MM/YYYY'))
+    setSearchValue((prevState) => {
+      return {
+        ...prevState,
+        startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
+        endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T00:00:00Z`
+      }
+    })
   }
 
   const columns: ColumnsType<IAttendance> = [
+    {
+      title: t('Họ tên'),
+      dataIndex: 'userName',
+      key: 'userName',
+      render: (userName) => {
+        return userName || 'Nguyễn Đức Anh'
+      }
+    },
     {
       title: t('Ngày điểm danh'),
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
-      render: (date) => {
-        return dayjs(date).format('DD/MM/YYYY')
+      render: (date, record) => {
+        return (
+          <span className={`${record.status === 'late' || record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
+            {dayjs(date).format('DD/MM/YYYY')}
+          </span>
+        )
       }
     },
     {
       title: t('Thời gian đến'),
-      dataIndex: 'timeStart',
-      key: 'timeStart',
-      render: (timeStart, record) => {
-        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{timeStart || '--'}</span>
+      dataIndex: 'startTime',
+      key: 'startTime',
+      render: (startTime, record) => {
+        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{startTime || '--'}</span>
       }
     },
     {
       title: t('Thời gian về'),
-      dataIndex: 'timeEnd',
-      key: 'timeEnd',
-      render: (timeEnd, record) => {
-        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{timeEnd || '--'}</span>
+      dataIndex: 'endTime',
+      key: 'endTime',
+      render: (endTime, record) => {
+        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{endTime || '--'}</span>
       }
     },
     {
@@ -78,7 +132,7 @@ const Timesheet: React.FC = () => {
               <Button
                 className='tw-border-none'
                 size='middle'
-                onClick={() => handleClickAddReason(record)}
+                onClick={() => handleClickAddReason()}
                 icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
               >
                 Thêm lý do
@@ -104,88 +158,144 @@ const Timesheet: React.FC = () => {
     { id: '56abc', date: '2023-07-30', timeStart: '', timeEnd: '', status: '' }
   ]
 
+  function handleTableChange(
+    pagination: TablePaginationConfig,
+    filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<any> | any
+  ) {
+    setSearchValue((prevState) => {
+      const paging: IPaging = {
+        ...prevState.paging,
+        page: Number(pagination.current) - 1,
+        size: pagination.pageSize as number
+      }
+      const sorts: ISort[] = []
+      if (sorter.order) {
+        sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
+      } else {
+        sorts.push({
+          direction: 'DESC',
+          field: 'date'
+        })
+      }
+      return { ...prevState, paging, sorts }
+    })
+  }
+
+  useEffect(() => {
+    const promise = dispatch(getAllGroup())
+    setSearchValue((prevState) => {
+      return { ...prevState, group: selectedGroup }
+    })
+    return () => promise.abort()
+  }, [])
+
+  useEffect(() => {
+    const promise = dispatch(getUserInGroup(selectedGroup))
+    setSearchValue((prevState) => {
+      return { ...prevState, group: selectedGroup }
+    })
+    return () => promise.abort()
+  }, [selectedGroup])
+
+  useEffect(() => {
+    setSearchValue((prevState) => {
+      return { ...prevState, userId: selectedUser }
+    })
+  }, [selectedUser])
+
+  useEffect(() => {
+    const promise = dispatch(
+      filterTimesheet({
+        paging: searchValue.paging,
+        sorts: searchValue.sorts,
+        query: searchValue.query,
+        groupCode: searchValue.group,
+        startDate: searchValue.startDate,
+        endDate: searchValue.endDate,
+        userId: searchValue.userId
+      })
+    )
+    return () => {
+      promise.abort()
+    }
+  }, [searchValue])
+
   return (
     <Row className='timesheet tw-p-5'>
-      <Col xs={24} xl={4} className='timesheet-short'>
-        <div className='tw-text-center'>
-          <Image className='tw-max-w-[130px]' src={DefaultImage} alt='' />
-          <p className='timesheet-short__fullname'>Quản trị viên</p>
-          <p className='timesheet-short__department'>HTSC</p>
-          <div className='tw-flex tw-justify-center tw-items-center tw-mt-4'>
-            <img className='tw-max-w-[100%]' src={IconBag} alt='' />
-            <p>
-              <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{attendanceList?.length}</span>ngày công
-            </p>
-          </div>
-        </div>
-        <div className='timesheet-short-info'>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>23</span>giờ
-            </p>
-            <p>Làm thêm (OT)</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ bù</p>
-          </div>
-        </div>
-        <div className='timesheet-short-info timesheet-short-info--onbussiness'>
-          <div className='timesheet-short-info__item'>
-            <p className='tw-border-t-cyan-950'>
-              <span>0</span>ngày
-            </p>
-            <p>Đi công tác</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ phép</p>
-          </div>
-        </div>
-        <div className='timesheet-short-info timesheet-short-info--violate'>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>lần
-            </p>
-            <p>Vi phạm</p>
-          </div>
-          <div className='timesheet-short-info__item'>
-            <p>
-              <span>0</span>ngày
-            </p>
-            <p>Nghỉ không phép</p>
-          </div>
-        </div>
-        <div className='tw-mt-20'>
-          <Button className='tw-w-full tw-bg-blue-500 tw-text-white' size='middle' onClick={() => setIsOpenModal(true)}>
-            Thêm phép
-          </Button>
-        </div>
-        <div className='tw-mt-3'>
-          <Button
-            className='tw-w-full tw-border-blue-500 tw-text-blue-500'
-            size='middle'
-            onClick={() => setIsOpenModal(true)}
-          >
-            Thời gian làm việc cá nhân
-          </Button>
-        </div>
+      <Col xs={24} xl={6} xxl={4}>
+        <TimesheetInfo data={timesheetSate.timesheetList} handleOpenModal={setIsOpenModal} />
       </Col>
-      <Col xs={24} xl={20} className=' tw-bg-white tw-p-5'>
+      <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
-          <Col xs={24} lg={12}>
+          <Col xs={24} lg={18}>
             {mode === 'list' && (
-              <div className='tw-flex tw-items-center tw-mb-8'>
-                <div className='tw-mr-[10px]'>Thời gian thống kê:</div>
-                <RangePicker onChange={handleSelectDate} format='DD/MM/YYYY' placeholder={['Từ ngày', 'Đến ngày']} />
-              </div>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} lg={6}>
+                  <p className='tw-mb-2'>Lọc theo nhóm</p>
+                  <Select
+                    className='tw-w-full'
+                    showSearch
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.group')}`}
+                    optionFilterProp='children'
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    // allowClear
+                    onClear={() => setSelectedGroup(userGroup)}
+                    onChange={(value) => setSelectedGroup(value)}
+                    defaultValue={userGroup}
+                  >
+                    {groupsSate?.length > 0 &&
+                      groupsSate?.map((i) => (
+                        <Option key={i?.code} label={i?.name} value={i?.code}>
+                          {i?.name}
+                        </Option>
+                      ))}
+                  </Select>
+                </Col>
+                <Col xs={24} lg={6}>
+                  <p className='tw-mb-2'>Lọc theo nhân viên</p>
+                  <Select
+                    className='tw-w-full'
+                    showSearch
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('nhân viên')}`}
+                    optionFilterProp='children'
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                    allowClear
+                    // onClear={() => setUserOptions([])}
+                    onChange={(value) => setSelectedUser(value)}
+                  >
+                    {usersInGroupSate?.length > 0 &&
+                      usersInGroupSate?.map((i) => (
+                        <Option key={i?.userName} label={i?.userName} value={i?.userName}>
+                          {i?.userName}
+                        </Option>
+                      ))}
+                  </Select>
+                </Col>
+                <Col xs={24} lg={12}>
+                  <div className='timesheet-filter-time'>
+                    <div className='tw-mb-2'>Thời gian thống kê</div>
+                    <RangePicker
+                      onChange={handleSelectDate}
+                      format='DD/MM/YYYY'
+                      placeholder={['Từ ngày', 'Đến ngày']}
+                      locale={localeVI}
+                      defaultValue={[dayjs(), dayjs()]}
+                      allowClear={false}
+                      renderExtraFooter={() => (
+                        <div className='timesheet-filter-time__button'>
+                          <Button size='small'>Hôm nay</Button>
+                          <Button size='small'>Tháng này</Button>
+                          <Button size='small'>Tháng trước</Button>
+                        </div>
+                      )}
+                    />
+                  </div>
+                </Col>
+              </Row>
             )}
           </Col>
-          <Col xs={24} lg={12} className='tw-text-right'>
+          <Col xs={24} lg={6} className='timesheet-filter-tab'>
             <Segmented
               options={[
                 { label: 'Lịch', value: 'calendar' },
@@ -198,19 +308,21 @@ const Timesheet: React.FC = () => {
         </Row>
         {mode === 'list' && (
           <>
-            <DaySelected data={attendanceList} />
+            <DaySelected data={timesheetSate.timesheetList} />
             <div className='tw-mt-6'>
               <Table
                 rowKey='id'
                 columns={columns}
-                dataSource={attendanceList}
-                // loading={userState.loading}
+                dataSource={timesheetSate.timesheetList}
+                loading={timesheetSate.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+                onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
               />
+              <Checkbox onChange={() => void {}}>Chỉ hiển thị ngày vi phạm chưa có phép</Checkbox>
             </div>
           </>
         )}
-        {mode === 'calendar' && <TimesheetCalendar />}
+        {mode === 'calendar' && <TimesheetCalendar data={attendanceList} handleOpenModal={setIsOpenModal} />}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>

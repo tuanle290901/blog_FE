@@ -5,6 +5,7 @@
     background-color: #fff;
     border-right: solid 1px #c7c4c4;
     padding: 20px;
+    height: 100%;
 
     &__fullname,
     &__department {
@@ -56,6 +57,25 @@
         p:first-child {
           border-color: #f5222d;
         }
+      }
+
+      &__add {
+        background: #1890ff;
+        color: #fff;
+        width: 100%;
+        border-radius: 0;
+      }
+
+      &__add:hover {
+        color: #fff !important;
+      }
+
+      &__config {
+        background: #fff;
+        color: #1890ff;
+        width: 100%;
+        border-color: #1890ff;
+        border-radius: 0;
       }
     }
   }
@@ -113,18 +133,18 @@
 
     &::before {
       background-color: #73d13d;
-      width: 6px;
-      height: 6px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       content: '';
       position: absolute;
       top: 50%;
-      left: -8px;
+      left: -10px;
       transform: translate(-50%, -50%);
     }
 
     &__violate::before {
-      background-color: #ff4d4f;
+      background-color: #d46b08;
       content: '';
     }
 
@@ -133,29 +153,61 @@
       content: '';
     }
   }
-}
 
-.events {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+  &-filter {
+    background: #fff;
+    padding: 20px;
 
-.events .ant-badge-status {
-  width: 100%;
-  overflow: hidden;
-  font-size: 12px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+    &-time {
+      &__button {
+        display: flex;
+        padding: 10px;
 
-.notes-month {
-  font-size: 28px;
-  text-align: center;
-}
+        button {
+          margin-right: 10px;
+          background: #1890ff;
+          color: #fff;
 
-.notes-month section {
-  font-size: 28px;
+          :hover {
+            color: #fff !important;
+          }
+        }
+      }
+    }
+
+    &-tab {
+      text-align: right;
+
+      .ant-segmented-item {
+        text-transform: uppercase;
+
+        &-selected {
+          border: solid 1px #1890ff;
+          color: #1890ff;
+          background: #e6f7ff;
+        }
+      }
+    }
+  }
+
+  &-form {
+    .ant-segmented-item {
+      &-selected {
+        border: solid 1px #1890ff;
+        color: #1890ff;
+        background: #e6f7ff;
+      }
+    }
+  }
+
+  &-calendar {
+    thead tr {
+      text-align: center;
+    }
+    tbody tr {
+      text-align: left;
+    }
+  }
 }
 
 .timesheet .ant-picker-calendar-header {
