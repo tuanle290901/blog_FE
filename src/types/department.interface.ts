@@ -65,12 +65,12 @@ export interface IDepartmentTitle {
 
 export interface updateUserRole {
   groupCode: string | null | undefined
-  updateRoles: updateRoles[]
+  updateRoles: updateRoles[] | []
 }
 
 export interface updateRoles {
-  role: string
-  userName: string
+  role: string | null | undefined
+  userName: string | null | undefined
 }
 
 export interface DataInfoDepartment {
