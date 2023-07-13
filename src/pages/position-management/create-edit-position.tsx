@@ -78,7 +78,7 @@ const CreateEditPosition: React.FC<{
         >
           <Input placeholder={'Nhập tên chúc vụ'} />
         </FormItem>
-        <FormItem name='Mô tả' label='Mô tả'>
+        <FormItem name='description' label='Mô tả'>
           <TextArea placeholder={'Mô tả cho chức vụ'} />
         </FormItem>
       </Form>
