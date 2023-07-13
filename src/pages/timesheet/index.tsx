@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, Col, DatePicker, Row, Segmented, Select, Table } from 'antd'
 // import DaySelected from './component/DaySelected'
 import './style.scss'
-import { ColumnsType } from 'antd/es/table'
+import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
 import { IAttendance } from '~/types/attendance.interface'
@@ -12,21 +12,46 @@ import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
 import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
+import { filterTimesheet, getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
+import { IPaging, ISort } from '~/types/api-response.interface'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
   const [t] = useTranslation()
-  const groupsData = useAppSelector((state) => state.timesheet.groups)
-  const usersData = useAppSelector((state) => state.timesheet.userInGroup)
+  const authSate = useAppSelector((state) => state.auth)
+  const userGroup = authSate?.userInfo?.groupProfiles ? authSate?.userInfo?.groupProfiles[0]?.groupCode : ''
+  const groupsSate = useAppSelector((state) => state.timesheet.groups)
+  const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const [isOpenModal, setIsOpenModal] = useState(false)
-  const [currentGroup, setCurrentGroup] = useState('')
-  const [currentUser, setCurrentUser] = useState('')
+  const [selectedGroup, setSelectedGroup] = useState(userGroup)
+  const [selectedUser, setSelectedUser] = useState('')
   const [mode, setMode] = useState('calendar')
 
-  const handleClickAddReason = (record: IAttendance) => {
+  const [searchValue, setSearchValue] = useState<{
+    query: string
+    group?: string | null
+    paging: IPaging
+    sorts: ISort[]
+  }>({
+    query: '',
+    paging: {
+      page: 0,
+      size: 10,
+      total: 0,
+      totalPage: 0
+    },
+    sorts: [
+      {
+        direction: 'DESC',
+        field: 'date'
+      }
+    ]
+  })
+
+  const handleClickAddReason = () => {
     setIsOpenModal(true)
   }
 
@@ -90,7 +115,7 @@ const Timesheet: React.FC = () => {
               <Button
                 className='tw-border-none'
                 size='middle'
-                onClick={() => handleClickAddReason(record)}
+                onClick={() => handleClickAddReason()}
                 icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
               >
                 Thêm lý do
@@ -116,26 +141,53 @@ const Timesheet: React.FC = () => {
     { id: '56abc', date: '2023-07-30', timeStart: '', timeEnd: '', status: '' }
   ]
 
-  // const usersData = [
-  //   {
-  //     fullName: '',
-  //     userName: 'Nguyễn Văn A'
-  //   },
-  //   {
-  //     fullName: '',
-  //     userName: 'Nguyễn Văn B'
-  //   }
-  // ]
+  function handleTableChange(
+    pagination: TablePaginationConfig,
+    filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<any> | any
+  ) {
+    setSearchValue((prevState) => {
+      const paging: IPaging = {
+        ...prevState.paging,
+        page: Number(pagination.current) - 1,
+        size: pagination.pageSize as number
+      }
+      const sorts: ISort[] = []
+      if (sorter.order) {
+        sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
+      } else {
+        sorts.push({
+          direction: 'DESC',
+          field: 'date'
+        })
+      }
+      return { ...prevState, paging, sorts }
+    })
+  }
 
   useEffect(() => {
     const promise = dispatch(getAllGroup())
     return () => promise.abort()
-  }, [dispatch])
+  }, [])
 
   useEffect(() => {
-    const promise = dispatch(getUserInGroup(currentGroup as string))
+    const promise = dispatch(getUserInGroup(selectedGroup))
     return () => promise.abort()
-  }, [currentGroup, dispatch])
+  }, [selectedGroup])
+
+  useEffect(() => {
+    const promise = dispatch(
+      filterTimesheet({
+        paging: searchValue.paging,
+        sorts: searchValue.sorts,
+        query: searchValue.query,
+        groupCode: searchValue.group
+      })
+    )
+    return () => {
+      promise.abort()
+    }
+  }, [searchValue])
 
   return (
     <Row className='timesheet tw-p-5'>
@@ -156,11 +208,12 @@ const Timesheet: React.FC = () => {
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                     allowClear
-                    onClear={() => setCurrentGroup('')}
-                    onChange={(value) => setCurrentGroup(value)}
+                    onClear={() => void {}}
+                    onChange={(value) => setSelectedGroup(value)}
+                    defaultValue={userGroup}
                   >
-                    {groupsData &&
-                      groupsData?.map((i) => (
+                    {groupsSate?.length > 0 &&
+                      groupsSate?.map((i) => (
                         <Option key={i?.code} label={i?.name} value={i?.code}>
                           {i?.name}
                         </Option>
@@ -176,11 +229,11 @@ const Timesheet: React.FC = () => {
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                     allowClear
-                    onClear={() => setCurrentUser('')}
-                    onChange={(value) => setCurrentUser(value)}
+                    // onClear={() => setUserOptions([])}
+                    onChange={(value) => setSelectedUser(value)}
                   >
-                    {usersData &&
-                      usersData?.map((i) => (
+                    {usersInGroupSate?.length > 0 &&
+                      usersInGroupSate?.map((i) => (
                         <Option key={i?.userName} label={i?.userName} value={i?.userName}>
                           {i?.userName}
                         </Option>
@@ -229,6 +282,7 @@ const Timesheet: React.FC = () => {
                 dataSource={attendanceList}
                 // loading={userState.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+                onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
               />
               <Checkbox onChange={() => void {}}>Chỉ hiển thị ngày vi phạm chưa có phép</Checkbox>
             </div>
