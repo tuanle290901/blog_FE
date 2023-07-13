@@ -6,7 +6,7 @@ import requestProcess from '~/stores/features/setting/ticket-process.slice'
 import timesheetSlice from './features/timesheet/timesheet.slice'
 import departmentSlice from './features/department/department.silce'
 import ticketProcess from '~/stores/features/setting/ticket-process.slice'
-
+import positionSlice from '~/stores/features/position/position.slice.ts'
 import masterDataSlice from '~/stores/features/master-data/master-data.slice.ts'
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -18,7 +18,8 @@ export const store = configureStore({
     timesheet: timesheetSlice,
     department: departmentSlice,
     ticketProcess,
-    masterData: masterDataSlice
+    masterData: masterDataSlice,
+    position: positionSlice
   }
 })
 
