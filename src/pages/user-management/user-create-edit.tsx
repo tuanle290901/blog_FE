@@ -226,17 +226,9 @@ const UserCreateEdit: React.FC<{
                   {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
                   {/*</Select>*/}
                   <Radio.Group name='genderType' className='tw-w-full'>
-                    <div className='tw-flex tw-gap-4 tw-justify-center tw-w-full'>
-                      <div className=' tw-bg-white tw-rounded-md tw-border tw-w-1/2 tw-border-solid tw-px-1 tw-py-1 tw-border-gray-300'>
-                        <Radio className='tw-w-full' value={GENDER.MALE}>
-                          {t('userList.male')}
-                        </Radio>
-                      </div>
-                      <div className=' tw-bg-white tw-rounded-md tw-border tw-w-1/2 tw-border-solid tw-px-1 tw-py-1 tw-border-gray-300'>
-                        <Radio className='tw-w-full' value={GENDER.FEMALE}>
-                          {t('userList.female')}
-                        </Radio>
-                      </div>
+                    <div className='tw-flex tw-gap-32 tw-border tw-border-gray-300 tw-border-solid  tw-bg-white tw-py-1 tw-px-2 tw-rounded-md'>
+                      <Radio value={GENDER.MALE}>{t('userList.male')}</Radio>
+                      <Radio value={GENDER.FEMALE}>{t('userList.female')}</Radio>
                     </div>
                   </Radio.Group>
                 </Form.Item>
