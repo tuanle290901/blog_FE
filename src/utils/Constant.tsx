@@ -10,3 +10,10 @@ export const SETTING = {
     REQUEST_THREE: 'requestThree'
   }
 }
+
+export const ROlE_STORAGE = {
+  SUB_MANAGER: 'SUB_MANAGER',
+  MANAGER: 'MANAGER',
+  OFFICER: 'OFFICER',
+  SYSTEM_ADMIN: 'SYSTEM_ADMIN'
+}

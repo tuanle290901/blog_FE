@@ -26,19 +26,25 @@ export interface IDepartmentModal {
   dataParent?: IDepartmentTitle[] | []
 }
 
-export interface ListDataType {
-  name: string
-  email?: string
-  picture: string
-  loading: boolean
-  role: string
-  id?: number
+export interface ListDataUserGroup {
+  fullName: string
+  userName?: string
+  avatarBase64?: string | null
+  id?: string | ''
+  groupProfiles?: GroupProfiles[] | []
+}
+
+export interface GroupProfiles {
+  title?: string | ''
+  groupCode?: string | ''
+  groupName?: string | ''
+  role?: string | ''
 }
 export interface DataMemberRender {
-  listDataUp: ListDataType[]
-  listDataDown: ListDataType[]
-  listDataUpFilter?: ListDataType[]
-  listDataDownFilter?: ListDataType[]
+  listDataUp: ListDataUserGroup[]
+  listDataDown: ListDataUserGroup[]
+  listDataUpFilter?: ListDataUserGroup[]
+  listDataDownFilter?: ListDataUserGroup[]
 }
 
 export interface IDepartment {
@@ -55,4 +61,22 @@ export interface IDepartment {
 export interface IDepartmentTitle {
   name?: string | ''
   code?: string | ''
+}
+
+export interface updateUserRole {
+  groupCode: string | null | undefined
+  updateRoles: updateRoles[]
+}
+
+export interface updateRoles {
+  role: string
+  userName: string
+}
+
+export interface DataInfoDepartment {
+  code: string
+  managers: ListDataUserGroup[]
+  name: string
+  status: string
+  subManagers: ListDataUserGroup[]
 }
