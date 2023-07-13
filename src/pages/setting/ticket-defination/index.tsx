@@ -7,11 +7,11 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { EditOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Form, Space, Tooltip, notification } from 'antd'
+import { Button, Form, Space, Tabs, Tooltip, notification } from 'antd'
 import Target from './component/Target'
 
 import iconAdd from '~/assets/images/setting/add.png'
-import iconHalfArrow from '~/assets/images/setting/half-arrow.png'
+import iconTickDone from '~/assets/images/setting/tick-done.png'
 import {
   addDroppedItem,
   addNewApprovalStep,
@@ -20,7 +20,7 @@ import {
   removeApprovalStep
 } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { DragItem, DropItem, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
+import { DragItem, DropItem, TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
 import BottomControl from './component/BottomControl'
 import FormInitName from './component/FormInitName'
 import ModalInitAttr from './component/ModalInitAttrr'
@@ -141,9 +141,18 @@ const Index: FC = memo(function Index() {
 
   const removeStep = (item: DropItem, index: number) => {
     if (index >= 0 && index < ticketRequestPayloadRef.current.revision.processNodes.length) {
-      ticketRequestPayloadRef.current.revision.processNodes.splice(index, 1)
+      ticketRequestPayloadRef.current.revision.processNodes.splice(index + 1, 1)
     }
-    dispatch(removeApprovalStep({ index }))
+    dispatch(removeApprovalStep({ index: index }))
+  }
+
+  const isValidStep = (index: number) => {
+    let isVaid = false
+    const item = ticketRequestPayloadRef.current.revision
+    if (item.processNodes[index].groupCode && item.processNodes[index].attributes[0].name) {
+      isVaid = true
+    }
+    return isVaid
   }
 
   const onSaveAll = () => {
@@ -181,6 +190,8 @@ const Index: FC = memo(function Index() {
     }
 
     if (isModalInitAttrOpen.status) {
+      console.log(isModalInitAttrOpen)
+      console.log(ticketRequestPayloadRef.current)
       const modalFormData = ticketRequestPayloadRef.current.revision.processNodes.find(
         (item, index) => Number(index) === Number(isModalInitAttrOpen.key)
       )
@@ -196,104 +207,132 @@ const Index: FC = memo(function Index() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
-        {!ticketInfo?.isFinished && <FormInitName form={form} onContinue={onContinue} />}
+        <Tabs
+          defaultActiveKey='0'
+          tabPosition={'left'}
+          style={{ height: 'calc(100vh - 100px)' }}
+          items={new Array(5).fill(null).map((_, i) => {
+            const id = String(i)
+            return {
+              label: `Biểu mẫu đăng ký nghỉ phép -${id}`,
+              key: id,
+              disabled: i === 28,
+              children: (
+                <>
+                  {!ticketInfo?.isFinished && <FormInitName form={form} onContinue={onContinue} />}
 
-        {ticketInfo?.isFinished && (
-          <>
-            <div className='tw-h-1/4'>
-              <div className='department-title  tw-text-lg tw-mt-3 tw-mb-[25px]'>
-                <span className='tw-font-semibold'>{ticketInfo.name}</span>
-                <span className='tw-ml-2 tw-cursor-pointer' onClick={onUpdateTicketName}>
-                  <EditOutlined />
-                </span>
-              </div>
-              <Space align='start' wrap>
-                {sourceBoxes?.map((item, index) => {
-                  return (
-                    <React.Fragment key={index}>
-                      <Source id={item.id} name={item.name} />
-                    </React.Fragment>
-                  )
-                })}
-                <img src={iconAdd} alt='add-department' />
-              </Space>
-            </div>
+                  {ticketInfo?.isFinished && (
+                    <>
+                      <div className='tw-h-1/4'>
+                        <div className='department-title  tw-text-lg tw-mt-3 tw-mb-[25px]'>
+                          <span className='tw-font-semibold'>{ticketInfo.name}</span>
+                          <span className='tw-ml-2 tw-cursor-pointer' onClick={onUpdateTicketName}>
+                            <EditOutlined />
+                          </span>
+                        </div>
+                        <Space align='start' wrap>
+                          {sourceBoxes?.map((item, index) => {
+                            return (
+                              <React.Fragment key={index}>
+                                <Source id={item.id} name={item.name} />
+                              </React.Fragment>
+                            )
+                          })}
+                          <img src={iconAdd} alt='add-department' />
+                        </Space>
+                      </div>
 
-            <div className='list-item-target tw-h-3/4'>
-              <div className='item-tartget__top'>
-                <div className='button-start-end' onClick={() => openModalInitAttr(0)}>
-                  <span className='dot' style={{ backgroundColor: '#1890ff' }} /> Khởi tạo phép
-                </div>
-                <span className='tw-text-blue-600'>----------</span>
-                <div
-                  className='target-box-container'
-                  style={{
-                    overflowY: targetBoxes?.length > 1 ? 'auto' : 'unset'
-                  }}
-                >
-                  {targetBoxes.map((item, index) => {
-                    return (
-                      <>
-                        <div
-                          className='tw-flex tw-flex-col tw-items-center tw-justify-center'
-                          key={index}
-                          style={{ maxWidth: '50%' }}
-                        >
-                          <div className='tw-mb-3'>Duyệt lần {index + 1}</div>
-                          <Target
-                            key={item.key}
-                            targetKey={item.key}
-                            onDrop={handleDrop}
-                            dropItem={item}
-                            canDropItem={canDropItem}
-                          />
-                          <Space className='tw-mt-3'>
-                            {index !== 0 && (
-                              <Tooltip title={'Xóa bước duyệt'}>
-                                <Button shape='circle' onClick={() => removeStep(item, index)}>
-                                  <MinusOutlined />
-                                </Button>
-                              </Tooltip>
-                            )}
+                      <div className='list-item-target tw-h-3/4'>
+                        <div className='item-tartget__top'>
+                          <div
+                            className='button-start-end'
+                            style={{ border: isValidStep(0) ? '1px solid #0100ff' : '1px solid #d9d9d9' }}
+                            onClick={() => openModalInitAttr(0)}
+                          >
+                            <span
+                              className='dot'
+                              style={{
+                                backgroundColor: '#1890ff'
+                              }}
+                            />
+                            <span> Khởi tạo phép</span>
+                          </div>
+                          <span className='tw-text-blue-600'>----------</span>
+                          <div
+                            className='target-box-container'
+                            style={{
+                              overflowY: targetBoxes?.length > 1 ? 'auto' : 'unset'
+                            }}
+                          >
+                            {targetBoxes.map((item, index) => {
+                              return (
+                                <>
+                                  <div
+                                    className='tw-flex tw-flex-col tw-items-center tw-justify-center'
+                                    key={index}
+                                    style={{ maxWidth: '50%' }}
+                                  >
+                                    <div className='tw-mb-3'>Duyệt lần {index + 1}</div>
+                                    <Target
+                                      key={item.key}
+                                      targetKey={item.key}
+                                      onDrop={handleDrop}
+                                      dropItem={item}
+                                      canDropItem={canDropItem}
+                                      isValidStep={() => isValidStep(index + 1)}
+                                    />
+                                    <Space className='tw-mt-3'>
+                                      {index !== 0 && (
+                                        <Tooltip title={'Xóa bước duyệt'}>
+                                          <Button shape='circle' onClick={() => removeStep(item, index)}>
+                                            <MinusOutlined />
+                                          </Button>
+                                        </Tooltip>
+                                      )}
 
-                            <Tooltip title={'Cập nhật thông tin thuộc tính'}>
-                              <Button
-                                shape='circle'
-                                onClick={() => openModalInitAttr(index + 1)}
-                                disabled={targetBoxes[index].data.length === 0}
-                              >
-                                <EditOutlined />
-                              </Button>
-                            </Tooltip>
+                                      <Tooltip title={'Cập nhật thông tin thuộc tính'}>
+                                        <Button
+                                          shape='circle'
+                                          onClick={() => openModalInitAttr(index + 1)}
+                                          disabled={targetBoxes[index].data.length === 0}
+                                        >
+                                          <EditOutlined />
+                                        </Button>
+                                      </Tooltip>
 
-                            {index === targetBoxes.length - 1 && (
-                              <Tooltip title={'Thêm bước duyệt'}>
-                                <Button shape='circle' onClick={addNewStep}>
-                                  <PlusOutlined />
-                                </Button>
-                              </Tooltip>
-                            )}
-                          </Space>
+                                      {index === targetBoxes.length - 1 && (
+                                        <Tooltip title={'Thêm bước duyệt'}>
+                                          <Button shape='circle' onClick={addNewStep}>
+                                            <PlusOutlined />
+                                          </Button>
+                                        </Tooltip>
+                                      )}
+                                    </Space>
+                                  </div>
+
+                                  {index !== targetBoxes.length - 1 && (
+                                    <span className='tw-text-blue-600 tw-min-w-[60px]'>----------</span>
+                                  )}
+                                </>
+                              )
+                            })}
+                          </div>
+                          <span className='tw-text-blue-600'>----------</span>
+                          {/* <img src={iconHalfArrow} alt='arrow' /> */}
+                          <div className='button-start-end tw-flex tw-items-center tw-justify-center'>
+                            <span className='dot' style={{ backgroundColor: '#52c41a' }} /> Trạng thái cuối
+                          </div>
                         </div>
 
-                        {index !== targetBoxes.length - 1 && (
-                          <span className='tw-text-blue-600 tw-min-w-[60px]'>----------</span>
-                        )}
-                      </>
-                    )
-                  })}
-                </div>
-                <span className='tw-text-blue-600'>----------</span>
-                {/* <img src={iconHalfArrow} alt='arrow' /> */}
-                <div className='button-start-end tw-flex tw-items-center tw-justify-center'>
-                  <span className='dot' style={{ backgroundColor: '#52c41a' }} /> Trạng thái cuối
-                </div>
-              </div>
-
-              <BottomControl onSave={onSaveAll} />
-            </div>
-          </>
-        )}
+                        <BottomControl onSave={onSaveAll} />
+                      </div>
+                    </>
+                  )}
+                </>
+              )
+            }
+          })}
+        />
       </div>
       <ModalInitAttr
         isModalInitAttrOpen={isModalInitAttrOpen}
