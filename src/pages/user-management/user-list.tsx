@@ -173,7 +173,7 @@ const UserList: React.FC = () => {
       key: 'groupProfiles',
       render: (text, record) => {
         const value = record.groupProfiles.map((item) => {
-          return item.title
+          return item.groupName
         })
         return <span>{value.join(',')}</span>
       },
