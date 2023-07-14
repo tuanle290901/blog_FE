@@ -143,7 +143,7 @@ const Timesheet: React.FC = () => {
 
   const columns: ColumnsType<IAttendance> = [
     {
-      title: t('Họ tên'),
+      title: t('timesheet.fullName'),
       dataIndex: 'userName',
       key: 'userName',
       ellipsis: true,
@@ -155,7 +155,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Ngày điểm danh'),
+      title: t('timesheet.attendanceDate'),
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
@@ -171,7 +171,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Thời gian đến'),
+      title: t('timesheet.startTime'),
       dataIndex: 'startTime',
       key: 'startTime',
       sorter: true,
@@ -182,7 +182,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Thời gian về'),
+      title: t('timesheet.endTime'),
       dataIndex: 'endTime',
       key: 'endTime',
       sorter: true,
@@ -193,7 +193,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Trạng thái'),
+      title: t('timesheet.status'),
       key: 'status',
       align: 'center',
       render: (_, record) => {
@@ -202,12 +202,12 @@ const Timesheet: React.FC = () => {
             {record?.status === 'ontime' ? (
               <div>
                 <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-3' />
-                Đúng giờ
+                {t('timesheet.ontime')}
               </div>
             ) : record?.status === 'waiting' ? (
               <div>
                 <MinusCircleFilled className='tw-text-[#096DD9] tw-mr-3' />
-                Đang chờ duyệt
+                {t('timesheet.waiting')}
               </div>
             ) : (
               <Button
@@ -216,7 +216,7 @@ const Timesheet: React.FC = () => {
                 onClick={() => handleClickAddReason()}
                 icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
               >
-                Thêm ghi chú
+                {t('timesheet.addNewNote')}
               </Button>
             )}
           </div>
@@ -304,7 +304,7 @@ const Timesheet: React.FC = () => {
             {mode === 'list' && (
               <Row gutter={[16, 16]}>
                 <Col xs={24} lg={6}>
-                  <p className='tw-mb-2'>Lọc theo nhóm</p>
+                  <p className='tw-mb-2'>{t('timesheet.filterByGroup')}</p>
                   <Select
                     className='tw-w-full'
                     showSearch
@@ -325,11 +325,11 @@ const Timesheet: React.FC = () => {
                   </Select>
                 </Col>
                 <Col xs={24} lg={6}>
-                  <p className='tw-mb-2'>Lọc theo nhân viên</p>
+                  <p className='tw-mb-2'>{t('timesheet.filterByEmployee')}</p>
                   <Select
                     className='tw-w-full'
                     showSearch
-                    placeholder={`${t('rootInit.requiredSelect')} ${t('nhân viên')}`}
+                    placeholder={`${t('rootInit.requiredSelect')} ${t('timesheet.employee')}`}
                     optionFilterProp='children'
                     filterOption={(input, option) => {
                       return (option?.label + '').toLowerCase().includes(input.toLowerCase())
@@ -349,11 +349,11 @@ const Timesheet: React.FC = () => {
                 </Col>
                 <Col xs={24} lg={12}>
                   <div className='timesheet-filter-time'>
-                    <div className='tw-mb-2'>Thời gian thống kê</div>
+                    <div className='tw-mb-2'>{t('timesheet.statisticalTime')}</div>
                     <RangePicker
                       onChange={handleSelectDate}
                       format='DD/MM/YYYY'
-                      placeholder={['Từ ngày', 'Đến ngày']}
+                      placeholder={[t('timesheet.from'), t('timesheet.to')]}
                       locale={localeVI}
                       defaultValue={[dayjs(), dayjs()]}
                       value={[selectedStartDate, selectedEndDate]}
@@ -361,13 +361,13 @@ const Timesheet: React.FC = () => {
                       renderExtraFooter={() => (
                         <div className='timesheet-filter-time__button'>
                           <Button onClick={handleSelectToday} size='small'>
-                            Hôm nay
+                            {t('timesheet.today')}
                           </Button>
                           <Button onClick={handleSelectThisMonth} size='small'>
-                            Tháng này
+                            {t('timesheet.thisMonth')}
                           </Button>
                           <Button onClick={handleSelectLastMonth} size='small'>
-                            Tháng trước
+                            {t('timesheet.lastMonth')}
                           </Button>
                         </div>
                       )}
@@ -380,8 +380,8 @@ const Timesheet: React.FC = () => {
           <Col xs={24} lg={6} className='timesheet-filter-tab'>
             <Segmented
               options={[
-                { label: 'Lịch', value: 'calendar' },
-                { label: 'Danh sách', value: 'list' }
+                { label: t('timesheet.calendar'), value: 'calendar' },
+                { label: t('timesheet.list'), value: 'list' }
               ]}
               defaultValue='calendar'
               onChange={(v) => setMode(v.toString())}
@@ -400,7 +400,7 @@ const Timesheet: React.FC = () => {
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
               />
-              <Checkbox onChange={() => void {}}>Chỉ hiển thị ngày vi phạm chưa có phép</Checkbox>
+              <Checkbox onChange={() => void {}}>{t('timesheet.showOnlyViolateDate')}</Checkbox>
             </div>
           </>
         )}
