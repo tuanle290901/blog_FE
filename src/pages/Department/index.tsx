@@ -1,33 +1,32 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { PlusOutlined } from '@ant-design/icons'
-import { Col, Input, Row, Space, Table, Tooltip } from 'antd'
+import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Col, Input, Row, Space, Table, TableColumnsType } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconBackSVG from '~/assets/svg/iconback'
-import IconDeleteSVG from '~/assets/svg/iconDelete'
-import IconEditSVG from '~/assets/svg/iconEdit'
-import IconTeamSVG from '~/assets/svg/iconTeam'
 import CommonButton from '~/components/Button/CommonButton'
 import { getListDepartments } from '~/stores/features/department/department.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 
-import './index.scss'
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
+import './index.scss'
 
 const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
 
-  const listDataDepartments: DataType[] = useAppSelector((state) => state.department.listData)
-  const isLoading = useAppSelector((state) => state.department.loading)
+  const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
+  const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
     listData: DataType[]
     listDataTitle: IDepartmentTitle[]
@@ -124,9 +123,8 @@ const Department: React.FC = () => {
     return filteredData
   }
 
-  function getListDataByNameOrCodeOrEmail(data: DataType[], keyword: string) {
+  const getListDataByNameOrCodeOrEmail = useCallback((data: DataType[], keyword: string): DataType[] => {
     const filteredData: DataType[] = []
-
     function getListDataByKey(listData: DataType[]) {
       for (const item of listData) {
         if (item.code.includes(keyword) || item.name?.includes(keyword)) {
@@ -139,30 +137,35 @@ const Department: React.FC = () => {
     }
     getListDataByKey(data)
     return filteredData
-  }
-  const getParentByKey = (listData: DataType[], targetKey: IDepartmentTitle): IDepartmentTitle[] => {
+  }, [])
+
+  const getParentByKey = useCallback((listData: DataType[], targetKey: IDepartmentTitle): IDepartmentTitle[] => {
     const parentList: IDepartmentTitle[] = []
     if (targetKey) {
       for (const item of listData) {
-        if (item.children && item.children.length > 0) {
-          const child = item.children.find((childItem: DataType) => childItem.code === targetKey.code)
-          if (child) {
-            parentList.push({ code: item.code, name: item.name })
-            parentList.push({ code: targetKey.code, name: targetKey.name })
-            break
-          } else {
-            const result = getParentByKey(item.children, targetKey)
-            if (result.length > 0) {
+        if (item.code === targetKey.code) {
+          parentList.push({ code: item.code, name: item.name })
+        } else {
+          if (item.children && item.children.length > 0) {
+            const child = item.children.find((childItem: DataType) => childItem.code === targetKey.code)
+            if (child) {
               parentList.push({ code: item.code, name: item.name })
-              parentList.push(...result)
+              parentList.push({ code: targetKey.code, name: targetKey.name })
               break
+            } else {
+              const result = getParentByKey(item.children, targetKey)
+              if (result.length > 0) {
+                parentList.push({ code: item.code, name: item.name })
+                parentList.push(...result)
+                break
+              }
             }
           }
         }
       }
     }
     return parentList
-  }
+  }, [])
 
   useEffect(() => {
     if (useSelect) {
@@ -222,7 +225,7 @@ const Department: React.FC = () => {
   }
 
   const columns = useMemo(() => {
-    const dataRenderColumns = [
+    const dataRenderColumns: TableColumnsType<DataType> = [
       {
         title: 'Name',
         dataIndex: 'name',
@@ -281,61 +284,41 @@ const Department: React.FC = () => {
           return <div className='tw-text-center'>Actions</div>
         },
         key: 'actions',
-        width: 200,
-        className: 'tw-text-center',
+        align: 'center',
+        width: '120px',
         render: (text: string, record: DataType) => (
-          <Space size='middle'>
-            <Tooltip title={t('edit')}>
-              <span
-                onClick={() => {
-                  setShowModal({
-                    openModal: true,
-                    type: ACTION_TYPE.Updated,
-                    data: record,
-                    dataParent: dataRender.listDataTitle
-                  })
-                }}
-              >
-                <IconEditSVG width={21} height={23} />
-              </span>
-            </Tooltip>
-            <Tooltip title={t('team')}>
-              <div
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  setShowModal({
-                    openModal: true,
-                    type: ACTION_TYPE.View,
-                    data: record,
-                    dataParent: dataRender.listDataTitle
-                  })
-                }}
-              >
-                <span>
-                  <IconTeamSVG width={21} height={23} fill='' />
-                </span>
-              </div>
-            </Tooltip>
-            <Tooltip title={t('delete')}>
-              {/* <Popconfirm
-            title={t('xóa')}
-            description={t('xóa')}
-            onConfirm={() => {
-              console.log('â')
-              onDelete(record)
-            }}
-            okText={t('delete')}
-            cancelText={t('cancel')}
-          > */}
-              <span
-                onClick={() => {
-                  onDelete(record)
-                }}
-              >
-                <IconDeleteSVG width={21} height={23} />
-              </span>
-              {/* </Popconfirm> */}
-            </Tooltip>
+          <Space size='small'>
+            <Button
+              size='small'
+              onClick={() => {
+                setShowModal({
+                  openModal: true,
+                  type: ACTION_TYPE.Updated,
+                  data: record,
+                  dataParent: dataRender.listDataTitle
+                })
+              }}
+              icon={<EditOutlined className='tw-text-blue-600' />}
+            />
+            <Button
+              size='small'
+              onClick={() => {
+                setShowModal({
+                  openModal: true,
+                  type: ACTION_TYPE.View,
+                  data: record,
+                  dataParent: dataRender.listDataTitle
+                })
+              }}
+              icon={<UserOutlined className='tw-text-orange-600' />}
+            />
+            <Button
+              size='small'
+              onClick={() => {
+                onDelete(record)
+              }}
+              icon={<DeleteOutlined className='tw-text-red-600' />}
+            />
           </Space>
         )
       }
@@ -402,15 +385,14 @@ const Department: React.FC = () => {
   }
 
   return (
-    <div className='tw-p-[20px] tw-bg-white page-department'>
+    <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
       <Row className='tw-w-100'>
-        <div
-          className='tw-cursor-pointer tw-w-[42px] tw-h-[42px] tw-rounded-sm tw-border-solid 
-          tw-border-[1px] tw-border-[#d9d9d9] tw-flex tw-items-center tw-justify-center tw-mr-[15px]'
+        <Button
+          size='large'
+          className='tw-mr-[15px]'
           onClick={() => onBackPageSize()}
-        >
-          <IconBackSVG width={11} height={16} fill='' />
-        </div>
+          icon={<IconBackSVG width={11} height={16} fill='' />}
+        />
         <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-3xl'>
           {dataRender?.listDataTitle.map((item: any, index) => {
             return (
@@ -419,14 +401,15 @@ const Department: React.FC = () => {
                 onClick={() => {
                   onRendered(item)
                 }}
+                className='tw-ml-[5px]'
               >
-                {`${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? '->' : ''}`}
+                {` ${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? ' ->  ' : ' '}`}
               </span>
             )
           })}
         </h1>
       </Row>
-      <Row className='tw-w-100 tw-flex tw-justify-end tw-my-[20px]'>
+      <Row className='tw-w-100 tw-flex tw-justify-start tw-my-[20px]'>
         <Col span={12}>
           <CommonButton
             loading={false}
@@ -443,7 +426,7 @@ const Department: React.FC = () => {
                 dataParent: dataRender.listDataTitle
               })
             }}
-            icon={<PlusOutlined />}
+            icon={<PlusOutlined className='tw-text-600' />}
             title={'add'}
           />
         </Col>
@@ -478,7 +461,7 @@ const Department: React.FC = () => {
           expandable={expandableConfig}
           pagination={false}
           style={{ width: '100%' }}
-          scroll={{ y: '650px' }}
+          scroll={{ y: 'calc(100vh - 360px)' }}
           rowKey={(record: DataType) => record.code}
         />
       </Row>
