@@ -1,9 +1,10 @@
 import React from 'react'
 import { IPropsIconSVG } from '~/types/common-svg'
 
-const IconUserDownSVG: React.FC<IPropsIconSVG> = ({ width, height }) => {
+const IconUserDownSVG: React.FC<IPropsIconSVG> = ({ width, height, className }) => {
   return (
     <svg
+      className={className}
       width={width || '16'}
       height={height || '16'}
       viewBox='0 0 16 17'

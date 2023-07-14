@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { Col, Input, List, Modal, Row, notification } from 'antd'
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import { Button, Col, Input, List, Modal, Row, notification } from 'antd'
+import { HttpStatusCode } from 'axios'
+import React, { ChangeEvent, useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconStartSVG from '~/assets/svg/iconStart'
 import IconUserDownSVG from '~/assets/svg/iconUserDown'
@@ -23,6 +25,8 @@ const { Search } = Input
 const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, data } = props
   const { t } = useTranslation()
+  const prevDataRef = useRef<any>(null)
+  const prevShowModalRef = useRef<any>(null)
   const [initLoading, setInitLoading] = useState(false)
   const [listDataRender, setListDataRender] = useState<DataMemberRender>({
     listDataUp: [],
@@ -59,10 +63,12 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data && showModal === true && (prevDataRef.current !== data || prevShowModalRef.current !== showModal)) {
       getDetpartmentsByCode(data.code)
     }
-  }, [data])
+    prevDataRef.current = data
+    prevShowModalRef.current = showModal
+  }, [data, showModal])
 
   const onSaveData = async () => {
     try {
@@ -82,8 +88,8 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
           }
         })
       }
-      const response = await HttpService.post(END_POINT_API.Department.updateUserRole(), payload)
-      if (response.status === 200) {
+      const response = await HttpService.put(END_POINT_API.Department.updateUserRole(), payload)
+      if (response.status === HttpStatusCode.Ok) {
         notification.success({ message: 'Updating user from department success' })
         onOk()
       }
@@ -219,15 +225,14 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
                     </h4>
                     <p> {item.groupProfiles && item.groupProfiles[0].title}</p>
                   </Col>
-                  <Col span={1} className='tw-flex tw-justify-end'>
-                    <span
-                      className='tw-flex tw-m-auto'
+                  <Col span={1} className=' tw-justify-end tw-text-center tw-m-auto'>
+                    <Button
+                      size='small'
                       onClick={() => {
                         onClickDown(item)
                       }}
-                    >
-                      <IconUserDownSVG />
-                    </span>
+                      icon={<IconUserDownSVG className='tw-text-600' />}
+                    />
                   </Col>
                 </Row>
               )
@@ -257,15 +262,14 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
                     </h4>
                     <p> {item.groupProfiles && item.groupProfiles[0].title} </p>
                   </Col>
-                  <Col span={1} className='tw-flex tw-justify-end'>
-                    <span
-                      className='tw-flex tw-m-auto'
+                  <Col span={1} className='tw-justify-end tw-text-center tw-m-auto'>
+                    <Button
+                      size='small'
                       onClick={() => {
                         onClickUp(item)
                       }}
-                    >
-                      <IconUserUpSVG />
-                    </span>
+                      icon={<IconUserUpSVG />}
+                    />
                   </Col>
                 </Row>
               )

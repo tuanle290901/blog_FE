@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Input, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import { Button, Input, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,14 +20,15 @@ import { IDevice } from '~/types/device.interface.ts'
 const DeviceList: React.FC = () => {
   const [t] = useTranslation()
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-  const listData: IDevice[] = useAppSelector((state) => state.device.listData)
+  const listData: IDevice[] = useAppSelector((state: any) => state.device.listData)
   const timerId = useRef<any>(null)
+  const meta: IPaging = useAppSelector((state: any) => state.device.meta)
   const handleClickDeleteUser = (record: IDevice) => {
     console.log(record)
   }
 
-  const editingDevice = useAppSelector((state) => state.device.editingDevice)
-  const filter = useAppSelector((state) => state.device.filter)
+  const editingDevice = useAppSelector((state: any) => state.device.editingDevice)
+  const filter = useAppSelector((state: any) => state.device.filter)
 
   const dispatch = useAppDispatch()
   const [searchValue, setSearchValue] = useState<{
@@ -89,11 +90,11 @@ const DeviceList: React.FC = () => {
       {
         key: '',
         title: t('device.action'),
-        width: '250px',
+        width: '120px',
         align: 'center',
         render: (_, record: IDevice) => {
           return (
-            <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+            <Space size='small'>
               <Button
                 size='small'
                 onClick={() => handleClickEditDevice(record)}
@@ -104,7 +105,7 @@ const DeviceList: React.FC = () => {
                 onClick={() => handleClickDeleteUser(record)}
                 icon={<DeleteOutlined className='tw-text-red-600' />}
               />
-            </div>
+            </Space>
           )
         }
       }
@@ -115,7 +116,7 @@ const DeviceList: React.FC = () => {
   const handleCloseModal = () => {
     setIsOpenModal(false)
     dispatch(cancelEditingDevice())
-    if (JSON.parse(filter) !== '') {
+    if (filter && JSON.parse(filter) !== '') {
       setSearchValue({
         ...JSON.parse(filter)
       })
@@ -174,7 +175,9 @@ const DeviceList: React.FC = () => {
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <CreateEditDevice open={isOpenModal} deviceData={editingDevice} handleClose={handleCloseModal} />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>{t('device.deviceListTitle')}(100)</h1>
+        <h1 className='tw-text-3xl tw-font-semibold'>
+          {t('device.deviceListTitle')}({meta.total})
+        </h1>
         <h5 className='tw-text-sm'>{t('device.deviceListSubTitle')}</h5>
       </div>
       <div className='tw-flex tw-my-3 tw-justify-between '>
@@ -200,6 +203,30 @@ const DeviceList: React.FC = () => {
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+          pagination={{
+            className: 'd-flex justify-content-end align-items-center',
+            current: meta && meta.page + 1,
+            total: meta?.total,
+            defaultPageSize: meta?.size,
+            pageSize: meta?.size,
+            pageSizeOptions: ['10', '25', '50'],
+            showSizeChanger: true,
+            showQuickJumper: true,
+            locale: {
+              items_per_page: `/ ${t('pagination.page')}`,
+              next_page: t('pagination.nextPage'),
+              prev_page: t('pagination.prevPage'),
+              jump_to: t('pagination.jumpTo'),
+              page: t('pagination.page')
+            },
+
+            position: ['bottomRight']
+            // onChange: (page: number, pageSize: number) => {
+            //   if (handlePropsChange) {
+            //     handlePropsChange(page, pageSize)
+            //   }
+            // }
+          }}
         />
       </div>
     </div>
