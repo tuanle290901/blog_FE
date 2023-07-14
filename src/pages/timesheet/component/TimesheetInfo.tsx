@@ -18,7 +18,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
       <div className='tw-text-center'>
         <Image
           className='tw-max-w-[130px] tw-rounded-[50%]'
-          src={`data:image/png;base64,${userInfo?.avatarBase64}` || DefaultImage}
+          src={userInfo?.avatarBase64 ? `data:image/png;base64,${userInfo?.avatarBase64}` : DefaultImage}
           alt=''
         />
         <p className='timesheet-short__fullname'>{userInfo?.fullName || userInfo?.userName}</p>
@@ -30,60 +30,67 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
         <div className='tw-flex tw-justify-center tw-items-center tw-mt-4'>
           <img className='tw-max-w-[100%]' src={IconBag} alt='' />
           <p>
-            <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{data?.length}</span>ngày công
+            <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{data?.length}</span>
+            {t('timesheet.workingDay')}
           </p>
         </div>
       </div>
       <div className='timesheet-short-info'>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>1</span>giờ
+            <span>1</span>
+            {t('timesheet.hour')}
           </p>
-          <p>Làm thêm (OT)</p>
+          <p>{t('timesheet.overtime')}</p>
         </div>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>0</span>ngày
+            <span>0</span>
+            {t('timesheet.day')}
           </p>
-          <p>Nghỉ bù</p>
+          <p>{t('timesheet.compensatoryLeave')}</p>
         </div>
       </div>
       <div className='timesheet-short-info timesheet-short-info--onbussiness'>
         <div className='timesheet-short-info__item'>
           <p className='tw-border-t-cyan-950'>
-            <span>0</span>ngày
+            <span>0</span>
+            {t('timesheet.day')}
           </p>
-          <p>Đi công tác</p>
+          <p>{t('timesheet.bussinessTrip')}</p>
         </div>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>0</span>ngày
+            <span>0</span>
+            {t('timesheet.day')}
           </p>
-          <p>Nghỉ phép</p>
+          <p>{t('timesheet.approvedLeave')}</p>
         </div>
       </div>
       <div className='timesheet-short-info timesheet-short-info--violate'>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>0</span>lần
+            <span>0</span>
+            {t('timesheet.bout')}
           </p>
-          <p>Vi phạm</p>
+          <p>{t('timesheet.violate')}</p>
         </div>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>0</span>ngày
+            <span>0</span>
+            {t('timesheet.day')}
           </p>
-          <p>Nghỉ không phép</p>
+          <p>{t('timesheet.leaveWithoutReason')}</p>
         </div>
       </div>
       <div className='tw-mt-20'>
         <Button className='timesheet-short-info__add' size='middle' onClick={() => handleOpenModal(true)}>
-          Thêm phép
+          {t('timesheet.requestLeave')}
         </Button>
       </div>
       <div className='tw-mt-3'>
         <Button className='timesheet-short-info__config' size='middle' onClick={() => handleOpenModal(true)}>
-          Thời gian làm việc cá nhân
+          {t('timesheet.personalWorkingTime')}
         </Button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Calendar, Space, Button, Tooltip } from 'antd'
 import { LeftOutlined, RightOutlined, PlusCircleFilled, CheckCircleFilled, FieldTimeOutlined } from '@ant-design/icons'
-// import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import type { CellRenderInfo } from 'rc-picker/lib/interface'
@@ -18,7 +18,7 @@ interface ITimeKeeping {
 }
 
 const TimesheetCalendar: React.FC<{ data: IAttendance[]; handleOpenModal: any }> = ({ handleOpenModal }) => {
-  // const [t] = useTranslation()
+  const [t] = useTranslation()
   const [currentMonth, setCurrentMonth] = useState(dayjs())
 
   const listTimeKeeping = [
@@ -47,49 +47,51 @@ const TimesheetCalendar: React.FC<{ data: IAttendance[]; handleOpenModal: any }>
         renderCell?.date === dayjs(value).format('YYYY-MM-DD') && (
           <div key={renderCell?.date}>
             {renderCell?.data?.map((cellContent: ITimeKeepingNote, index) => (
-              <>
-                <div key={index}>
+              <div key={index}>
+                <div>
                   {cellContent?.status === 'ontime' ? (
                     <Tooltip
                       title={
                         <div>
                           <div className='tw-flex'>
-                            <span className='tw-mr-3'>Giờ đến:</span>
+                            <span className='tw-mr-3'>{t('timesheet.startTime')}:</span>
                             <span className='tw-ml-auto'>{cellContent?.startTime}</span>
                           </div>
                           <div className='tw-flex'>
-                            <span className='tw-mr-3'>Giờ về:</span>
+                            <span className='tw-mr-3'>{t('timesheet.endTime')}:</span>
                             <span className='tw-ml-auto'>{cellContent?.endTime}</span>
                           </div>
                         </div>
                       }
-                      color='#389E0D'
+                      color='#52c41a'
                     >
-                      <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-3' />
-                      Đúng giờ
+                      <CheckCircleFilled className='tw-text-[#52c41a] tw-mr-3' />
+                      {t('timesheet.ontime')}
                     </Tooltip>
                   ) : cellContent?.status === 'early' || cellContent?.status === 'late' ? (
                     <Tooltip
-                      className='tw-text-[#FA8C16]'
+                      className='tw-text-[#f5222d]'
                       title={
                         <div>
-                          <div className={`tw-flex ${cellContent?.status === 'early' ? '' : 'tw-text-[#CF1322]'}`}>
-                            <span className='tw-mr-3'>Giờ đến:</span>
+                          <div className={`tw-flex ${cellContent?.status === 'early' ? '' : 'tw-text-[#f5222d]'}`}>
+                            <span className='tw-mr-3'>{t('timesheet.startTime')}:</span>
                             <span className='tw-ml-auto'>{cellContent?.startTime}</span>
                           </div>
-                          <div className={`tw-flex ${cellContent?.status === 'early' ? 'tw-text-[#CF1322]' : ''}`}>
-                            <span className='tw-mr-3'>Giờ về:</span>
+                          <div className={`tw-flex ${cellContent?.status === 'early' ? 'tw-text-[#f5222d]' : ''}`}>
+                            <span className='tw-mr-3'>{t('timesheet.endTime')}:</span>
                             <span className='tw-ml-auto'>{cellContent?.endTime}</span>
                           </div>
                         </div>
                       }
                       color='#FFC069'
                     >
-                      <FieldTimeOutlined className='tw-text-[#FA8C16] tw-mr-3' />
-                      {cellContent?.status === 'early' ? 'Về sớm' : 'Đến muộn'}
+                      <FieldTimeOutlined className='tw-text-[#f5222d] tw-mr-3' />
+                      {cellContent?.status === 'early'
+                        ? t('timesheet.leavingTheCompanyEarly')
+                        : t('timesheet.lateForWork')}
                     </Tooltip>
                   ) : (
-                    <p>Không có dữ liệu</p>
+                    <p>{t('timesheet.nodata')}</p>
                   )}
                 </div>
                 <div>
@@ -104,11 +106,11 @@ const TimesheetCalendar: React.FC<{ data: IAttendance[]; handleOpenModal: any }>
                       onClick={() => handleOpenModal(true)}
                       icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
                     >
-                      Thêm lý do
+                      {t('timesheet.addNewNote')}
                     </Button>
                   )}
                 </div>
-              </>
+              </div>
             ))}
           </div>
         )

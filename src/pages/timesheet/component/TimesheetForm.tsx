@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Col, DatePicker, Form, Input, message, Modal, Row, Segmented, Select, TimePicker } from 'antd'
+import React from 'react'
+import { Col, DatePicker, Form, Input, message, Modal, Row, Select, TimePicker } from 'antd'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 
@@ -25,7 +25,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
   return (
     <Modal
       open={open}
-      title={t('Đăng ký nghỉ phép')}
+      title={t('timesheet.registerForLeave')}
       onCancel={handleClose}
       onOk={handleSubmit}
       okText={t('common.save')}
@@ -37,10 +37,10 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
       <div className='tw-my-4'>
         <Form form={form} layout='vertical'>
           <div className='tw-mb-3'>
-            <div>Thời gian</div>
+            <div>{t('timesheet.time')}</div>
             <Row gutter={[16, 16]} className='tw-items-center tw-mt-3'>
               <Col xs={4} className='tw-text-[#BFBFBF]'>
-                Từ
+                {t('timesheet.from')}
               </Col>
               <Col xs={20}>
                 <Row gutter={[16, 16]}>
@@ -53,13 +53,13 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                         }}
                         showToday={false}
                         className='tw-w-full'
-                        placeholder={t('Chọn ngày')}
+                        placeholder={t('timesheet.selectDate')}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={12}>
                     <Form.Item className='tw-mb-0' name='startTime'>
-                      <TimePicker showNow={false} placeholder='Chọn giờ' className='tw-w-full' />
+                      <TimePicker showNow={false} placeholder={t('timesheet.selectHour')} className='tw-w-full' />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -67,7 +67,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
             </Row>
             <Row gutter={[16, 16]} className='tw-items-center tw-mt-3'>
               <Col xs={4} className='tw-text-[#BFBFBF]'>
-                Đến
+                {t('timesheet.to')}
               </Col>
               <Col xs={20}>
                 <Row gutter={[16, 16]}>
@@ -80,7 +80,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                         }}
                         showToday={false}
                         className='tw-w-full'
-                        placeholder={t('Chọn ngày')}
+                        placeholder={t('timesheet.selectDate')}
                       />
                     </Form.Item>
                   </Col>
@@ -91,7 +91,7 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
                         //   return time.isBefore(form.getFieldValue('startTime'))
                         // }}
                         showNow={false}
-                        placeholder='Chọn giờ'
+                        placeholder={t('timesheet.selectHour')}
                         className='tw-w-full'
                       />
                     </Form.Item>
@@ -100,16 +100,16 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
               </Col>
             </Row>
           </div>
-          <Form.Item className='tw-mb-3' label={t('Loại phép')} name='type'>
-            <Select placeholder={t('Loại phép')}>
+          <Form.Item className='tw-mb-3' label={t('timesheet.kindOfLeave')} name='type'>
+            <Select placeholder={t('timesheet.kindOfLeave')}>
               <Select.Option value='phep'>{t('Nghỉ phép')}</Select.Option>
               <Select.Option value='om'>{t('Nghỉ ốm')}</Select.Option>
               <Select.Option value='thaisan'>{t('Nghỉ thai sản')}</Select.Option>
               <Select.Option value='cuoi'>{t('Nghỉ cưới')}</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item className='tw-mb-3' label={t('Ghi chú')} name='reason'>
-            <Input.TextArea rows={3} placeholder={t('Ghi chú')} allowClear />
+          <Form.Item className='tw-mb-3' label={t('timesheet.note')} name='reason'>
+            <Input.TextArea rows={3} placeholder={t('timesheet.note')} allowClear />
           </Form.Item>
         </Form>
       </div>
