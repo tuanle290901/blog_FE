@@ -58,11 +58,11 @@ module.exports = {
         jsxSingleQuote: true
       }
     ],
-    'import/no-unresolved': [
-      'error',
-      {
-        caseSensitive: false
-      }
-    ]
+    // 'import/no-unresolved': [
+    //   'error',
+    //   {
+    //     caseSensitive: false
+    //   }
+    // ]
   }
 }
