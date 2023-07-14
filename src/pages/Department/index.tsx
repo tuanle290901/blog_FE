@@ -1,13 +1,12 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import './index.scss'
-
 import { PlusOutlined } from '@ant-design/icons'
 import { Col, Input, Row, Space, Table, Tooltip } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router'
 import IconBackSVG from '~/assets/svg/iconback'
 import IconDeleteSVG from '~/assets/svg/iconDelete'
 import IconEditSVG from '~/assets/svg/iconEdit'
@@ -18,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 
+import './index.scss'
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
 
@@ -140,7 +140,7 @@ const Department: React.FC = () => {
     getListDataByKey(data)
     return filteredData
   }
-  const getParentByKey = (listData: DataType[], targetKey: IDepartmentTitle) => {
+  const getParentByKey = (listData: DataType[], targetKey: IDepartmentTitle): IDepartmentTitle[] => {
     const parentList: IDepartmentTitle[] = []
     if (targetKey) {
       for (const item of listData) {
@@ -182,7 +182,7 @@ const Department: React.FC = () => {
         ]
       })
     }
-  }, [useSelect, listDataDepartments])
+  }, [useSelect, listDataDepartments, getParentByKey])
 
   useEffect(() => {
     if (isLoading === false && listDataDepartments.length > 0) {
@@ -227,6 +227,7 @@ const Department: React.FC = () => {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
+        width: '250px',
         render: (value: string, record: DataType) => {
           return (
             <span
@@ -237,33 +238,43 @@ const Department: React.FC = () => {
               {value}
             </span>
           )
-        }
+        },
+        ellipsis: true
       },
       {
         title: 'code',
         dataIndex: 'code',
         key: 'code',
-        width: '100px'
+        width: '100px',
+        ellipsis: true
       },
       {
         title: 'address',
         dataIndex: 'address',
-        key: 'address'
+        key: 'address',
+        width: '250px',
+        ellipsis: true
       },
       {
         title: 'contactPhoneNumber',
         dataIndex: 'contactPhoneNumber',
-        key: 'contactPhoneNumber'
+        key: 'contactPhoneNumber',
+        width: '150px',
+        ellipsis: true
       },
       {
         title: 'contactEmail',
         dataIndex: 'contactEmail',
-        key: 'contactEmail'
+        key: 'contactEmail',
+        width: '150px',
+        ellipsis: true
       },
       {
         title: 'publishDate',
         dataIndex: 'publishDate',
-        key: 'publishDate'
+        key: 'publishDate',
+        width: '150px',
+        ellipsis: true
       },
       {
         title: () => {
@@ -285,7 +296,7 @@ const Department: React.FC = () => {
                   })
                 }}
               >
-                <IconEditSVG width={21} height={23} fill='' />
+                <IconEditSVG width={21} height={23} />
               </span>
             </Tooltip>
             <Tooltip title={t('team')}>
@@ -321,7 +332,7 @@ const Department: React.FC = () => {
                   onDelete(record)
                 }}
               >
-                <IconDeleteSVG width={21} height={23} fill='' />
+                <IconDeleteSVG width={21} height={23} />
               </span>
               {/* </Popconfirm> */}
             </Tooltip>
@@ -356,13 +367,14 @@ const Department: React.FC = () => {
     if (dataRender.listDataTitle.length > 1) {
       const listDataTitle: IDepartmentTitle[] = getParentByKey(
         listDataDepartments,
-        dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
+        dataRender.listDataTitle[dataRender.listDataTitle.length - 2]
+      )
+      const data = await getListDataByKey(
+        listDataDepartments,
+        dataRender.listDataTitle[dataRender.listDataTitle.length - 2]
       )
       await setDataRender({
-        listData: await getListDataByKey(
-          listDataDepartments,
-          dataRender.listDataTitle[dataRender.listDataTitle.length - 1]
-        ),
+        listData: data,
         listDataTitle: listDataTitle
       })
     } else if (dataRender.listDataTitle.length === 1) {
@@ -395,9 +407,7 @@ const Department: React.FC = () => {
         <div
           className='tw-cursor-pointer tw-w-[42px] tw-h-[42px] tw-rounded-sm tw-border-solid 
           tw-border-[1px] tw-border-[#d9d9d9] tw-flex tw-items-center tw-justify-center tw-mr-[15px]'
-          onClick={() => {
-            onBackPageSize()
-          }}
+          onClick={() => onBackPageSize()}
         >
           <IconBackSVG width={11} height={16} fill='' />
         </div>

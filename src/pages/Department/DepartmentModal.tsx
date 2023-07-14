@@ -1,10 +1,11 @@
 import { DatePicker, Form, Input, Modal } from 'antd'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_TRIM } from '~/constants/regex.constant'
 import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
-import { ACTION_TYPE, REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_TRIM } from '~/utils/helper'
+import { ACTION_TYPE } from '~/utils/helper'
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data, dataParent } = props

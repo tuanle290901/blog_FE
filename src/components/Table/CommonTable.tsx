@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table } from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
-import { ColumnType, ColumnGroupType, ExpandableConfig, Key, GetRowKey } from 'antd/es/table/interface'
+import { ColumnGroupType, ColumnType, ExpandableConfig, Key } from 'antd/es/table/interface'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
