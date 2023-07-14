@@ -98,7 +98,12 @@ const UserList: React.FC = () => {
       setSearchValue((prevState) => {
         return {
           ...prevState,
-          sorts: []
+          sorts: [
+            {
+              direction: 'DESC',
+              field: 'created_at'
+            }
+          ]
         }
       })
     }
@@ -284,14 +289,16 @@ const UserList: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
       <UserCreateEdit
         open={isOpenUserModal || !!userState.editingUser}
         userData={userState.editingUser}
         handleClose={handleCloseUserModal}
       />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>{t('userList.member')}(100)</h1>
+        <h1 className='tw-text-3xl tw-font-semibold'>
+          {t('userList.member')}({userState.meta.total})
+        </h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
@@ -314,7 +321,7 @@ const UserList: React.FC = () => {
           columns={columns}
           dataSource={userState.userList}
           loading={userState.loading}
-          pagination={{ total: searchValue.paging.total }}
+          pagination={{ total: userState.meta.total }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />

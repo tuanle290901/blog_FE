@@ -20,18 +20,6 @@ const initialState: IUserState = {
   meta: { page: 0, size: 10, total: 0, totalPage: 0 }
 }
 
-export const getListUser = createAsyncThunk('users/getAll', async (payload: any, thunkAPI) => {
-  // const response = await HttpService.get<IUser[]>('/api/user/getall', {
-  //   signal: thunkAPI.signal
-  // })
-  // return response.data
-  const fakeApi = new Promise<IUser[]>((resolve, reject) => {
-    setTimeout(() => {
-      resolve([])
-    }, 1000)
-  })
-  return await fakeApi
-})
 export const searchUser = createAsyncThunk(
   'users/search',
   async (params: { query: string; groupCode?: string | null; paging: IPaging; sorts: ISort[] }, thunkAPI) => {
@@ -136,9 +124,18 @@ export const createUser = createAsyncThunk('users/create', async (body: IUser, t
     throw error
   }
 })
-export const updateUser = createAsyncThunk('users/create', (body: { userId: string; newUser: IUser }, thunkAPI) => {
-  // TODO implement
-  return body
+export const updateUser = createAsyncThunk('users/create', async (body: { userId: string; user: IUser }, thunkAPI) => {
+  try {
+    const response: IApiResponse<IUser[]> = await HttpService.put(`/system-user/${body.userId}/update`, body.user, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
 })
 export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
   return userId

@@ -9,7 +9,7 @@ import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { GENDER, ROLE } from '~/constants/app.constant.ts'
-import { createUser } from '~/stores/features/user/user.slice.ts'
+import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, PHONE_NUMBER_REG } from '~/constants/regex.constant.ts'
 
 const UserCreateEdit: React.FC<{
@@ -120,10 +120,20 @@ const UserCreateEdit: React.FC<{
       }))
       const index = avatarBase64.indexOf(',')
       value.avatarBase64 = avatarBase64.slice(index + 1)
-      const payload: IUser = { ...value, groupProfiles, birthday: value.birthday?.format('YYYY-MM-DD') }
+      const payload: IUser = {
+        ...value,
+        groupProfiles,
+        birthday: value.birthday?.format('YYYY-MM-DD')
+      }
       try {
         setLoading(true)
-        await dispatch(createUser(payload))
+        if (userData) {
+          await dispatch(
+            updateUser({ userId: userData.id as string, user: { ...payload, userName: userData.userName } })
+          )
+        } else {
+          await dispatch(createUser(payload))
+        }
         finishAndClose(true)
       } catch (e) {
         finishAndClose(false)
@@ -202,8 +212,13 @@ const UserCreateEdit: React.FC<{
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.commonInfo')}</h3>
               <div className='tw-p-4 tw-bg-[#FAFAFA]'>
                 {userData?.userName && (
-                  <Form.Item style={{ marginBottom: 24 }} label={t('userList.username')} name='username'>
-                    <Input defaultValue={userData?.userName} disabled />
+                  <Form.Item
+                    initialValue={userData.userName}
+                    style={{ marginBottom: 24 }}
+                    label={t('userList.username')}
+                    name='username'
+                  >
+                    <Input disabled />
                   </Form.Item>
                 )}
                 <Form.Item
