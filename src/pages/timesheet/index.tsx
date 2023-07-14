@@ -29,6 +29,8 @@ const Timesheet: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [selectedUser, setSelectedUser] = useState('')
+  const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
+  const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
   const [mode, setMode] = useState('calendar')
 
   const [searchValue, setSearchValue] = useState<{
@@ -64,13 +66,79 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectDate = (dataSelected: any) => {
+    setSelectedStartDate(dayjs(dataSelected[0]))
+    setSelectedEndDate(dayjs(dataSelected[1]))
     setSearchValue((prevState) => {
       return {
         ...prevState,
         startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
-        endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T00:00:00Z`
+        endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T23:59:59Z`
       }
     })
+  }
+
+  const handleSelectToday = () => {
+    setSelectedStartDate(dayjs())
+    setSelectedEndDate(dayjs())
+    setSearchValue((prevState) => {
+      return {
+        ...prevState,
+        startDate: `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
+        endDate: `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
+      }
+    })
+  }
+
+  const handleSelectThisMonth = () => {
+    setSelectedStartDate(dayjs().startOf('M'))
+    setSelectedEndDate(dayjs().endOf('M'))
+    setSearchValue((prevState) => {
+      return {
+        ...prevState,
+        startDate: `${dayjs().startOf('M').format('YYYY-MM-DD')}T00:00:00Z`,
+        endDate: `${dayjs().endOf('M').format('YYYY-MM-DD')}T23:59:59Z`
+      }
+    })
+  }
+
+  const handleSelectLastMonth = () => {
+    setSelectedStartDate(
+      dayjs()
+        .month(dayjs().month() - 1)
+        .startOf('M')
+    )
+    setSelectedEndDate(
+      dayjs()
+        .month(dayjs().month() - 1)
+        .endOf('M')
+    )
+    setSearchValue((prevState) => {
+      return {
+        ...prevState,
+        startDate: `${dayjs()
+          .month(dayjs().month() - 1)
+          .startOf('M')
+          .format('YYYY-MM-DD')}T00:00:00Z`,
+        endDate: `${dayjs()
+          .month(dayjs().month() - 1)
+          .endOf('M')
+          .format('YYYY-MM-DD')}T23:59:59Z`
+      }
+    })
+  }
+
+  const handleSelectGroup = (value: string) => {
+    setSelectedGroup(value)
+    setSelectedUser('')
+  }
+
+  const getSortOrder = (filed: string) => {
+    const sort = searchValue.sorts[0]
+    if (sort && sort.field === filed) {
+      return searchValue.sorts[0].direction === 'ASC' ? 'ascend' : 'descend'
+    } else {
+      return null
+    }
   }
 
   const columns: ColumnsType<IAttendance> = [
@@ -78,8 +146,12 @@ const Timesheet: React.FC = () => {
       title: t('Họ tên'),
       dataIndex: 'userName',
       key: 'userName',
-      render: (userName) => {
-        return userName || 'Nguyễn Đức Anh'
+      ellipsis: true,
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('fullName'),
+      render: (userName, record) => {
+        return userName || `Nguyễn Đức Anh ${record?.userId?.slice(-2)}`
       }
     },
     {
@@ -87,6 +159,9 @@ const Timesheet: React.FC = () => {
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('date'),
       render: (date, record) => {
         return (
           <span className={`${record.status === 'late' || record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
@@ -99,6 +174,9 @@ const Timesheet: React.FC = () => {
       title: t('Thời gian đến'),
       dataIndex: 'startTime',
       key: 'startTime',
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('startTime'),
       render: (startTime, record) => {
         return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{startTime || '--'}</span>
       }
@@ -107,6 +185,9 @@ const Timesheet: React.FC = () => {
       title: t('Thời gian về'),
       dataIndex: 'endTime',
       key: 'endTime',
+      sorter: true,
+      showSorterTooltip: false,
+      sortOrder: getSortOrder('endTime'),
       render: (endTime, record) => {
         return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{endTime || '--'}</span>
       }
@@ -135,7 +216,7 @@ const Timesheet: React.FC = () => {
                 onClick={() => handleClickAddReason()}
                 icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
               >
-                Thêm lý do
+                Thêm ghi chú
               </Button>
             )}
           </div>
@@ -144,24 +225,10 @@ const Timesheet: React.FC = () => {
     }
   ]
 
-  const attendanceList: IAttendance[] = [
-    { id: '1abc', date: '2023-07-20', timeStart: '08:25', timeEnd: '17:26', status: 'early' },
-    { id: '2abc', date: '2023-07-21', timeStart: '08:20', timeEnd: '17:35', status: 'ontime' },
-    { id: '3abc', date: '2023-07-22', timeStart: '08:35', timeEnd: '17:32', status: 'late' },
-    { id: '4abc', date: '2023-07-23', timeStart: '', timeEnd: '', status: '' },
-    { id: '5abc', date: '2023-07-24', timeStart: '08:10', timeEnd: '17:45', status: 'ontime' },
-    { id: '6abc', date: '2023-07-25', timeStart: '07:10', timeEnd: '17:56', status: 'ontime' },
-    { id: '7abc', date: '2023-07-26', timeStart: '08:40', timeEnd: '17:51', status: 'late' },
-    { id: '8abc', date: '2023-07-27', timeStart: '07:10', timeEnd: '17:52', status: 'ontime' },
-    { id: '9abc', date: '2023-07-28', timeStart: '08:10', timeEnd: '17:55', status: 'ontime' },
-    { id: '10abc', date: '2023-07-29', timeStart: '09:10', timeEnd: '17:55', status: 'waiting' },
-    { id: '56abc', date: '2023-07-30', timeStart: '', timeEnd: '', status: '' }
-  ]
-
   function handleTableChange(
     pagination: TablePaginationConfig,
     filters: Record<string, FilterValue | null>,
-    sorter: SorterResult<any> | any
+    sorter: SorterResult<IAttendance> | any
   ) {
     setSearchValue((prevState) => {
       const paging: IPaging = {
@@ -172,12 +239,13 @@ const Timesheet: React.FC = () => {
       const sorts: ISort[] = []
       if (sorter.order) {
         sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
-      } else {
-        sorts.push({
-          direction: 'DESC',
-          field: 'date'
-        })
       }
+      //  else {
+      //   sorts.push({
+      //     direction: 'DESC',
+      //     field: 'date'
+      //   })
+      // }
       return { ...prevState, paging, sorts }
     })
   }
@@ -224,7 +292,11 @@ const Timesheet: React.FC = () => {
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
-        <TimesheetInfo data={timesheetSate.timesheetList} handleOpenModal={setIsOpenModal} />
+        <TimesheetInfo
+          data={timesheetSate.timesheetList}
+          userInfo={authSate.userInfo}
+          handleOpenModal={setIsOpenModal}
+        />
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
@@ -240,8 +312,8 @@ const Timesheet: React.FC = () => {
                     optionFilterProp='children'
                     filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
                     // allowClear
-                    onClear={() => setSelectedGroup(userGroup)}
-                    onChange={(value) => setSelectedGroup(value)}
+                    // onClear={() => setSelectedGroup(userGroup)}
+                    onChange={(value) => handleSelectGroup(value)}
                     defaultValue={userGroup}
                   >
                     {groupsSate?.length > 0 &&
@@ -264,6 +336,7 @@ const Timesheet: React.FC = () => {
                     }}
                     allowClear
                     // onClear={() => setUserOptions([])}
+                    value={selectedUser}
                     onChange={(value) => setSelectedUser(value)}
                   >
                     {usersInGroupSate?.length > 0 &&
@@ -283,12 +356,19 @@ const Timesheet: React.FC = () => {
                       placeholder={['Từ ngày', 'Đến ngày']}
                       locale={localeVI}
                       defaultValue={[dayjs(), dayjs()]}
+                      value={[selectedStartDate, selectedEndDate]}
                       allowClear={false}
                       renderExtraFooter={() => (
                         <div className='timesheet-filter-time__button'>
-                          <Button size='small'>Hôm nay</Button>
-                          <Button size='small'>Tháng này</Button>
-                          <Button size='small'>Tháng trước</Button>
+                          <Button onClick={handleSelectToday} size='small'>
+                            Hôm nay
+                          </Button>
+                          <Button onClick={handleSelectThisMonth} size='small'>
+                            Tháng này
+                          </Button>
+                          <Button onClick={handleSelectLastMonth} size='small'>
+                            Tháng trước
+                          </Button>
                         </div>
                       )}
                     />
@@ -324,7 +404,9 @@ const Timesheet: React.FC = () => {
             </div>
           </>
         )}
-        {mode === 'calendar' && <TimesheetCalendar data={attendanceList} handleOpenModal={setIsOpenModal} />}
+        {mode === 'calendar' && (
+          <TimesheetCalendar data={timesheetSate.timesheetList} handleOpenModal={setIsOpenModal} />
+        )}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
     </Row>
