@@ -14,7 +14,7 @@ import { LocalStorage } from '~/utils/local-storage'
 import { useTranslation } from 'react-i18next'
 import '../../layouts/style.scss'
 
-const LoginComponent: React.FC = () => {
+const Index: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -105,4 +105,4 @@ const LoginComponent: React.FC = () => {
     </div>
   )
 }
-export default LoginComponent
+export default Index
