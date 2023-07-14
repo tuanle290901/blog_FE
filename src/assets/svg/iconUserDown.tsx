@@ -1,7 +1,7 @@
 import React from 'react'
 import { IPropsIconSVG } from '~/types/common-svg'
 
-const IconUserDownSVG: React.FC<IPropsIconSVG> = ({ width, height, fill }) => {
+const IconUserDownSVG: React.FC<IPropsIconSVG> = ({ width, height }) => {
   return (
     <svg
       width={width || '16'}

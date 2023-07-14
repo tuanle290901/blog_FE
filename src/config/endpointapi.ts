@@ -3,5 +3,10 @@ export const END_POINT_API = {
     getByCode: (code: string) => `/org/group/${code}`,
     getBaseInfo: (code: string) => `/org/group/get-base-info/${code}`,
     updateUserRole: () => `/org/group/update/user-role`
+  },
+  Devices: {
+    create: () => `/attmachine/setup/register`,
+    update: () => `/attmachine/setup/update`,
+    getPageSize: () => `/attmachine/setup/filter`
   }
 }

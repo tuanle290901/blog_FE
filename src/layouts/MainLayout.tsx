@@ -3,7 +3,7 @@
 import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 
 import logo from '../assets/images/logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/carry-out.png'
@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { logout } from '~/stores/features/auth/auth.slice'
 import { PUBLIC_PATH } from '~/constants/public-routes'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -49,6 +50,12 @@ const MainLayout: React.FC = () => {
     dispatch(logout())
     navigate(`auth/${PUBLIC_PATH.login}`)
   }
+  useEffect(() => {
+    const getAllGroups = dispatch(getAllGroup())
+    return () => {
+      getAllGroups.abort()
+    }
+  }, [])
 
   const dropdownItems = useMemo(() => {
     return [
@@ -98,7 +105,8 @@ const MainLayout: React.FC = () => {
         null,
         [
           getItem('Thành viên', '/users', <img src={menuIconMember} alt='' className='menu-image' />),
-          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
+          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />),
+          getItem('Chức vụ', 'positions', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
         'group'
       ),
@@ -112,6 +120,7 @@ const MainLayout: React.FC = () => {
         [
           getItem('Cấu hình', 'setting', <img src={menuIconSetting} alt='' className='menu-image' />, [
             getItem('Thời gian làm việc', 'timeWorking'),
+            getItem('Danh sách thiết bị chấm công', 'devices'),
             getItem('Quy trình phê duyệt phép', 'ticket-process-definition')
           ])
         ],
