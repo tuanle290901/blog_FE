@@ -48,9 +48,12 @@ const Index: React.FC = () => {
 
   return (
     <div className='login-container tw-pt-[15%]'>
-      <Row className='login-logo-container tw-h-[12%]'>
+      <Row className='login-logo-container tw-h-[12%]' align='middle'>
         <Col xs={24} md={{ span: 16, offset: 4 }}>
-          <img src={logo} alt='logo' />
+          <div className='tw-flex tw-items-center'>
+            <img src={logo} alt='logo' />
+            <span className='tw-text-3xl tw-font-bold tw-text-sky-500 tw-ml-[10px]'>ATTENCDENCE</span>
+          </div>
         </Col>
       </Row>
 
@@ -58,7 +61,7 @@ const Index: React.FC = () => {
         <Col xs={24} md={{ span: 16, offset: 4 }}>
           <div className='title-one tw-flex tw-items-center'>
             <span>{t('auth.hello')}</span>
-            <img src={iconHand} alt='' className='tw-ml-[10px]' />
+            {/* <img src={iconHand} alt='' className='tw-ml-[10px]' /> */}
           </div>
           <div className='title-two tw-mt-[10px]'>{t('auth.loginToSystem')}</div>
         </Col>
