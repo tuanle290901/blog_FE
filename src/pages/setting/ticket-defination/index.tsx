@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { FC } from 'react'
-import React, { memo, useEffect, useState, useRef } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -11,16 +11,17 @@ import { Button, Form, Space, Tabs, Tooltip, notification } from 'antd'
 import Target from './component/Target'
 
 import iconAdd from '~/assets/images/setting/add.png'
-import iconTickDone from '~/assets/images/setting/tick-done.png'
 import {
   addDroppedItem,
   addNewApprovalStep,
   createRevision,
   fetchDepartments,
+  fetchListTicket,
+  getTicketById,
   removeApprovalStep
 } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { DragItem, DropItem, TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
+import { DragItem, DropItem, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 import BottomControl from './component/BottomControl'
 import FormInitName from './component/FormInitName'
 import ModalInitAttr from './component/ModalInitAttrr'
@@ -33,6 +34,9 @@ const Index: FC = memo(function Index() {
   const [initAttrForm] = Form.useForm()
   const sourceBoxes = useAppSelector((state) => state.ticketProcess.departments)
   const targetBoxes = useAppSelector((state) => state.ticketProcess.approvalSteps)
+  const tickets = useAppSelector((state) => state.ticketProcess.tickets)
+  const ticketSelected = useAppSelector((state) => state.ticketProcess.ticketSelected)
+  console.log(ticketSelected, 'selected')
 
   const [ticketInfo, setTicketInfo] = useState<TicketInitial>({ name: '', description: '', isFinished: false })
   const [isModalInitAttrOpen, setIsModalInitAttrOpen] = useState<{ key: string; status: boolean }>({
@@ -155,6 +159,10 @@ const Index: FC = memo(function Index() {
     return isVaid
   }
 
+  const onChangeTab = (tabId: string) => {
+    dispatch(getTicketById(tabId))
+  }
+
   const onSaveAll = () => {
     const targetBoxLen = targetBoxes.length
     let startNode = 0
@@ -174,6 +182,7 @@ const Index: FC = memo(function Index() {
   }
 
   useEffect(() => {
+    dispatch(fetchListTicket())
     dispatch(fetchDepartments())
   }, [dispatch])
 
@@ -183,6 +192,12 @@ const Index: FC = memo(function Index() {
       ticketRequestPayloadRef.current.description = ticketInfo.description
     }
   }, [ticketInfo])
+
+  useEffect(() => {
+    if (ticketSelected.length > 0) {
+      setTicketInfo({ name: ticketSelected[0]?.name, description: ticketSelected[0]?.description, isFinished: true })
+    }
+  }, [ticketSelected])
 
   useEffect(() => {
     if (!isModalInitAttrOpen.status) {
@@ -208,15 +223,14 @@ const Index: FC = memo(function Index() {
     <DndProvider backend={HTML5Backend}>
       <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
         <Tabs
-          defaultActiveKey='0'
+          defaultActiveKey='1'
           tabPosition={'left'}
           style={{ height: 'calc(100vh - 100px)' }}
-          items={new Array(5).fill(null).map((_, i) => {
-            const id = String(i)
+          onTabClick={onChangeTab}
+          items={tickets.map((item) => {
             return {
-              label: `Biểu mẫu đăng ký nghỉ phép -${id}`,
-              key: id,
-              disabled: i === 28,
+              label: item.title,
+              key: item.id,
               children: (
                 <>
                   {!ticketInfo?.isFinished && <FormInitName form={form} onContinue={onContinue} />}

@@ -1,7 +1,6 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
-import Department from '~/pages/department'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
 import TicketDefination from '~/pages/setting/ticket-defination'
@@ -10,6 +9,7 @@ import UserHistory from '~/pages/user-management/user-history.tsx'
 import UserList from '~/pages/user-management/user-list.tsx'
 
 import PositionList from '~/pages/position-management/position-list.tsx'
+import Department from '~/pages/Department'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -89,7 +89,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: 'requestWorkTime',
+    name: 'positions',
     path: PRIVATE_PATH.position,
     component: PositionList,
     allowedRoles: []

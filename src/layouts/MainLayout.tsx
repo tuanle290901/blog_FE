@@ -105,7 +105,8 @@ const MainLayout: React.FC = () => {
         null,
         [
           getItem('Thành viên', '/users', <img src={menuIconMember} alt='' className='menu-image' />),
-          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />)
+          getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />),
+          getItem('Chức vụ', 'positions', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
         'group'
       ),
