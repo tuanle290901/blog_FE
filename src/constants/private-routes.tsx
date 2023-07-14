@@ -9,7 +9,7 @@ import UserHistory from '~/pages/user-management/user-history.tsx'
 import UserList from '~/pages/user-management/user-list.tsx'
 
 import PositionList from '~/pages/position-management/position-list.tsx'
-import Department from '~/pages/Department'
+import Department from '~/pages/department'
 
 export const PRIVATE_PATH = {
   home: '/',
