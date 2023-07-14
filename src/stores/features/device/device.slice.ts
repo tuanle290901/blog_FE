@@ -91,7 +91,7 @@ export const getListDevice = createAsyncThunk(
       const response = await HttpService.post(END_POINT_API.Devices.getPageSize(), body, {
         signal: thunkAPI.signal
       })
-      return response?.data
+      return response
     } catch (error) {
       return thunkAPI.rejectWithValue(error)
     }
@@ -150,7 +150,10 @@ const devicesSlice = createSlice({
         state.loading = false
       })
       .addCase(getListDevice.fulfilled, (state, action) => {
-        state.listData = [...action.payload]
+        state.listData = [...action.payload.data]
+        state.meta = {
+          ...action.payload.meta
+        }
       })
       .addCase(updateDevice.pending, (state) => {
         state.loading = true
