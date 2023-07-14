@@ -4,16 +4,29 @@ import { useTranslation } from 'react-i18next'
 import DefaultImage from '~/assets/images/default-img.png'
 import IconBag from '~/assets/images/timesheet/icon_bag.png'
 import { IAttendance } from '~/types/attendance.interface'
+import { IUser } from '~/types/user.interface'
 
-const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any }> = ({ data, handleOpenModal }) => {
+const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userInfo: IUser | null }> = ({
+  data,
+  handleOpenModal,
+  userInfo
+}) => {
   const [t] = useTranslation()
 
   return (
     <div className='timesheet-short'>
       <div className='tw-text-center'>
-        <Image className='tw-max-w-[130px]' src={DefaultImage} alt='' />
-        <p className='timesheet-short__fullname'>Quản trị viên</p>
-        <p className='timesheet-short__department'>HTSC</p>
+        <Image
+          className='tw-max-w-[130px] tw-rounded-[50%]'
+          src={`data:image/png;base64,${userInfo?.avatarBase64}` || DefaultImage}
+          alt=''
+        />
+        <p className='timesheet-short__fullname'>{userInfo?.fullName || userInfo?.userName}</p>
+        <p className='timesheet-short__department'>
+          {userInfo?.groupProfiles
+            ? userInfo?.groupProfiles[0]?.groupName || userInfo?.groupProfiles[0]?.groupCode
+            : ''}
+        </p>
         <div className='tw-flex tw-justify-center tw-items-center tw-mt-4'>
           <img className='tw-max-w-[100%]' src={IconBag} alt='' />
           <p>
