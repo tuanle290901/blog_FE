@@ -114,7 +114,7 @@
     display: flex;
     align-items: center;
     position: relative;
-    margin-right: 23px;
+    margin-right: 28px;
     border-right: solid 1px #d9d9d9;
 
     &:last-child {
@@ -132,24 +132,24 @@
     }
 
     &::before {
-      background-color: #73d13d;
-      width: 9px;
-      height: 9px;
+      background-color: #52c41a;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       content: '';
       position: absolute;
       top: 50%;
-      left: -10px;
+      left: -12px;
       transform: translate(-50%, -50%);
     }
 
     &__violate::before {
-      background-color: #d46b08;
+      background-color: #f5222d;
       content: '';
     }
 
     &__waiting::before {
-      background-color: #096dd9;
+      background-color: #1890ff;
       content: '';
     }
   }
