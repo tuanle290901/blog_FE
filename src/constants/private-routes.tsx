@@ -89,7 +89,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: 'requestWorkTime',
+    name: 'positions',
     path: PRIVATE_PATH.position,
     component: PositionList,
     allowedRoles: []

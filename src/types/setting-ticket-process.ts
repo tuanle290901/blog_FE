@@ -24,7 +24,8 @@ export interface ITicketDef {
   departments: DragItem[]
   approvalSteps: IApprovalStep[]
   currentRequestId: string | null
-  tickets?: string | null
+  tickets: Ticket[]
+  ticketSelected: TicketDefRevisionCreateReq[]
 }
 
 export interface DragItem {
