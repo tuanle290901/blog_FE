@@ -1,5 +1,5 @@
 import Initialize from '~/pages/Initialize'
-import LoginComponent from '~/pages/login'
+import LoginComponent from '~/pages/Login'
 
 export interface IRoutes {
   path: string
