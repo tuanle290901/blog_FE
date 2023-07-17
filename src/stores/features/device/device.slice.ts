@@ -3,7 +3,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
-import { IPaging, ISort } from '~/types/api-response.interface'
+import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface'
 import { IDevice, IDeviceForm } from '~/types/device.interface'
 
 export interface IDeviceState {
@@ -88,7 +88,7 @@ export const getListDevice = createAsyncThunk(
           }
         ]
       }
-      const response = await HttpService.post(END_POINT_API.Devices.getPageSize(), body, {
+      const response: IApiResponse<IDevice[]> = await HttpService.post(END_POINT_API.Devices.getPageSize(), body, {
         signal: thunkAPI.signal
       })
       return response
@@ -150,9 +150,10 @@ const devicesSlice = createSlice({
         state.loading = false
       })
       .addCase(getListDevice.fulfilled, (state, action) => {
+        console.log(action?.payload)
         state.listData = [...action.payload.data]
         state.meta = {
-          ...action.payload.meta
+          ...action?.payload?.meta
         }
       })
       .addCase(updateDevice.pending, (state) => {
