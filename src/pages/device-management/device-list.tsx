@@ -120,6 +120,15 @@ const DeviceList: React.FC = () => {
       setSearchValue({
         ...JSON.parse(filter)
       })
+    } else {
+      dispatch(
+        getListDevice({
+          paging: searchValue.paging,
+          sorts: searchValue.sorts,
+          query: searchValue.query,
+          groupCode: searchValue.group
+        })
+      )
     }
     dispatch(resetValueFilter())
   }

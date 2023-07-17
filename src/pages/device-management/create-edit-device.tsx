@@ -45,6 +45,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
           id: deviceData.id
         })
       )
+      form.resetFields()
     } else {
       dispatch(createDevice(payload))
       form.resetFields()
@@ -52,12 +53,17 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
     handleClose()
   }
 
+  const onCancel = () => {
+    handleClose()
+    form.resetFields()
+  }
+
   return (
     <Modal
       open={open}
       title={t('device.addDevice')}
-      onCancel={handleClose}
-      onOk={handleSubmit}
+      onCancel={onCancel}
+      onOk={form.submit}
       okText={t('common.save')}
       cancelText={t('common.cancel')}
       maskClosable={false}
@@ -65,7 +71,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
       centered
     >
       <div className='tw-my-4'>
-        <Form form={form} layout='vertical'>
+        <Form form={form} layout='vertical' onFinish={handleSubmit}>
           <Form.Item style={{ marginBottom: 8 }} label={t('device.name')} name='name' required>
             <Input placeholder={t('device.enterName')} />
           </Form.Item>
@@ -92,6 +98,10 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
               {
                 pattern: REGEX_PORT,
                 message: `${t('device.port')}`
+              },
+              {
+                required: true,
+                message: 'please enter a port'
               }
             ]}
           >
