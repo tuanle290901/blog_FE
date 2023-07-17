@@ -1,9 +1,11 @@
 import { Col, Row } from 'antd'
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { IAttendance } from '~/types/attendance.interface'
 // import dayjs from 'dayjs'
 
 const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
+  const [t] = useTranslation()
   // const handleGenderColor = (status: string) => {
   //   switch (status) {
   //     case 'ontime':
@@ -53,22 +55,22 @@ const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <div className='timesheet-workday'>
-            <p>Số ngày công</p>
+            <p>{t('timesheet.totalWorkingDay')}</p>
             <span>{data?.length}</span>
           </div>
         </Col>
         <Col xs={24} lg={12} className='tw-flex'>
           <div className='tw-flex tw-ml-auto'>
             <div className='timesheet-statistic'>
-              <p>Đúng giờ:</p>
+              <p>{t('timesheet.ontime')}:</p>
               <span>2</span>
             </div>
             <div className='timesheet-statistic timesheet-statistic__violate'>
-              <p>Vi phạm:</p>
+              <p>{t('timesheet.violate')}:</p>
               <span>1</span>
             </div>
             <div className='timesheet-statistic timesheet-statistic__waiting'>
-              <p>Đang chờ:</p>
+              <p>{t('timesheet.waiting')}:</p>
               <span>1</span>
             </div>
           </div>

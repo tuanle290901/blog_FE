@@ -88,7 +88,7 @@ export const filterTimesheet = createAsyncThunk(
                 type: 'INSTANT',
                 operator: 'BETWEEN',
                 min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
               }
             ]
           }
@@ -109,7 +109,7 @@ export const filterTimesheet = createAsyncThunk(
                 type: 'INSTANT',
                 operator: 'BETWEEN',
                 min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
               }
             ]
           }
@@ -135,7 +135,7 @@ export const filterTimesheet = createAsyncThunk(
                 type: 'INSTANT',
                 operator: 'BETWEEN',
                 min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`
+                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
               }
             ]
           }
@@ -185,14 +185,10 @@ const timesheetSlice = createSlice({
       )
       .addMatcher<RejectedAction | FulfilledAction>(
         (action) => action.type.endsWith('/rejected') || action.type.endsWith('/fulfilled'),
-        (state, action) => {
+        (state) => {
           if (state.loading) {
             state.loading = false
-
-            const { status, message } = action.payload as ErrorResponse
-            if (status === 401) {
-              notification.error({ message: message })
-            }
+            //   TODO handle error
           }
         }
       )
