@@ -1,5 +1,5 @@
 export const EMAIL_REG = /\S+@\S+\.\S+/
-export const PHONE_NUMBER_REG = /^[0][1-9]\d{9}$|^[1-9]\d{9}$/
+export const PHONE_NUMBER_REG = /^0\d{9}$/
 export const REGEX_PORT =
   /^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$/
 
