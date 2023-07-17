@@ -284,6 +284,32 @@ export const ticketItem = {
               ]
             },
             {
+              groupCode: 'HR',
+              attributes: [
+                {
+                  name: 'note',
+                  description: 'Ý kiến',
+                  required: true,
+                  type: 'TEXT',
+                  options: null,
+                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                }
+              ]
+            },
+            {
+              groupCode: 'HR',
+              attributes: [
+                {
+                  name: 'note',
+                  description: 'Ý kiến',
+                  required: true,
+                  type: 'TEXT',
+                  options: null,
+                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                }
+              ]
+            },
+            {
               groupCode: '__END__',
               attributes: null
             }

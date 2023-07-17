@@ -2,7 +2,7 @@ import { Action, ThunkAction, configureStore } from '@reduxjs/toolkit'
 import authReducer from '~/stores/features/auth/auth.slice.ts'
 import masterDataSlice from '~/stores/features/master-data/master-data.slice.ts'
 import positionSlice from '~/stores/features/position/position.slice.ts'
-import { default as requestProcess, default as ticketProcess } from '~/stores/features/setting/ticket-process.slice'
+import ticketProcess from '~/stores/features/setting/ticket-process.slice'
 import userHistory from '~/stores/features/user/user-history.slice.ts'
 import userSlice from '~/stores/features/user/user.slice.ts'
 import departmentSlice from './features/department/department.silce'
@@ -15,7 +15,6 @@ export const store = configureStore({
     auth: authReducer,
     user: userSlice,
     userHistory: userHistory,
-    requestProcess: requestProcess,
     timesheet: timesheetSlice,
     department: departmentSlice,
     ticketProcess,

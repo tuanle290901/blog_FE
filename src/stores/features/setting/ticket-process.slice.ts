@@ -9,7 +9,7 @@ const initialState: ITicketDef = {
   loading: false,
   departments: [],
   tickets: [],
-  ticketSelected: [],
+  ticketSelected: null,
   createRevisionSuccess: false,
   currentRequestId: null,
   approvalSteps: [
@@ -39,7 +39,7 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
             name: 'HCNS'
           },
           {
-            id: 'department1',
+            id: 'department',
             name: 'HTSC'
           }
         ],
@@ -57,56 +57,7 @@ const fetchListTicket = createAsyncThunk('tickets/getTickets', async (_, thunkAP
   // })
   const response = new Promise<any>((resolve, reject) => {
     setTimeout(() => {
-      resolve({
-        data: [
-          {
-            id: '1',
-            title: 'Đăng ký nghỉ phép'
-          },
-          {
-            id: '2',
-            title: 'Đăng ký xin xe'
-          },
-          {
-            id: '3',
-            title: 'Đăng ký mua thiết bị'
-          },
-          {
-            id: '4',
-            title: 'Đăng ký công tác trong nước'
-          },
-          {
-            id: '5',
-            title: 'Đăng ký công tác nước ngoài'
-          }
-        ],
-        message: 'Lấy dữ liệu thành công.',
-        status: 200
-      })
-    }, 100)
-  })
-  return await response
-})
-
-const getTicketById = createAsyncThunk('tickets/getById', async (tabId: string, thunkAPI) => {
-  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
-  //   signal: thunkAPI.signal
-  // })
-  const response = new Promise<any>((resolve, reject) => {
-    setTimeout(() => {
-      if (tabId == '1') {
-        resolve({
-          data: ticketItem.data,
-          message: 'Lấy dữ liệu thành công.',
-          status: 200
-        })
-      } else {
-        resolve({
-          data: [],
-          message: 'Lấy dữ liệu thành công.',
-          status: 200
-        })
-      }
+      resolve(ticketItem)
     }, 100)
   })
   return await response
@@ -126,6 +77,13 @@ const ticketProcessSlice = createSlice({
   name: 'ticketProcess',
   initialState,
   reducers: {
+    getTicketById: (state, action) => {
+      const item: any = state.tickets.find((t) => t.id === action.payload.id)
+      state.ticketSelected = { ...item }
+    },
+    setDroppedItem: (state, action) => {
+      state.approvalSteps = action.payload.data
+    },
     addDroppedItem: (state, action: PayloadAction<{ targetKey: string; item: DragItem }>) => {
       const { targetKey, item } = action.payload
       const itemIndex = state.approvalSteps.findIndex((item) => item.key === targetKey)
@@ -182,9 +140,6 @@ const ticketProcessSlice = createSlice({
       .addCase(fetchListTicket.fulfilled, (state: ITicketDef, action) => {
         state.tickets = action.payload.data
       })
-      .addCase(getTicketById.fulfilled, (state: ITicketDef, action) => {
-        state.ticketSelected = action.payload.data
-      })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
         (state, action) => {
@@ -204,6 +159,13 @@ const ticketProcessSlice = createSlice({
   }
 })
 
-export const { addDroppedItem, removeDroppedItem, addNewApprovalStep, removeApprovalStep } = ticketProcessSlice.actions
-export { fetchDepartments, createRevision, fetchListTicket, getTicketById }
+export const {
+  addDroppedItem,
+  removeDroppedItem,
+  addNewApprovalStep,
+  removeApprovalStep,
+  getTicketById,
+  setDroppedItem
+} = ticketProcessSlice.actions
+export { fetchDepartments, createRevision, fetchListTicket }
 export default ticketProcessSlice.reducer
