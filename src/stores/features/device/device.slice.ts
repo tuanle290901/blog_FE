@@ -150,7 +150,6 @@ const devicesSlice = createSlice({
         state.loading = false
       })
       .addCase(getListDevice.fulfilled, (state, action) => {
-        console.log(action?.payload)
         state.listData = [...action.payload.data]
         state.meta = {
           ...action?.payload?.meta
