@@ -9,7 +9,7 @@ const initialState: ITicketDef = {
   loading: false,
   departments: [],
   tickets: [],
-  ticketSelected: [],
+  ticketSelected: null,
   createRevisionSuccess: false,
   currentRequestId: null,
   approvalSteps: [
@@ -39,7 +39,7 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
             name: 'HCNS'
           },
           {
-            id: 'department1',
+            id: 'department',
             name: 'HTSC'
           }
         ],

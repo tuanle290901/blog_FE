@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { FC } from 'react'
-import React, { memo, useEffect, useReducer, useRef, useState } from 'react'
+import React, { memo, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -29,6 +29,11 @@ import FormInitName from './component/FormInitName'
 import ModalInitAttr from './component/ModalInitAttrr'
 import Source from './component/Source'
 import { TicketInitial } from './type/ItemTypes'
+
+export const Node = {
+  START: '__START__',
+  END: '__END__'
+}
 
 const initialPayloadState = {
   name: '',
@@ -96,6 +101,7 @@ const ticketPayloadReducer = (state: TicketDefRevisionCreateReq, action: any) =>
 }
 
 const Index: FC = memo(function Index() {
+  const [ticketRequestPayload, dispatchTicketRequest] = useReducer(ticketPayloadReducer, initialPayloadState)
   const dispatch = useAppDispatch()
   const { id } = useParams()
   const [form] = Form.useForm()
@@ -111,7 +117,6 @@ const Index: FC = memo(function Index() {
     key: '0',
     status: false
   })
-  const [ticketRequestPayload, dispatchTicketRequest] = useReducer(ticketPayloadReducer, initialPayloadState)
 
   const ticketNodeIndexRef = useRef<number>(0)
 
@@ -151,10 +156,17 @@ const Index: FC = memo(function Index() {
   const onFinishInitAttr = (initFormValues: any) => {
     const index = ticketNodeIndexRef.current
     const newProcessNodes = [...ticketRequestPayload.revision.processNodes]
+    const newProcessFlow = [
+      ...ticketRequestPayload.revision.processFlow,
+      {
+        destIdx: index,
+        srcIdx: index + 1
+      }
+    ]
     if (index === 0) {
       newProcessNodes[index] = {
         ...newProcessNodes[index],
-        groupCode: '__START__',
+        groupCode: Node.START,
         attributes: initFormValues.initAttr
       }
     } else {
@@ -164,7 +176,9 @@ const Index: FC = memo(function Index() {
         attributes: initFormValues.initAttr
       }
     }
+
     dispatchTicketRequest({ type: 'SET_PROCESS_NODES', payload: newProcessNodes })
+    dispatchTicketRequest({ type: 'SET_PROCESS_FLOW', payload: newProcessFlow })
     setIsModalInitAttrOpen((prev) => {
       return {
         ...prev,
@@ -203,23 +217,35 @@ const Index: FC = memo(function Index() {
 
   const removeStep = (item: DropItem, index: number) => {
     if (index >= 0 && index < ticketRequestPayload.revision.processNodes.length) {
-      const newProcessNodes = [...ticketRequestPayload.revision.processNodes.splice(index + 1, 1)]
-      dispatchTicketRequest({ type: 'SET_PROCESS_NODES', payload: newProcessNodes })
+      const newProcessNodes = [...ticketRequestPayload.revision.processNodes]
+      const newProcessFlow = [...ticketRequestPayload.revision.processFlow]
+      const indexInProcessNodes = index + 1
+      const removedProcessNodes = newProcessNodes.filter((_, i) => i !== indexInProcessNodes)
+      const removedProcessFlow = newProcessFlow.filter((_, i) => i !== indexInProcessNodes)
+      dispatchTicketRequest({ type: 'SET_PROCESS_NODES', payload: removedProcessNodes })
+      dispatchTicketRequest({ type: 'SET_PROCESS_FLOW', payload: removedProcessFlow })
+      dispatch(removeApprovalStep({ index: index }))
     }
-    dispatch(removeApprovalStep({ index: index }))
   }
 
-  const isValidStep = (index: number) => {
-    // let isVaid = false
-    // const item = ticketRequestPayloadRef.current.revision
-    // if (item.processNodes[index].groupCode && item.processNodes[index].attributes[0].name) {
-    //   isVaid = true
-    // }
-    return false
-  }
+  const isValidStep = useMemo(() => {
+    return (index: number) => {
+      let isVaid = false
+      const item = ticketRequestPayload.revision
+      if (
+        item?.processNodes[index]?.groupCode &&
+        item?.processNodes[index]?.attributes?.length > 0 &&
+        item?.processNodes[index]?.attributes[0]?.name
+      ) {
+        isVaid = true
+      }
+      return isVaid
+    }
+  }, [ticketRequestPayload.revision])
 
   const setTicketCurrentInfo = (item: any) => {
     const { id, name, description, revisions } = item
+    const revision = { ...revisions[0] }
     setIsUpdateNameFinish(true)
     dispatchTicketRequest({
       type: 'SET_TICKET',
@@ -227,41 +253,29 @@ const Index: FC = memo(function Index() {
         id,
         name,
         description,
-        revision: { ...revisions[0] }
+        revision
       }
     })
-    const fillterNodes = revisions[0].processNodes.filter(
-      (r: any) => r.groupCode !== '__START__' && r.groupCode !== '__END__'
-    )
+    const fillterNodes = revision.processNodes
+      .filter((p: any) => p.groupCode !== Node.START && p.groupCode !== Node.END)
+      .map((data: any, index: number) => {
+        return {
+          index,
+          key: `request${index}`,
+          tittle: `Duyệt lần ${index + 1} `,
+          data: [
+            {
+              id: data.groupCode,
+              name: data.groupCode
+            }
+          ]
+        }
+      })
 
-    const test = fillterNodes.map((data: any, index: number) => {
-      return {
-        index,
-        key: `request${index}`,
-        tittle: `Duyệt lần ${index + 1} `,
-        data: [
-          {
-            id: data.groupCode,
-            name: data.groupCode
-          }
-        ]
-      }
-    })
-    dispatch(setDroppedItem({ data: test }))
+    dispatch(setDroppedItem({ data: fillterNodes }))
   }
 
   const onSaveAll = () => {
-    console.log(ticketRequestPayload, 'payload')
-    const targetBoxLen = targetBoxes.length
-    let startNode = 0
-    let endNode = 1
-    const processFlowTemp = []
-    for (let i = 0; i < targetBoxLen; i++) {
-      processFlowTemp.push({ destIdx: startNode, srcIdx: endNode })
-      startNode++
-      endNode++
-    }
-    dispatchTicketRequest({ type: 'SET_PROCESS_FLOW', payload: processFlowTemp })
     dispatch(createRevision(ticketRequestPayload))
   }
 
@@ -277,7 +291,7 @@ const Index: FC = memo(function Index() {
   }, [id, tickets, dispatch])
 
   useEffect(() => {
-    if (ticketSelected.id) {
+    if (ticketSelected?.id) {
       setTicketCurrentInfo(ticketSelected)
     }
   }, [ticketSelected])
@@ -366,7 +380,7 @@ const Index: FC = memo(function Index() {
                             isValidStep={() => isValidStep(index + 1)}
                           />
                           <Space className='tw-mt-3'>
-                            {index !== 0 && (
+                            {targetBoxes.length > 1 && (
                               <Tooltip title={'Xóa bước duyệt'}>
                                 <Button shape='circle' onClick={() => removeStep(item, index)}>
                                   <MinusOutlined />
