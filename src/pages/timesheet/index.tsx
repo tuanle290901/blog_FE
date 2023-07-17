@@ -378,8 +378,8 @@ const Timesheet: React.FC = () => {
                   >
                     {usersInGroupSate?.length > 0 &&
                       usersInGroupSate?.map((i) => (
-                        <Option key={i?.userName} label={i?.userName} value={i?.userName}>
-                          {i?.userName}
+                        <Option key={i?.id} label={i?.fullName} value={i?.id}>
+                          {i?.fullName || i?.userName}
                         </Option>
                       ))}
                   </Select>
