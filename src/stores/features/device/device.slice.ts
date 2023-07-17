@@ -2,8 +2,9 @@
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
+import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
-import { IPaging, ISort } from '~/types/api-response.interface'
+import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface'
 import { IDevice, IDeviceForm } from '~/types/device.interface'
 
 export interface IDeviceState {
@@ -88,7 +89,7 @@ export const getListDevice = createAsyncThunk(
           }
         ]
       }
-      const response = await HttpService.post(END_POINT_API.Devices.getPageSize(), body, {
+      const response: IApiResponse<IDevice[]> = await HttpService.post(END_POINT_API.Devices.getPageSize(), body, {
         signal: thunkAPI.signal
       })
       return response
@@ -104,18 +105,25 @@ export const createDevice = createAsyncThunk('devices/create', async (body: IDev
       signal: thunkAPI.signal
     })
     return response.data
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error)
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
   }
 })
+
 export const updateDevice = createAsyncThunk('devices/update', async (body: IDeviceForm, thunkAPI) => {
   try {
     const response = await HttpService.put(END_POINT_API.Devices.update(), body, {
       signal: thunkAPI.signal
     })
     return response.data
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error)
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
   }
 })
 
@@ -152,7 +160,7 @@ const devicesSlice = createSlice({
       .addCase(getListDevice.fulfilled, (state, action) => {
         state.listData = [...action.payload.data]
         state.meta = {
-          ...action.payload.meta
+          ...action?.payload?.meta
         }
       })
       .addCase(updateDevice.pending, (state) => {

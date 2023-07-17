@@ -16,9 +16,9 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 
-import DepartmentMemberModal from './DepartmentMemberModal'
-import DepartmentModal from './DepartmentModal'
 import './index.scss'
+import DepartmentModal from './DepartmentModal'
+import DepartmentMemberModal from './DepartmentMemberModal'
 
 const { Search } = Input
 const Department: React.FC = () => {

@@ -249,7 +249,7 @@ const UserCreateEdit: React.FC<{
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
-                    format='YYYY/MM/DD'
+                    format='DD/MM/YYYY'
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
@@ -303,7 +303,7 @@ const UserCreateEdit: React.FC<{
               >
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
                   <DatePicker
-                    format='YYYY/MM/DD'
+                    format='DD/MM/YYYY'
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
@@ -314,7 +314,7 @@ const UserCreateEdit: React.FC<{
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>
                   <DatePicker
-                    format='YYYY/MM/DD'
+                    format='DD/MM/YYYY'
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
@@ -329,7 +329,7 @@ const UserCreateEdit: React.FC<{
                   name='formalDate'
                 >
                   <DatePicker
-                    format='YYYY/MM/DD'
+                    format='DD/MM/YYYY'
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
