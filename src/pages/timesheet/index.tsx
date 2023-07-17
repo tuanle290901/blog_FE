@@ -12,17 +12,20 @@ import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
 import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { filterTimesheet, getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
+import { filterTimesheet, getAllGroup, getUserInGroup, getUsersName } from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import { LocalStorage } from '~/utils/local-storage'
+import { IUser } from '~/types/user.interface'
+import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
   const [t] = useTranslation()
-  const authSate = useAppSelector((state) => state.auth)
-  const userGroup = authSate?.userInfo?.groupProfiles ? authSate?.userInfo?.groupProfiles[0]?.groupCode : ''
+  const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
+  const userGroup = currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.timesheet.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
@@ -53,6 +56,10 @@ const Timesheet: React.FC = () => {
       {
         direction: 'DESC',
         field: 'date'
+      },
+      {
+        direction: 'DESC',
+        field: 'startTime'
       }
     ]
   })
@@ -144,14 +151,14 @@ const Timesheet: React.FC = () => {
   const columns: ColumnsType<IAttendance> = [
     {
       title: t('timesheet.fullName'),
-      dataIndex: 'userName',
-      key: 'userName',
-      ellipsis: true,
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder('fullName'),
-      render: (userName, record) => {
-        return userName || `Nguyễn Đức Anh ${record?.userId?.slice(-2)}`
+      dataIndex: 'userId',
+      key: 'userId',
+      // ellipsis: true,
+      // sorter: true,
+      // showSorterTooltip: false,
+      // sortOrder: getSortOrder('fullName'),
+      render: (userId) => {
+        return handleGetFullName(userId)
       }
     },
     {
@@ -165,7 +172,7 @@ const Timesheet: React.FC = () => {
       render: (date, record) => {
         return (
           <span className={`${record.status === 'late' || record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
-            {dayjs(date).format('DD/MM/YYYY')}
+            {convertUTCToLocaleDate(date)}
           </span>
         )
       }
@@ -178,7 +185,11 @@ const Timesheet: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('startTime'),
       render: (startTime, record) => {
-        return <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>{startTime || '--'}</span>
+        return (
+          <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>
+            {convertUTCToLocaleTime(startTime) || '--'}
+          </span>
+        )
       }
     },
     {
@@ -189,7 +200,11 @@ const Timesheet: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('endTime'),
       render: (endTime, record) => {
-        return <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>{endTime || '--'}</span>
+        return (
+          <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
+            {convertUTCToLocaleTime(endTime) || '--'}
+          </span>
+        )
       }
     },
     {
@@ -250,12 +265,37 @@ const Timesheet: React.FC = () => {
     })
   }
 
+  const handleGetAllUserName = () => {
+    if (timesheetSate.timesheetList?.length < 1) {
+      return
+    }
+    const ids = timesheetSate.timesheetList?.map((item: IAttendance) => {
+      return item.userId
+    })
+    const promiseGetAllUserName = dispatch(getUsersName(ids))
+    return () => promiseGetAllUserName.abort()
+  }
+
+  const handleGetFullName = (userId: string) => {
+    let fullName = ''
+    if (timesheetSate.usersName?.length > 0) {
+      const result = timesheetSate.usersName.find(
+        (item: { id: string; userName: string; fullName: string }) => item.id === userId
+      )
+      if (result) {
+        fullName = result['fullName']
+      }
+    }
+    return fullName
+  }
+
   useEffect(() => {
-    const promise = dispatch(getAllGroup())
+    const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, group: selectedGroup }
     })
-    return () => promise.abort()
+    handleGetAllUserName()
+    return () => promiseGetAllGroup.abort()
   }, [])
 
   useEffect(() => {
@@ -273,6 +313,7 @@ const Timesheet: React.FC = () => {
   }, [selectedUser])
 
   useEffect(() => {
+    handleGetAllUserName()
     const promise = dispatch(
       filterTimesheet({
         paging: searchValue.paging,
@@ -292,11 +333,7 @@ const Timesheet: React.FC = () => {
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
-        <TimesheetInfo
-          data={timesheetSate.timesheetList}
-          userInfo={authSate.userInfo}
-          handleOpenModal={setIsOpenModal}
-        />
+        <TimesheetInfo data={timesheetSate.timesheetList} userInfo={currentAuth} handleOpenModal={setIsOpenModal} />
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
