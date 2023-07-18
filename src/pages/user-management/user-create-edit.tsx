@@ -22,7 +22,9 @@ const UserCreateEdit: React.FC<{
   const [loading, setLoading] = useState(false)
   const [avatarBase64, setAvatarBase64] = useState<string>('')
   const [avtError, setAvtError] = useState(false)
-  const [form] = Form.useForm<Omit<IUser, 'birthday'> & { birthday: Dayjs }>()
+  const [form] = Form.useForm<
+    Omit<IUser, 'birthday' | 'joinDate' | 'formalDate'> & { birthday: Dayjs; joinDate: Dayjs; formalDate: Dayjs }
+  >()
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
   const userTitle = useAppSelector((state) => state.masterData.listUserTitle)
@@ -97,7 +99,9 @@ const UserCreateEdit: React.FC<{
     if (userData) {
       form.setFieldsValue({
         ...userData,
-        birthday: dayjs(userData.birthday)
+        birthday: userData.birthday ? dayjs(userData.birthday) : undefined,
+        formalDate: userData.joinDate ? dayjs(userData.formalDate) : undefined,
+        joinDate: userData.joinDate ? dayjs(userData.joinDate) : undefined
       })
       setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
     } else {
@@ -120,10 +124,15 @@ const UserCreateEdit: React.FC<{
       }))
       const index = avatarBase64.indexOf(',')
       value.avatarBase64 = avatarBase64.slice(index + 1)
+      const birthday = value.birthday ? value.birthday.format('YYYY-MM-DD') : null
+      const joinDate = value.joinDate ? value.joinDate.format('YYYY-MM-DD') : null
+      const formalDate = value.formalDate ? value.formalDate.format('YYYY-MM-DD') : null
       const payload: IUser = {
         ...value,
         groupProfiles,
-        birthday: value.birthday?.format('YYYY-MM-DD')
+        birthday,
+        formalDate,
+        joinDate
       }
       try {
         setLoading(true)
@@ -216,7 +225,7 @@ const UserCreateEdit: React.FC<{
                     initialValue={userData.userName}
                     style={{ marginBottom: 24 }}
                     label={t('userList.username')}
-                    name='username'
+                    name='userName'
                   >
                     <Input disabled />
                   </Form.Item>
