@@ -6,6 +6,11 @@
       "officer": "Nhân viên",
       "subManager": "Quản lí trực tiếp",
       "manager": "Quản lí"
-    }
-  }
+    },
+    "page": "Trang",
+    "nextPage": "Trang sau",
+    "prevPage": "Trang trước",
+    "jumpTo": "Đến trang"
+  },
+  "noData": "Không có dữ liệu"
 }

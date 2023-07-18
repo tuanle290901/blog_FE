@@ -5,8 +5,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Button, Col, Input, List, Modal, Row, notification } from 'antd'
 import { HttpStatusCode } from 'axios'
-import React, { ChangeEvent, useEffect, useState, useRef } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import IconNoData from '~/assets/svg/iconNoData'
 import IconStartSVG from '~/assets/svg/iconStart'
 import IconUserDownSVG from '~/assets/svg/iconUserDown'
 import IconUserUpSVG from '~/assets/svg/iconUserUp'
@@ -19,9 +20,9 @@ import {
   ListDataUserGroup,
   updateUserRole
 } from '~/types/department.interface'
+import { ErrorResponse } from '~/types/error-response.interface'
 import { ROlE_STORAGE } from '~/utils/Constant'
 
-const { Search } = Input
 const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, data } = props
   const { t } = useTranslation()
@@ -90,11 +91,12 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
       }
       const response = await HttpService.put(END_POINT_API.Department.updateUserRole(), payload)
       if (response.status === HttpStatusCode.Ok) {
-        notification.success({ message: 'Updating user from department success' })
+        notification.success({ message: response.data.message })
         onOk()
       }
-    } catch (error) {
-      notification.error({ message: 'Error updating user from department' })
+    } catch (error: any) {
+      const response = error.data as ErrorResponse
+      notification.error({ message: `${response?.message}` || 'Error updating user from department' })
     }
   }
 
@@ -106,13 +108,13 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
           ...prew,
           listDataUpFilter: prew?.listDataUp?.filter(
             (item) =>
-              item.fullName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()) ||
-              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()))
+              (item.fullName && item.fullName.toLocaleLowerCase().includes(valueFilter?.toLocaleLowerCase())) ||
+              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter?.toLocaleLowerCase()))
           ),
           listDataDownFilter: prew?.listDataDown?.filter(
             (item) =>
-              item.fullName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()) ||
-              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter.toLocaleLowerCase()))
+              (item.fullName && item.fullName.toLocaleLowerCase().includes(valueFilter?.toLocaleLowerCase())) ||
+              (item.userName && item.userName.toLocaleLowerCase().includes(valueFilter?.toLocaleLowerCase()))
           )
         }
       })
@@ -195,17 +197,27 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
       onCancel={() => onCancel()}
       onOk={() => onSaveData()}
       title={data && data.name}
+      okText={`${t('common.save')}`}
+      cancelText={`${t('common.cancel')}`}
       maskClosable={false}
       className='modal-content-member'
     >
-      <Search placeholder='input search text' onChange={onSearch} enterButton />
+      <Input.Search placeholder={`${t('department.pleaseEnterSearch')}`} onChange={(e) => onSearch(e)} enterButton />
       <div className='tw-my-[10px]'>
-        <h4 className='tw-font-medium tw-text-base tw-mb-[5px]'> Quản lý </h4>
+        <h4 className='tw-font-medium tw-text-base tw-mb-[5px]'> {`${t('department.manager')}`} </h4>
         <div className='tw-p-[10px] tw-h-[200px] tw-overflow-y-auto'>
           <List
             loading={initLoading}
             itemLayout='horizontal'
             dataSource={listDataRender.listDataDownFilter}
+            locale={{
+              emptyText: (
+                <div>
+                  <IconNoData width={64} height={41} />
+                  <div>{t('noData')}</div>
+                </div>
+              )
+            }}
             renderItem={(item: ListDataUserGroup) => {
               return (
                 <Row className='tw-my-[12px]'>
@@ -241,12 +253,20 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
         </div>
       </div>
       <div className='tw-my-[10px]'>
-        <h4 className='tw-font-medium tw-text-base tw-mb-[5px]'> Thành viên </h4>
+        <h4 className='tw-font-medium tw-text-base tw-mb-[5px]'> {`${t('department.menber')}`} </h4>
         <div className='tw-p-[10px] tw-h-[200px] tw-overflow-y-auto'>
           <List
             loading={initLoading}
             itemLayout='horizontal'
             dataSource={listDataRender.listDataUpFilter}
+            locale={{
+              emptyText: (
+                <div>
+                  <IconNoData width={64} height={41} />
+                  <div>{t('noData')}</div>
+                </div>
+              )
+            }}
             renderItem={(item: ListDataUserGroup) => {
               return (
                 <Row className='tw-my-[12px]'>
