@@ -102,7 +102,7 @@ const UserCreateEdit: React.FC<{
       form.setFieldsValue({
         ...userData,
         birthday: userData.birthday ? dayjs(userData.birthday) : undefined,
-        formalDate: userData.joinDate ? dayjs(userData.formalDate) : undefined,
+        formalDate: userData.formalDate ? dayjs(userData.formalDate) : undefined,
         joinDate: userData.joinDate ? dayjs(userData.joinDate) : undefined
       })
       setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
@@ -160,7 +160,9 @@ const UserCreateEdit: React.FC<{
     }
   }
   useEffect(() => {
-    void form.validateFields(['email', 'phoneNumber'])
+    if (serverError) {
+      void form.validateFields(['email', 'phoneNumber'])
+    }
   }, [serverError])
   const finishAndClose = (isSuccess: boolean) => {
     handleClose(isSuccess)
@@ -354,17 +356,17 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterDateJoin')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>
-                  <DatePicker
-                    format='DD/MM/YYYY'
-                    disabledDate={(date) => {
-                      return date.isAfter(new Date())
-                    }}
-                    showToday={false}
-                    className='tw-w-full'
-                    placeholder={t('userModal.enterProbationDate')}
-                  />
-                </Form.Item>
+                {/*<Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>*/}
+                {/*  <DatePicker*/}
+                {/*    format='DD/MM/YYYY'*/}
+                {/*    disabledDate={(date) => {*/}
+                {/*      return date.isAfter(new Date())*/}
+                {/*    }}*/}
+                {/*    showToday={false}*/}
+                {/*    className='tw-w-full'*/}
+                {/*    placeholder={t('userModal.enterProbationDate')}*/}
+                {/*  />*/}
+                {/*</Form.Item>*/}
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.officialContractSigningDate')}
