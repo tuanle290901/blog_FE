@@ -75,13 +75,16 @@ const Timesheet: React.FC = () => {
   const handleSelectDate = (dataSelected: any) => {
     setSelectedStartDate(dayjs(dataSelected[0]))
     setSelectedEndDate(dayjs(dataSelected[1]))
-    setSearchValue((prevState) => {
-      return {
-        ...prevState,
-        startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
-        endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T23:59:59Z`
-      }
-    })
+    if (dataSelected[0] && dataSelected[1]) {
+      setSearchValue((prevState) => {
+        return {
+          ...prevState,
+          paging: { ...prevState.paging, page: 0 },
+          startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
+          endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T23:59:59Z`
+        }
+      })
+    }
   }
 
   const handleSelectToday = () => {
@@ -90,6 +93,7 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return {
         ...prevState,
+        paging: { ...prevState.paging, page: 0 },
         startDate: `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
         endDate: `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
       }
@@ -102,6 +106,7 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return {
         ...prevState,
+        paging: { ...prevState.paging, page: 0 },
         startDate: `${dayjs().startOf('M').format('YYYY-MM-DD')}T00:00:00Z`,
         endDate: `${dayjs().endOf('M').format('YYYY-MM-DD')}T23:59:59Z`
       }
@@ -122,6 +127,7 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return {
         ...prevState,
+        paging: { ...prevState.paging, page: 0 },
         startDate: `${dayjs()
           .month(dayjs().month() - 1)
           .startOf('M')
@@ -292,7 +298,7 @@ const Timesheet: React.FC = () => {
   useEffect(() => {
     const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
-      return { ...prevState, group: selectedGroup }
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
     handleGetAllUserName()
     return () => promiseGetAllGroup.abort()
@@ -301,14 +307,14 @@ const Timesheet: React.FC = () => {
   useEffect(() => {
     const promise = dispatch(getUserInGroup(selectedGroup))
     setSearchValue((prevState) => {
-      return { ...prevState, group: selectedGroup }
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
     return () => promise.abort()
   }, [selectedGroup])
 
   useEffect(() => {
     setSearchValue((prevState) => {
-      return { ...prevState, userId: selectedUser }
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, userId: selectedUser }
     })
   }, [selectedUser])
 
@@ -378,8 +384,8 @@ const Timesheet: React.FC = () => {
                   >
                     {usersInGroupSate?.length > 0 &&
                       usersInGroupSate?.map((i) => (
-                        <Option key={i?.userName} label={i?.userName} value={i?.userName}>
-                          {i?.userName}
+                        <Option key={i?.id} label={i?.fullName} value={i?.id}>
+                          {i?.fullName || i?.userName}
                         </Option>
                       ))}
                   </Select>
@@ -434,6 +440,7 @@ const Timesheet: React.FC = () => {
                 columns={columns}
                 dataSource={timesheetSate.timesheetList}
                 loading={timesheetSate.loading}
+                pagination={{ total: timesheetSate?.meta?.total }}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
               />
