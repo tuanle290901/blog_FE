@@ -78,8 +78,13 @@ const ticketProcessSlice = createSlice({
   initialState,
   reducers: {
     getTicketById: (state, action) => {
-      const item: any = state.tickets.find((t) => t.id === action.payload.id)
-      state.ticketSelected = { ...item }
+      const { id } = action.payload
+      if (id) {
+        const item: any = state.tickets.find((t) => t.id === action.payload.id)
+        state.ticketSelected = { ...item }
+      } else {
+        state.ticketSelected = null
+      }
     },
     setDroppedItem: (state, action) => {
       state.approvalSteps = action.payload.data

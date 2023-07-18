@@ -10,14 +10,12 @@ import { EditOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Form, Space, Tooltip, notification } from 'antd'
 import Target from './component/Target'
 
-import { useParams } from 'react-router-dom'
 import iconAdd from '~/assets/images/setting/add.png'
 import {
   addDroppedItem,
   addNewApprovalStep,
   createRevision,
   fetchDepartments,
-  fetchListTicket,
   getTicketById,
   removeApprovalStep,
   setDroppedItem
@@ -102,14 +100,12 @@ const ticketPayloadReducer = (state: TicketDefRevisionCreateReq, action: any) =>
 
 interface PropType {
   id: string
+  key: string
 }
 
 const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreate({ id }: PropType) {
-  // const { id } = props
-  // console.log(id, 'id from child')
   const [ticketRequestPayload, dispatchTicketRequest] = useReducer(ticketPayloadReducer, initialPayloadState)
   const dispatch = useAppDispatch()
-  // const { id } = useParams()
   const [form] = Form.useForm()
   const [initAttrForm] = Form.useForm()
 
@@ -126,6 +122,11 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
 
   const ticketNodeIndexRef = useRef<number>(0)
 
+  /**
+   * Submit name and description
+   * @param formValue
+   * @returns
+   */
   const onContinue = (formValue: TicketInitial) => {
     const { name, description } = formValue
     if (!name || name.trim().length === 0) {
@@ -137,6 +138,9 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     dispatchTicketRequest({ type: 'SET_DESCRIPTION', payload: description })
   }
 
+  /**
+   * Edit name and description
+   */
   const onUpdateTicketName = () => {
     setIsUpdateNameFinish(false)
     form.setFieldsValue({
@@ -145,6 +149,9 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     })
   }
 
+  /**
+   * On open modal init attribute
+   */
   const openModalInitAttr = (indexNode: number) => {
     ticketNodeIndexRef.current = indexNode
     setIsModalInitAttrOpen({
@@ -153,13 +160,10 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     })
   }
 
-  const onChangeType = (value: string, index: number) => {
-    const updatedForm = { ...initAttrForm.getFieldsValue() }
-    updatedForm.initAttr[index].type = value
-    initAttrForm.setFieldsValue(updatedForm)
-  }
-
-  const onFinishInitAttr = (initFormValues: any) => {
+  /**
+   * On close modal init attribute
+   */
+  const onCloseModalInitAttr = (initFormValues: any) => {
     const index = ticketNodeIndexRef.current
     const newProcessNodes = [...ticketRequestPayload.revision.processNodes]
     const newProcessFlow = [
@@ -193,8 +197,20 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     })
   }
 
-  const onFinishInitAttrFail = (initFormValues: any) => {
+  /**
+   * On close modal init attribute fail
+   */
+  const onCloseModalInitAttrFail = (initFormValues: any) => {
     console.log(initFormValues, 'initFormValues')
+  }
+
+  /**
+   * On change attribute type
+   */
+  const onChangeType = (value: string, index: number) => {
+    const updatedForm = { ...initAttrForm.getFieldsValue() }
+    updatedForm.initAttr[index].type = value
+    initAttrForm.setFieldsValue(updatedForm)
   }
 
   const handleCancelModalInitAttr = () => {
@@ -206,6 +222,9 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     })
   }
 
+  /**
+   * Drop item to box
+   */
   const handleDrop = (item: DragItem, targetKey: string) => {
     dispatch(addDroppedItem({ targetKey, item }))
   }
@@ -214,6 +233,9 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     return true
   }
 
+  /**
+   * Add new step box
+   */
   const addNewStep = () => {
     const newNode = { groupCode: '', attributes: [] }
     const newProcessNodes = [...ticketRequestPayload.revision.processNodes, newNode]
@@ -221,6 +243,9 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     dispatch(addNewApprovalStep())
   }
 
+  /**
+   * Remove step box
+   */
   const removeStep = (item: DropItem, index: number) => {
     if (index >= 0 && index < ticketRequestPayload.revision.processNodes.length) {
       const newProcessNodes = [...ticketRequestPayload.revision.processNodes]
@@ -234,11 +259,15 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     }
   }
 
+  /**
+   * Check step is full info
+   */
   const isValidStep = useMemo(() => {
     return (index: number) => {
       let isVaid = false
       const item = ticketRequestPayload.revision
       if (
+        item?.processNodes?.length > 0 &&
         item?.processNodes[index]?.groupCode &&
         item?.processNodes[index]?.attributes?.length > 0 &&
         item?.processNodes[index]?.attributes[0]?.name
@@ -249,10 +278,12 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
     }
   }, [ticketRequestPayload.revision])
 
+  /**
+   * Set data for ticket request payload
+   */
   const setTicketCurrentInfo = (item: any) => {
     const { id, name, description, revisions } = item
     const revision = { ...revisions[0] }
-    setIsUpdateNameFinish(true)
     dispatchTicketRequest({
       type: 'SET_TICKET',
       payload: {
@@ -262,23 +293,27 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
         revision
       }
     })
-    const fillterNodes = revision.processNodes
-      .filter((p: any) => p.groupCode !== Node.START && p.groupCode !== Node.END)
-      .map((data: any, index: number) => {
-        return {
-          index,
-          key: `request${index}`,
-          tittle: `Duyệt lần ${index + 1} `,
-          data: [
-            {
-              id: data.groupCode,
-              name: data.groupCode
-            }
-          ]
-        }
-      })
+    if (revision?.processNodes?.length > 0) {
+      const fillterNodes = revision.processNodes
+        .filter((p: any) => p.groupCode !== Node.START && p.groupCode !== Node.END)
+        .map((data: any, index: number) => {
+          return {
+            index,
+            key: `request${index}`,
+            tittle: `Duyệt lần ${index + 1} `,
+            data: data?.groupCode
+              ? [
+                  {
+                    id: data.groupCode,
+                    name: data.groupCode
+                  }
+                ]
+              : []
+          }
+        })
 
-    dispatch(setDroppedItem({ data: fillterNodes }))
+      dispatch(setDroppedItem({ data: fillterNodes }))
+    }
   }
 
   const onSaveAll = () => {
@@ -286,19 +321,39 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
   }
 
   useEffect(() => {
-    dispatch(fetchListTicket())
     dispatch(fetchDepartments())
   }, [dispatch])
 
   useEffect(() => {
     if (tickets.length > 0 && id) {
       dispatch(getTicketById({ id }))
+    } else {
+      dispatch(getTicketById({ id: null }))
     }
   }, [id, tickets, dispatch])
 
   useEffect(() => {
     if (ticketSelected?.id) {
+      setIsUpdateNameFinish(true)
       setTicketCurrentInfo(ticketSelected)
+    } else {
+      setIsUpdateNameFinish(false)
+      setTicketCurrentInfo({
+        id: '',
+        name: '',
+        description: '',
+        revisions: [
+          {
+            processFlow: [],
+            processNodes: [
+              {
+                groupCode: '',
+                attributes: []
+              }
+            ]
+          }
+        ]
+      })
     }
   }, [ticketSelected])
 
@@ -322,7 +377,7 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className='process-container tw-p-[10px] tw-w-full tw-h-full'>
+      <div className='process-container tw-p-[20px] tw-w-full'>
         {!isUpdateNameFinish && <FormInitName form={form} onContinue={onContinue} />}
 
         {isUpdateNameFinish && (
@@ -437,8 +492,8 @@ const TicketDefinationCreate: FC<PropType> = memo(function TicketDefinationCreat
         isModalInitAttrOpen={isModalInitAttrOpen}
         initAttrForm={initAttrForm}
         handleCancelModalInitAttr={handleCancelModalInitAttr}
-        onFinishInitAttr={onFinishInitAttr}
-        onFinishInitAttrFail={onFinishInitAttrFail}
+        onFinishInitAttr={onCloseModalInitAttr}
+        onFinishInitAttrFail={onCloseModalInitAttrFail}
         onChangeType={onChangeType}
       />
     </DndProvider>

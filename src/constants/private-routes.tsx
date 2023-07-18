@@ -23,9 +23,7 @@ export const PRIVATE_PATH = {
   },
   timesheet: '/timesheet',
   setting: {
-    ticketProcessDefinition: 'ticket-process-definition',
-    ticketProcessDefinitionCreate: 'ticket-process-definition/create',
-    ticketProcessDefinitionById: 'ticket-process-definition/:id'
+    ticketProcessDefinition: 'ticket-process-definition'
   },
   department: {
     prefix: 'department'
@@ -58,18 +56,6 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'ticket-definition-list',
     path: PRIVATE_PATH.setting.ticketProcessDefinition,
     component: TicketDefination,
-    allowedRoles: []
-  },
-  {
-    name: 'ticket-definition-create',
-    path: PRIVATE_PATH.setting.ticketProcessDefinitionCreate,
-    component: TicketDefinationCreate,
-    allowedRoles: []
-  },
-  {
-    name: 'ticket-definition-update',
-    path: PRIVATE_PATH.setting.ticketProcessDefinitionById,
-    component: TicketDefinationCreate,
     allowedRoles: []
   },
   {
