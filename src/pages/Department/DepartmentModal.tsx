@@ -2,7 +2,7 @@
 import { DatePicker, Form, Input, Modal, notification } from 'antd'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_TRIM } from '~/constants/regex.constant'
+import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_SPECIAL_CHARS, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
 import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
@@ -115,7 +115,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
               message: `${t('department.please-insert-input')} ${t('department.code')}`
             },
             {
-              pattern: REGEX_TRIM,
+              pattern: REGEX_SPECIAL_CHARS,
               message: `${t('department.alter-notification.do-not-leave-spaces-special-accents')}`
             }
           ]}
@@ -134,8 +134,8 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
               message: `${t('department.please-insert-input')} ${t('department.name')}`
             },
             {
-              pattern: REGEX_TRIM,
-              message: `${t('department.alter-notification.do-not-leave-spaces-special-characters-vietnamese-accents')}`
+              pattern: REGEX_SPECIAL_TRIM,
+              message: `${t('department.alter-notification.do-not-leave-spaces-special-accents')}`
             }
           ]}
         >
