@@ -160,7 +160,9 @@ const UserCreateEdit: React.FC<{
     }
   }
   useEffect(() => {
-    void form.validateFields(['email', 'phoneNumber'])
+    if (serverError) {
+      void form.validateFields(['email', 'phoneNumber'])
+    }
   }, [serverError])
   const finishAndClose = (isSuccess: boolean) => {
     handleClose(isSuccess)
@@ -354,17 +356,17 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterDateJoin')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>
-                  <DatePicker
-                    format='DD/MM/YYYY'
-                    disabledDate={(date) => {
-                      return date.isAfter(new Date())
-                    }}
-                    showToday={false}
-                    className='tw-w-full'
-                    placeholder={t('userModal.enterProbationDate')}
-                  />
-                </Form.Item>
+                {/*<Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>*/}
+                {/*  <DatePicker*/}
+                {/*    format='DD/MM/YYYY'*/}
+                {/*    disabledDate={(date) => {*/}
+                {/*      return date.isAfter(new Date())*/}
+                {/*    }}*/}
+                {/*    showToday={false}*/}
+                {/*    className='tw-w-full'*/}
+                {/*    placeholder={t('userModal.enterProbationDate')}*/}
+                {/*  />*/}
+                {/*</Form.Item>*/}
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.officialContractSigningDate')}

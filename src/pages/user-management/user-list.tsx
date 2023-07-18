@@ -81,9 +81,9 @@ const UserList: React.FC = () => {
     })
     return [{ value: null, label: t('userList.allGroup') }, ...options]
   }, [groups])
-  const handleClickEditUser = (user: IUser) => {
+  const handleClickEditUser = async (user: IUser) => {
     //   TODO
-    dispatch(startEditingUser(user.id as string))
+    await dispatch(startEditingUser(user.id as string))
   }
   const handleClickDeleteUser = (user: IUser) => {
     //   TODO
@@ -293,11 +293,13 @@ const UserList: React.FC = () => {
 
   return (
     <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <UserCreateEdit
-        open={isOpenUserModal || !!userState.editingUser}
-        userData={userState.editingUser}
-        handleClose={handleCloseUserModal}
-      />
+      {(isOpenUserModal || !!userState.editingUser) && (
+        <UserCreateEdit
+          open={isOpenUserModal || !!userState.editingUser}
+          userData={userState.editingUser}
+          handleClose={handleCloseUserModal}
+        />
+      )}
       <div>
         <h1 className='tw-text-3xl tw-font-semibold'>
           {t('userList.member')}({userState.meta.total})
