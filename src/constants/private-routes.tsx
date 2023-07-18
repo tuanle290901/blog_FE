@@ -3,6 +3,7 @@ import Dashboard from '~/pages/Dashboard'
 import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
+import TicketDefinationCreate from '~/pages/setting/ticket-defination/TicketDefinationCreate'
 import TicketDefination from '~/pages/setting/ticket-defination'
 import Timesheet from '~/pages/timesheet'
 import UserHistory from '~/pages/user-management/user-history.tsx'
@@ -22,8 +23,7 @@ export const PRIVATE_PATH = {
   },
   timesheet: '/timesheet',
   setting: {
-    ticketProcessDefinition: 'ticket-process-definition',
-    ticketProcessDefinitionById: 'ticketProcessDefinitionById'
+    ticketProcessDefinition: 'ticket-process-definition'
   },
   department: {
     prefix: 'department'
@@ -53,14 +53,8 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: []
   },
   {
-    name: PRIVATE_PATH.setting.ticketProcessDefinition,
+    name: 'ticket-definition-list',
     path: PRIVATE_PATH.setting.ticketProcessDefinition,
-    component: TicketDefination,
-    allowedRoles: []
-  },
-  {
-    name: PRIVATE_PATH.setting.ticketProcessDefinitionById,
-    path: 'ticket-process-definition/:id',
     component: TicketDefination,
     allowedRoles: []
   },
