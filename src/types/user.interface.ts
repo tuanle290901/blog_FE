@@ -2,13 +2,13 @@ export interface IUser {
   id?: string
   address?: string
   avatarBase64: string
-  birthday?: string
+  birthday?: string | null
   email: string
-  formalDate?: string
+  formalDate?: string | null
   fullName?: string
   groupProfiles: GroupProfile[]
   historyNo?: number
-  joinDate?: string
+  joinDate?: string | null
   note?: string
   notificationMethods?: string[]
   ownWeekWorkingTimeSetup?: OwnWeekWorkingTimeSetup[]

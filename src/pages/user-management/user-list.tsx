@@ -238,7 +238,7 @@ const UserList: React.FC = () => {
       if (value) {
         return { ...prevState, group: value }
       } else {
-        return { ...prevState, query: prevState.query }
+        return { ...prevState, query: prevState.query, group: null }
       }
     })
   }
