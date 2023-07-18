@@ -1,4 +1,7 @@
-import { Form, Input, Modal, Select } from 'antd'
+/* eslint-disable prettier/prettier */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Form, Input, Modal, Select, notification } from 'antd'
+import { HttpStatusCode } from 'axios'
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT } from '~/constants/regex.constant'
@@ -30,7 +33,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
     }
   }, [deviceData])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { port, name, ipAddress, groupCode } = form.getFieldsValue()
     const payload: IDeviceForm = {
       port: port,
@@ -39,18 +42,37 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
       groupCode: groupCode
     }
     if (deviceData) {
-      dispatch(
-        updateDevice({
-          ...payload,
-          id: deviceData.id
+      try {
+        const response = await dispatch(
+          updateDevice({
+            ...payload,
+            id: deviceData.id
+          })
+        ).unwrap()
+        form.resetFields()
+        handleClose()
+        notification.success({
+          message: response.message
         })
-      )
-      form.resetFields()
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
     } else {
-      dispatch(createDevice(payload))
-      form.resetFields()
+      try {
+        const response = await dispatch(createDevice(payload)).unwrap()
+        form.resetFields()
+        handleClose()
+        notification.success({
+          message: response.message
+        })
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
     }
-    handleClose()
   }
 
   const onCancel = () => {

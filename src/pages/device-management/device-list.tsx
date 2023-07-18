@@ -222,11 +222,11 @@ const DeviceList: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true,
             locale: {
-              items_per_page: `/ ${t('pagination.page')}`,
-              next_page: t('pagination.nextPage'),
-              prev_page: t('pagination.prevPage'),
-              jump_to: t('pagination.jumpTo'),
-              page: t('pagination.page')
+              items_per_page: `/ ${t('common.page')}`,
+              next_page: t('common.nextPage'),
+              prev_page: t('common.prevPage'),
+              jump_to: t('common.jumpTo'),
+              page: t('common.page')
             },
 
             position: ['bottomRight']

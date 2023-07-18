@@ -19,12 +19,12 @@ import { ACTION_TYPE } from '~/utils/helper'
 import './index.scss'
 import DepartmentModal from './DepartmentModal'
 import DepartmentMemberModal from './DepartmentMemberModal'
+import { useNavigate } from 'react-router-dom'
 
-const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-
+  const navigate = useNavigate()
   const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
   const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
@@ -43,9 +43,9 @@ const Department: React.FC = () => {
   })
   const [useSelect, setUseSelect] = useState<DataType>()
 
-  const onSearch = (value: string) => {
-    if (value) {
-      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, value)
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value) {
+      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, e.target.value)
       setDataRender({
         listData: data,
         listDataTitle: [
@@ -127,7 +127,10 @@ const Department: React.FC = () => {
     const filteredData: DataType[] = []
     function getListDataByKey(listData: DataType[]) {
       for (const item of listData) {
-        if (item.code.includes(keyword) || item.name?.includes(keyword)) {
+        if (
+          item.code.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
+          item.name?.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
+        ) {
           filteredData.push(item)
           break
         } else if (item.children && item.children.length > 0) {
@@ -227,7 +230,7 @@ const Department: React.FC = () => {
   const columns = useMemo(() => {
     const dataRenderColumns: TableColumnsType<DataType> = [
       {
-        title: 'Name',
+        title: `${t('department.name')}`,
         dataIndex: 'name',
         key: 'name',
         width: '250px',
@@ -245,35 +248,35 @@ const Department: React.FC = () => {
         ellipsis: true
       },
       {
-        title: 'code',
+        title: `${t('department.code')}`,
         dataIndex: 'code',
         key: 'code',
         width: '100px',
         ellipsis: true
       },
       {
-        title: 'address',
+        title: `${t('department.address')}`,
         dataIndex: 'address',
         key: 'address',
         width: '250px',
         ellipsis: true
       },
       {
-        title: 'contactPhoneNumber',
+        title: `${t('department.contactPhoneNumber')}`,
         dataIndex: 'contactPhoneNumber',
         key: 'contactPhoneNumber',
         width: '150px',
         ellipsis: true
       },
       {
-        title: 'contactEmail',
+        title: `${t('department.contactEmail')}`,
         dataIndex: 'contactEmail',
         key: 'contactEmail',
         width: '150px',
         ellipsis: true
       },
       {
-        title: 'publishDate',
+        title: `${t('department.publishDate')}`,
         dataIndex: 'publishDate',
         key: 'publishDate',
         width: '150px',
@@ -281,7 +284,7 @@ const Department: React.FC = () => {
       },
       {
         title: () => {
-          return <div className='tw-text-center'>Actions</div>
+          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
         },
         key: 'actions',
         align: 'center',
@@ -324,7 +327,7 @@ const Department: React.FC = () => {
       }
     ]
     return dataRenderColumns
-  }, [setShowModal, onDelete])
+  }, [setShowModal, onDelete, t])
 
   const onRendered = async (item: DataType) => {
     if (item.code === listDataDepartments[0].code) {
@@ -361,17 +364,9 @@ const Department: React.FC = () => {
         listDataTitle: listDataTitle
       })
     } else if (dataRender.listDataTitle.length === 1) {
-      await setDataRender({
-        listData: listDataDepartments,
-        listDataTitle: [
-          {
-            code: listDataDepartments[0].code,
-            name: listDataDepartments[0]?.name
-          }
-        ]
-      })
+      navigate(-1)
     } else {
-      window.history.back()
+      navigate(-1)
     }
   }
 
@@ -427,11 +422,15 @@ const Department: React.FC = () => {
               })
             }}
             icon={<PlusOutlined className='tw-text-600' />}
-            title={'add'}
+            title={`${t('department.add')}`}
           />
         </Col>
         <Col span={12} className='tw-flex tw-justify-end'>
-          <Search placeholder='input search text' onSearch={onSearch} style={{ width: '30%' }} />
+          <Input.Search
+            placeholder={`${t('department.pleaseEnterSearch')}`}
+            onChange={(value) => onSearch(value)}
+            style={{ width: '30%' }}
+          />
         </Col>
       </Row>
       {showModal.type !== ACTION_TYPE.View ? (
