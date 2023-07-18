@@ -124,7 +124,7 @@ export const createUser = createAsyncThunk('users/create', async (body: IUser, t
     throw error
   }
 })
-export const updateUser = createAsyncThunk('users/create', async (body: { userId: string; user: IUser }, thunkAPI) => {
+export const updateUser = createAsyncThunk('users/update', async (body: { userId: string; user: IUser }, thunkAPI) => {
   try {
     const response: IApiResponse<IUser[]> = await HttpService.put(`/system-user/${body.userId}/update`, body.user, {
       signal: thunkAPI.signal

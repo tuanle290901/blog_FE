@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, Select, Table, TablePaginationConfig } from 'antd'
-import { DeleteOutlined, EditOutlined, HistoryOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
@@ -226,7 +226,7 @@ const UserList: React.FC = () => {
                 onClick={() => handleClickDeleteUser(record)}
                 icon={<DeleteOutlined className='tw-text-red-600' />}
               />
-              <Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />
+              {/*<Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />*/}
             </div>
           </div>
         )
@@ -287,6 +287,9 @@ const UserList: React.FC = () => {
       return { ...prevState, paging, sorts }
     })
   }
+  const openModalCreateUser = () => {
+    setIsOpenUserModal(true)
+  }
 
   return (
     <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
@@ -302,7 +305,7 @@ const UserList: React.FC = () => {
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
-        <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
+        <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
           {t('userList.addMember')}
         </Button>
         <div className='tw-flex tw-gap-4'>
