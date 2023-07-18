@@ -140,7 +140,7 @@ export const updateUser = createAsyncThunk('users/update', async (body: { userId
 export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
   return userId
 })
-export const startEditingUser = createAsyncThunk('users/update', async (userId: string, thunkAPI) => {
+export const startEditingUser = createAsyncThunk('users/editUser', async (userId: string, thunkAPI) => {
   try {
     const response: IApiResponse<IUser> = await HttpService.get(`/system-user/${userId}`, {
       signal: thunkAPI.signal

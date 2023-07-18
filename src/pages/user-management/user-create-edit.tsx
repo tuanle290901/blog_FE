@@ -102,7 +102,7 @@ const UserCreateEdit: React.FC<{
       form.setFieldsValue({
         ...userData,
         birthday: userData.birthday ? dayjs(userData.birthday) : undefined,
-        formalDate: userData.joinDate ? dayjs(userData.formalDate) : undefined,
+        formalDate: userData.formalDate ? dayjs(userData.formalDate) : undefined,
         joinDate: userData.joinDate ? dayjs(userData.joinDate) : undefined
       })
       setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
