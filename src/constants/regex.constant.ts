@@ -11,3 +11,5 @@ export const REGEX_IP_ADDRESS =
   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
 
 export const REGEX_NUMBER_AND_SPACE = /^(?=.*\d)[\d ]+$/
+export const REGEX_SPECIAL_CHARS = /^[a-zA-Z0-9]+$/
+export const REGEX_SPECIAL_TRIM = /^[^\s]+[a-zA-Z0-9]+(\s+[a-zA-Z0-9]+[^\s]+)*$/

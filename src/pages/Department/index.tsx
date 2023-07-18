@@ -4,11 +4,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import './index.scss'
+
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Col, Input, Row, Space, Table, TableColumnsType } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
+import dayjs from 'dayjs'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import IconBackSVG from '~/assets/svg/iconback'
 import CommonButton from '~/components/Button/CommonButton'
 import { getListDepartments } from '~/stores/features/department/department.silce'
@@ -16,10 +20,8 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 
-import './index.scss'
-import DepartmentModal from './DepartmentModal'
 import DepartmentMemberModal from './DepartmentMemberModal'
-import { useNavigate } from 'react-router-dom'
+import DepartmentModal from './DepartmentModal'
 
 const Department: React.FC = () => {
   const { t } = useTranslation()
@@ -70,7 +72,8 @@ const Department: React.FC = () => {
 
   const renderTreeRows = (nodes: DataType[], isLastLevel = false) => {
     return nodes.map((node) => {
-      const { code, name, contactEmail, address, children, parentCode, parentName, contactPhoneNumber } = node
+      const { code, name, contactEmail, address, children, parentCode, parentName, contactPhoneNumber, publishDate } =
+        node
       const hasChildren = children && children.length > 0
       const row = {
         code,
@@ -80,7 +83,8 @@ const Department: React.FC = () => {
         children,
         parentCode,
         parentName,
-        contactPhoneNumber
+        contactPhoneNumber,
+        publishDate
       }
       if (hasChildren) {
         row.children = renderTreeRows(children, !isLastLevel)
@@ -280,7 +284,13 @@ const Department: React.FC = () => {
         dataIndex: 'publishDate',
         key: 'publishDate',
         width: '150px',
-        ellipsis: true
+        ellipsis: true,
+        render: (value: string) => {
+          if (value) {
+            const date = dayjs(value).format('DD/MM/YYYY')
+            return date
+          }
+        }
       },
       {
         title: () => {

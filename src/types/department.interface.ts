@@ -14,7 +14,7 @@ export interface DataType {
   contactPhoneNumber?: string | ''
   parentCode?: string
   parentName?: string
-  publishDate?: string
+  publishDate?: string | null | ''
 }
 
 export interface IDepartmentModal {
@@ -52,7 +52,7 @@ export interface IDepartment {
   address: string
   name: string
   id?: string | ''
-  publishDate: Date
+  publishDate: string
   contactEmail: string
   contactPhoneNumber: string
   parentCode?: string | ''
