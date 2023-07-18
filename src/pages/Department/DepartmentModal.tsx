@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePicker, Form, Input, Modal, notification } from 'antd'
-import { AxiosResponse, HttpStatusCode } from 'axios'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_TRIM } from '~/constants/regex.constant'
 import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
+
+import dayjs from 'dayjs'
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data, dataParent } = props
@@ -20,7 +21,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       code,
       address,
       name,
-      publishDate,
+      publishDate: publishDate ? publishDate.format('YYYY-MM-DD') : null,
       contactEmail,
       contactPhoneNumber,
       parentCode: ''
@@ -74,7 +75,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
         name: data.name,
         code: data.code,
         address: data.address,
-        publishDate: data.publishDate,
+        publishDate: data.publishDate ? dayjs(data.publishDate) : undefined,
         contactEmail: data.contactEmail,
         contactPhoneNumber: data.contactPhoneNumber,
         parentCode: data.parentCode
@@ -168,7 +169,12 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
           <Input placeholder={`${t('department.please-insert-input')}`} />
         </Form.Item>
         <Form.Item labelAlign='left' name='publishDate' label={t('department.publishDate')}>
-          <DatePicker className='tw-w-[100%]' />
+          <DatePicker
+            className='tw-w-[100%]'
+            format='DD/MM/YYYY'
+            showToday={false}
+            placeholder={`${t('department.please-insert-input')}`}
+          />
         </Form.Item>
       </Form>
     </Modal>
