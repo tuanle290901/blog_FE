@@ -172,9 +172,6 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
           <DatePicker
             className='tw-w-[100%]'
             format='DD/MM/YYYY'
-            disabledDate={(date) => {
-              return date.isAfter(new Date())
-            }}
             showToday={false}
             placeholder={`${t('department.please-insert-input')}`}
           />
