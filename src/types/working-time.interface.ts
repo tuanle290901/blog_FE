@@ -14,8 +14,8 @@ export interface IWorkingTimeConfig {
   workingDays: IWorkingDayConfig[]
 }
 export interface IShift {
-  startTimeShift: string
-  endTimeShift: string
+  startTimeShift?: string
+  endTimeShift?: string
 }
 export interface IWorkingDayConfig {
   day: WEEK_DAY

@@ -3,7 +3,7 @@ import { IWorkingDayConfig } from '~/types/working-time.interface.ts'
 import { Checkbox, Select, Switch, TimePicker } from 'antd'
 
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 import { DeleteOutlined, DownOutlined, InfoCircleOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons'
 
@@ -79,8 +79,10 @@ const DayItem: ForwardRefRenderFunction<
     setFormValue({ ...formValue, weeks: values as number[] })
   }
 
-  const handleShiftChange = (value: Dayjs | null, index: number) => {
-    console.log(value, index)
+  const handleShiftChange = (value: Dayjs | null, index: number, field: 'startTimeShift' | 'endTimeShift') => {
+    const shifts = [...formValue.shifts]
+    shifts[index][field] = value?.format('hh:mm')
+    setFormValue((prevState) => ({ ...prevState, shifts }))
   }
   const addShift = () => {
     setFormValue((prevState) => {
@@ -151,19 +153,23 @@ const DayItem: ForwardRefRenderFunction<
               </div>
             )}
             {formValue.shifts.map((item, index) => {
+              const startTimeShift = item.startTimeShift ? dayjs(item.startTimeShift, 'hh:mm') : null
+              const endTimeShift = item.endTimeShift ? dayjs(item.endTimeShift, 'hh:mm') : null
               return (
                 <div key={index} className='tw-flex tw-gap-4 tw-my-4 tw-items-center'>
                   <label className='tw-min-w-[96px]'>Ca {index}:</label>
                   <TimePicker
                     className='tw-w-32'
                     format='hh:mm'
-                    onChange={(value) => handleShiftChange(value, index)}
+                    value={startTimeShift}
+                    onChange={(value) => handleShiftChange(value, index, 'startTimeShift')}
                   />
                   <p>đến</p>
                   <TimePicker
                     className='tw-w-32'
                     format='hh:mm'
-                    onChange={(value) => handleShiftChange(value, index)}
+                    value={endTimeShift}
+                    onChange={(value) => handleShiftChange(value, index, 'endTimeShift')}
                   />
                   {index + 1 === formValue.shifts.length && (
                     <div className='tw-flex tw-gap-2 tw-items-center'>
