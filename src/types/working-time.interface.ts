@@ -95,12 +95,15 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       endTime: '17:30',
       dayOfWeek: 'FRIDAY',
       isActive: true,
+      always: false,
       weekIndexInMonth: [1]
     },
     {
       startTime: '08:30',
       endTime: '12:00',
       dayOfWeek: 'SATURDAY',
+      isActive: false,
+      always: false,
       weekIndexInMonth: [1]
     }
   ]

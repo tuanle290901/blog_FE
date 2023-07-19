@@ -95,7 +95,6 @@ const DayItem: ForwardRefRenderFunction<
       return newState
     })
   }
-  console.log(formValue)
   return (
     <div className={`${className} tw-flex tw-items-center`}>
       <div className='tw-flex-1 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-4'>
@@ -193,8 +192,12 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailyS
   ])
   useImperativeHandle(ref, () => ({ submit }))
 
-  const handleDataChange = (data: IWorkingDailySetup) => {
-    //   TODO
+  const handleDataChange = (index: number, data: IWorkingDailySetup) => {
+    setData((prevState) => {
+      const newState = [...prevState]
+      newState[index] = data
+      return newState
+    })
   }
 
   const submit = () => {
@@ -212,7 +215,7 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailyS
             key={index}
             className='tw-w-full tw-my-2'
             config={item}
-            onFinish={handleDataChange}
+            onFinish={(value) => handleDataChange(index, value)}
           />
         )
       })}
