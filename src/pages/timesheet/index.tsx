@@ -157,15 +157,10 @@ const Timesheet: React.FC = () => {
   const columns: ColumnsType<IAttendance> = [
     {
       title: t('timesheet.fullName'),
-      dataIndex: 'userId',
-      key: 'userId',
-      // ellipsis: true,
-      // sorter: true,
-      // showSorterTooltip: false,
-      // sortOrder: getSortOrder('fullName'),
-      render: (userId) => {
-        return handleGetFullName(userId)
-      }
+      dataIndex: 'fullName',
+      key: 'fullName',
+      ellipsis: true,
+      sortOrder: getSortOrder('fullName')
     },
     {
       title: t('timesheet.attendanceDate'),
@@ -271,36 +266,11 @@ const Timesheet: React.FC = () => {
     })
   }
 
-  const handleGetAllUserName = () => {
-    if (timesheetSate.timesheetList?.length < 1) {
-      return
-    }
-    const ids = timesheetSate.timesheetList?.map((item: IAttendance) => {
-      return item.userId
-    })
-    const promiseGetAllUserName = dispatch(getUsersName(ids))
-    return () => promiseGetAllUserName.abort()
-  }
-
-  const handleGetFullName = (userId: string) => {
-    let fullName = ''
-    if (timesheetSate.usersName?.length > 0) {
-      const result = timesheetSate.usersName.find(
-        (item: { id: string; userName: string; fullName: string }) => item.id === userId
-      )
-      if (result) {
-        fullName = result['fullName']
-      }
-    }
-    return fullName
-  }
-
   useEffect(() => {
     const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
-    handleGetAllUserName()
     return () => promiseGetAllGroup.abort()
   }, [])
 
@@ -319,7 +289,6 @@ const Timesheet: React.FC = () => {
   }, [selectedUser])
 
   useEffect(() => {
-    handleGetAllUserName()
     const promise = dispatch(
       filterTimesheet({
         paging: searchValue.paging,
