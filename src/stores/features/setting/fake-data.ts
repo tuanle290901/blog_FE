@@ -70,7 +70,7 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: '__REQUESTER_GROUP__',
+              groupCode: 'manager',
               attributes: [
                 {
                   name: 'note',
@@ -83,7 +83,20 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: 'HR',
+              groupCode: 'vice-director',
+              attributes: [
+                {
+                  name: 'note',
+                  description: 'Ý kiến',
+                  required: false,
+                  type: 'TEXT',
+                  options: null,
+                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                }
+              ]
+            },
+            {
+              groupCode: 'hr',
               attributes: [
                 {
                   name: 'note',
@@ -164,7 +177,7 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: '__REQUESTER_GROUP__',
+              groupCode: 'manager',
               attributes: [
                 {
                   name: 'note',
@@ -177,12 +190,12 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: 'HR',
+              groupCode: 'director',
               attributes: [
                 {
                   name: 'note',
                   description: 'Ý kiến',
-                  required: true,
+                  required: false,
                   type: 'TEXT',
                   options: null,
                   suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
@@ -258,7 +271,21 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: '__REQUESTER_GROUP__',
+              groupCode: 'manager',
+              attributes: [
+                {
+                  name: 'note',
+                  description: 'Ý kiến',
+                  required: true,
+                  type: 'TEXT',
+                  options: null,
+                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                }
+              ]
+            },
+
+            {
+              groupCode: 'hr',
               attributes: [
                 {
                   name: 'note',
@@ -271,33 +298,7 @@ export const ticketItem = {
               ]
             },
             {
-              groupCode: 'HR',
-              attributes: [
-                {
-                  name: 'note',
-                  description: 'Ý kiến',
-                  required: true,
-                  type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
-                }
-              ]
-            },
-            {
-              groupCode: 'HR',
-              attributes: [
-                {
-                  name: 'note',
-                  description: 'Ý kiến',
-                  required: true,
-                  type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
-                }
-              ]
-            },
-            {
-              groupCode: 'HR',
+              groupCode: 'director',
               attributes: [
                 {
                   name: 'note',

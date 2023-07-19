@@ -6,12 +6,13 @@ import { useDrop } from 'react-dnd'
 import { CloseCircleFilled } from '@ant-design/icons'
 import { Empty, Space, Tooltip } from 'antd'
 import { removeDroppedItem } from '~/stores/features/setting/ticket-process.slice'
-import { useAppDispatch } from '~/stores/hook'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DragItem, TargetProps } from '~/types/setting-ticket-process'
 import { ItemTypes } from '../type/ItemTypes'
 
 const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem, isValidStep }) => {
   const dispatch = useAppDispatch()
+  const departments = useAppSelector((state) => state.ticketProcess.departments)
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.BOX,
@@ -34,6 +35,13 @@ const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem, isV
     border: isValidStep() ? '1px dashed #0100ff' : '1px dashed #b9bec7'
   }
 
+  const convertGroupCodeToName = (groupCode: string) => {
+    if (!groupCode) return ''
+    const groupName = departments.find((d) => d.id === groupCode)?.name
+    if (groupName) return groupName
+    return groupCode
+  }
+
   const handleRemoveDroppedItem = (item: DragItem) => {
     const { id, name } = item
     dispatch(removeDroppedItem({ targetKey, id }))
@@ -51,8 +59,8 @@ const Target: FC<TargetProps> = ({ targetKey, onDrop, dropItem, canDropItem, isV
         <Space direction='vertical'>
           {dropItem.data.map((item, index) => (
             <div key={index} className='tw-relative'>
-              <Tooltip title={item.name} placement='left'>
-                <div className='drop-box__name'>{item.name}</div>
+              <Tooltip title={convertGroupCodeToName(item.name)} placement='left'>
+                <div className='drop-box__name'>{convertGroupCodeToName(item.name)}</div>
               </Tooltip>
               <div
                 className='tw-absolute tw-top-[-5px] tw-right-[-5px] tw-cursor-pointer'
