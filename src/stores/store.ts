@@ -8,6 +8,7 @@ import userSlice from '~/stores/features/user/user.slice.ts'
 import departmentSlice from './features/department/department.silce'
 import devicesSlice from './features/device/device.slice'
 import timesheetSlice from './features/timesheet/timesheet.slice'
+import typesOfLeaveSlice from './features/types-of-leave/types-of-leave.slice'
 
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -20,7 +21,8 @@ export const store = configureStore({
     ticketProcess,
     masterData: masterDataSlice,
     position: positionSlice,
-    device: devicesSlice
+    device: devicesSlice,
+    typesOfLeave: typesOfLeaveSlice
   }
 })
 
