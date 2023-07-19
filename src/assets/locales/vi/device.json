@@ -10,6 +10,15 @@
     "deviceListSubTitle": "Quản lí các thiết bị chấm công có trong hệ thống",
     "enterDeviceCode": "Nhập mã thiết bị",
     "enterInstallationLocation": "Nhập vị trí lắp đặt",
-    "selectDepartment": "Chọn tổ chức/phòng ban"
+    "selectDepartment": "Chọn tổ chức/phòng ban",
+    "name": "Tên thiết bị",
+    "enterName": "Nhập tên thiết bị",
+    "enterIpAddress": "Nhập địa chỉ thiết bị",
+    "ipAddress": "Địa chỉ thiết bị",
+    "enterPort": "Nhập port của thiết bị",
+    "port": "Port của thiết bị",
+    "groupCode": "Phòng ban sử dụng thiết bị",
+    "pleaseSelectAGroup": "Bạn chọn một phòng ban quản lý thiết bị",
+    "do-not-leave-spaces-special-accents": "Kí tự đặc biệt, dấu cách không được sử dụng"
   }
 }

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { HttpStatusCode } from 'axios'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant'
@@ -101,10 +102,10 @@ export const getListDevice = createAsyncThunk(
 
 export const createDevice = createAsyncThunk('devices/create', async (body: IDeviceForm, thunkAPI) => {
   try {
-    const response = await HttpService.post(END_POINT_API.Devices.create(), body, {
+    const response: IApiResponse<IDevice> = await HttpService.post(END_POINT_API.Devices.create(), body, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)
@@ -115,10 +116,10 @@ export const createDevice = createAsyncThunk('devices/create', async (body: IDev
 
 export const updateDevice = createAsyncThunk('devices/update', async (body: IDeviceForm, thunkAPI) => {
   try {
-    const response = await HttpService.put(END_POINT_API.Devices.update(), body, {
+    const response: IApiResponse<IDevice> = await HttpService.put(END_POINT_API.Devices.update(), body, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)

@@ -4,11 +4,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import './index.scss'
+
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Col, Input, Row, Space, Table, TableColumnsType } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
+import dayjs from 'dayjs'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import IconBackSVG from '~/assets/svg/iconback'
 import CommonButton from '~/components/Button/CommonButton'
 import { getListDepartments } from '~/stores/features/department/department.silce'
@@ -16,15 +20,13 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 
-import './index.scss'
-import DepartmentModal from './DepartmentModal'
 import DepartmentMemberModal from './DepartmentMemberModal'
+import DepartmentModal from './DepartmentModal'
 
-const { Search } = Input
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-
+  const navigate = useNavigate()
   const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
   const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
@@ -43,9 +45,9 @@ const Department: React.FC = () => {
   })
   const [useSelect, setUseSelect] = useState<DataType>()
 
-  const onSearch = (value: string) => {
-    if (value) {
-      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, value)
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value) {
+      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, e.target.value)
       setDataRender({
         listData: data,
         listDataTitle: [
@@ -70,7 +72,8 @@ const Department: React.FC = () => {
 
   const renderTreeRows = (nodes: DataType[], isLastLevel = false) => {
     return nodes.map((node) => {
-      const { code, name, contactEmail, address, children, parentCode, parentName, contactPhoneNumber } = node
+      const { code, name, contactEmail, address, children, parentCode, parentName, contactPhoneNumber, publishDate } =
+        node
       const hasChildren = children && children.length > 0
       const row = {
         code,
@@ -80,7 +83,8 @@ const Department: React.FC = () => {
         children,
         parentCode,
         parentName,
-        contactPhoneNumber
+        contactPhoneNumber,
+        publishDate
       }
       if (hasChildren) {
         row.children = renderTreeRows(children, !isLastLevel)
@@ -127,7 +131,10 @@ const Department: React.FC = () => {
     const filteredData: DataType[] = []
     function getListDataByKey(listData: DataType[]) {
       for (const item of listData) {
-        if (item.code.includes(keyword) || item.name?.includes(keyword)) {
+        if (
+          item.code.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
+          item.name?.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
+        ) {
           filteredData.push(item)
           break
         } else if (item.children && item.children.length > 0) {
@@ -227,7 +234,7 @@ const Department: React.FC = () => {
   const columns = useMemo(() => {
     const dataRenderColumns: TableColumnsType<DataType> = [
       {
-        title: 'Name',
+        title: `${t('department.name')}`,
         dataIndex: 'name',
         key: 'name',
         width: '250px',
@@ -245,43 +252,49 @@ const Department: React.FC = () => {
         ellipsis: true
       },
       {
-        title: 'code',
+        title: `${t('department.code')}`,
         dataIndex: 'code',
         key: 'code',
         width: '100px',
         ellipsis: true
       },
       {
-        title: 'address',
+        title: `${t('department.address')}`,
         dataIndex: 'address',
         key: 'address',
         width: '250px',
         ellipsis: true
       },
       {
-        title: 'contactPhoneNumber',
+        title: `${t('department.contactPhoneNumber')}`,
         dataIndex: 'contactPhoneNumber',
         key: 'contactPhoneNumber',
         width: '150px',
         ellipsis: true
       },
       {
-        title: 'contactEmail',
+        title: `${t('department.contactEmail')}`,
         dataIndex: 'contactEmail',
         key: 'contactEmail',
         width: '150px',
         ellipsis: true
       },
       {
-        title: 'publishDate',
+        title: `${t('department.publishDate')}`,
         dataIndex: 'publishDate',
         key: 'publishDate',
         width: '150px',
-        ellipsis: true
+        ellipsis: true,
+        render: (value: string) => {
+          if (value) {
+            const date = dayjs(value).format('DD/MM/YYYY')
+            return date
+          }
+        }
       },
       {
         title: () => {
-          return <div className='tw-text-center'>Actions</div>
+          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
         },
         key: 'actions',
         align: 'center',
@@ -324,7 +337,7 @@ const Department: React.FC = () => {
       }
     ]
     return dataRenderColumns
-  }, [setShowModal, onDelete])
+  }, [setShowModal, onDelete, t])
 
   const onRendered = async (item: DataType) => {
     if (item.code === listDataDepartments[0].code) {
@@ -361,17 +374,9 @@ const Department: React.FC = () => {
         listDataTitle: listDataTitle
       })
     } else if (dataRender.listDataTitle.length === 1) {
-      await setDataRender({
-        listData: listDataDepartments,
-        listDataTitle: [
-          {
-            code: listDataDepartments[0].code,
-            name: listDataDepartments[0]?.name
-          }
-        ]
-      })
+      navigate(-1)
     } else {
-      window.history.back()
+      navigate(-1)
     }
   }
 
@@ -427,11 +432,15 @@ const Department: React.FC = () => {
               })
             }}
             icon={<PlusOutlined className='tw-text-600' />}
-            title={'add'}
+            title={`${t('department.add')}`}
           />
         </Col>
         <Col span={12} className='tw-flex tw-justify-end'>
-          <Search placeholder='input search text' onSearch={onSearch} style={{ width: '30%' }} />
+          <Input.Search
+            placeholder={`${t('department.pleaseEnterSearch')}`}
+            onChange={(value) => onSearch(value)}
+            style={{ width: '30%' }}
+          />
         </Col>
       </Row>
       {showModal.type !== ACTION_TYPE.View ? (

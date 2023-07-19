@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, DatePicker, Form, Input, message, Modal, Radio, Select, Upload } from 'antd'
+import { Button, DatePicker, Form, Input, message, Modal, notification, Radio, Select, Upload } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { RuleObject } from 'antd/lib/form'
 import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
@@ -10,7 +11,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { GENDER, ROLE } from '~/constants/app.constant.ts'
 import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
-import { EMAIL_REG, PHONE_NUMBER_REG } from '~/constants/regex.constant.ts'
+import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -22,6 +23,7 @@ const UserCreateEdit: React.FC<{
   const [loading, setLoading] = useState(false)
   const [avatarBase64, setAvatarBase64] = useState<string>('')
   const [avtError, setAvtError] = useState(false)
+  const [serverError, setServerError] = useState<any>(null)
   const [form] = Form.useForm<
     Omit<IUser, 'birthday' | 'joinDate' | 'formalDate'> & { birthday: Dayjs; joinDate: Dayjs; formalDate: Dayjs }
   >()
@@ -100,7 +102,7 @@ const UserCreateEdit: React.FC<{
       form.setFieldsValue({
         ...userData,
         birthday: userData.birthday ? dayjs(userData.birthday) : undefined,
-        formalDate: userData.joinDate ? dayjs(userData.formalDate) : undefined,
+        formalDate: userData.formalDate ? dayjs(userData.formalDate) : undefined,
         joinDate: userData.joinDate ? dayjs(userData.joinDate) : undefined
       })
       setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
@@ -139,13 +141,17 @@ const UserCreateEdit: React.FC<{
         if (userData) {
           await dispatch(
             updateUser({ userId: userData.id as string, user: { ...payload, userName: userData.userName } })
-          )
+          ).unwrap()
         } else {
-          await dispatch(createUser(payload))
+          await dispatch(createUser(payload)).unwrap()
         }
+        setServerError(null)
         finishAndClose(true)
+        notification.success({
+          message: userData ? 'Cập nhật thông tin thành viên thành công' : 'Tạo mới thành viên thành cồng'
+        })
       } catch (e) {
-        finishAndClose(false)
+        setServerError(e)
       } finally {
         setLoading(false)
       }
@@ -153,17 +159,52 @@ const UserCreateEdit: React.FC<{
       console.log(e)
     }
   }
+  useEffect(() => {
+    if (serverError) {
+      void form.validateFields(['email', 'phoneNumber'])
+    }
+  }, [serverError])
   const finishAndClose = (isSuccess: boolean) => {
     handleClose(isSuccess)
     form.resetFields()
     setAvtError(false)
     setAvatarBase64('')
+    setServerError(null)
   }
   const handleClickButtonUpdateAvatar = () => {
     if (uploadRef?.current) {
       uploadRef.current.click()
     }
   }
+
+  const emailValidator = (rule: RuleObject | any, value: any) => {
+    if (!value) {
+      return Promise.resolve()
+    }
+    if (!EMAIL_REG.test(value)) {
+      return Promise.reject(t('userModal.errorMessage.invalidEmail'))
+    }
+    if (serverError) {
+      if (serverError.message.includes(value)) {
+        return Promise.reject('Email ' + value + ' đã được sử dụng.')
+      }
+    }
+    return Promise.resolve()
+  }
+  const phoneNumberValidator = (rule: RuleObject | any, value: any) => {
+    if (!value) {
+      return Promise.reject(t('userModal.errorMessage.phoneNumberEmpty'))
+    }
+    if (!REGEX_PHONE_NUMBER.test(value)) {
+      return Promise.reject(t('userModal.errorMessage.invalidPhoneNumber'))
+    }
+    console.log(serverError)
+    if (serverError && serverError.message.includes(value)) {
+      return Promise.reject('Số điện thoại ' + value + ' đã được sử dụng.')
+    }
+    return Promise.resolve()
+  }
+
   return (
     <Modal
       open={open}
@@ -274,12 +315,7 @@ const UserCreateEdit: React.FC<{
                   name='phoneNumber'
                   rules={[
                     {
-                      required: true,
-                      message: t('userModal.errorMessage.phoneNumberEmpty')
-                    },
-                    {
-                      pattern: PHONE_NUMBER_REG,
-                      message: t('userModal.errorMessage.invalidPhoneNumber')
+                      validator: phoneNumberValidator
                     }
                   ]}
                 >
@@ -291,8 +327,7 @@ const UserCreateEdit: React.FC<{
                   name='email'
                   rules={[
                     {
-                      pattern: EMAIL_REG,
-                      message: t('userModal.errorMessage.invalidEmail')
+                      validator: emailValidator
                     }
                   ]}
                 >
@@ -321,17 +356,17 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterDateJoin')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>
-                  <DatePicker
-                    format='DD/MM/YYYY'
-                    disabledDate={(date) => {
-                      return date.isAfter(new Date())
-                    }}
-                    showToday={false}
-                    className='tw-w-full'
-                    placeholder={t('userModal.enterProbationDate')}
-                  />
-                </Form.Item>
+                {/*<Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>*/}
+                {/*  <DatePicker*/}
+                {/*    format='DD/MM/YYYY'*/}
+                {/*    disabledDate={(date) => {*/}
+                {/*      return date.isAfter(new Date())*/}
+                {/*    }}*/}
+                {/*    showToday={false}*/}
+                {/*    className='tw-w-full'*/}
+                {/*    placeholder={t('userModal.enterProbationDate')}*/}
+                {/*  />*/}
+                {/*</Form.Item>*/}
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.officialContractSigningDate')}

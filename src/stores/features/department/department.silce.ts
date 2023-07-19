@@ -1,7 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { HttpStatusCode } from 'axios'
 import HttpService from '~/config/api'
+import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { DataType, IDepartment } from '~/types/department.interface'
+import { IApiResponse } from '~/types/api-response.interface'
 
 export interface IDepartmentState {
   listData: DataType[]
@@ -9,6 +12,7 @@ export interface IDepartmentState {
   loading: boolean
   currentRequestId: string | null
 }
+
 const initialState: IDepartmentState = {
   listData: [],
   editingDepartment: null,
@@ -27,22 +31,29 @@ export const getListDepartments = createAsyncThunk('departments/getAll', async (
   }
 })
 
-export const createDepartment = createAsyncThunk('departments/create', async (body: IDepartment, thunkAPI) => {
+export const createDepartment = createAsyncThunk('departments/create', async (body: IDepartment, thunkAPI: any) => {
   try {
-    const response = await HttpService.post('/org/group/create', body, {
+    const response: IApiResponse<DataType> = await HttpService.post('/org/group/create', body, {
       signal: thunkAPI.signal
     })
-    return response.data
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error)
+    if (response.status === HttpStatusCode.Ok) {
+      return response
+    } else {
+      return thunkAPI.rejectWithValue(response.data)
+    }
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
   }
 })
 export const updateDepartment = createAsyncThunk('departments/update', async (body: IDepartment, thunkAPI) => {
   try {
-    const response = await HttpService.post('/org/group/update/info', body, {
+    const response: IApiResponse<DataType> = await HttpService.post('/org/group/update/info', body, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -79,7 +90,7 @@ const departmentSlice = createSlice({
         state.loading = true
       })
       .addCase(updateDepartment.fulfilled, (state, action) => {
-        const updatedDepartment = action.payload
+        const updatedDepartment = action.payload.data
         state.listData = updateDepartmentInTree(state.listData, updatedDepartment)
       })
       .addMatcher<PendingAction>(
@@ -105,6 +116,7 @@ const updateDepartmentInTree = (listData: DataType[], updatedDepartment: DataTyp
   return listData.map((department: DataType) => {
     if (department.code === updatedDepartment.code) {
       return {
+        ...department,
         ...updatedDepartment
       }
     } else if (department.children && department.children.length > 0) {

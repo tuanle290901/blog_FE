@@ -24,7 +24,7 @@ HttpService.interceptors.response.use(
     if (error.response?.status === 500) {
       //   TODO show error
     }
-    return error.response
+    throw error
   }
 )
 export default HttpService

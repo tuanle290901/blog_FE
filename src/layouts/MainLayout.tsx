@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
@@ -12,7 +13,7 @@ import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { logout } from '~/stores/features/auth/auth.slice'
@@ -43,8 +44,10 @@ const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-
+  const params = useLocation()
   const { userInfo } = useUserInfo()
+  const [sideBarMenuKey, setSideBarMenuKey] = useState('')
+  const [selectedKeyStatus, setSelectedKeyStatus] = useState<string>(`${params.pathname}`.split('/')[1])
 
   const handleLogout = () => {
     dispatch(logout())
@@ -104,7 +107,7 @@ const MainLayout: React.FC = () => {
         'manageFunction',
         null,
         [
-          getItem('Thành viên', '/users', <img src={menuIconMember} alt='' className='menu-image' />),
+          getItem('Thành viên', 'users', <img src={menuIconMember} alt='' className='menu-image' />),
           getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />),
           getItem('Chức vụ', 'positions', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
@@ -135,6 +138,12 @@ const MainLayout: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    const pathname = window.location.pathname.replace('/', '')
+    setSideBarMenuKey(pathname)
+    setSelectedKeyStatus(pathname)
+  }, [window.location.pathname])
+
   return (
     <Layout className='app-container tw-min-h-screen'>
       <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
@@ -147,7 +156,16 @@ const MainLayout: React.FC = () => {
           )}
         </div>
         <hr className='hr-custom' />
-        <Menu theme='light' defaultSelectedKeys={['1']} mode='inline' items={menuItems} onClick={handleMenuClick} />
+        <Menu
+          theme='light'
+          // defaultSelectedKeys={['1']}
+          defaultSelectedKeys={[sideBarMenuKey]}
+          defaultOpenKeys={[sideBarMenuKey]}
+          selectedKeys={[selectedKeyStatus]}
+          mode='inline'
+          items={menuItems}
+          onClick={handleMenuClick}
+        />
       </Sider>
       <Layout>
         <Header className='header-container'>

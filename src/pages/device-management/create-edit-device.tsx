@@ -1,7 +1,10 @@
-import { Form, Input, Modal, Select } from 'antd'
+/* eslint-disable prettier/prettier */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Form, Input, Modal, Select, notification } from 'antd'
+import { HttpStatusCode } from 'axios'
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT } from '~/constants/regex.constant'
+import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
 import { createDevice, updateDevice } from '~/stores/features/device/device.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IDevice, IDeviceForm } from '~/types/device.interface.ts'
@@ -30,7 +33,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
     }
   }, [deviceData])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { port, name, ipAddress, groupCode } = form.getFieldsValue()
     const payload: IDeviceForm = {
       port: port,
@@ -39,18 +42,37 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
       groupCode: groupCode
     }
     if (deviceData) {
-      dispatch(
-        updateDevice({
-          ...payload,
-          id: deviceData.id
+      try {
+        const response = await dispatch(
+          updateDevice({
+            ...payload,
+            id: deviceData.id
+          })
+        ).unwrap()
+        form.resetFields()
+        handleClose()
+        notification.success({
+          message: response.message
         })
-      )
-      form.resetFields()
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
     } else {
-      dispatch(createDevice(payload))
-      form.resetFields()
+      try {
+        const response = await dispatch(createDevice(payload)).unwrap()
+        form.resetFields()
+        handleClose()
+        notification.success({
+          message: response.message
+        })
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
     }
-    handleClose()
   }
 
   const onCancel = () => {
@@ -72,7 +94,18 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
     >
       <div className='tw-my-4'>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
-          <Form.Item style={{ marginBottom: 8 }} label={t('device.name')} name='name' required>
+          <Form.Item
+            style={{ marginBottom: 8 }}
+            label={t('device.name')}
+            name='name'
+            required
+            rules={[
+              {
+                pattern: REGEX_SPECIAL_TRIM,
+                message: `${t('device.do-not-leave-spaces-special-accents')}`
+              }
+            ]}
+          >
             <Input placeholder={t('device.enterName')} />
           </Form.Item>
           <Form.Item
@@ -101,7 +134,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
               },
               {
                 required: true,
-                message: 'please enter a port'
+                message: 'device.enterPort'
               }
             ]}
           >
@@ -123,7 +156,7 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
             rules={[
               {
                 required: true,
-                message: 'select a group code'
+                message: 'department.pleaseSelectAGroup'
               }
             ]}
           >

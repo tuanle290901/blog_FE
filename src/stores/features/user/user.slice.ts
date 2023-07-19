@@ -124,7 +124,7 @@ export const createUser = createAsyncThunk('users/create', async (body: IUser, t
     throw error
   }
 })
-export const updateUser = createAsyncThunk('users/create', async (body: { userId: string; user: IUser }, thunkAPI) => {
+export const updateUser = createAsyncThunk('users/update', async (body: { userId: string; user: IUser }, thunkAPI) => {
   try {
     const response: IApiResponse<IUser[]> = await HttpService.put(`/system-user/${body.userId}/update`, body.user, {
       signal: thunkAPI.signal
@@ -140,15 +140,28 @@ export const updateUser = createAsyncThunk('users/create', async (body: { userId
 export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
   return userId
 })
+export const startEditingUser = createAsyncThunk('users/editUser', async (userId: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<IUser> = await HttpService.get(`/system-user/${userId}`, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
 const userSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    startEditingUser: (state, action: PayloadAction<string>) => {
-      const userId = action.payload
-      const foundUser = state.userList.find((user) => user.id === userId)
-      state.editingUser = foundUser as IUser
-    },
+    // startEditingUser: (state, action: PayloadAction<string>) => {
+    //   const userId = action.payload
+    //   const foundUser = state.userList.find((user) => user.id === userId)
+    //   state.editingUser = foundUser as IUser
+    // },
     cancelEditingUser: (state) => {
       state.editingUser = null
     }
@@ -158,6 +171,9 @@ const userSlice = createSlice({
       .addCase(searchUser.fulfilled, (state, action) => {
         state.userList = action.payload.data
         state.meta = action.payload.meta
+      })
+      .addCase(startEditingUser.fulfilled, (state, action) => {
+        state.editingUser = action.payload
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
@@ -181,5 +197,5 @@ const userSlice = createSlice({
       })
   }
 })
-export const { startEditingUser, cancelEditingUser } = userSlice.actions
+export const { cancelEditingUser } = userSlice.actions
 export default userSlice.reducer
