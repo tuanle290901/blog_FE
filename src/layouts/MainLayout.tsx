@@ -13,6 +13,7 @@ import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
 
+import defaultImg from '~/assets/images/default-img.png'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
@@ -20,6 +21,7 @@ import { logout } from '~/stores/features/auth/auth.slice'
 import { PUBLIC_PATH } from '~/constants/public-routes'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
+import ChangePassword from '~/pages/change-password/change-password'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -48,6 +50,7 @@ const MainLayout: React.FC = () => {
   const { userInfo } = useUserInfo()
   const [sideBarMenuKey, setSideBarMenuKey] = useState('')
   const [selectedKeyStatus, setSelectedKeyStatus] = useState<string>(`${params.pathname}`.split('/')[1])
+  const [showChangePassword, setShowChangePassword] = useState<boolean>(false)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -67,6 +70,19 @@ const MainLayout: React.FC = () => {
         label: (
           <div className='tw-flex tw-items-center'>
             <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
+          </div>
+        )
+      },
+      {
+        key: 'changePassword',
+        label: (
+          <div
+            className='tw-flex tw-items-center'
+            onClick={() => {
+              setShowChangePassword(!showChangePassword)
+            }}
+          >
+            <span className='tw-ml-[8px]'>Đổi mật khẩu</span>
           </div>
         )
       },
@@ -182,11 +198,34 @@ const MainLayout: React.FC = () => {
                   <BellOutlined className='bell-icon-custom' />
                 </Badge>
                 <Space className='tw-cursor-pointer tw-ml-[15px]'>
-                  <Avatar size='default' icon={<UserOutlined />} />
+                  <Avatar
+                    size='default'
+                    icon={
+                      userInfo?.avatarBase64 ? (
+                        <img
+                          className='tw-w-28 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-28 tw-rounded-full tw-object-cover'
+                          src={`data:image/png;base64,${userInfo?.avatarBase64}`}
+                          alt='avatar'
+                        />
+                      ) : (
+                        <img
+                          className='tw-w-28 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-28 tw-rounded-full tw-object-cover'
+                          src={defaultImg}
+                          alt='avatar'
+                        />
+                      )
+                    }
+                  />
                   <span className='tw-font-bold'>{userInfo?.fullName}</span>
                 </Space>
               </div>
             </Dropdown>
+            <ChangePassword
+              showModal={showChangePassword}
+              handClose={() => {
+                setShowChangePassword(!showChangePassword)
+              }}
+            />
           </div>
         </Header>
         <Content className='content-container'>
