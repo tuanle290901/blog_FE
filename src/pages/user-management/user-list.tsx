@@ -79,7 +79,7 @@ const UserList: React.FC = () => {
     const options = groups.map((item) => {
       return { value: item.code, label: item.name }
     })
-    return [{ value: null, label: t('userList.allGroup') }, ...options]
+    return [{ value: 'all', label: t('userList.allGroup') }, ...options]
   }, [groups])
   const handleClickEditUser = async (user: IUser) => {
     //   TODO
@@ -98,7 +98,7 @@ const UserList: React.FC = () => {
       setSearchValue((prevState) => {
         return {
           ...prevState,
-          group: null,
+          group: 'all',
           sorts: [
             {
               direction: 'DESC',
@@ -236,10 +236,10 @@ const UserList: React.FC = () => {
   ]
   const handleDepartmentChange = (value: string | null) => {
     setSearchValue((prevState) => {
-      if (value) {
+      if (value !== 'all') {
         return { ...prevState, group: value }
       } else {
-        return { ...prevState, query: prevState.query, group: null }
+        return { ...prevState, query: prevState.query }
       }
     })
   }
@@ -257,7 +257,7 @@ const UserList: React.FC = () => {
         paging: searchValue.paging,
         sorts: searchValue.sorts,
         query: searchValue.query,
-        groupCode: searchValue.group
+        groupCode: searchValue.group === 'all' ? null : searchValue.group
       })
     )
     return () => {
@@ -314,8 +314,9 @@ const UserList: React.FC = () => {
         <div className='tw-flex tw-gap-4'>
           <Select
             onChange={handleDepartmentChange}
-            defaultValue={null}
+            defaultValue={'all'}
             options={groupOptions}
+            value={searchValue.group}
             className='tw-w-64'
           ></Select>
           <Search
