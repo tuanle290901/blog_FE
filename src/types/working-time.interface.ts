@@ -13,6 +13,7 @@ export interface IWorkingTimeConfig {
 
 export interface IWorkingDailySetup {
   isActive?: boolean
+  always?: boolean
   dayOfWeek: string
   endTime: string | null | Dayjs
   startTime: string | null | Dayjs
@@ -61,31 +62,36 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       startTime: '08:30',
       endTime: '17:30',
       dayOfWeek: 'MONDAY',
+      isActive: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
       startTime: '08:30',
       endTime: '17:30',
       dayOfWeek: 'TUESDAY',
+      isActive: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
       startTime: '08:30',
       endTime: '17:30',
       dayOfWeek: 'WEDNESDAY',
+      isActive: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
       startTime: '08:30',
       endTime: '17:30',
       dayOfWeek: 'THURSDAY',
+      isActive: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
       startTime: '08:30',
       endTime: '17:30',
       dayOfWeek: 'FRIDAY',
-      weekIndexInMonth: [1, 2, 3, 4, 5]
+      isActive: true,
+      weekIndexInMonth: [1]
     },
     {
       startTime: '08:30',
