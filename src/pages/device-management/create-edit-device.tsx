@@ -144,7 +144,7 @@ const CreateEditDevice: React.FC<{
               },
               {
                 required: true,
-                message: 'device.enterPort'
+                message: `${t('device.enterPort')}`
               }
             ]}
           >
@@ -166,7 +166,7 @@ const CreateEditDevice: React.FC<{
             rules={[
               {
                 required: true,
-                message: 'department.pleaseSelectAGroup'
+                message: `${t('department.pleaseSelectAGroup')}`
               }
             ]}
           >
