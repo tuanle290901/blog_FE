@@ -26,6 +26,6 @@ export const convertUTCToLocaleDate = (dateStr: string) => {
 
 export const convertUTCToLocaleTime = (timeStr: string) => {
   if (!timeStr) return null
-  const formatDate = dayjs(`${dayjs().format('YYYY-MM-DD')}T${timeStr}+00:00`).format('HH:mm:ss')
+  const formatDate = dayjs(`${dayjs().format('YYYY-MM-DD')}T${timeStr}+07:00`).format('HH:mm:ss')
   return formatDate.toString()
 }

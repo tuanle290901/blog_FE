@@ -13,3 +13,5 @@ export const REGEX_IP_ADDRESS =
 export const REGEX_NUMBER_AND_SPACE = /^(?=.*\d)[\d ]+$/
 export const REGEX_SPECIAL_CHARS = /^[a-zA-Z0-9]+$/
 export const REGEX_SPECIAL_TRIM = /^[^\s]+[a-zA-Z0-9]+(\s+[a-zA-Z0-9]+[^\s]+)*$/
+
+export const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%&])[A-Za-z\d@#$%&]{8,20}$/
