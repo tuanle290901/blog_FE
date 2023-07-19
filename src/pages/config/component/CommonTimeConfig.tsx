@@ -33,7 +33,7 @@ const TabItem = () => {
               />
               <span>Đến</span>
               <InputNumber
-                value={config.common.startPayrollCutoffDay.day}
+                value={config.common.endPayrollCutoffDay.day}
                 className='tw-w-14'
                 defaultValue={5}
                 min={1}

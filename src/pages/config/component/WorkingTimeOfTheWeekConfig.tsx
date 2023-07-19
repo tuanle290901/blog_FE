@@ -147,7 +147,7 @@ const DayItem: ForwardRefRenderFunction<
               <TimePicker
                 className='tw-w-32'
                 format='HH:mm'
-                value={config.startTime ? dayjs(config.startTime, 'HH:mm') : null}
+                value={config.startTime ? dayjs(config.endTime, 'HH:mm') : null}
                 onChange={(value) => handleShiftChange(value, 'endTime')}
               />
             </div>
