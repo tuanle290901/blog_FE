@@ -9,12 +9,14 @@ import { createDevice, updateDevice } from '~/stores/features/device/device.slic
 import { IGroup } from '~/stores/features/master-data/master-data.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IDevice, IDeviceForm } from '~/types/device.interface.ts'
+import { ACTION_TYPE } from '~/utils/helper'
 
-const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; deviceData?: IDevice | null }> = ({
-  open,
-  handleClose,
-  deviceData
-}) => {
+const CreateEditDevice: React.FC<{
+  open: boolean
+  handleClose: () => void
+  deviceData?: IDevice | null
+  typeAction?: string
+}> = ({ open, handleClose, deviceData, typeAction }) => {
   const [t] = useTranslation()
   const [form] = Form.useForm<IDevice>()
   const dispatch = useAppDispatch()
@@ -125,7 +127,10 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
               }
             ]}
           >
-            <Input placeholder={t('device.enterIpAddress')} />
+            <Input
+              placeholder={t('device.enterIpAddress')}
+              disabled={typeAction === ACTION_TYPE.Updated ? true : false}
+            />
           </Form.Item>
           <Form.Item
             required
