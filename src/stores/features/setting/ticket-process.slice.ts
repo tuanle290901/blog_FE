@@ -39,8 +39,12 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
             name: 'HCNS'
           },
           {
-            id: 'department',
-            name: 'HTSC'
+            id: 'vice-director',
+            name: 'Phó giám đốc'
+          },
+          {
+            id: 'director',
+            name: 'Giám đốc'
           }
         ],
         message: 'Lấy dữ liệu thành công.',
