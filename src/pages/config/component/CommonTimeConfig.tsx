@@ -1,13 +1,17 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import '../index.scss'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
-import { Button, InputNumber, Tabs, TimePicker } from 'antd'
-import { DEFAULT_CONFIG, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
+import { Button, Form, InputNumber, Tabs, TimePicker } from 'antd'
+import { DEFAULT_CONFIG, ICommonConfig, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
 import dayjs from 'dayjs'
+import { useForm } from 'antd/es/form/Form'
+import FormItem from 'antd/es/form/FormItem'
+
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
 const TabItem = () => {
   const ref = useRef<RefType>(null)
   const [config, setConfig] = useState<IWorkingTimeConfig>({ ...DEFAULT_CONFIG })
+  const [form] = useForm<Omit<ICommonConfig, 'overTimeSetting' | 'endPayrollCutoffDay' | 'startPayrollCutoffDay'>>()
   const save = () => {
     ref.current?.submit()
   }
@@ -19,69 +23,87 @@ const TabItem = () => {
             <span className='tw-font-semibold'>Các mốc thời gian</span>
           </div>
           <div className='tw-flex-1'>
-            <div className='tw-flex tw-items-center tw-gap-2 tw-mb-4'>
-              <div className='tw-w-56'>
-                <p>Ngày chốt công</p>
+            <Form>
+              <div className='tw-flex tw-gap-2 tw-mb-4'>
+                <div className='tw-w-56 tw-mt-1.5'>
+                  <p>Ngày chốt công</p>
+                </div>
+                <p className='tw-mt-1.5'>Từ</p>
+                <FormItem>
+                  <InputNumber
+                    value={config.common.startPayrollCutoffDay.day}
+                    className='tw-w-14'
+                    defaultValue={1}
+                    min={1}
+                    max={31}
+                  />
+                </FormItem>
+
+                <p className='tw-mt-1.5'>Đến</p>
+                <FormItem>
+                  <InputNumber
+                    value={config.common.endPayrollCutoffDay.day}
+                    className='tw-w-14'
+                    defaultValue={5}
+                    min={1}
+                    max={31}
+                  />
+                </FormItem>
+                <p className='tw-mt-1.5'>Hàng tháng</p>
               </div>
-              <span>Từ</span>
-              <InputNumber
-                value={config.common.startPayrollCutoffDay.day}
-                className='tw-w-14'
-                defaultValue={1}
-                min={1}
-                max={31}
-              />
-              <span>Đến</span>
-              <InputNumber
-                value={config.common.endPayrollCutoffDay.day}
-                className='tw-w-14'
-                defaultValue={5}
-                min={1}
-                max={31}
-              />
-              <span>Hàng tháng</span>
-            </div>
-            <div className='tw-flex tw-items-center tw-gap-8 tw-my-4'>
-              <div className='tw-w-56'>
-                <p>Số ngày nghỉ phép mặc định</p>
+              <div className='tw-flex tw-gap-8 tw-my-4'>
+                <div className='tw-w-56 tw-mt-1.5'>
+                  <p>Số ngày nghỉ phép mặc định</p>
+                </div>
+                <FormItem>
+                  <InputNumber value={config.common.defaultLeaveDay} className='tw-w-14' defaultValue={12} min={1} />
+                </FormItem>
               </div>
-              <InputNumber value={config.common.defaultLeaveDay} className='tw-w-14' defaultValue={12} min={1} />
-            </div>
-            <div className='tw-flex tw-items-center tw-gap-8 tw-my-4'>
-              <div className='tw-w-56'>
-                <p>Thời gian nghỉ bù có hiệu lực</p>
+              <div className='tw-flex tw-gap-8 tw-my-4'>
+                <div className='tw-w-56 tw-mt-1.5'>
+                  <p>Thời gian nghỉ bù có hiệu lực</p>
+                </div>
+                <FormItem>
+                  <InputNumber
+                    value={config.common.affectCompensatoryInMonth}
+                    className='tw-w-14'
+                    defaultValue={3}
+                    min={1}
+                  />
+                </FormItem>
               </div>
-              <InputNumber
-                value={config.common.affectCompensatoryInMonth}
-                className='tw-w-14'
-                defaultValue={3}
-                min={1}
-              />
-            </div>
-            <div className='tw-flex tw-items-center tw-gap-2 tw-my-4'>
-              <div className='tw-w-56'>
-                <p>Khoảng thời gian làm thêm(OT)</p>
+              <div className='tw-flex tw-gap-2 tw-my-4'>
+                <div className='tw-w-56 tw-mt-1.5'>
+                  <p>Khoảng thời gian làm thêm(OT)</p>
+                </div>
+                <p className='tw-mt-1.5'>Từ</p>
+                <FormItem>
+                  <TimePicker
+                    value={
+                      config.common.overTimeSetting.startTime
+                        ? dayjs(config.common.overTimeSetting.startTime, 'HH:mm')
+                        : null
+                    }
+                    format='HH:mm'
+                    className='tw-w-32'
+                  />
+                </FormItem>
+
+                <p className='tw-mt-1.5'>Đến</p>
+                <FormItem>
+                  <TimePicker
+                    value={
+                      config.common.overTimeSetting.endTime
+                        ? dayjs(config.common.overTimeSetting.endTime, 'HH:mm')
+                        : null
+                    }
+                    format='HH:mm'
+                    className='tw-w-32'
+                  />
+                </FormItem>
+                <p className='tw-mt-1.5'>Hàng ngày</p>
               </div>
-              <span>Từ</span>
-              <TimePicker
-                value={
-                  config.common.overTimeSetting.startTime
-                    ? dayjs(config.common.overTimeSetting.startTime, 'HH:mm')
-                    : null
-                }
-                format='HH:mm'
-                className='tw-w-32'
-              />
-              <span>Đến</span>
-              <TimePicker
-                value={
-                  config.common.overTimeSetting.endTime ? dayjs(config.common.overTimeSetting.endTime, 'HH:mm') : null
-                }
-                format='HH:mm'
-                className='tw-w-32'
-              />
-              <span>Hàng ngày</span>
-            </div>
+            </Form>
           </div>
         </div>
         <div className='tw-flex'>

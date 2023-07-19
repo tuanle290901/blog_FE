@@ -19,7 +19,7 @@ const DayItem: ForwardRefRenderFunction<
     className?: string
   }
 > = ({ config, onFinish, className }, ref) => {
-  const [formValue, setFormValue] = useState<IWorkingDailySetup & { isActive: boolean }>({ ...config, isActive: true })
+  const [formValue, setFormValue] = useState<IWorkingDailySetup>({ ...config })
   const [isCollapse, setIsCollapse] = useState(true)
   useImperativeHandle(ref, () => ({ submit }))
   const submit = () => {
@@ -65,7 +65,7 @@ const DayItem: ForwardRefRenderFunction<
 
   const handleRepeatChange = (value: number) => {
     setFormValue((prevState) => {
-      let newState: IWorkingDailySetup & { isActive: boolean }
+      let newState: IWorkingDailySetup
       if (value === 0) {
         newState = { ...prevState, weekIndexInMonth: [1, 2, 3, 4, 5] }
       } else {
@@ -179,7 +179,7 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailyS
   useImperativeHandle(ref, () => ({ submit }))
 
   const handleDataChange = (data: IWorkingDailySetup) => {
-    console.log(data)
+    //   TODO
   }
 
   const submit = () => {
