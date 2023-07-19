@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Form, Input, Modal, Select, notification } from 'antd'
-import { HttpStatusCode } from 'axios'
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
 import { createDevice, updateDevice } from '~/stores/features/device/device.slice'
+import { IGroup } from '~/stores/features/master-data/master-data.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IDevice, IDeviceForm } from '~/types/device.interface.ts'
 
@@ -17,17 +18,17 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
   const [t] = useTranslation()
   const [form] = Form.useForm<IDevice>()
   const dispatch = useAppDispatch()
-  const groups = useAppSelector((state) => state.masterData.groups)
+  const groups = useAppSelector((state: any) => state.masterData.groups)
 
   const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
-    return groups.map((item) => {
+    return groups.map((item: IGroup) => {
       return { value: item.code, label: item.name }
     })
   }, [groups])
 
   useEffect(() => {
     if (deviceData) {
-      form.setFieldsValue(deviceData)
+      form.setFieldsValue({ ...deviceData, name: deviceData.name })
     } else {
       form.resetFields()
     }
@@ -95,11 +96,15 @@ const CreateEditDevice: React.FC<{ open: boolean; handleClose: () => void; devic
       <div className='tw-my-4'>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
           <Form.Item
+            name='name'
             style={{ marginBottom: 8 }}
             label={t('device.name')}
-            name='name'
             required
             rules={[
+              {
+                required: true,
+                message: t('device.enterName')
+              },
               {
                 pattern: REGEX_SPECIAL_TRIM,
                 message: `${t('device.do-not-leave-spaces-special-accents')}`
