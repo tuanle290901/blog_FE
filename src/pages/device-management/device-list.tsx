@@ -16,10 +16,17 @@ import {
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { IDevice } from '~/types/device.interface.ts'
+import { ACTION_TYPE } from '~/utils/helper'
 
 const DeviceList: React.FC = () => {
   const [t] = useTranslation()
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const [isOpenModal, setIsOpenModal] = useState<{
+    openModel: boolean
+    typeAction: string
+  }>({
+    openModel: false,
+    typeAction: ''
+  })
   const listData: IDevice[] = useAppSelector((state: any) => state.device.listData)
   const timerId = useRef<any>(null)
   const meta: IPaging = useAppSelector((state: any) => state.device.meta)
@@ -53,7 +60,10 @@ const DeviceList: React.FC = () => {
   })
 
   const handleClickEditDevice = (record: IDevice) => {
-    setIsOpenModal(true)
+    setIsOpenModal({
+      openModel: !isOpenModal.openModel,
+      typeAction: ACTION_TYPE.Updated
+    })
     dispatch(startEditingDevice(record.id as string))
   }
 
@@ -114,7 +124,10 @@ const DeviceList: React.FC = () => {
   }, [handleClickDeleteUser, getSortOrder, handleClickEditDevice, t])
 
   const handleCloseModal = () => {
-    setIsOpenModal(false)
+    setIsOpenModal({
+      openModel: !isOpenModal.openModel,
+      typeAction: ''
+    })
     dispatch(cancelEditingDevice())
     if (filter && JSON.parse(filter) !== '') {
       setSearchValue({
@@ -182,7 +195,12 @@ const DeviceList: React.FC = () => {
 
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <CreateEditDevice open={isOpenModal} deviceData={editingDevice} handleClose={handleCloseModal} />
+      <CreateEditDevice
+        open={isOpenModal.openModel}
+        deviceData={editingDevice}
+        handleClose={handleCloseModal}
+        typeAction={isOpenModal.typeAction}
+      />
       <div>
         <h1 className='tw-text-3xl tw-font-semibold'>
           {t('device.deviceListTitle')}({meta.total})
@@ -192,7 +210,10 @@ const DeviceList: React.FC = () => {
       <div className='tw-flex tw-my-3 tw-justify-between '>
         <Button
           onClick={() => {
-            setIsOpenModal(true)
+            setIsOpenModal({
+              typeAction: ACTION_TYPE.Created,
+              openModel: !isOpenModal.openModel
+            })
             dispatch(setValueFilter(JSON.stringify(searchValue)))
           }}
           icon={<PlusOutlined />}
