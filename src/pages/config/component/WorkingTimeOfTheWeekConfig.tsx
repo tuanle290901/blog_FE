@@ -19,7 +19,16 @@ const DayItem: ForwardRefRenderFunction<
     className?: string
   }
 > = ({ config, onFinish, className }, ref) => {
-  const [formValue, setFormValue] = useState<IWorkingDailySetup>({ ...config })
+  const [formValue, setFormValue] = useState<IWorkingDailySetup>(() => {
+    return {
+      always: config.always,
+      dayOfWeek: config.dayOfWeek,
+      isActive: config.isActive,
+      weekIndexInMonth: config.weekIndexInMonth,
+      startTime: config.startTime ? dayjs(config.startTime, 'HH:mm') : null,
+      endTime: config.endTime ? dayjs(config.endTime, 'HH:mm') : null
+    }
+  })
   const [isCollapse, setIsCollapse] = useState(true)
   useImperativeHandle(ref, () => ({ submit }))
   const submit = () => {
@@ -67,9 +76,9 @@ const DayItem: ForwardRefRenderFunction<
     setFormValue((prevState) => {
       let newState: IWorkingDailySetup
       if (value === 0) {
-        newState = { ...prevState, weekIndexInMonth: [1, 2, 3, 4, 5] }
+        newState = { ...prevState, weekIndexInMonth: [1, 2, 3, 4, 5], always: true }
       } else {
-        newState = { ...prevState }
+        newState = { ...prevState, always: false }
       }
       return newState
     })
@@ -86,7 +95,7 @@ const DayItem: ForwardRefRenderFunction<
       return newState
     })
   }
-
+  console.log(formValue)
   return (
     <div className={`${className} tw-flex tw-items-center`}>
       <div className='tw-flex-1 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-4'>
@@ -120,7 +129,7 @@ const DayItem: ForwardRefRenderFunction<
               <Select
                 className='tw-w-48'
                 onChange={(value) => handleRepeatChange(value)}
-                defaultValue={formValue.weekIndexInMonth.length < 5 ? 0 : 1}
+                defaultValue={formValue.always ? 0 : 1}
                 options={[
                   { label: 'Luôn lặp lại', value: 0 },
                   {
@@ -130,9 +139,13 @@ const DayItem: ForwardRefRenderFunction<
                 ]}
               />
             </div>
-            {formValue.weekIndexInMonth.length < 5 && (
+            {!formValue.always && (
               <div className='tw-my-2'>
-                <Checkbox.Group onChange={(values) => handleRepeatWeeksChange(values)} options={plainOptions} />
+                <Checkbox.Group
+                  defaultValue={formValue.weekIndexInMonth}
+                  onChange={(values) => handleRepeatWeeksChange(values)}
+                  options={plainOptions}
+                />
               </div>
             )}
             <div className='tw-flex tw-gap-4 tw-my-4 tw-items-center'>
@@ -140,14 +153,14 @@ const DayItem: ForwardRefRenderFunction<
               <TimePicker
                 className='tw-w-32'
                 format='HH:mm'
-                value={config.startTime ? dayjs(config.startTime, 'HH:mm') : null}
+                value={formValue.startTime as any}
                 onChange={(value) => handleShiftChange(value, 'startTime')}
               />
               <p>đến</p>
               <TimePicker
                 className='tw-w-32'
                 format='HH:mm'
-                value={config.startTime ? dayjs(config.endTime, 'HH:mm') : null}
+                value={formValue.endTime as any}
                 onChange={(value) => handleShiftChange(value, 'endTime')}
               />
             </div>
@@ -156,7 +169,9 @@ const DayItem: ForwardRefRenderFunction<
       </div>
       <div
         className={`${
-          isCollapse && formValue.weekIndexInMonth.length === 5 && formValue.isActive ? 'tw-visible' : 'tw-invisible'
+          isCollapse && (formValue.weekIndexInMonth.length === 5 || formValue.always) && formValue.isActive
+            ? 'tw-visible'
+            : 'tw-invisible'
         } tw-w-auto tw-mx-2`}
       >
         <InfoCircleOutlined className='tw-text-blue-600' />

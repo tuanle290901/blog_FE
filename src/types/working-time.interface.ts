@@ -63,6 +63,7 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       endTime: '17:30',
       dayOfWeek: 'MONDAY',
       isActive: true,
+      always: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
@@ -70,6 +71,7 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       endTime: '17:30',
       dayOfWeek: 'TUESDAY',
       isActive: true,
+      always: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
@@ -77,6 +79,7 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       endTime: '17:30',
       dayOfWeek: 'WEDNESDAY',
       isActive: true,
+      always: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
@@ -84,6 +87,7 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
       endTime: '17:30',
       dayOfWeek: 'THURSDAY',
       isActive: true,
+      always: true,
       weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
