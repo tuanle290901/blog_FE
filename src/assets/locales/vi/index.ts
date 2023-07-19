@@ -5,6 +5,7 @@ import auth from './auth.json'
 import device from './device.json'
 import timesheetVI from './timesheet.json'
 import department from './department.json'
+import typesOfLeave from './types-of-leave.json'
 
 export const vi = {
   ...common,
@@ -13,5 +14,6 @@ export const vi = {
   ...userManagement,
   ...device,
   ...timesheetVI,
-  ...department
+  ...department,
+  ...typesOfLeave
 }
