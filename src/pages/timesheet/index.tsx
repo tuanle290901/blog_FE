@@ -19,6 +19,7 @@ import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
+import ExcelExportButton from '~/components/ExportExcel/ExcelExportButton'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -363,6 +364,24 @@ const Timesheet: React.FC = () => {
     }
   }, [searchValue])
 
+  const sheetsData = [
+    {
+      sheetName: 'Sheet1',
+      headers: ['1', '23'],
+      data: [
+        ['John', 25],
+        ['Jane', 30]
+      ]
+    },
+    {
+      sheetName: 'Sheet2',
+      headers: ['City', 'Population'],
+      data: [
+        ['New York', 8500000],
+        ['London', 8900000]
+      ]
+    }
+  ]
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
@@ -370,7 +389,7 @@ const Timesheet: React.FC = () => {
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
-          <Col xs={24} lg={18}>
+          <Col xs={24} lg={16}>
             {mode === 'list' && (
               <Row gutter={[16, 16]}>
                 <Col xs={24} lg={6}>
@@ -447,7 +466,12 @@ const Timesheet: React.FC = () => {
               </Row>
             )}
           </Col>
-          <Col xs={24} lg={6} className='timesheet-filter-tab'>
+          {mode === 'list' && (
+            <Col xs={24} lg={4} className='tw-flex tw-justify-end'>
+              <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
+            </Col>
+          )}
+          <Col xs={24} lg={4} className='timesheet-filter-tab'>
             <Segmented
               options={[
                 { label: t('timesheet.calendar'), value: 'calendar' },
