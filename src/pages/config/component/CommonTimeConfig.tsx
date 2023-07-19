@@ -1,11 +1,13 @@
-import React, { useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import '../index.scss'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
 import { Button, InputNumber, Tabs, TimePicker } from 'antd'
-import { fakeData } from '~/types/working-time.interface.ts'
+import { DEFAULT_CONFIG, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
+import dayjs from 'dayjs'
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
 const TabItem = () => {
   const ref = useRef<RefType>(null)
+  const [config, setConfig] = useState<IWorkingTimeConfig>({ ...DEFAULT_CONFIG })
   const save = () => {
     ref.current?.submit()
   }
@@ -22,31 +24,62 @@ const TabItem = () => {
                 <p>Ngày chốt công</p>
               </div>
               <span>Từ</span>
-              <InputNumber className='tw-w-14' defaultValue={1} min={1} max={31} />
+              <InputNumber
+                value={config.common.startPayrollCutoffDay.day}
+                className='tw-w-14'
+                defaultValue={1}
+                min={1}
+                max={31}
+              />
               <span>Đến</span>
-              <InputNumber className='tw-w-14' defaultValue={5} min={1} max={31} />
+              <InputNumber
+                value={config.common.startPayrollCutoffDay.day}
+                className='tw-w-14'
+                defaultValue={5}
+                min={1}
+                max={31}
+              />
               <span>Hàng tháng</span>
             </div>
             <div className='tw-flex tw-items-center tw-gap-8 tw-my-4'>
               <div className='tw-w-56'>
                 <p>Số ngày nghỉ phép mặc định</p>
               </div>
-              <InputNumber className='tw-w-14' defaultValue={12} min={1} />
+              <InputNumber value={config.common.defaultLeaveDay} className='tw-w-14' defaultValue={12} min={1} />
             </div>
             <div className='tw-flex tw-items-center tw-gap-8 tw-my-4'>
               <div className='tw-w-56'>
                 <p>Thời gian nghỉ bù có hiệu lực</p>
               </div>
-              <InputNumber className='tw-w-14' defaultValue={3} min={1} />
+              <InputNumber
+                value={config.common.affectCompensatoryInMonth}
+                className='tw-w-14'
+                defaultValue={3}
+                min={1}
+              />
             </div>
             <div className='tw-flex tw-items-center tw-gap-2 tw-my-4'>
               <div className='tw-w-56'>
                 <p>Khoảng thời gian làm thêm(OT)</p>
               </div>
               <span>Từ</span>
-              <TimePicker className='tw-w-32' />
+              <TimePicker
+                value={
+                  config.common.overTimeSetting.startTime
+                    ? dayjs(config.common.overTimeSetting.startTime, 'HH:mm')
+                    : null
+                }
+                format='HH:mm'
+                className='tw-w-32'
+              />
               <span>Đến</span>
-              <TimePicker className='tw-w-32' />
+              <TimePicker
+                value={
+                  config.common.overTimeSetting.endTime ? dayjs(config.common.overTimeSetting.endTime, 'HH:mm') : null
+                }
+                format='HH:mm'
+                className='tw-w-32'
+              />
               <span>Hàng ngày</span>
             </div>
           </div>
@@ -56,7 +89,7 @@ const TabItem = () => {
             <span className='tw-font-semibold'>Thời gian làm việc</span>
           </div>
           <div className='tw-w-2/5'>
-            <WorkingTimeOfTheWeekConfig weekConfig={fakeData.workingDays} ref={ref} />
+            <WorkingTimeOfTheWeekConfig weekConfig={config.workingDailySetups} ref={ref} />
           </div>
         </div>
       </div>
