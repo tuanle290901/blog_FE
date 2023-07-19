@@ -1,4 +1,4 @@
-import React, { forwardRef, ForwardRefRenderFunction, RefObject, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, ForwardRefRenderFunction, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { IWorkingDailySetup } from '~/types/working-time.interface.ts'
 import { Checkbox, Select, Switch, TimePicker } from 'antd'
 
@@ -15,10 +15,10 @@ const DayItem: ForwardRefRenderFunction<
   RefType,
   {
     config: IWorkingDailySetup
-    onFinish: (data: IWorkingDailySetup) => void
+    handleValueChange: (data: IWorkingDailySetup) => void
     className?: string
   }
-> = ({ config, onFinish, className }, ref) => {
+> = ({ config, handleValueChange, className }, ref) => {
   const [formValue, setFormValue] = useState<IWorkingDailySetup>(() => {
     return {
       always: config.always,
@@ -33,8 +33,12 @@ const DayItem: ForwardRefRenderFunction<
   useImperativeHandle(ref, () => ({ submit }))
   const submit = () => {
     //   TODO validate data
-    onFinish(formValue)
   }
+
+  useEffect(() => {
+    handleValueChange(formValue)
+  }, [formValue])
+
   const plainOptions = [
     {
       value: 1,
@@ -179,8 +183,11 @@ const DayItem: ForwardRefRenderFunction<
   )
 }
 const DayConfigItem = forwardRef(DayItem)
-const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailySetup[] }> = (props, ref) => {
-  const [data, setData] = useState(props.weekConfig)
+const WeekConfig: ForwardRefRenderFunction<
+  RefType,
+  { weekConfig: IWorkingDailySetup[]; onChange: (data: IWorkingDailySetup[]) => void }
+> = (props, ref) => {
+  const [data, setData] = useState<IWorkingDailySetup[]>(props.weekConfig)
   const refList = useRef<any>([
     useRef<RefType>(null),
     useRef<RefType>(null),
@@ -199,12 +206,13 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailyS
       return newState
     })
   }
-
   const submit = () => {
-    refList.current.forEach((ref: RefObject<RefType>) => {
-      ref.current?.submit()
-    })
+    //   TODO
   }
+
+  useEffect(() => {
+    props.onChange(data)
+  }, [data])
 
   return (
     <div>
@@ -215,7 +223,7 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDailyS
             key={index}
             className='tw-w-full tw-my-2'
             config={item}
-            onFinish={(value) => handleDataChange(index, value)}
+            handleValueChange={(value) => handleDataChange(index, value)}
           />
         )
       })}

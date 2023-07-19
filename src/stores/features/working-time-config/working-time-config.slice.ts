@@ -19,7 +19,7 @@ const initialState: IWorkingTimeConfigState = {
   currentRequestId: null,
   loading: false
 }
-const createWorkingTime = createAsyncThunk(
+export const createWorkingTime = createAsyncThunk(
   'workingTimeConfig/create',
   async (payload: IWorkingTimeConfig, thunkAPI) => {
     try {
@@ -67,3 +67,4 @@ const workingTimeConfigSlice = createSlice({
       })
   }
 })
+export default workingTimeConfigSlice.reducer

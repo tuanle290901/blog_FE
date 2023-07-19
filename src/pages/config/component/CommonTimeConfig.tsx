@@ -1,11 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import '../index.scss'
 import WorkingTimeOfTheWeekConfig, { RefType } from '~/pages/config/component/WorkingTimeOfTheWeekConfig.tsx'
-import { Button, Form, InputNumber, Tabs, TimePicker } from 'antd'
-import { DEFAULT_CONFIG, ICommonConfig, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
+import { Button, Form, InputNumber, notification, Tabs, TimePicker } from 'antd'
+import {
+  DEFAULT_CONFIG,
+  ICommonConfig,
+  IWorkingDailySetup,
+  IWorkingTimeConfig
+} from '~/types/working-time.interface.ts'
 import { useForm } from 'antd/es/form/Form'
 import FormItem from 'antd/es/form/FormItem'
 import dayjs, { Dayjs } from 'dayjs'
+import { useAppDispatch } from '~/stores/hook.ts'
+import { createWorkingTime } from '~/stores/features/working-time-config/working-time-config.slice.ts'
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
 const TabItem = () => {
@@ -21,8 +28,33 @@ const TabItem = () => {
       }
     }
   >()
-  const save = () => {
-    ref.current?.submit()
+  const dispatch = useAppDispatch()
+  const save = async () => {
+    const formValue = form.getFieldsValue()
+    const common: ICommonConfig = {
+      overTimeSetting: {
+        startTime: formValue.overTimeSetting.startTime ? formValue.overTimeSetting.startTime.format('HH:mm') : null,
+        endTime: formValue.overTimeSetting.endTime ? formValue.overTimeSetting.endTime.format('HH:mm') : null
+      },
+      endPayrollCutoffDay: {
+        day: formValue.endPayrollCutoffDay.day,
+        monthType: 'FOR_THIS_MONTH'
+      },
+      startPayrollCutoffDay: {
+        day: formValue.startPayrollCutoffDay.day,
+        monthType: 'FOR_THIS_MONTH'
+      },
+      affectCompensatoryInMonth: formValue.affectCompensatoryInMonth,
+      defaultLeaveDay: formValue.defaultLeaveDay
+    }
+    const workingDailySetups = config.workingDailySetups
+    const payload: IWorkingTimeConfig = { common, workingDailySetups, groupCode: 'null' }
+    try {
+      await dispatch(createWorkingTime(payload)).unwrap()
+      notification.success({ message: 'Cấu hình thời gian làm việc thành công' })
+    } catch (e) {
+      console.log(e)
+    }
   }
   useEffect(() => {
     form.setFieldsValue({
@@ -37,19 +69,24 @@ const TabItem = () => {
         endTime: config.common.overTimeSetting.endTime ? dayjs(config.common.overTimeSetting.endTime, 'HH:mm') : null
       }
     })
-    console.log({
-      defaultLeaveDay: config.common.defaultLeaveDay,
-      affectCompensatoryInMonth: config.common.affectCompensatoryInMonth,
-      endPayrollCutoffDay: { day: config.common.endPayrollCutoffDay.day },
-      startPayrollCutoffDay: { day: config.common.startPayrollCutoffDay.day },
-      overTimeSetting: {
-        startTime: config.common.overTimeSetting.startTime
-          ? dayjs(config.common.overTimeSetting.startTime, 'HH:mm')
-          : null,
-        endTime: config.common.overTimeSetting.endTime ? dayjs(config.common.overTimeSetting.endTime, 'HH:mm') : null
-      }
-    })
   }, [config])
+
+  const handleDataChange = (data: IWorkingDailySetup[]) => {
+    const workingDailySetups = data.map((item) => {
+      const newItem = { ...item }
+      if (newItem.endTime && newItem.endTime instanceof dayjs) {
+        newItem.endTime = newItem.endTime.format('HH:mm')
+      }
+      if (newItem.startTime && newItem.startTime instanceof dayjs) {
+        newItem.startTime = newItem.startTime.format('HH:mm')
+      }
+      return newItem
+    })
+    setConfig((prevState) => {
+      return { ...prevState, workingDailySetups }
+    })
+  }
+
   return (
     <div className='tw-px-4 tw-py-4 tw-border tw-border-t-0 tw-border-[#eee] tw-border-solid'>
       <div className='tw-h-[calc(100vh-350px)] tw-overflow-auto'>
@@ -113,7 +150,7 @@ const TabItem = () => {
             <span className='tw-font-semibold'>Thời gian làm việc</span>
           </div>
           <div className='tw-w-2/5'>
-            <WorkingTimeOfTheWeekConfig weekConfig={config.workingDailySetups} ref={ref} />
+            <WorkingTimeOfTheWeekConfig onChange={handleDataChange} weekConfig={config.workingDailySetups} ref={ref} />
           </div>
         </div>
       </div>

@@ -35,8 +35,8 @@ export interface ICommonConfig {
 }
 
 export interface IOverTimeSetting {
-  endTime: string
-  startTime: string
+  endTime: string | null
+  startTime: string | null
 }
 
 export const DEFAULT_CONFIG: IWorkingTimeConfig = {
