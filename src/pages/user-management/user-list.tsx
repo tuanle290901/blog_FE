@@ -98,6 +98,7 @@ const UserList: React.FC = () => {
       setSearchValue((prevState) => {
         return {
           ...prevState,
+          group: null,
           sorts: [
             {
               direction: 'DESC',
@@ -317,7 +318,11 @@ const UserList: React.FC = () => {
             options={groupOptions}
             className='tw-w-64'
           ></Select>
-          <Search onChange={(event) => handleSearchValueChange(event.target.value)} className='tw-w-64' />
+          <Search
+            placeholder={'Tìm kiếm thành viên'}
+            onChange={(event) => handleSearchValueChange(event.target.value)}
+            className='tw-w-64'
+          />
         </div>
       </div>
       <div className='tw-mt-6'>
