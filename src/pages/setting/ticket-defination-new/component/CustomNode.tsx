@@ -33,4 +33,4 @@ CustomNode.propTypes = {
   isConnectable: PropTypes.bool.isRequired
 }
 
-export default CustomNode
+export default memo(CustomNode)
