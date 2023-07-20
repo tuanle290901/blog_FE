@@ -46,6 +46,7 @@ const SelectGroupModal: React.FC<{
       centered
     >
       <Select
+        className='tw-w-full'
         value={selectedGroup?.value}
         onChange={(value, option) => setSelectedGroup(option)}
         options={groupOptions}
