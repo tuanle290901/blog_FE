@@ -21,7 +21,8 @@
     "female": "Nữ",
     "commonInfo": "Thông tin chung",
     "workInfo": "Thông tin làm việc",
-    "allGroup": "Tất cả phòng ban"
+    "allGroup": "Tất cả phòng ban",
+    "password": "Mật khẩu"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
@@ -41,6 +42,7 @@
     "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
     "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
     "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB.",
+    "enterPassword": "Nhập mật khẩu",
     "addRole": "Thêm vị trí",
     "errorMessage": {
       "fullNameIsEmpty": "Họ và tên không được để trống",
@@ -50,7 +52,8 @@
       "phoneNumberEmpty": "Số điện thoại không được để trống",
       "avatarEmpty": "Ảnh đại diện không được để trống",
       "invalidEmail": "Email không đúng định dạng",
-      "invalidPhoneNumber": "Số điện thoại không đúng định dạng"
+      "invalidPhoneNumber": "Số điện thoại không đúng định dạng",
+      "passwordIsEmpty": "Mật khẩu không được để trống"
     }
   }
 }

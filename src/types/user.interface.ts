@@ -4,6 +4,7 @@ export interface IUser {
   avatarBase64: string
   birthday?: string | null
   email: string
+  password: string
   formalDate?: string | null
   fullName?: string
   groupProfiles: GroupProfile[]

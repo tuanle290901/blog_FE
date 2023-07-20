@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { GENDER, ROLE } from '~/constants/app.constant.ts'
 import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
+import Password from 'antd/es/input/Password'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -229,13 +230,13 @@ const UserCreateEdit: React.FC<{
             <div ref={uploadRef}>
               {avatarBase64 ? (
                 <img
-                  className='tw-w-28 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-28 tw-rounded-full tw-object-cover'
+                  className='tw-w-16 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-16 tw-rounded-full tw-object-cover'
                   src={avatarBase64}
                   alt='avatar'
                 />
               ) : (
                 <img
-                  className='tw-w-28 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-28 tw-rounded-full tw-object-cover'
+                  className='tw-w-16 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-16 tw-rounded-full tw-object-cover'
                   src={defaultImg}
                   alt='avatar'
                 />
@@ -333,8 +334,20 @@ const UserCreateEdit: React.FC<{
                 >
                   <Input placeholder={t('userModal.enterEmail')} />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 0 }} label={t('userList.address')} name='address'>
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.address')} name='address'>
                   <Input placeholder={t('userModal.enterAddress')} />
+                </Form.Item>
+                <Form.Item
+                  label={t('userList.password')}
+                  name='password'
+                  rules={[
+                    {
+                      required: true,
+                      message: t('userModal.errorMessage.passwordIsEmpty')
+                    }
+                  ]}
+                >
+                  <Password placeholder={t('userModal.enterPassword')}></Password>
                 </Form.Item>
               </div>
             </div>
@@ -342,7 +355,7 @@ const UserCreateEdit: React.FC<{
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
               <div
                 className={`tw-p-4 tw-bg-[#FAFAFA] ${
-                  userData?.userName ? 'tw-h-[578px]' : 'tw-h-[492px]'
+                  userData?.userName ? 'tw-h-[578px]' : 'tw-h-[602px]'
                 }   tw-overflow-auto`}
               >
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
