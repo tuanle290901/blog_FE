@@ -34,8 +34,9 @@ const Timesheet: React.FC = () => {
   const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
-  // const [selectedGroup, setSelectedGroup] = useState('HR')
-  const [selectedUser, setSelectedUser] = useState('')
+  const [selectedUser, setSelectedUser] = useState(
+    currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : ''
+  )
   const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
   const [mode, setMode] = useState('calendar')
@@ -87,8 +88,8 @@ const Timesheet: React.FC = () => {
         return {
           ...prevState,
           paging: { ...prevState.paging, page: 0 },
-          startDate: `${dayjs(dataSelected[0]).format('YYYY-MM-DD')}T00:00:00Z`,
-          endDate: `${dayjs(dataSelected[1]).format('YYYY-MM-DD')}T23:59:59Z`
+          startDate: dayjs(dataSelected[0]).format('YYYY-MM-DD'),
+          endDate: dayjs(dataSelected[1]).format('YYYY-MM-DD')
         }
       })
     }
@@ -101,8 +102,8 @@ const Timesheet: React.FC = () => {
       return {
         ...prevState,
         paging: { ...prevState.paging, page: 0 },
-        startDate: `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-        endDate: `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
+        startDate: dayjs().format('YYYY-MM-DD'),
+        endDate: dayjs().format('YYYY-MM-DD')
       }
     })
   }
@@ -114,8 +115,8 @@ const Timesheet: React.FC = () => {
       return {
         ...prevState,
         paging: { ...prevState.paging, page: 0 },
-        startDate: `${dayjs().startOf('M').format('YYYY-MM-DD')}T00:00:00Z`,
-        endDate: `${dayjs().endOf('M').format('YYYY-MM-DD')}T23:59:59Z`
+        startDate: dayjs().startOf('M').format('YYYY-MM-DD'),
+        endDate: dayjs().endOf('M').format('YYYY-MM-DD')
       }
     })
   }
@@ -135,14 +136,14 @@ const Timesheet: React.FC = () => {
       return {
         ...prevState,
         paging: { ...prevState.paging, page: 0 },
-        startDate: `${dayjs()
+        startDate: dayjs()
           .month(dayjs().month() - 1)
           .startOf('M')
-          .format('YYYY-MM-DD')}T00:00:00Z`,
-        endDate: `${dayjs()
+          .format('YYYY-MM-DD'),
+        endDate: dayjs()
           .month(dayjs().month() - 1)
           .endOf('M')
-          .format('YYYY-MM-DD')}T23:59:59Z`
+          .format('YYYY-MM-DD')
       }
     })
   }
@@ -186,7 +187,7 @@ const Timesheet: React.FC = () => {
                 : ''
             }
           >
-            {dayjs(record?.date).format('DD/MM/YYYY')}
+            {dayjs(date).format('DD/MM/YYYY')}
           </span>
         )
       }
@@ -230,8 +231,8 @@ const Timesheet: React.FC = () => {
     },
     {
       title: t('Ngày công (ngày)'),
-      dataIndex: 'record',
-      key: 'record',
+      dataIndex: 'reportData',
+      key: 'reportData',
       ellipsis: true,
       render: (reportData) => {
         return (
@@ -255,7 +256,12 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       render: (reportData) => {
         return reportData ? (
-          <Select onChange={() => void {}} defaultValue={null} options={typesOfLeaveOptions} className='tw-w-full' />
+          <Select
+            onChange={() => void {}}
+            defaultValue={reportData?.absenceType}
+            options={typesOfLeaveOptions}
+            className='tw-w-full'
+          />
         ) : (
           '--'
         )
