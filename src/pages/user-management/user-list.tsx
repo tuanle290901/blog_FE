@@ -26,6 +26,8 @@ const UserList: React.FC = () => {
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
+  const searchRef = useRef(null)
+  const [query, setQuery] = useState<string>('')
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
@@ -97,8 +99,9 @@ const UserList: React.FC = () => {
     if (isCreateUserSuccess) {
       setSearchValue((prevState) => {
         return {
-          ...prevState,
           group: 'all',
+          query: '',
+          paging: prevState.paging,
           sorts: [
             {
               direction: 'DESC',
@@ -244,6 +247,7 @@ const UserList: React.FC = () => {
     })
   }
   const handleSearchValueChange = (value: string) => {
+    setQuery(value)
     if (timerId.current) {
       clearTimeout(timerId.current)
     }
@@ -320,6 +324,7 @@ const UserList: React.FC = () => {
             className='tw-w-64'
           ></Select>
           <Search
+            value={query}
             placeholder={'Tìm kiếm thành viên'}
             onChange={(event) => handleSearchValueChange(event.target.value)}
             className='tw-w-64'
