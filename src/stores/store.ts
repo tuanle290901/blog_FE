@@ -8,6 +8,7 @@ import userSlice from '~/stores/features/user/user.slice.ts'
 import departmentSlice from './features/department/department.silce'
 import devicesSlice from './features/device/device.slice'
 import timesheetSlice from './features/timesheet/timesheet.slice'
+import workingTimeConfigSlice from '~/stores/features/working-time-config/working-time-config.slice.ts'
 import typesOfLeaveSlice from './features/types-of-leave/types-of-leave.slice'
 
 export const store = configureStore({
@@ -22,7 +23,8 @@ export const store = configureStore({
     masterData: masterDataSlice,
     position: positionSlice,
     device: devicesSlice,
-    typesOfLeave: typesOfLeaveSlice
+    typesOfLeave: typesOfLeaveSlice,
+    workingTime: workingTimeConfigSlice
   }
 })
 
