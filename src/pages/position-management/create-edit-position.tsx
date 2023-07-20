@@ -1,11 +1,11 @@
-import { Button, Form, Input, Modal } from 'antd'
+import { Button, Form, Input, Modal, notification } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IPosition } from '~/types/position.interface.ts'
 import FormItem from 'antd/es/form/FormItem'
 import TextArea from 'antd/es/input/TextArea'
 import { useAppDispatch } from '~/stores/hook.ts'
-import { createPosition } from '~/stores/features/position/position.slice.ts'
+import { createPosition, updatePosition } from '~/stores/features/position/position.slice.ts'
 
 const CreateEditPosition: React.FC<{
   open: boolean
@@ -36,8 +36,10 @@ const CreateEditPosition: React.FC<{
       const value = form.getFieldsValue()
       if (!position?.id) {
         await dispatch(createPosition(value))
+        notification.success({ message: 'Tạo mới chức vụ thành công' })
       } else {
-        // TODO update position
+        await dispatch(updatePosition({ ...value, id: position.id }))
+        notification.success({ message: 'Cập nhật chức vụ thành công' })
       }
       finishAndClose(true)
     } catch (e) {
@@ -50,7 +52,7 @@ const CreateEditPosition: React.FC<{
   return (
     <Modal
       open={open}
-      title={position ? 'Thêm chức vụ' : 'Cập nhật chức vụ'}
+      title={position ? 'Cập nhật chức vụ' : 'Thêm chức vụ'}
       onCancel={() => finishAndClose(false)}
       footer={
         <div className={'tw-flex tw-justify-end'}>
