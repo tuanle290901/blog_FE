@@ -60,6 +60,30 @@ export const createPosition = createAsyncThunk('position/create', async (body: P
     throw error
   }
 })
+export const updatePosition = createAsyncThunk('position/update', async (body: Partial<IPosition>, thunkAPI) => {
+  try {
+    return (await HttpService.put('org/title/update/' + body.id, body, {
+      signal: thunkAPI.signal
+    })) as IApiResponse<IPosition[]>
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+export const deletePosition = createAsyncThunk('position/delete', async (body: Partial<IPosition>, thunkAPI) => {
+  try {
+    return (await HttpService.put('org/title/delete?id=' + body.id, {
+      signal: thunkAPI.signal
+    })) as IApiResponse<IPosition[]>
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
 
 const positionSlice = createSlice({
   name: 'position',

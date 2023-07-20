@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Input, Table, TablePaginationConfig } from 'antd'
+import { Button, Input, notification, Popconfirm, Table, TablePaginationConfig } from 'antd'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
@@ -12,6 +12,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { IPosition } from '~/types/position.interface.ts'
 import {
   cancelEditingPosition,
+  deletePosition,
   searchPosition,
   startEditingPosition
 } from '~/stores/features/position/position.slice.ts'
@@ -49,8 +50,16 @@ const PositionList: React.FC = () => {
     //   TODO
     dispatch(startEditingPosition(position.id as string))
   }
-  const handleClickDeletePosition = (user: IPosition) => {
-    //   TODO
+  const handleClickDeletePosition = async (position: IPosition) => {
+    await dispatch(deletePosition(position))
+    notification.success({ message: 'Xóa chức vụ thành công' })
+    dispatch(
+      searchPosition({
+        paging: searchValue.paging,
+        sorts: searchValue.sorts,
+        query: searchValue.query
+      })
+    )
   }
   const getSortOrder = (filed: string) => {
     const sort = searchValue.sorts[0]
@@ -111,11 +120,14 @@ const PositionList: React.FC = () => {
                 onClick={() => handleClickEditPosition(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
-              <Button
-                size='small'
-                onClick={() => handleClickDeletePosition(record)}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
+              <Popconfirm
+                onConfirm={() => handleClickDeletePosition(record)}
+                title={'Bạn có muốn xóa chức vụ'}
+                cancelText={t('common.cancel')}
+                okText={t('common.yes')}
+              >
+                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+              </Popconfirm>
             </div>
           </div>
         )
