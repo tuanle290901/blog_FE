@@ -49,7 +49,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
     } else {
       payload = {
         ...payload,
-        parentCode: dataParent && dataParent[dataParent.length > 2 ? dataParent.length - 1 : 0].code
+        parentCode: dataParent && dataParent[dataParent.length >= 2 ? dataParent.length - 1 : 0].code
       }
       dispatch(createDepartment(payload))
         .unwrap()
