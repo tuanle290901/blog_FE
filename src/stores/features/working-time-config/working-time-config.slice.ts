@@ -39,12 +39,46 @@ export const createWorkingTime = createAsyncThunk(
     }
   }
 )
+export const getAllWorkingTimeSetting = createAsyncThunk('workingTimeConfig/getAll', async (_, thunkAPI) => {
+  try {
+    const response: IApiResponse<
+      {
+        id: string
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+        updatedBy: string
+        dataType: string
+        data: IWorkingTimeConfig
+      }[]
+    > = await HttpService.get('/group-working-time-setup/get-all', {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
 const workingTimeConfigSlice = createSlice({
   name: 'workingTimeConfig',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(getAllWorkingTimeSetting.fulfilled, (state, action) => {
+        state.listWKTC = action.payload.map((item) => {
+          const result: IWorkingTimeConfig = {
+            id: item.id,
+            common: item.data.common,
+            workingDailySetups: item.data.workingDailySetups,
+            groupCode: item.data.groupCode
+          }
+          return result
+        })
+      })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),
         (state, action) => {

@@ -11,12 +11,16 @@ import {
 import { useForm } from 'antd/es/form/Form'
 import FormItem from 'antd/es/form/FormItem'
 import dayjs, { Dayjs } from 'dayjs'
-import { useAppDispatch } from '~/stores/hook.ts'
-import { createWorkingTime } from '~/stores/features/working-time-config/working-time-config.slice.ts'
+import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
+import {
+  createWorkingTime,
+  getAllWorkingTimeSetting
+} from '~/stores/features/working-time-config/working-time-config.slice.ts'
 import SelectGroupModal from '~/pages/config/component/select-group-modal.tsx'
+import { getAllGroup } from '~/stores/features/master-data/master-data.slice.ts'
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
-const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
+const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCode, id }) => {
   const ref = useRef<RefType>(null)
   const [config, setConfig] = useState<IWorkingTimeConfig>({ ...DEFAULT_CONFIG })
   const [form] = useForm<
@@ -87,6 +91,9 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
       return { ...prevState, workingDailySetups }
     })
   }
+  const resetForm = () => {
+    setConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)))
+  }
 
   return (
     <div className='tw-px-4 tw-py-4 tw-border tw-border-t-0 tw-border-[#eee] tw-border-solid'>
@@ -103,12 +110,12 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
                 </div>
                 <p className='tw-mt-1.5'>Từ</p>
                 <FormItem name={['startPayrollCutoffDay', 'day']}>
-                  <InputNumber className='tw-w-14' min={1} max={31} />
+                  <InputNumber disabled={!!id} className='tw-w-14' min={1} max={31} />
                 </FormItem>
 
                 <p className='tw-mt-1.5'>Đến</p>
                 <FormItem name={['endPayrollCutoffDay', 'day']}>
-                  <InputNumber className='tw-w-14' min={1} max={31} />
+                  <InputNumber disabled={!!id} className='tw-w-14' min={1} max={31} />
                 </FormItem>
                 <p className='tw-mt-1.5'>Hàng tháng</p>
               </div>
@@ -117,7 +124,7 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
                   <p>Số ngày nghỉ phép mặc định</p>
                 </div>
                 <FormItem name={'defaultLeaveDay'}>
-                  <InputNumber value={config.common.defaultLeaveDay} className='tw-w-14' min={1} />
+                  <InputNumber disabled={!!id} value={config.common.defaultLeaveDay} className='tw-w-14' min={1} />
                 </FormItem>
               </div>
               <div className='tw-flex tw-gap-8 tw-my-4'>
@@ -125,7 +132,7 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
                   <p>Thời gian nghỉ bù có hiệu lực</p>
                 </div>
                 <FormItem name={'affectCompensatoryInMonth'}>
-                  <InputNumber className='tw-w-14' min={1} />
+                  <InputNumber disabled={!!id} className='tw-w-14' min={1} />
                 </FormItem>
               </div>
               <div className='tw-flex tw-gap-2 tw-my-4'>
@@ -134,12 +141,12 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
                 </div>
                 <p className='tw-mt-1.5'>Từ</p>
                 <FormItem name={['overTimeSetting', 'startTime']}>
-                  <TimePicker format='HH:mm' className='tw-w-32' />
+                  <TimePicker disabled={!!id} format='HH:mm' className='tw-w-32' />
                 </FormItem>
 
                 <p className='tw-mt-1.5'>Đến</p>
                 <FormItem name={['overTimeSetting', 'endTime']}>
-                  <TimePicker format='HH:mm' className='tw-w-32' />
+                  <TimePicker disabled={!!id} format='HH:mm' className='tw-w-32' />
                 </FormItem>
                 <p className='tw-mt-1.5'>Hàng ngày</p>
               </div>
@@ -151,37 +158,64 @@ const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
             <span className='tw-font-semibold'>Thời gian làm việc</span>
           </div>
           <div className='tw-w-2/5'>
-            <WorkingTimeOfTheWeekConfig onChange={handleDataChange} weekConfig={config.workingDailySetups} ref={ref} />
+            <WorkingTimeOfTheWeekConfig
+              disabled={!!id}
+              onChange={handleDataChange}
+              weekConfig={config.workingDailySetups}
+              ref={ref}
+            />
           </div>
         </div>
       </div>
-      <div className='tw-flex tw-gap-4 tw-justify-end tw-mt-4'>
-        <Button>Đặt lại thông số</Button>
-        <Button type='primary' onClick={save}>
-          Lưu cấu hình
-        </Button>
-      </div>
+      {!id && (
+        <div className='tw-flex tw-gap-4 tw-justify-end tw-mt-4'>
+          <Button onClick={resetForm}>Đặt lại thông số</Button>
+          <Button type='primary' onClick={save}>
+            Lưu cấu hình
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
 
 const CommonTimeConfig: React.FC = () => {
-  const initialItems = [{ label: 'Cấu hình chung', children: <TabItem groupCode={null} />, key: '1', closable: false }]
-  const [activeKey, setActiveKey] = useState(initialItems[0].key)
-  const [items, setItems] = useState(initialItems)
-  const newTabIndex = useRef(0)
+  const [activeKey, setActiveKey] = useState('0')
+  const [items, setItems] = useState<any[]>([])
   const [openModal, setOpenModal] = useState(false)
-  const onChange = (newActiveKey: string) => {
-    setActiveKey(newActiveKey)
+  const dispatch = useAppDispatch()
+  const listWKTC = useAppSelector((state) => state.workingTime.listWKTC)
+  const groups = useAppSelector((state) => state.masterData.groups)
+  useEffect(() => {
+    const promise1 = dispatch(getAllWorkingTimeSetting())
+    const promise2 = dispatch(getAllGroup())
+    return () => {
+      promise1.abort()
+      promise2.abort()
+    }
+  }, [])
+  const onChange = (activeKey: string) => {
+    setActiveKey(activeKey)
   }
 
+  useEffect(() => {
+    const listTabPanel = listWKTC.map((item, index) => {
+      const groupName = groups.find((group) => item.groupCode === group.code)
+      return {
+        label: groupName?.name || 'Cấu hình chung',
+        children: <TabItem groupCode={item.groupCode} id={item.id} />,
+        key: item.groupCode || '0',
+        closable: false
+      }
+    })
+    setItems(listTabPanel)
+  }, [listWKTC, groups])
   const add = (code: string, name: string) => {
     setOpenModal(false)
-    const newActiveKey = `newTab${newTabIndex.current++}`
     const newPanes = [...items]
-    newPanes.push({ label: name, children: <TabItem groupCode={code} />, key: newActiveKey, closable: false })
+    newPanes.push({ label: name, children: <TabItem groupCode={code} />, key: code, closable: false })
     setItems(newPanes)
-    setActiveKey(newActiveKey)
+    setActiveKey(code)
   }
 
   const remove = (targetKey: TargetKey) => {
@@ -220,7 +254,11 @@ const CommonTimeConfig: React.FC = () => {
 
   return (
     <div className='working-time-config  tw-h-[calc(100vh-112px)] tw-overflow-auto tw-m-6 tw-p-5 tw-bg-white'>
-      <SelectGroupModal open={openModal} handleClose={handleAddConfigForGroup} />
+      <SelectGroupModal
+        ignoreGroupCode={items.map((item) => item.key)}
+        open={openModal}
+        handleClose={handleAddConfigForGroup}
+      />
       <div className='tw-mb-2'>
         <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
