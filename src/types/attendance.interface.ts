@@ -9,4 +9,12 @@ export interface IAttendance {
   startTime?: string
   endTime?: string
   violate?: []
+  reportData: IReportData | any
+}
+export interface IReportData {
+  violate: []
+  absenceType: string | null
+  absenceAmount: number | null
+  workingAmount: number | null
+  note: string | null
 }

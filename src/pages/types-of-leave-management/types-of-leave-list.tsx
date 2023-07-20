@@ -1,7 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Input, Row, Space, Table, TableColumnsType, TablePaginationConfig, notification } from 'antd'
+import {
+  Button,
+  Col,
+  Input,
+  Popconfirm,
+  Row,
+  Space,
+  Table,
+  TableColumnsType,
+  TablePaginationConfig,
+  notification
+} from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +28,8 @@ import {
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { ITypesOfLeave } from '~/types/types-of-leave'
-import { convertUTCToLocaleDate } from '~/utils/helper'
+// import { convertUTCToLocaleDate } from '~/utils/helper'
+import dayjs from 'dayjs'
 
 const TypesOfLeave: React.FC = () => {
   const [t] = useTranslation()
@@ -111,7 +123,7 @@ const TypesOfLeave: React.FC = () => {
         dataIndex: 'createdAt',
         ellipsis: true,
         render: (createdAt) => {
-          return convertUTCToLocaleDate(createdAt)
+          return dayjs(createdAt).format('DD/MM/YYYY')
         }
       },
       {
@@ -127,11 +139,15 @@ const TypesOfLeave: React.FC = () => {
                 onClick={() => handleClickUpdate(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
-              <Button
-                size='small'
-                onClick={() => handleClickDelete(record)}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
+              <Popconfirm
+                title={t('typesOfLeave.confirmDeleteTitle')}
+                description={t('typesOfLeave.confirmDelete')}
+                onConfirm={() => handleClickDelete(record)}
+                okText={t('common.yes')}
+                cancelText={t('common.no')}
+              >
+                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+              </Popconfirm>
             </Space>
           )
         }

@@ -17,7 +17,7 @@ import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
-import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
+// import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 import ExcelExportButton from '~/components/ExportExcel/ExcelExportButton'
 
@@ -34,6 +34,7 @@ const Timesheet: React.FC = () => {
   const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
+  // const [selectedGroup, setSelectedGroup] = useState('HR')
   const [selectedUser, setSelectedUser] = useState('')
   const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
@@ -178,8 +179,14 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('date'),
       render: (date, record) => {
         return (
-          <span className={`${record.status === 'late' || record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
-            {convertUTCToLocaleDate(date)}
+          <span
+            className={
+              record?.reportData?.violate?.includes('LATE_COME') || record?.reportData?.violate?.includes('EARLY_BACK')
+                ? 'tw-text-[#D46B08]'
+                : ''
+            }
+          >
+            {dayjs(record?.date).format('DD/MM/YYYY')}
           </span>
         )
       }
@@ -193,8 +200,15 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('startTime'),
       render: (startTime, record) => {
         return (
-          <span className={`${record.status === 'late' ? 'tw-text-[#D46B08]' : ''}`}>
-            {convertUTCToLocaleTime(startTime) || '--'}
+          <span
+            className={
+              record?.reportData?.violate?.includes('LATE_COME') ||
+              record?.reportData?.violate?.includes('FORGET_TIME_ATTENDANCE')
+                ? 'tw-text-[#D46B08]'
+                : ''
+            }
+          >
+            {startTime || '--'}
           </span>
         )
       }
@@ -208,37 +222,64 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('endTime'),
       render: (endTime, record) => {
         return (
-          <span className={`${record.status === 'early' ? 'tw-text-[#D46B08]' : ''}`}>
-            {convertUTCToLocaleTime(endTime) || '--'}
+          <span className={record?.reportData?.violate?.includes('EARLY_BACK') ? 'tw-text-[#D46B08]' : ''}>
+            {endTime || '--'}
           </span>
         )
       }
     },
     {
-      title: t('Phép'),
-      dataIndex: '',
-      key: '',
+      title: t('Ngày công (ngày)'),
+      dataIndex: 'record',
+      key: 'record',
       ellipsis: true,
-      width: '300px',
-      render: () => {
+      render: (reportData) => {
         return (
-          <>
-            <Select
-              onChange={() => void {}}
-              defaultValue={null}
-              options={typesOfLeaveOptions}
-              className='tw-w-[180px] tw-mr-[20px]'
-            />
-            <Select
-              className='tw-w-[80px]'
-              onChange={() => void {}}
-              defaultValue={null}
-              options={[
-                { value: '0.5', label: '0.5' },
-                { value: '1', label: '1' }
-              ]}
-            />
-          </>
+          <Select
+            className='tw-w-full'
+            onChange={() => void {}}
+            defaultValue={reportData?.workingAmount}
+            options={[
+              { value: 0.0, label: '0' },
+              { value: 0.5, label: '0.5' },
+              { value: 1, label: '1' }
+            ]}
+          />
+        )
+      }
+    },
+    {
+      title: t('Loại phép'),
+      dataIndex: 'reportData',
+      key: 'reportData',
+      ellipsis: true,
+      render: (reportData) => {
+        return reportData ? (
+          <Select onChange={() => void {}} defaultValue={null} options={typesOfLeaveOptions} className='tw-w-full' />
+        ) : (
+          '--'
+        )
+      }
+    },
+    {
+      title: t('Ngày phép (ngày)'),
+      dataIndex: 'reportData',
+      key: 'reportData.absenceAmount',
+      ellipsis: true,
+      render: (reportData) => {
+        return reportData ? (
+          <Select
+            className='tw-w-full'
+            onChange={() => void {}}
+            defaultValue={reportData?.absenceAmount}
+            options={[
+              { value: 0.0, label: '0' },
+              { value: 0.5, label: '0.5' },
+              { value: 1, label: '1' }
+            ]}
+          />
+        ) : (
+          '--'
         )
       }
     },
@@ -246,7 +287,28 @@ const Timesheet: React.FC = () => {
       title: t('timesheet.violate'),
       dataIndex: '',
       key: '',
-      ellipsis: true
+      ellipsis: true,
+      render: (record) => {
+        return record?.reportData ? (
+          <div className='timesheet-violate'>
+            {record?.reportData?.violate?.includes('LATE_COME') && (
+              <p className='timesheet-violate__lable'>{t('timesheet.lateForWork') || '--'}</p>
+            )}
+            {record?.reportData?.violate?.includes('EARLY_BACK') && (
+              <p className='timesheet-violate__lable timesheet-violate__lable--early'>
+                {t('timesheet.leavingTheCompanyEarly') || '--'}
+              </p>
+            )}
+            {record?.reportData?.violate?.includes('FORGET_TIME_ATTENDANCE') && (
+              <p className='timesheet-violate__lable timesheet-violate__lable--forget'>
+                {t('timesheet.forgetTimeAttendance') || '--'}
+              </p>
+            )}
+          </div>
+        ) : (
+          ''
+        )
+      }
     },
     {
       title: t('timesheet.note'),
