@@ -1,0 +1,10 @@
+{
+  "typesOfLeave": {
+    "code": "Mã",
+    "title": "Danh sách loại nghỉ phép",
+    "name": "Tên nghỉ phép",
+    "createNew": "Thêm loại nghỉ phép",
+    "createdAt": "Ngày tạo",
+    "search": "Tìm kiếm..."
+  }
+}

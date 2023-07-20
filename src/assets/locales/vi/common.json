@@ -12,5 +12,6 @@
     "prevPage": "Trang trước",
     "jumpTo": "Đến trang"
   },
-  "noData": "Không có dữ liệu"
+  "noData": "Không có dữ liệu",
+  "exportStatisticButton": "Xuất báo cáo"
 }

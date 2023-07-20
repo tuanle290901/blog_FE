@@ -8,5 +8,11 @@ export const END_POINT_API = {
     create: () => `/attmachine/setup/register`,
     update: () => `/attmachine/setup/update`,
     getPageSize: () => `/attmachine/setup/filter`
+  },
+  TypesOfLeave: {
+    create: () => `/type-of-leave/create`,
+    update: () => `/type-of-leave/update`,
+    getPageSize: () => `/type-of-leave/filter`,
+    delete: () => `/type-of-leave/delete`
   }
 }

@@ -1,41 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Input, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import { Button, Col, Input, Row, Space, Table, TableColumnsType, TablePaginationConfig, notification } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import CreateEditDevice from '~/pages/device-management/create-edit-device.tsx'
+import TypesOfLeaveForm from '~/pages/types-of-leave-management/types-of-leave-form'
 import {
-  cancelEditingDevice,
-  getListDevice,
+  cancelEditing,
+  deleteTypesOfLeave,
+  filterTypesOfLeave,
   resetValueFilter,
   setValueFilter,
-  startEditingDevice
-} from '~/stores/features/device/device.slice'
+  startEditing
+} from '~/stores/features/types-of-leave/types-of-leave.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IPaging, ISort } from '~/types/api-response.interface'
-import { IDevice } from '~/types/device.interface.ts'
-import { ACTION_TYPE } from '~/utils/helper'
+import { ITypesOfLeave } from '~/types/types-of-leave'
+import { convertUTCToLocaleDate } from '~/utils/helper'
 
-const DeviceList: React.FC = () => {
+const TypesOfLeave: React.FC = () => {
   const [t] = useTranslation()
-  const [isOpenModal, setIsOpenModal] = useState<{
-    openModel: boolean
-    typeAction: string
-  }>({
-    openModel: false,
-    typeAction: ''
-  })
-  const listData: IDevice[] = useAppSelector((state: any) => state.device.listData)
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const listData: ITypesOfLeave[] = useAppSelector((state: any) => state.typesOfLeave.listData)
   const timerId = useRef<any>(null)
-  const meta: IPaging = useAppSelector((state: any) => state.device.meta)
-  const handleClickDeleteUser = (record: IDevice) => {
-    console.log(record)
-  }
-
-  const editingDevice = useAppSelector((state: any) => state.device.editingDevice)
-  const filter = useAppSelector((state: any) => state.device.filter)
+  const meta: IPaging = useAppSelector((state: any) => state.typesOfLeave.meta)
+  const editingTypesOfLeave = useAppSelector((state: any) => state.typesOfLeave.editingTypesOfLeave)
+  const filter = useAppSelector((state: any) => state.typesOfLeave.filter)
 
   const dispatch = useAppDispatch()
   const [searchValue, setSearchValue] = useState<{
@@ -55,16 +46,37 @@ const DeviceList: React.FC = () => {
       {
         direction: 'DESC',
         field: 'created_at'
+      },
+      {
+        direction: 'DESC',
+        field: 'name'
       }
     ]
   })
 
-  const handleClickEditDevice = (record: IDevice) => {
-    setIsOpenModal({
-      openModel: !isOpenModal.openModel,
-      typeAction: ACTION_TYPE.Updated
-    })
-    dispatch(startEditingDevice(record.id as string))
+  const handleClickDelete = async (record: ITypesOfLeave) => {
+    try {
+      const response = await dispatch(deleteTypesOfLeave(record.id as string)).unwrap()
+      await notification.success({
+        message: response.message
+      })
+      dispatch(
+        filterTypesOfLeave({
+          paging: searchValue.paging,
+          sorts: searchValue.sorts,
+          query: searchValue.query
+        })
+      )
+    } catch (error: any) {
+      notification.error({
+        message: error.message
+      })
+    }
+  }
+
+  const handleClickUpdate = (record: ITypesOfLeave) => {
+    setIsOpenModal(true)
+    dispatch(startEditing(record.id as string))
   }
 
   const getSortOrder = (filed: string) => {
@@ -77,42 +89,47 @@ const DeviceList: React.FC = () => {
   }
 
   const columns = useMemo(() => {
-    const columns: TableColumnsType<IDevice> = [
+    const columns: TableColumnsType<ITypesOfLeave> = [
       {
         key: 'name',
-        title: t('device.name'),
+        title: t('typesOfLeave.name'),
         dataIndex: 'name',
+        sorter: true,
+        showSorterTooltip: false,
         sortOrder: getSortOrder('name'),
         ellipsis: true
       },
       {
-        key: 'ipAddress',
-        title: t('device.ipAddress'),
-        dataIndex: 'ipAddress',
+        key: 'code',
+        title: t('typesOfLeave.code'),
+        dataIndex: 'code',
         ellipsis: true
       },
       {
-        key: 'port',
-        title: t('device.port'),
-        dataIndex: 'port',
-        ellipsis: true
+        key: 'createdAt',
+        title: t('typesOfLeave.createdAt'),
+        dataIndex: 'createdAt',
+        ellipsis: true,
+        render: (createdAt) => {
+          return convertUTCToLocaleDate(createdAt)
+        }
       },
       {
         key: '',
         title: t('device.action'),
         width: '120px',
         align: 'center',
-        render: (_, record: IDevice) => {
+        render: (_, record: ITypesOfLeave) => {
           return (
             <Space size='small'>
               <Button
                 size='small'
-                onClick={() => handleClickEditDevice(record)}
+                onClick={() => handleClickUpdate(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
               <Button
                 size='small'
-                onClick={() => handleClickDeleteUser(record)}
+                onClick={() => handleClickDelete(record)}
                 icon={<DeleteOutlined className='tw-text-red-600' />}
               />
             </Space>
@@ -121,25 +138,21 @@ const DeviceList: React.FC = () => {
       }
     ]
     return columns
-  }, [handleClickDeleteUser, getSortOrder, handleClickEditDevice, t])
+  }, [handleClickDelete, getSortOrder, handleClickUpdate, t])
 
   const handleCloseModal = () => {
-    setIsOpenModal({
-      openModel: !isOpenModal.openModel,
-      typeAction: ''
-    })
-    dispatch(cancelEditingDevice())
+    setIsOpenModal(false)
+    dispatch(cancelEditing())
     if (filter && JSON.parse(filter) !== '') {
       setSearchValue({
         ...JSON.parse(filter)
       })
     } else {
       dispatch(
-        getListDevice({
+        filterTypesOfLeave({
           paging: searchValue.paging,
           sorts: searchValue.sorts,
-          query: searchValue.query,
-          groupCode: searchValue.group
+          query: searchValue.query
         })
       )
     }
@@ -148,11 +161,10 @@ const DeviceList: React.FC = () => {
 
   useEffect(() => {
     const promise = dispatch(
-      getListDevice({
+      filterTypesOfLeave({
         paging: searchValue.paging,
         sorts: searchValue.sorts,
-        query: searchValue.query,
-        groupCode: searchValue.group
+        query: searchValue.query
       })
     )
     return () => {
@@ -163,7 +175,7 @@ const DeviceList: React.FC = () => {
   const handleTableChange = (
     pagination: TablePaginationConfig,
     filters: Record<string, FilterValue | null>,
-    sorter: SorterResult<IDevice> | any
+    sorter: SorterResult<ITypesOfLeave> | any
   ) => {
     setSearchValue((prevState) => {
       const paging: IPaging = {
@@ -195,38 +207,31 @@ const DeviceList: React.FC = () => {
 
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <CreateEditDevice
-        open={isOpenModal.openModel}
-        deviceData={editingDevice}
-        handleClose={handleCloseModal}
-        typeAction={isOpenModal.typeAction}
-      />
+      <TypesOfLeaveForm open={isOpenModal} data={editingTypesOfLeave} handleClose={handleCloseModal} />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>
-          {t('device.deviceListTitle')}({meta.total})
-        </h1>
-        <h5 className='tw-text-sm'>{t('device.deviceListSubTitle')}</h5>
+        <h1 className='tw-text-3xl tw-font-semibold'>{t('typesOfLeave.title')}</h1>
       </div>
-      <div className='tw-flex tw-my-3 tw-justify-between '>
-        <Button
-          onClick={() => {
-            setIsOpenModal({
-              typeAction: ACTION_TYPE.Created,
-              openModel: !isOpenModal.openModel
-            })
-            dispatch(setValueFilter(JSON.stringify(searchValue)))
-          }}
-          icon={<PlusOutlined />}
-          type='primary'
-        >
-          {t('device.addDevice')}
-        </Button>
-        <Input.Search
-          className='tw-w-64'
-          placeholder='Tìm kiếm thiết bị'
-          onChange={(event) => handleSearchValueChange(event.target.value)}
-        />
-      </div>
+      <Row gutter={[16, 16]} className='tw-flex tw-my-5 tw-justify-between'>
+        <Col xs={24} lg={12}>
+          <Button
+            onClick={() => {
+              setIsOpenModal(true)
+              dispatch(setValueFilter(JSON.stringify(searchValue)))
+            }}
+            icon={<PlusOutlined />}
+            type='default'
+          >
+            {t('typesOfLeave.createNew')}
+          </Button>
+        </Col>
+        <Col xs={24} lg={12} className=' tw-text-right'>
+          <Input.Search
+            className='tw-w-64'
+            placeholder={t('typesOfLeave.search')}
+            onChange={(event) => handleSearchValueChange(event.target.value)}
+          />
+        </Col>
+      </Row>
       <div>
         <Table
           columns={columns}
@@ -262,4 +267,4 @@ const DeviceList: React.FC = () => {
     </div>
   )
 }
-export default DeviceList
+export default TypesOfLeave

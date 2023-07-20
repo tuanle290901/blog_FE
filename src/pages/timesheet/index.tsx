@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Row, Segmented, Select, Table } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Segmented, Select, Table } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
@@ -12,12 +12,14 @@ import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
 import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { filterTimesheet, getAllGroup, getUserInGroup, getUsersName } from '~/stores/features/timesheet/timesheet.slice'
+import { filterTimesheet, getAllGroup, getUserInGroup } from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
+import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
+import ExcelExportButton from '~/components/ExportExcel/ExcelExportButton'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -29,12 +31,16 @@ const Timesheet: React.FC = () => {
   const groupsSate = useAppSelector((state) => state.timesheet.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
+  const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [selectedUser, setSelectedUser] = useState('')
   const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
   const [mode, setMode] = useState('calendar')
+  const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
+    return { value: item?.code, label: item?.name }
+  })
 
   const [searchValue, setSearchValue] = useState<{
     query: string
@@ -209,36 +215,82 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('timesheet.status'),
-      key: 'status',
-      align: 'center',
-      render: (_, record) => {
+      title: t('Phép'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true,
+      width: '300px',
+      render: () => {
         return (
-          <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
-            {record?.status === 'ontime' ? (
-              <div>
-                <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-3' />
-                {t('timesheet.ontime')}
-              </div>
-            ) : record?.status === 'waiting' ? (
-              <div>
-                <MinusCircleFilled className='tw-text-[#096DD9] tw-mr-3' />
-                {t('timesheet.waiting')}
-              </div>
-            ) : (
-              <Button
-                className='tw-border-none'
-                size='middle'
-                onClick={() => handleClickAddReason()}
-                icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
-              >
-                {t('timesheet.addNewNote')}
-              </Button>
-            )}
-          </div>
+          <>
+            <Select
+              onChange={() => void {}}
+              defaultValue={null}
+              options={typesOfLeaveOptions}
+              className='tw-w-[180px] tw-mr-[20px]'
+            />
+            <Select
+              className='tw-w-[80px]'
+              onChange={() => void {}}
+              defaultValue={null}
+              options={[
+                { value: '0.5', label: '0.5' },
+                { value: '1', label: '1' }
+              ]}
+            />
+          </>
         )
       }
+    },
+    {
+      title: t('timesheet.violate'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true
+    },
+    {
+      title: t('timesheet.note'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true,
+      render: () => {
+        return <Input onChange={() => void {}} defaultValue='' className='tw-w-full' />
+      }
     }
+    // {
+    //   title: t('timesheet.status'),
+    //   key: 'status',
+    //   align: 'center',
+    //   width: '500px',
+    //   render: (_, record) => {
+    //     return (
+    //       <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+    //         {record?.status === 'ontime' ? (
+    //           <div>
+    //             <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-3' />
+    //             {t('timesheet.ontime')}
+    //           </div>
+    //         ) : record?.status === 'waiting' ? (
+    //           <div>
+    //             <MinusCircleFilled className='tw-text-[#096DD9] tw-mr-3' />
+    //             {t('timesheet.waiting')}
+    //           </div>
+    //         ) : (
+    //           <>
+    //             <Button
+    //               className='tw-border-none'
+    //               size='middle'
+    //               onClick={() => handleClickAddReason()}
+    //               icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
+    //             >
+    //               {t('timesheet.addNewNote')}
+    //             </Button>
+    //           </>
+    //         )}
+    //       </div>
+    //     )
+    //   }
+    // }
   ]
 
   function handleTableChange(
@@ -271,6 +323,13 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
+    dispatch(
+      filterTypesOfLeave({
+        paging: null,
+        sorts: null,
+        query: null
+      })
+    )
     return () => promiseGetAllGroup.abort()
   }, [])
 
@@ -305,6 +364,24 @@ const Timesheet: React.FC = () => {
     }
   }, [searchValue])
 
+  const sheetsData = [
+    {
+      sheetName: 'Sheet1',
+      headers: ['1', '23'],
+      data: [
+        ['John', 25],
+        ['Jane', 30]
+      ]
+    },
+    {
+      sheetName: 'Sheet2',
+      headers: ['City', 'Population'],
+      data: [
+        ['New York', 8500000],
+        ['London', 8900000]
+      ]
+    }
+  ]
   return (
     <Row className='timesheet tw-p-5'>
       <Col xs={24} xl={6} xxl={4}>
@@ -312,7 +389,7 @@ const Timesheet: React.FC = () => {
       </Col>
       <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
-          <Col xs={24} lg={18}>
+          <Col xs={24} lg={16}>
             {mode === 'list' && (
               <Row gutter={[16, 16]}>
                 <Col xs={24} lg={6}>
@@ -389,7 +466,12 @@ const Timesheet: React.FC = () => {
               </Row>
             )}
           </Col>
-          <Col xs={24} lg={6} className='timesheet-filter-tab'>
+          {mode === 'list' && (
+            <Col xs={24} lg={4} className='tw-flex tw-justify-end'>
+              <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
+            </Col>
+          )}
+          <Col xs={24} lg={4} className='timesheet-filter-tab'>
             <Segmented
               options={[
                 { label: t('timesheet.calendar'), value: 'calendar' },
