@@ -11,6 +11,7 @@ import UserList from '~/pages/user-management/user-list.tsx'
 
 import PositionList from '~/pages/position-management/position-list.tsx'
 import Department from '~/pages/Department'
+import TypesOfLeave from '~/pages/types-of-leave-management/types-of-leave-list'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -37,7 +38,8 @@ export const PRIVATE_PATH = {
     prefix: '/work-time',
     requests: '/work-time/requests'
   },
-  position: '/positions'
+  position: '/positions',
+  typesOfleave: '/types-of-leave'
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
@@ -100,6 +102,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'positions',
     path: PRIVATE_PATH.position,
     component: PositionList,
+    allowedRoles: []
+  },
+  {
+    name: 'typesOfleave',
+    path: PRIVATE_PATH.typesOfleave,
+    component: TypesOfLeave,
     allowedRoles: []
   }
 ]

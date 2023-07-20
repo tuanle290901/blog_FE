@@ -1,11 +1,11 @@
-import React, { forwardRef, ForwardRefRenderFunction, RefObject, useImperativeHandle, useRef, useState } from 'react'
-import { IWorkingDayConfig } from '~/types/working-time.interface.ts'
+import React, { forwardRef, ForwardRefRenderFunction, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { IWorkingDailySetup } from '~/types/working-time.interface.ts'
 import { Checkbox, Select, Switch, TimePicker } from 'antd'
 
 import { CheckboxValueType } from 'antd/es/checkbox/Group'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
-import { DeleteOutlined, DownOutlined, InfoCircleOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons'
+import { DownOutlined, InfoCircleOutlined, UpOutlined } from '@ant-design/icons'
 
 export interface RefType {
   submit: () => void
@@ -14,18 +14,32 @@ export interface RefType {
 const DayItem: ForwardRefRenderFunction<
   RefType,
   {
-    config: IWorkingDayConfig
-    onFinish: (data: IWorkingDayConfig) => void
+    config: IWorkingDailySetup
+    handleValueChange: (data: IWorkingDailySetup) => void
     className?: string
+    disabled: boolean
   }
-> = ({ config, onFinish, className }, ref) => {
-  const [formValue, setFormValue] = useState<IWorkingDayConfig>({ ...config })
+> = ({ config, handleValueChange, className, disabled }, ref) => {
+  const [formValue, setFormValue] = useState<IWorkingDailySetup>(() => {
+    return {
+      always: config.always,
+      dayOfWeek: config.dayOfWeek,
+      isActive: config.isActive,
+      weekIndexInMonth: config.weekIndexInMonth,
+      startTime: config.startTime ? dayjs(config.startTime, 'HH:mm') : null,
+      endTime: config.endTime ? dayjs(config.endTime, 'HH:mm') : null
+    }
+  })
   const [isCollapse, setIsCollapse] = useState(true)
   useImperativeHandle(ref, () => ({ submit }))
   const submit = () => {
     //   TODO validate data
-    onFinish(formValue)
   }
+
+  useEffect(() => {
+    handleValueChange(formValue)
+  }, [formValue])
+
   const plainOptions = [
     {
       value: 1,
@@ -65,9 +79,9 @@ const DayItem: ForwardRefRenderFunction<
 
   const handleRepeatChange = (value: number) => {
     setFormValue((prevState) => {
-      let newState: IWorkingDayConfig
+      let newState: IWorkingDailySetup
       if (value === 0) {
-        newState = { ...prevState, always: true, weeks: [] }
+        newState = { ...prevState, weekIndexInMonth: [1, 2, 3, 4, 5], always: true }
       } else {
         newState = { ...prevState, always: false }
       }
@@ -76,28 +90,16 @@ const DayItem: ForwardRefRenderFunction<
   }
 
   const handleRepeatWeeksChange = (values: Array<CheckboxValueType>) => {
-    setFormValue({ ...formValue, weeks: values as number[] })
+    setFormValue({ ...formValue, weekIndexInMonth: values as number[] })
   }
 
-  const handleShiftChange = (value: Dayjs | null, index: number) => {
-    console.log(value, index)
-  }
-  const addShift = () => {
+  const handleShiftChange = (value: Dayjs | null, field: 'startTime' | 'endTime') => {
     setFormValue((prevState) => {
-      return { ...prevState, shifts: [...prevState.shifts, { startTimeShift: '08:30', endTimeShift: '17:30' }] }
+      const newState = { ...prevState }
+      newState[field] = value
+      return newState
     })
   }
-  const removeShift = (index: number) => {
-    if (formValue.shifts.length <= 1) {
-      return
-    }
-    setFormValue((prevState) => {
-      const shifts = [...prevState.shifts]
-      shifts.splice(index)
-      return { ...prevState, shifts }
-    })
-  }
-
   return (
     <div className={`${className} tw-flex tw-items-center`}>
       <div className='tw-flex-1 tw-border tw-border-solid tw-border-gray-300 tw-rounded-md tw-py-2 tw-px-4'>
@@ -108,21 +110,17 @@ const DayItem: ForwardRefRenderFunction<
           onClick={handleToggleHeader}
         >
           <div onClick={(event) => event.stopPropagation()}>
-            <Switch checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
+            <Switch disabled={disabled} checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
           </div>
-          <span className='tw-font-semibold'>{formValue.day}</span>
+          <span className='tw-font-semibold'>{formValue.dayOfWeek}</span>
           <div
             className={`${
               isCollapse && formValue.isActive ? 'tw-visible' : 'tw-invisible'
             } tw-flex-1 tw-flex tw-gap-4 tw-mx-6`}
           >
-            {formValue.shifts.slice(0, 2).map((item, index) => {
-              return (
-                <span key={index}>
-                  {item.startTimeShift} - {item.endTimeShift}
-                </span>
-              )
-            })}
+            {/*<span>*/}
+            {/*  {formValue.startTime as string ? formValue.startTime : ''} - {formValue.endTime}*/}
+            {/*</span>*/}
           </div>
           <div className={`${formValue.isActive ? 'tw-visible' : 'tw-invisible'}`}>
             {isCollapse ? <DownOutlined /> : <UpOutlined />}
@@ -133,6 +131,7 @@ const DayItem: ForwardRefRenderFunction<
             <div className='tw-flex tw-gap-4 tw-items-center'>
               <p className='tw-w-24'>Lặp lại</p>
               <Select
+                disabled={disabled}
                 className='tw-w-48'
                 onChange={(value) => handleRepeatChange(value)}
                 defaultValue={formValue.always ? 0 : 1}
@@ -147,44 +146,40 @@ const DayItem: ForwardRefRenderFunction<
             </div>
             {!formValue.always && (
               <div className='tw-my-2'>
-                <Checkbox.Group onChange={(values) => handleRepeatWeeksChange(values)} options={plainOptions} />
+                <Checkbox.Group
+                  disabled={disabled}
+                  defaultValue={formValue.weekIndexInMonth}
+                  onChange={(values) => handleRepeatWeeksChange(values)}
+                  options={plainOptions}
+                />
               </div>
             )}
-            {formValue.shifts.map((item, index) => {
-              return (
-                <div key={index} className='tw-flex tw-gap-4 tw-my-4 tw-items-center'>
-                  <label className='tw-min-w-[96px]'>Ca {index}:</label>
-                  <TimePicker
-                    className='tw-w-32'
-                    format='hh:mm'
-                    onChange={(value) => handleShiftChange(value, index)}
-                  />
-                  <p>đến</p>
-                  <TimePicker
-                    className='tw-w-32'
-                    format='hh:mm'
-                    onChange={(value) => handleShiftChange(value, index)}
-                  />
-                  {index + 1 === formValue.shifts.length && (
-                    <div className='tw-flex tw-gap-2 tw-items-center'>
-                      <PlusOutlined onClick={addShift} className='tw-text-blue-600 tw-cursor-pointer' />
-                      {formValue.shifts.length > 1 && (
-                        <DeleteOutlined
-                          onClick={() => removeShift(index)}
-                          className='tw-text-red-600 tw-cursor-pointer'
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+            <div className='tw-flex tw-gap-4 tw-my-4 tw-items-center'>
+              <p className='tw-w-24'>Thời gian làm</p>
+              <TimePicker
+                disabled={disabled}
+                className='tw-w-32'
+                format='HH:mm'
+                value={formValue.startTime as any}
+                onChange={(value) => handleShiftChange(value, 'startTime')}
+              />
+              <p>đến</p>
+              <TimePicker
+                disabled={disabled}
+                className='tw-w-32'
+                format='HH:mm'
+                value={formValue.endTime as any}
+                onChange={(value) => handleShiftChange(value, 'endTime')}
+              />
+            </div>
           </div>
         )}
       </div>
       <div
         className={`${
-          isCollapse && formValue.always && formValue.isActive ? 'tw-visible' : 'tw-invisible'
+          isCollapse && (formValue.weekIndexInMonth.length === 5 || formValue.always) && formValue.isActive
+            ? 'tw-visible'
+            : 'tw-invisible'
         } tw-w-auto tw-mx-2`}
       >
         <InfoCircleOutlined className='tw-text-blue-600' />
@@ -193,8 +188,11 @@ const DayItem: ForwardRefRenderFunction<
   )
 }
 const DayConfigItem = forwardRef(DayItem)
-const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDayConfig[] }> = (props, ref) => {
-  const [data, setData] = useState(props.weekConfig)
+const WeekConfig: ForwardRefRenderFunction<
+  RefType,
+  { weekConfig: IWorkingDailySetup[]; onChange: (data: IWorkingDailySetup[]) => void; disabled: boolean }
+> = (props, ref) => {
+  const [data, setData] = useState<IWorkingDailySetup[]>(props.weekConfig)
   const refList = useRef<any>([
     useRef<RefType>(null),
     useRef<RefType>(null),
@@ -206,26 +204,32 @@ const WeekConfig: ForwardRefRenderFunction<RefType, { weekConfig: IWorkingDayCon
   ])
   useImperativeHandle(ref, () => ({ submit }))
 
-  const handleDataChange = (data: IWorkingDayConfig) => {
-    console.log(data)
-  }
-
-  const submit = () => {
-    refList.current.forEach((ref: RefObject<RefType>) => {
-      ref.current?.submit()
+  const handleDataChange = (index: number, data: IWorkingDailySetup) => {
+    setData((prevState) => {
+      const newState = [...prevState]
+      newState[index] = data
+      return newState
     })
   }
+  const submit = () => {
+    //   TODO
+  }
+
+  useEffect(() => {
+    props.onChange(data)
+  }, [data])
 
   return (
     <div>
       {data.map((item, index) => {
         return (
           <DayConfigItem
+            disabled={props.disabled}
             ref={refList.current[index]}
             key={index}
             className='tw-w-full tw-my-2'
             config={item}
-            onFinish={handleDataChange}
+            handleValueChange={(value) => handleDataChange(index, value)}
           />
         )
       })}

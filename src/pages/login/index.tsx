@@ -52,7 +52,7 @@ const Index: React.FC = () => {
         <Col xs={24} md={{ span: 16, offset: 4 }}>
           <div className='tw-flex tw-items-center'>
             <img src={logo} alt='logo' />
-            <span className='tw-text-3xl tw-font-bold tw-text-sky-500 tw-ml-[10px]'>ATTENCDENCE</span>
+            <span className='tw-text-3xl tw-font-bold tw-text-sky-500 tw-ml-[10px]'>ATTENDENCE</span>
           </div>
         </Col>
       </Row>

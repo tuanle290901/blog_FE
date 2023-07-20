@@ -26,6 +26,8 @@ const UserList: React.FC = () => {
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
+  const searchRef = useRef(null)
+  const [query, setQuery] = useState<string>('')
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
@@ -79,7 +81,7 @@ const UserList: React.FC = () => {
     const options = groups.map((item) => {
       return { value: item.code, label: item.name }
     })
-    return [{ value: null, label: t('userList.allGroup') }, ...options]
+    return [{ value: 'all', label: t('userList.allGroup') }, ...options]
   }, [groups])
   const handleClickEditUser = async (user: IUser) => {
     //   TODO
@@ -95,9 +97,12 @@ const UserList: React.FC = () => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
     if (isCreateUserSuccess) {
+      setQuery('')
       setSearchValue((prevState) => {
         return {
-          ...prevState,
+          group: 'all',
+          query: '',
+          paging: prevState.paging,
           sorts: [
             {
               direction: 'DESC',
@@ -235,14 +240,15 @@ const UserList: React.FC = () => {
   ]
   const handleDepartmentChange = (value: string | null) => {
     setSearchValue((prevState) => {
-      if (value) {
+      if (value !== 'all') {
         return { ...prevState, group: value }
       } else {
-        return { ...prevState, query: prevState.query, group: null }
+        return { ...prevState, query: prevState.query }
       }
     })
   }
   const handleSearchValueChange = (value: string) => {
+    setQuery(value)
     if (timerId.current) {
       clearTimeout(timerId.current)
     }
@@ -256,7 +262,7 @@ const UserList: React.FC = () => {
         paging: searchValue.paging,
         sorts: searchValue.sorts,
         query: searchValue.query,
-        groupCode: searchValue.group
+        groupCode: searchValue.group === 'all' ? null : searchValue.group
       })
     )
     return () => {
@@ -313,11 +319,17 @@ const UserList: React.FC = () => {
         <div className='tw-flex tw-gap-4'>
           <Select
             onChange={handleDepartmentChange}
-            defaultValue={null}
+            defaultValue={'all'}
             options={groupOptions}
+            value={searchValue.group}
             className='tw-w-64'
           ></Select>
-          <Search onChange={(event) => handleSearchValueChange(event.target.value)} className='tw-w-64' />
+          <Search
+            value={query}
+            placeholder={'Tìm kiếm thành viên'}
+            onChange={(event) => handleSearchValueChange(event.target.value)}
+            className='tw-w-64'
+          />
         </div>
       </div>
       <div className='tw-mt-6'>
