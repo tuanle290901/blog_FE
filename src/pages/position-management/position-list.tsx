@@ -80,7 +80,7 @@ const PositionList: React.FC = () => {
       ellipsis: true
     },
     {
-      title: 'Tên chức vụ',
+      title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
       sorter: true,
@@ -185,7 +185,12 @@ const PositionList: React.FC = () => {
       setSearchValue((prevState) => {
         return {
           ...prevState,
-          sorts: []
+          sorts: [
+            {
+              direction: 'DESC',
+              field: 'updated_at'
+            }
+          ]
         }
       })
     }
