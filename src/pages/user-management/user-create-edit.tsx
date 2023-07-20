@@ -410,7 +410,7 @@ const UserCreateEdit: React.FC<{
                           )}
                           <Form.Item
                             {...restField}
-                            style={{ marginBottom: 24 }}
+                            style={{ marginBottom: 8 }}
                             label={t('userList.department') + ' ' + index}
                             name={[name, 'groupCode']}
                             required
@@ -423,6 +423,7 @@ const UserCreateEdit: React.FC<{
                               {...restField}
                               style={{ marginBottom: 24 }}
                               name={[name, 'title']}
+                              label={t('userModal.departmentRole')}
                               rules={[{ required: true, message: t('userModal.errorMessage.titleEmpty') }]}
                             >
                               <Select options={titleOptions} placeholder={t('userModal.selectPosition')}></Select>
@@ -430,6 +431,7 @@ const UserCreateEdit: React.FC<{
                             <Form.Item
                               {...restField}
                               style={{ marginBottom: 24 }}
+                              label={t('userModal.systemRole')}
                               name={[name, 'role']}
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
