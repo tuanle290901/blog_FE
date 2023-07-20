@@ -62,16 +62,16 @@ const DaySelected: React.FC<{ data: IAttendance[] }> = ({ data }) => {
         <Col xs={24} lg={12} className='tw-flex'>
           <div className='tw-flex tw-ml-auto'>
             <div className='timesheet-statistic'>
-              <p>{t('timesheet.ontime')}:</p>
-              <span>2</span>
+              <p>{t('timesheet.leavingTheCompanyEarly')}</p>
+              {/* <span>2</span> */}
             </div>
             <div className='timesheet-statistic timesheet-statistic__violate'>
-              <p>{t('timesheet.violate')}:</p>
-              <span>1</span>
+              <p>{t('timesheet.lateForWork')}</p>
+              {/* <span>1</span> */}
             </div>
             <div className='timesheet-statistic timesheet-statistic__waiting'>
-              <p>{t('timesheet.waiting')}:</p>
-              <span>1</span>
+              <p>{t('timesheet.forgetTimeAttendance')}</p>
+              {/* <span>1</span> */}
             </div>
           </div>
         </Col>
