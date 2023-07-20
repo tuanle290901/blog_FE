@@ -215,6 +215,7 @@ const CommonTimeConfig: React.FC = () => {
     if (group) {
       add(group.code, group.name)
     }
+    setOpenModal(false)
   }
 
   return (
