@@ -13,9 +13,10 @@ import FormItem from 'antd/es/form/FormItem'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch } from '~/stores/hook.ts'
 import { createWorkingTime } from '~/stores/features/working-time-config/working-time-config.slice.ts'
+import SelectGroupModal from '~/pages/config/component/select-group-modal.tsx'
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
-const TabItem = () => {
+const TabItem: React.FC<{ groupCode: string | null }> = ({ groupCode }) => {
   const ref = useRef<RefType>(null)
   const [config, setConfig] = useState<IWorkingTimeConfig>({ ...DEFAULT_CONFIG })
   const [form] = useForm<
@@ -48,7 +49,7 @@ const TabItem = () => {
       defaultLeaveDay: formValue.defaultLeaveDay
     }
     const workingDailySetups = config.workingDailySetups
-    const payload: IWorkingTimeConfig = { common, workingDailySetups, groupCode: 'null' }
+    const payload: IWorkingTimeConfig = { common, workingDailySetups, groupCode }
     try {
       await dispatch(createWorkingTime(payload)).unwrap()
       notification.success({ message: 'Cấu hình thời gian làm việc thành công' })
@@ -165,18 +166,20 @@ const TabItem = () => {
 }
 
 const CommonTimeConfig: React.FC = () => {
-  const initialItems = [{ label: 'Cấu hình chung', children: <TabItem />, key: '1', closable: false }]
+  const initialItems = [{ label: 'Cấu hình chung', children: <TabItem groupCode={null} />, key: '1', closable: false }]
   const [activeKey, setActiveKey] = useState(initialItems[0].key)
   const [items, setItems] = useState(initialItems)
   const newTabIndex = useRef(0)
+  const [openModal, setOpenModal] = useState(false)
   const onChange = (newActiveKey: string) => {
     setActiveKey(newActiveKey)
   }
 
-  const add = () => {
+  const add = (code: string, name: string) => {
+    setOpenModal(false)
     const newActiveKey = `newTab${newTabIndex.current++}`
     const newPanes = [...items]
-    newPanes.push({ label: 'New Tab', children: <TabItem />, key: newActiveKey, closable: false })
+    newPanes.push({ label: name, children: <TabItem groupCode={code} />, key: newActiveKey, closable: false })
     setItems(newPanes)
     setActiveKey(newActiveKey)
   }
@@ -203,14 +206,20 @@ const CommonTimeConfig: React.FC = () => {
 
   const onEdit = (targetKey: React.MouseEvent | React.KeyboardEvent | string, action: 'add' | 'remove') => {
     if (action === 'add') {
-      add()
+      setOpenModal(true)
     } else {
       remove(targetKey)
+    }
+  }
+  const handleAddConfigForGroup = (group?: { code: string; name: string }) => {
+    if (group) {
+      add(group.code, group.name)
     }
   }
 
   return (
     <div className='working-time-config  tw-h-[calc(100vh-112px)] tw-overflow-auto tw-m-6 tw-p-5 tw-bg-white'>
+      <SelectGroupModal open={openModal} handleClose={handleAddConfigForGroup} />
       <div className='tw-mb-2'>
         <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
