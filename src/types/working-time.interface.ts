@@ -1,153 +1,110 @@
-import { WEEK_DAY } from '~/constants/app.constant.ts'
+import { Dayjs } from 'dayjs'
 
 export interface IWorkingTimeConfig {
-  id: string
-  groupCode: string
-  affectCompensatoryInMonth: number
-  startPayrollCutoffDay: number
-  endPayrollCutoffDay: number
-  defaultLeaveDay: number
-  workOT: {
-    startTimeOT: string
-    endTimeOT: string
-  }
-  workingDays: IWorkingDayConfig[]
-}
-export interface IShift {
-  startTimeShift: string
-  endTimeShift: string
-}
-export interface IWorkingDayConfig {
-  day: WEEK_DAY
-  always: boolean
-  weeks: number[]
-  isActive: boolean
-  shifts: IShift[]
+  id?: string
+  createdAt?: string
+  createdBy?: string
+  updatedAt?: string
+  updatedBy?: string
+  common: ICommonConfig
+  groupCode: string | null
+  workingDailySetups: IWorkingDailySetup[]
 }
 
-export const fakeData: IWorkingTimeConfig = {
-  id: 'working-time-id',
-  groupCode: 'master-data-code',
-  affectCompensatoryInMonth: 3,
-  startPayrollCutoffDay: 1,
-  endPayrollCutoffDay: 5,
-  defaultLeaveDay: 12,
-  workOT: {
-    startTimeOT: '17:30',
-    endTimeOT: '22:30'
+export interface IWorkingDailySetup {
+  isActive?: boolean
+  always?: boolean
+  dayOfWeek: string
+  endTime: string | null | Dayjs
+  startTime: string | null | Dayjs
+  weekIndexInMonth: number[]
+}
+
+export interface ICommonConfig {
+  affectCompensatoryInMonth: number
+  defaultLeaveDay: number
+  endPayrollCutoffDay: {
+    day: number
+    monthType: string
+  }
+  overTimeSetting: IOverTimeSetting
+  startPayrollCutoffDay: {
+    day: number
+    monthType: string
+  }
+}
+
+export interface IOverTimeSetting {
+  endTime: string | null
+  startTime: string | null
+}
+
+export const DEFAULT_CONFIG: IWorkingTimeConfig = {
+  groupCode: null,
+  common: {
+    affectCompensatoryInMonth: 3,
+    startPayrollCutoffDay: {
+      monthType: 'FOR_THIS_MONTH',
+      day: 1
+    },
+    endPayrollCutoffDay: {
+      monthType: 'FOR_THIS_MONTH',
+      day: 5
+    },
+    defaultLeaveDay: 12,
+    overTimeSetting: {
+      startTime: '21:00',
+      endTime: '23:00'
+    }
   },
-  workingDays: [
+  workingDailySetups: [
     {
-      day: WEEK_DAY.MONDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '17:30',
+      dayOfWeek: 'MONDAY',
       isActive: true,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: true,
+      weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
-      day: WEEK_DAY.TUESDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '17:30',
+      dayOfWeek: 'TUESDAY',
       isActive: true,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: true,
+      weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
-      day: WEEK_DAY.WEDNESDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '17:30',
+      dayOfWeek: 'WEDNESDAY',
       isActive: true,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: true,
+      weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
-      day: WEEK_DAY.THURSDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '17:30',
+      dayOfWeek: 'THURSDAY',
       isActive: true,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: true,
+      weekIndexInMonth: [1, 2, 3, 4, 5]
     },
     {
-      day: WEEK_DAY.FRIDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '17:30',
+      dayOfWeek: 'FRIDAY',
       isActive: true,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: false,
+      weekIndexInMonth: [1]
     },
     {
-      day: WEEK_DAY.SATURDAY,
-      always: true,
-      weeks: [],
+      startTime: '08:30',
+      endTime: '12:00',
+      dayOfWeek: 'SATURDAY',
       isActive: false,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
-    },
-    {
-      day: WEEK_DAY.SUNDAY,
-      always: true,
-      weeks: [],
-      isActive: false,
-      shifts: [
-        {
-          startTimeShift: '08:30',
-          endTimeShift: '12:00'
-        },
-        {
-          startTimeShift: '13:00',
-          endTimeShift: '17:30'
-        }
-      ]
+      always: false,
+      weekIndexInMonth: [1]
     }
   ]
 }

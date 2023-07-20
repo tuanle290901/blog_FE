@@ -1,0 +1,9 @@
+{
+  "typesOfLeave": {
+    "code": "Code",
+    "title": "Types of leave",
+    "name": "name",
+    "createNew": "Create new",
+    "search": "Search..."
+  }
+}
