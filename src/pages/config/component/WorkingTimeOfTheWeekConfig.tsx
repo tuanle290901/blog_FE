@@ -17,8 +17,9 @@ const DayItem: ForwardRefRenderFunction<
     config: IWorkingDailySetup
     handleValueChange: (data: IWorkingDailySetup) => void
     className?: string
+    disabled: boolean
   }
-> = ({ config, handleValueChange, className }, ref) => {
+> = ({ config, handleValueChange, className, disabled }, ref) => {
   const [formValue, setFormValue] = useState<IWorkingDailySetup>(() => {
     return {
       always: config.always,
@@ -109,7 +110,7 @@ const DayItem: ForwardRefRenderFunction<
           onClick={handleToggleHeader}
         >
           <div onClick={(event) => event.stopPropagation()}>
-            <Switch checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
+            <Switch disabled={disabled} checked={formValue.isActive} onChange={(value) => handleActiveChange(value)} />
           </div>
           <span className='tw-font-semibold'>{formValue.dayOfWeek}</span>
           <div
@@ -130,6 +131,7 @@ const DayItem: ForwardRefRenderFunction<
             <div className='tw-flex tw-gap-4 tw-items-center'>
               <p className='tw-w-24'>Lặp lại</p>
               <Select
+                disabled={disabled}
                 className='tw-w-48'
                 onChange={(value) => handleRepeatChange(value)}
                 defaultValue={formValue.always ? 0 : 1}
@@ -145,6 +147,7 @@ const DayItem: ForwardRefRenderFunction<
             {!formValue.always && (
               <div className='tw-my-2'>
                 <Checkbox.Group
+                  disabled={disabled}
                   defaultValue={formValue.weekIndexInMonth}
                   onChange={(values) => handleRepeatWeeksChange(values)}
                   options={plainOptions}
@@ -154,6 +157,7 @@ const DayItem: ForwardRefRenderFunction<
             <div className='tw-flex tw-gap-4 tw-my-4 tw-items-center'>
               <p className='tw-w-24'>Thời gian làm</p>
               <TimePicker
+                disabled={disabled}
                 className='tw-w-32'
                 format='HH:mm'
                 value={formValue.startTime as any}
@@ -161,6 +165,7 @@ const DayItem: ForwardRefRenderFunction<
               />
               <p>đến</p>
               <TimePicker
+                disabled={disabled}
                 className='tw-w-32'
                 format='HH:mm'
                 value={formValue.endTime as any}
@@ -185,7 +190,7 @@ const DayItem: ForwardRefRenderFunction<
 const DayConfigItem = forwardRef(DayItem)
 const WeekConfig: ForwardRefRenderFunction<
   RefType,
-  { weekConfig: IWorkingDailySetup[]; onChange: (data: IWorkingDailySetup[]) => void }
+  { weekConfig: IWorkingDailySetup[]; onChange: (data: IWorkingDailySetup[]) => void; disabled: boolean }
 > = (props, ref) => {
   const [data, setData] = useState<IWorkingDailySetup[]>(props.weekConfig)
   const refList = useRef<any>([
@@ -219,6 +224,7 @@ const WeekConfig: ForwardRefRenderFunction<
       {data.map((item, index) => {
         return (
           <DayConfigItem
+            disabled={props.disabled}
             ref={refList.current[index]}
             key={index}
             className='tw-w-full tw-my-2'

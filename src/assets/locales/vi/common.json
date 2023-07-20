@@ -2,6 +2,8 @@
   "common": {
     "save": "Lưu",
     "cancel": "Hủy",
+    "yes": "Có",
+    "no": "Không",
     "role": {
       "officer": "Nhân viên",
       "subManager": "Quản lí trực tiếp",

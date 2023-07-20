@@ -1,3 +1,9 @@
 {
-  "title": "Htime"
+  "title": "Htime",
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No"
+  }
 }

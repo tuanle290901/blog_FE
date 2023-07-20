@@ -8,25 +8,21 @@ import { getAllGroup } from '~/stores/features/master-data/master-data.slice.ts'
 const SelectGroupModal: React.FC<{
   open: boolean
   handleClose: (group?: { code: string; name: string }) => void
-}> = ({ open, handleClose }) => {
+  ignoreGroupCode: string[]
+}> = ({ open, handleClose, ignoreGroupCode }) => {
   const [t] = useTranslation()
   const dispatch = useAppDispatch()
   const [selectedGroup, setSelectedGroup] = useState<any>()
   const groups = useAppSelector((state) => state.masterData.groups)
   const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
-    return groups.map((item) => {
+    const filterGroups = groups.filter((item) => !ignoreGroupCode.includes(item.code))
+    return filterGroups.map((item) => {
       return { value: item.code, label: item.name }
     })
-  }, [groups])
-
-  useEffect(() => {
-    const promise = dispatch(getAllGroup())
-    return () => promise.abort()
-  }, [])
-
+  }, [groups, ignoreGroupCode])
   const handleSubmit = () => {
     handleClose({ code: selectedGroup.value, name: selectedGroup.label })
-    selectedGroup(null)
+    setSelectedGroup(undefined)
   }
   return (
     <Modal
