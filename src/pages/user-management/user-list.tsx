@@ -97,6 +97,7 @@ const UserList: React.FC = () => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
     if (isCreateUserSuccess) {
+      setQuery('')
       setSearchValue((prevState) => {
         return {
           group: 'all',
