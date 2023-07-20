@@ -5,6 +5,8 @@
     "name": "Tên nghỉ phép",
     "createNew": "Thêm loại nghỉ phép",
     "createdAt": "Ngày tạo",
-    "search": "Tìm kiếm..."
+    "search": "Tìm kiếm...",
+    "confirmDeleteTitle": "Xóa loại nghỉ phép",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa không?"
   }
 }

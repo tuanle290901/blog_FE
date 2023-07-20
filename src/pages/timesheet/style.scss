@@ -133,7 +133,7 @@
     }
 
     &::before {
-      background-color: #52c41a;
+      background-color: orange;
       width: 12px;
       height: 12px;
       border-radius: 50%;
@@ -205,8 +205,31 @@
     thead tr {
       text-align: center;
     }
+
     tbody tr {
       text-align: left;
+    }
+  }
+
+  &-violate {
+    text-align: center;
+    &__lable {
+      background: #f5222d;
+      color: #fff;
+      padding: 0 5px;
+      margin-bottom: 5px;
+      &--early {
+        background: orange;
+      }
+      &--forget {
+        background: #1890ff;
+      }
+    }
+  }
+
+  .ant-table-thead {
+    th {
+      text-align: center !important;
     }
   }
 }
