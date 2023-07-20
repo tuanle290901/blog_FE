@@ -1,0 +1,38 @@
+.react-flow__node-selectorNode {
+  min-width: 140px;
+  min-height: 140px;
+  font-size: 12px;
+  background: rgb(145, 240, 157);
+  border: 1px solid #555;
+  border-radius: 5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box-item-new {
+  height: 32px;
+  background-color: rgb(240, 240, 240);
+  border-radius: 6px;
+  cursor: move;
+  min-width: 120px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-top-control {
+  border-top: 1px solid #f0f0f0;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
+
+.source-box-panel {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  border-radius: 6px;
+  max-width: 90%;
+  overflow-x: auto;
+}
