@@ -113,7 +113,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
     }
     if (serverError) {
       if (serverError.status === HttpStatusCode.Conflict || serverError.message.includes(value)) {
-        return Promise.reject('Code ' + value + ' đã được sử dụng.')
+        return Promise.reject('Mã phòng ban ' + value + ' đã được sử dụng.')
       }
     }
     return Promise.resolve()
@@ -145,16 +145,6 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
               validator: codeValidator
             }
           ]}
-          // rules={[
-          //   {
-          //     required: true,
-          //     message: `${t('department.please-insert-input')} ${t('department.code')}`
-          //   },
-          //   {
-          //     pattern: REGEX_SPECIAL_CHARS,
-          //     message: `${t('department.alter-notification.do-not-leave-spaces-special-accents')}`
-          //   }
-          // ]}
         >
           <Input
             disabled={typeModel === ACTION_TYPE.Created ? false : true}
