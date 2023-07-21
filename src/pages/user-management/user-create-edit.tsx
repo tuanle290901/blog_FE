@@ -106,7 +106,9 @@ const UserCreateEdit: React.FC<{
         formalDate: userData.formalDate ? dayjs(userData.formalDate) : undefined,
         joinDate: userData.joinDate ? dayjs(userData.joinDate) : undefined
       })
-      setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
+      if (userData.avatarBase64) {
+        setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
+      }
     } else {
       form.resetFields()
       setAvatarBase64('')
