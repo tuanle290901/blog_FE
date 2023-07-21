@@ -98,6 +98,12 @@ const DeviceList: React.FC = () => {
         ellipsis: true
       },
       {
+        key: 'groupName',
+        title: t('device.groupName'),
+        dataIndex: 'groupName',
+        ellipsis: true
+      },
+      {
         key: '',
         title: t('device.action'),
         width: '120px',
