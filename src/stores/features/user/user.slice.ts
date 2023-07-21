@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import HttpService from '~/config/api.ts'
@@ -12,6 +12,7 @@ export interface IUserState {
   currentRequestId: string | null
   meta: IPaging
 }
+
 const initialState: IUserState = {
   userList: [],
   editingUser: null,
@@ -146,6 +147,23 @@ export const startEditingUser = createAsyncThunk('users/editUser', async (userId
       signal: thunkAPI.signal
     })
     return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+export const importUser = createAsyncThunk('users/importUser', async (payload: File, thunkAPI) => {
+  try {
+    const form = new FormData()
+    form.append('file', payload)
+    const response = await HttpService.post('/system-user/import', form, {
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)
