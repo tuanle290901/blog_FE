@@ -240,11 +240,7 @@ const UserList: React.FC = () => {
   ]
   const handleDepartmentChange = (value: string | null) => {
     setSearchValue((prevState) => {
-      if (value !== 'all') {
-        return { ...prevState, group: value }
-      } else {
-        return { ...prevState, query: prevState.query }
-      }
+      return { ...prevState, query: prevState.query, group: value }
     })
   }
   const handleSearchValueChange = (value: string) => {
