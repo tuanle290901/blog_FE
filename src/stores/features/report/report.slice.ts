@@ -1,6 +1,7 @@
 import { ThunkDispatch, createSlice } from '@reduxjs/toolkit'
 import { saveAs } from 'file-saver'
 import HttpService from '~/config/api'
+import { excelBlob } from './fake-data'
 
 const initialState: any = {
   downloaded: false,
@@ -20,9 +21,10 @@ const reportSlice = createSlice({
 export const downloadExcelFile =
   (payload: { groupCode: string; startTime: string; endTime: string }) => async (dispatch: any) => {
     try {
-      const response = await HttpService.post('/api/excel', payload, { responseType: 'blob' })
-      const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' })
-      saveAs(blob, 'Bao-cao.xlsx')
+      // const response = await HttpService.post('/api/excel', payload, { responseType: 'blob' })
+      const response = excelBlob
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+      saveAs(blob, 'Bao-cao.csv')
       dispatch(setDownloaded(true))
     } catch (error) {
       console.error('Lỗi khi tải xuống tệp Excel:', error)
