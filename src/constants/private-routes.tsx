@@ -13,6 +13,7 @@ import PositionList from '~/pages/position-management/position-list.tsx'
 import Department from '~/pages/Department'
 import TypesOfLeave from '~/pages/types-of-leave-management/types-of-leave-list'
 import Report from '~/pages/report'
+import { ROLE } from '~/constants/app.constant.ts'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -55,56 +56,50 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'users',
     path: PRIVATE_PATH.user.prefix,
     component: UserList,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'ticket-definition-list',
     path: PRIVATE_PATH.setting.ticketProcessDefinition,
     component: TicketDefination,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
     name: 'ticket-definition-new',
     path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
     component: TicketDefinationNew,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
     name: 'userHistory',
     path: PRIVATE_PATH.user.history,
     component: UserHistory,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
   },
   {
     name: 'timesheet',
     path: PRIVATE_PATH.timesheet,
     component: Timesheet,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
-  { name: 'devices', path: PRIVATE_PATH.devices, component: DeviceList, allowedRoles: [] },
+  { name: 'devices', path: PRIVATE_PATH.devices, component: DeviceList, allowedRoles: [ROLE.SYSTEM_ADMIN] },
   {
     path: PRIVATE_PATH.department.prefix,
     name: 'department',
     component: Department,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
   },
   {
     name: 'config',
     path: PRIVATE_PATH.config.prefix,
     component: CommonTimeConfig,
-    allowedRoles: []
-  },
-  {
-    name: 'requestWorkTime',
-    path: PRIVATE_PATH.timeManagement.requests,
-    component: PersonalWokingTimeRequestList,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
     name: 'positions',
     path: PRIVATE_PATH.position,
     component: PositionList,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
   },
   {
     name: 'typesOfleave',
@@ -116,6 +111,6 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'report',
     path: PRIVATE_PATH.report,
     component: Report,
-    allowedRoles: []
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
   }
 ]

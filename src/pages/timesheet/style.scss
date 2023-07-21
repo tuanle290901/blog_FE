@@ -217,7 +217,8 @@
       background: #f5222d;
       color: #fff;
       padding: 0 5px;
-      margin-bottom: 5px;
+      margin: 0 5px 6px;
+      min-width: 90px;
       &--early {
         background: orange;
       }

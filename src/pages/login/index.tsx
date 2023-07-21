@@ -42,7 +42,7 @@ const Index: React.FC = () => {
   useEffect(() => {
     if (loginState?.userInfo?.userName) {
       LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
-      navigate('/')
+      navigate('/timesheet')
     }
   }, [loginState.userInfo, navigate])
 

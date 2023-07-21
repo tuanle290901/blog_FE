@@ -35,6 +35,10 @@ export const convertUTCToLocaleTime = (timeStr: string) => {
 
 export const hasPermission = (allowedRoles: ROLE[], groupProfiles?: GroupProfile[]) => {
   let isHasPermission = false
+  console.log(allowedRoles)
+  if (allowedRoles.length === 0) {
+    isHasPermission = true
+  }
   for (const role of allowedRoles) {
     const foundRole = groupProfiles?.find((group) => group.role === role)
     if (foundRole) {
