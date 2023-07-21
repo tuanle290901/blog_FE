@@ -6,7 +6,7 @@ import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 // import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
@@ -748,21 +748,26 @@ const Timesheet: React.FC = () => {
               </Row>
             )}
           </Col>
-          {mode === 'list' && (
+          {/* {mode === 'list' && (
             <Col xs={24} lg={6} className='tw-flex'>
               <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
             </Col>
-          )}
-          {/* <Col xs={24} lg={4} className='timesheet-filter-tab'>
-            <Segmented
+          )} */}
+          <Col xs={24} lg={6} className='timesheet-filter-tab tw-w-full'>
+            <div className='tw-text-right'>
+              <Button icon={<CheckCircleOutlined />} type='primary' onClick={() => handleUpdateAttendanceStatistic()}>
+                Cập nhật
+              </Button>
+            </div>
+            {/* <Segmented
               options={[
                 { label: t('timesheet.calendar'), value: 'calendar' },
                 { label: t('timesheet.list'), value: 'list' }
               ]}
               defaultValue='calendar'
               onChange={(v) => setMode(v.toString())}
-            />
-          </Col> */}
+            /> */}
+          </Col>
         </Row>
         {mode === 'list' && (
           <>
@@ -785,9 +790,6 @@ const Timesheet: React.FC = () => {
                 </Col>
                 <Col xs={24} lg={12} className='tw-flex'>
                   <div className='tw-flex tw-ml-auto'>
-                    <div className='tw-mr-[30px]'>
-                      <Button onClick={() => handleUpdateAttendanceStatistic()}>Cập nhật</Button>
-                    </div>
                     <div className='timesheet-statistic'>
                       <p>{t('timesheet.leavingTheCompanyEarly')}</p>
                       {/* <span>2</span> */}
