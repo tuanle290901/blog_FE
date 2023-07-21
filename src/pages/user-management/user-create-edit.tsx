@@ -415,7 +415,7 @@ const UserCreateEdit: React.FC<{
                           <Form.Item
                             {...restField}
                             style={{ marginBottom: 8 }}
-                            label={t('userList.department') + ' ' + index}
+                            label={t('userList.department')}
                             name={[name, 'groupCode']}
                             required
                             rules={[{ required: true, message: t('userModal.errorMessage.groupEmpty') }]}
