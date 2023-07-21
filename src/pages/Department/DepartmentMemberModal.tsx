@@ -45,7 +45,6 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
     try {
       const response = await HttpService.get(END_POINT_API.Department.getBaseInfo(code))
       if (response.status === 200) {
-        console.log(response.data)
         setDataInfoDepartment(response.data)
         setListDataRender({
           listDataUp: [...response.data.subManagers],
