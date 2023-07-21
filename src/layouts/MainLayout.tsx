@@ -12,6 +12,7 @@ import menuIconDepartment from '../assets/images/menu/department.png'
 import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
+import menuIconReport from '../assets/images/menu/icon-report.png'
 
 import defaultImg from '~/assets/images/default-img.png'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -127,6 +128,16 @@ const MainLayout: React.FC = () => {
           getItem('Phòng ban', 'department', <img src={menuIconDepartment} alt='' className='menu-image' />),
           getItem('Chức vụ', 'positions', <img src={menuIconDepartment} alt='' className='menu-image' />)
         ],
+        'group'
+      ),
+
+      getItem(
+        <Tooltip placement='topLeft' title='Chức năng báo cáo'>
+          Chức năng báo cáo
+        </Tooltip>,
+        'reportFunction',
+        null,
+        [getItem('Báo cáo', 'report', <img src={menuIconReport} alt='' className='menu-image' />)],
         'group'
       ),
 

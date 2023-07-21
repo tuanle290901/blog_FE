@@ -15,7 +15,7 @@ export const VALIDATE_FORM = {
 }
 
 export const convertUTCToLocaleDate = (dateStr: string) => {
-  if (!dateStr) return null
+  if (!dateStr) return ''
   // const now = new Date()
   // const localOffset = now.getTimezoneOffset()
   // const utcOffset = localOffset / 60
