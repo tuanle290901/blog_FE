@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, notification, Select, Table, TablePaginationConfig } from 'antd'
-import { DeleteOutlined, EditOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
+import { EditOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
@@ -50,7 +50,7 @@ const UserList: React.FC = () => {
     ]
   })
   const permissionAddUser = useMemo(() => {
-    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
+    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER], userInfo?.groupProfiles)
   }, [userInfo])
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
@@ -180,13 +180,11 @@ const UserList: React.FC = () => {
       dataIndex: 'groupProfiles',
       key: 'groupProfiles',
       render: (text, record) => {
-        return record.groupProfiles.map((item, index) => {
-          return (
-            <span key={index}>
-              {item.groupName}(<span className='tw-text-blue-600'>{t(`common.role.${item.role.toLowerCase()}`)}</span>)
-            </span>
-          )
-        })
+        return record.groupProfiles
+          .map((item, index) => {
+            return `${item.groupName}(${t(`common.role.${item.role.toLowerCase()}`)})`
+          })
+          .join(',')
       },
       ellipsis: true
     },
