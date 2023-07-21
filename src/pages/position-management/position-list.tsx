@@ -225,7 +225,7 @@ const PositionList: React.FC = () => {
           columns={columns}
           dataSource={positionState.positionList}
           loading={positionState.loading}
-          pagination={{ total: positionState.meta.total }}
+          pagination={{ total: positionState.meta.total, showSizeChanger: true, showQuickJumper: true }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />

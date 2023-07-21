@@ -238,6 +238,14 @@ const CommonTimeConfig: React.FC = () => {
         closable: false
       }
     })
+    if (listTabPanel.length === 0) {
+      listTabPanel.push({
+        label: 'Cấu hình chung',
+        children: <TabItem groupCode={null} />,
+        key: '0',
+        closable: false
+      })
+    }
     setItems(listTabPanel)
   }, [listWKTC, groups])
   const add = (code: string, name: string) => {

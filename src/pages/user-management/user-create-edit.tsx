@@ -153,8 +153,10 @@ const UserCreateEdit: React.FC<{
         notification.success({
           message: userData ? 'Cập nhật thông tin thành viên thành công' : 'Tạo mới thành viên thành công'
         })
-      } catch (e) {
-        setServerError(e)
+      } catch (e: any) {
+        if (e?.status === 409) {
+          setServerError(e)
+        }
       } finally {
         setLoading(false)
       }
@@ -339,27 +341,27 @@ const UserCreateEdit: React.FC<{
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.address')} name='address'>
                   <Input placeholder={t('userModal.enterAddress')} />
                 </Form.Item>
-                {!userData && (
-                  <Form.Item
-                    label={t('userList.password')}
-                    name='password'
-                    rules={[
-                      {
-                        required: true,
-                        message: t('userModal.errorMessage.passwordIsEmpty')
-                      }
-                    ]}
-                  >
-                    <Password placeholder={t('userModal.enterPassword')}></Password>
-                  </Form.Item>
-                )}
+                {/*{!userData && (*/}
+                {/*  <Form.Item*/}
+                {/*    label={t('userList.password')}*/}
+                {/*    name='password'*/}
+                {/*    rules={[*/}
+                {/*      {*/}
+                {/*        required: true,*/}
+                {/*        message: t('userModal.errorMessage.passwordIsEmpty')*/}
+                {/*      }*/}
+                {/*    ]}*/}
+                {/*  >*/}
+                {/*    <Password placeholder={t('userModal.enterPassword')}></Password>*/}
+                {/*  </Form.Item>*/}
+                {/*)}*/}
               </div>
             </div>
             <div className='tw-w-1/2'>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
               <div
                 className={`tw-p-4 tw-bg-[#FAFAFA] ${
-                  userData?.userName ? 'tw-h-[602px]' : 'tw-h-[602px]'
+                  userData?.userName ? 'tw-h-[602px]' : 'tw-h-[516px]'
                 }   tw-overflow-auto`}
               >
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
@@ -413,7 +415,7 @@ const UserCreateEdit: React.FC<{
                           <Form.Item
                             {...restField}
                             style={{ marginBottom: 8 }}
-                            label={t('userList.department') + ' ' + index}
+                            label={t('userList.department')}
                             name={[name, 'groupCode']}
                             required
                             rules={[{ required: true, message: t('userModal.errorMessage.groupEmpty') }]}
