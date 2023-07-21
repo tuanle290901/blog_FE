@@ -5,11 +5,13 @@ import DefaultImage from '~/assets/images/default-img.png'
 import IconBag from '~/assets/images/timesheet/icon_bag.png'
 import { IAttendance } from '~/types/attendance.interface'
 import { IUser } from '~/types/user.interface'
+import { IPaging } from '~/types/api-response.interface'
 
-const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userInfo: IUser | null }> = ({
+const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userInfo: IUser | null; meta: IPaging }> = ({
   data,
   handleOpenModal,
-  userInfo
+  userInfo,
+  meta
 }) => {
   const [t] = useTranslation()
 
@@ -30,7 +32,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
         <div className='tw-flex tw-justify-center tw-items-center tw-mt-4'>
           <img className='tw-max-w-[100%]' src={IconBag} alt='' />
           <p>
-            <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{data?.length}</span>
+            <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{meta?.total}</span>
             {t('timesheet.workingDay')}
           </p>
         </div>
