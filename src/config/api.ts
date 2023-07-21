@@ -17,7 +17,14 @@ const HttpService = axios.create({
 })
 HttpService.interceptors.request.use((config: any) => {
   const accessToken = LocalStorage.get(LOCAL_STORAGE.ACCESS_TOKEN)
-  return { ...config, headers: { ...config.headers, Authorization: `Bearer ${accessToken}` } }
+  return {
+    ...config,
+    headers: {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+      'Accept-Language': LocalStorage.get('i18nextLng') || 'vi'
+    }
+  }
 })
 HttpService.interceptors.response.use(
   (response) => response.data,
