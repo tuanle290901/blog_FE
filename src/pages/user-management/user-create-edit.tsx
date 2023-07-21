@@ -153,8 +153,10 @@ const UserCreateEdit: React.FC<{
         notification.success({
           message: userData ? 'Cập nhật thông tin thành viên thành công' : 'Tạo mới thành viên thành công'
         })
-      } catch (e) {
-        setServerError(e)
+      } catch (e: any) {
+        if (e?.status === 409) {
+          setServerError(e)
+        }
       } finally {
         setLoading(false)
       }
