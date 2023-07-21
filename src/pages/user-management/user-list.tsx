@@ -1,20 +1,21 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, Select, Table, TablePaginationConfig } from 'antd'
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Input, notification, Select, Table, TablePaginationConfig } from 'antd'
+import { DeleteOutlined, EditOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import { cancelEditingUser, importUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { GENDER } from '~/constants/app.constant.ts'
+import { GENDER, ROLE } from '~/constants/app.constant.ts'
+import { hasPermission } from '~/utils/helper.ts'
 
 const { Search } = Input
 
@@ -26,8 +27,8 @@ const UserList: React.FC = () => {
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
-  const searchRef = useRef(null)
   const [query, setQuery] = useState<string>('')
+  const fileSelect = useRef<any>(null)
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
@@ -48,18 +49,8 @@ const UserList: React.FC = () => {
       }
     ]
   })
-  const hasPermissionAddNewUser = useMemo(() => {
-    const groupProfiles = userInfo?.groupProfiles
-    if (groupProfiles) {
-      for (const group of groupProfiles) {
-        if (group.groupCode === 'ADMIN') {
-          return true
-        } else {
-          //   TODO
-        }
-      }
-    }
-    return false
+  const permissionAddUser = useMemo(() => {
+    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
@@ -97,21 +88,24 @@ const UserList: React.FC = () => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
     if (isCreateUserSuccess) {
-      setQuery('')
-      setSearchValue((prevState) => {
-        return {
-          group: 'all',
-          query: '',
-          paging: prevState.paging,
-          sorts: [
-            {
-              direction: 'DESC',
-              field: 'created_at'
-            }
-          ]
-        }
-      })
+      resetAndSearchUser()
     }
+  }
+  const resetAndSearchUser = () => {
+    setQuery('')
+    setSearchValue((prevState) => {
+      return {
+        group: 'all',
+        query: '',
+        paging: prevState.paging,
+        sorts: [
+          {
+            direction: 'DESC',
+            field: 'created_at'
+          }
+        ]
+      }
+    })
   }
   const getSortOrder = (filed: string) => {
     const sort = searchValue.sorts[0]
@@ -186,11 +180,13 @@ const UserList: React.FC = () => {
       dataIndex: 'groupProfiles',
       key: 'groupProfiles',
       render: (text, record) => {
-        const value = record.groupProfiles.map((item) => {
-          return item.groupName
+        return record.groupProfiles.map((item, index) => {
+          return (
+            <span key={index}>
+              {item.groupName}(<span className='tw-text-blue-600'>{t(`common.role.${item.role.toLowerCase()}`)}</span>)
+            </span>
+          )
         })
-
-        return <span>{value.join(',')}</span>
       },
       ellipsis: true
     },
@@ -226,11 +222,11 @@ const UserList: React.FC = () => {
                 onClick={() => handleClickEditUser(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
-              <Button
-                size='small'
-                onClick={() => handleClickDeleteUser(record)}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
+              {/*<Button*/}
+              {/*  size='small'*/}
+              {/*  onClick={() => handleClickDeleteUser(record)}*/}
+              {/*  icon={<DeleteOutlined className='tw-text-red-600' />}*/}
+              {/*/>*/}
               {/*<Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />*/}
             </div>
           </div>
@@ -240,11 +236,7 @@ const UserList: React.FC = () => {
   ]
   const handleDepartmentChange = (value: string | null) => {
     setSearchValue((prevState) => {
-      if (value !== 'all') {
-        return { ...prevState, group: value }
-      } else {
-        return { ...prevState, query: prevState.query }
-      }
+      return { ...prevState, query: prevState.query, group: value }
     })
   }
   const handleSearchValueChange = (value: string) => {
@@ -297,6 +289,27 @@ const UserList: React.FC = () => {
     setIsOpenUserModal(true)
   }
 
+  const handleFileChange = async (files: FileList | null) => {
+    if (files && files.length) {
+      const file = files[0]
+      const fileName = file.name.split('.')
+      const fileExtension = fileName.length ? fileName[fileName.length - 1] : ''
+      if (!(fileExtension === 'xlsx' || fileExtension === 'xls')) {
+        notification.error({ message: 'Vui lòng chọn file có định dạng xlsx hoặc xls' })
+      } else {
+        try {
+          await dispatch(importUser(file)).unwrap()
+          notification.success({ message: 'Import thành viên thành công' })
+          resetAndSearchUser()
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    }
+    if (fileSelect?.current) {
+      fileSelect.current.value = ''
+    }
+  }
   return (
     <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
       {(isOpenUserModal || !!userState.editingUser) && (
@@ -312,11 +325,26 @@ const UserList: React.FC = () => {
         </h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
-      <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
-        <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
-          {t('userList.addMember')}
-        </Button>
-        <div className='tw-flex tw-gap-4'>
+      <div className='tw-flex tw-gap-4 tw-mt-4'>
+        {permissionAddUser && (
+          <div className='tw-gap-4 tw-flex'>
+            <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
+              {t('userList.addMember')}
+            </Button>
+            <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
+              Import thành viên
+            </Button>
+            <input
+              ref={fileSelect}
+              className='tw-hidden'
+              type='file'
+              accept='.xlxs,.xls'
+              onChange={(event) => handleFileChange(event.target.files)}
+            />
+          </div>
+        )}
+
+        <div className='tw-flex tw-gap-4 tw-justify-end tw-flex-1'>
           <Select
             onChange={handleDepartmentChange}
             defaultValue={'all'}
@@ -338,7 +366,7 @@ const UserList: React.FC = () => {
           columns={columns}
           dataSource={userState.userList}
           loading={userState.loading}
-          pagination={{ total: userState.meta.total }}
+          pagination={{ total: userState.meta.total, showSizeChanger: true, showQuickJumper: true }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />

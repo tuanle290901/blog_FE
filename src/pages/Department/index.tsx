@@ -406,7 +406,7 @@ const Department: React.FC = () => {
                 onClick={() => {
                   onRendered(item)
                 }}
-                className='tw-ml-[5px]'
+                className='tw-ml-[5px] pointer'
               >
                 {` ${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? ' ->  ' : ' '}`}
               </span>
@@ -470,6 +470,7 @@ const Department: React.FC = () => {
           expandable={expandableConfig}
           pagination={false}
           style={{ width: '100%' }}
+          className='pointer'
           scroll={{ y: 'calc(100vh - 360px)' }}
           rowKey={(record: DataType) => record.code}
         />

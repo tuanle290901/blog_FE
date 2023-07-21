@@ -47,7 +47,7 @@ const switchGroup = createAsyncThunk('auth/switchGroup', async (parmas: any, thu
   return response.data
 })
 
-const clearLocalStorage = () => {
+export const clearLocalStorage = () => {
   Object.entries(LOCAL_STORAGE).forEach(([key, value]) => {
     if (key) {
       localStorage.removeItem(value)
