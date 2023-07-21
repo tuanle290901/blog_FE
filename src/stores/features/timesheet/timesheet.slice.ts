@@ -101,10 +101,9 @@ export const filterTimesheet = createAsyncThunk(
               },
               {
                 field: 'date',
-                type: 'INSTANT',
                 operator: 'BETWEEN',
-                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
               }
             ]
           }
@@ -122,10 +121,9 @@ export const filterTimesheet = createAsyncThunk(
               },
               {
                 field: 'date',
-                type: 'INSTANT',
                 operator: 'BETWEEN',
-                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
               }
             ]
           }
@@ -148,10 +146,9 @@ export const filterTimesheet = createAsyncThunk(
               },
               {
                 field: 'date',
-                type: 'INSTANT',
                 operator: 'BETWEEN',
-                min: params.startDate || `${dayjs().format('YYYY-MM-DD')}T00:00:00Z`,
-                max: params.endDate || `${dayjs().format('YYYY-MM-DD')}T23:59:59Z`
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
               }
             ]
           }

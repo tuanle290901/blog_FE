@@ -20,9 +20,38 @@ import SelectGroupModal from '~/pages/config/component/select-group-modal.tsx'
 import { getAllGroup } from '~/stores/features/master-data/master-data.slice.ts'
 
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string
-const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCode, id }) => {
+const TabItem: React.FC<{ groupCode: string | null; id?: string; data?: IWorkingTimeConfig }> = ({
+  groupCode,
+  id,
+  data
+}) => {
+  const [disabled, setDisabled] = useState(!!id)
   const ref = useRef<RefType>(null)
-  const [config, setConfig] = useState<IWorkingTimeConfig>({ ...DEFAULT_CONFIG })
+  const [config, setConfig] = useState<IWorkingTimeConfig>(() => {
+    if (data) {
+      let workingDailySetups = [...DEFAULT_CONFIG.workingDailySetups]
+      workingDailySetups = workingDailySetups.map((item) => {
+        const foundData = data.workingDailySetups.find((day) => day.dayOfWeek === item.dayOfWeek)
+        if (foundData) {
+          return { ...foundData, isActive: true }
+        }
+        return {
+          startTime: item.startTime,
+          endTime: item.endTime,
+          always: item.always,
+          dayOfWeek: item.dayOfWeek,
+          weekIndexInMonth: item.weekIndexInMonth,
+          isActive: false
+        }
+      })
+      return {
+        ...data,
+        workingDailySetups
+      }
+    } else {
+      return { ...DEFAULT_CONFIG }
+    }
+  })
   const [form] = useForm<
     Omit<ICommonConfig, 'overTimeSetting' | 'endPayrollCutoffDay' | 'startPayrollCutoffDay'> & {
       endPayrollCutoffDay: { day: number }
@@ -52,11 +81,12 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
       affectCompensatoryInMonth: formValue.affectCompensatoryInMonth,
       defaultLeaveDay: formValue.defaultLeaveDay
     }
-    const workingDailySetups = config.workingDailySetups
+    const workingDailySetups = config.workingDailySetups.filter((item) => item.isActive)
     const payload: IWorkingTimeConfig = { common, workingDailySetups, groupCode }
     try {
       await dispatch(createWorkingTime(payload)).unwrap()
       notification.success({ message: 'Cấu hình thời gian làm việc thành công' })
+      setDisabled(true)
     } catch (e) {
       console.log(e)
     }
@@ -91,9 +121,9 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
       return { ...prevState, workingDailySetups }
     })
   }
-  const resetForm = () => {
-    setConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)))
-  }
+  // const resetForm = () => {
+  //   setConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)))
+  // }
 
   return (
     <div className='tw-px-4 tw-py-4 tw-border tw-border-t-0 tw-border-[#eee] tw-border-solid'>
@@ -110,12 +140,12 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
                 </div>
                 <p className='tw-mt-1.5'>Từ</p>
                 <FormItem name={['startPayrollCutoffDay', 'day']}>
-                  <InputNumber disabled={!!id} className='tw-w-14' min={1} max={31} />
+                  <InputNumber disabled={disabled} className='tw-w-14' min={1} max={31} />
                 </FormItem>
 
                 <p className='tw-mt-1.5'>Đến</p>
                 <FormItem name={['endPayrollCutoffDay', 'day']}>
-                  <InputNumber disabled={!!id} className='tw-w-14' min={1} max={31} />
+                  <InputNumber disabled={disabled} className='tw-w-14' min={1} max={31} />
                 </FormItem>
                 <p className='tw-mt-1.5'>Hàng tháng</p>
               </div>
@@ -124,7 +154,7 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
                   <p>Số ngày nghỉ phép mặc định</p>
                 </div>
                 <FormItem name={'defaultLeaveDay'}>
-                  <InputNumber disabled={!!id} value={config.common.defaultLeaveDay} className='tw-w-14' min={1} />
+                  <InputNumber disabled={disabled} value={config.common.defaultLeaveDay} className='tw-w-14' min={1} />
                 </FormItem>
               </div>
               <div className='tw-flex tw-gap-8 tw-my-4'>
@@ -132,7 +162,7 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
                   <p>Thời gian nghỉ bù có hiệu lực</p>
                 </div>
                 <FormItem name={'affectCompensatoryInMonth'}>
-                  <InputNumber disabled={!!id} className='tw-w-14' min={1} />
+                  <InputNumber disabled={disabled} className='tw-w-14' min={1} />
                 </FormItem>
               </div>
               <div className='tw-flex tw-gap-2 tw-my-4'>
@@ -141,12 +171,12 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
                 </div>
                 <p className='tw-mt-1.5'>Từ</p>
                 <FormItem name={['overTimeSetting', 'startTime']}>
-                  <TimePicker disabled={!!id} format='HH:mm' className='tw-w-32' />
+                  <TimePicker disabled={disabled} format='HH:mm' className='tw-w-32' />
                 </FormItem>
 
                 <p className='tw-mt-1.5'>Đến</p>
                 <FormItem name={['overTimeSetting', 'endTime']}>
-                  <TimePicker disabled={!!id} format='HH:mm' className='tw-w-32' />
+                  <TimePicker disabled={disabled} format='HH:mm' className='tw-w-32' />
                 </FormItem>
                 <p className='tw-mt-1.5'>Hàng ngày</p>
               </div>
@@ -159,7 +189,7 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
           </div>
           <div className='tw-w-2/5'>
             <WorkingTimeOfTheWeekConfig
-              disabled={!!id}
+              disabled={disabled}
               onChange={handleDataChange}
               weekConfig={config.workingDailySetups}
               ref={ref}
@@ -167,9 +197,9 @@ const TabItem: React.FC<{ groupCode: string | null; id?: string }> = ({ groupCod
           </div>
         </div>
       </div>
-      {!id && (
+      {!disabled && (
         <div className='tw-flex tw-gap-4 tw-justify-end tw-mt-4'>
-          <Button onClick={resetForm}>Đặt lại thông số</Button>
+          {/*<Button onClick={resetForm}>Đặt lại thông số</Button>*/}
           <Button type='primary' onClick={save}>
             Lưu cấu hình
           </Button>
@@ -203,7 +233,7 @@ const CommonTimeConfig: React.FC = () => {
       const groupName = groups.find((group) => item.groupCode === group.code)
       return {
         label: groupName?.name || 'Cấu hình chung',
-        children: <TabItem groupCode={item.groupCode} id={item.id} />,
+        children: <TabItem groupCode={item.groupCode} id={item.id} data={item} />,
         key: item.groupCode || '0',
         closable: false
       }

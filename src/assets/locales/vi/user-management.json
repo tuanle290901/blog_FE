@@ -21,7 +21,8 @@
     "female": "Nữ",
     "commonInfo": "Thông tin chung",
     "workInfo": "Thông tin làm việc",
-    "allGroup": "Tất cả phòng ban"
+    "allGroup": "Tất cả phòng ban",
+    "password": "Mật khẩu"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
@@ -32,8 +33,8 @@
     "enterAddress": "Nhập địa chỉ thành viên",
     "selectDOB": "Chọn ngày sinh thành viên",
     "selectDepartment": "Chọn tổ chức",
-    "selectPosition": "Chức vụ",
-    "selectFunction": "Chức năng",
+    "selectPosition": "Chọn vai trò trong tổ chức",
+    "selectFunction": "Chọn vai trò trong hệ thống",
     "enterPhoneNumber": "Nhập số điện thoại thành viên",
     "enterEmail": "Nhập email thành viên",
     "selectGender": "Chọn giới tính",
@@ -41,16 +42,20 @@
     "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
     "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
     "avatarAccept": "Chấp nhận ảnh với định dạng PNG hoặc JPEG. Kích thước tối đa 800KB.",
+    "enterPassword": "Nhập mật khẩu",
     "addRole": "Thêm vị trí",
+    "departmentRole": "Vai trò trong tổ chức",
+    "systemRole": "Vai trò trong hệ thống",
     "errorMessage": {
       "fullNameIsEmpty": "Họ và tên không được để trống",
       "groupEmpty": "Tổ chức không được để trống",
-      "titleEmpty": "Chức vụ không được để trống",
+      "titleEmpty": "Vai trò trong tổ chức không được để trống",
       "roleEmpty": "Chức năng không được để trống",
       "phoneNumberEmpty": "Số điện thoại không được để trống",
       "avatarEmpty": "Ảnh đại diện không được để trống",
       "invalidEmail": "Email không đúng định dạng",
-      "invalidPhoneNumber": "Số điện thoại không đúng định dạng"
+      "invalidPhoneNumber": "Số điện thoại không đúng định dạng",
+      "passwordIsEmpty": "Mật khẩu không được để trống"
     }
   }
 }
