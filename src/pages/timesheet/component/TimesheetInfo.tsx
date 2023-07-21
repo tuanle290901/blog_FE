@@ -40,7 +40,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
       <div className='timesheet-short-info'>
         <div className='timesheet-short-info__item'>
           <p>
-            <span>1</span>
+            <span>0</span>
             {t('timesheet.hour')}
           </p>
           <p>{t('timesheet.overtime')}</p>
@@ -85,7 +85,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
           <p>{t('timesheet.leaveWithoutReason')}</p>
         </div>
       </div>
-      <div className='tw-mt-20'>
+      {/* <div className='tw-mt-20'>
         <Button className='timesheet-short-info__add' size='middle' onClick={() => handleOpenModal(true)}>
           {t('timesheet.requestLeave')}
         </Button>
@@ -94,7 +94,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
         <Button className='timesheet-short-info__config' size='middle' onClick={() => handleOpenModal(true)}>
           {t('timesheet.personalWorkingTime')}
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }
