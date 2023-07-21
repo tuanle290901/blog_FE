@@ -434,7 +434,7 @@ const Timesheet: React.FC = () => {
               className='tw-w-full'
               showSearch
               filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
-              allowClear
+              // allowClear
             />
           )
         )
@@ -753,13 +753,14 @@ const Timesheet: React.FC = () => {
               <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
             </Col>
           )} */}
-          <Col xs={24} lg={6} className='timesheet-filter-tab tw-w-full'>
-            <div className='tw-text-right'>
-              <Button icon={<CheckCircleOutlined />} type='primary' onClick={() => handleUpdateAttendanceStatistic()}>
-                Cập nhật
-              </Button>
-            </div>
-            {/* <Segmented
+          {currentAuth?.groupProfiles[0]?.role !== 'OFFICER' && (
+            <Col xs={24} lg={6} className='timesheet-filter-tab tw-w-full'>
+              <div className='tw-text-right'>
+                <Button icon={<CheckCircleOutlined />} type='primary' onClick={() => handleUpdateAttendanceStatistic()}>
+                  Cập nhật
+                </Button>
+              </div>
+              {/* <Segmented
               options={[
                 { label: t('timesheet.calendar'), value: 'calendar' },
                 { label: t('timesheet.list'), value: 'list' }
@@ -767,7 +768,8 @@ const Timesheet: React.FC = () => {
               defaultValue='calendar'
               onChange={(v) => setMode(v.toString())}
             /> */}
-          </Col>
+            </Col>
+          )}
         </Row>
         {mode === 'list' && (
           <>

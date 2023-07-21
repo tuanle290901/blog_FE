@@ -33,7 +33,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
           <img className='tw-max-w-[100%]' src={IconBag} alt='' />
           <p>
             <span className='tw-mx-2 tw-text-[20px] tw-font-bold'>{meta?.total}</span>
-            {t('timesheet.workingDay')}
+            {/* {t('timesheet.workingDay')} */}
           </p>
         </div>
       </div>
