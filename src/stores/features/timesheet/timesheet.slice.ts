@@ -8,6 +8,7 @@ import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
 import dayjs from 'dayjs'
 import { IUser } from '~/types/user.interface'
 import { IGroup } from '../master-data/master-data.slice'
+import { IPayloadUpdateAttendance } from '~/types/attendance.interface'
 
 export interface TimesheetStateInterface {
   loading: boolean
@@ -68,6 +69,23 @@ const getUsersName = createAsyncThunk('system-user/get-info', async (body: (stri
     throw error
   }
 })
+
+export const updateAttendanceStatistic = createAsyncThunk(
+  'time-attendance/statistic-confirm',
+  async (body: IPayloadUpdateAttendance[], thunkAPI) => {
+    try {
+      const response: IApiResponse<any> = await HttpService.post('/time-attendance/statistic-confirm', body, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      return error
+    }
+  }
+)
 
 export const filterTimesheet = createAsyncThunk(
   'time-attendance/filter',
