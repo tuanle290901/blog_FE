@@ -180,11 +180,13 @@ const UserList: React.FC = () => {
       dataIndex: 'groupProfiles',
       key: 'groupProfiles',
       render: (text, record) => {
-        const value = record.groupProfiles.map((item) => {
-          return item.groupName
+        return record.groupProfiles.map((item, index) => {
+          return (
+            <span key={index}>
+              {item.groupName}(<span className='tw-text-blue-600'>{t(`common.role.${item.role.toLowerCase()}`)}</span>)
+            </span>
+          )
         })
-
-        return <span>{value.join(',')}</span>
       },
       ellipsis: true
     },
