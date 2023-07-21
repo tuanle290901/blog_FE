@@ -61,6 +61,7 @@ export interface IDepartment {
 export interface IDepartmentTitle {
   name?: string | ''
   code?: string | ''
+  parentCode?: string | ''
 }
 
 export interface updateUserRole {

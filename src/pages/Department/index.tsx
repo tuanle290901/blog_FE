@@ -18,15 +18,18 @@ import CommonButton from '~/components/Button/CommonButton'
 import { getListDepartments } from '~/stores/features/department/department.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
-import { ACTION_TYPE } from '~/utils/helper'
+import { ACTION_TYPE, hasPermissionAndGroup } from '~/utils/helper'
 
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
+import { ROLE } from '~/constants/app.constant'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 
 const Department: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { userInfo } = useUserInfo()
   const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
   const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
@@ -156,13 +159,13 @@ const Department: React.FC = () => {
           if (item.children && item.children.length > 0) {
             const child = item.children.find((childItem: DataType) => childItem.code === targetKey.code)
             if (child) {
-              parentList.push({ code: item.code, name: item.name })
-              parentList.push({ code: targetKey.code, name: targetKey.name })
+              parentList.push({ code: item.code, name: item.name, parentCode: item?.parentCode })
+              parentList.push({ code: targetKey.code, name: targetKey.name, parentCode: targetKey?.parentCode })
               break
             } else {
               const result = getParentByKey(item.children, targetKey)
               if (result.length > 0) {
-                parentList.push({ code: item.code, name: item.name })
+                parentList.push({ code: item.code, name: item.name, parentCode: item?.parentCode })
                 parentList.push(...result)
                 break
               }
@@ -187,7 +190,8 @@ const Department: React.FC = () => {
         listDataTitle: [
           {
             name: listDataDepartments[0]?.name,
-            code: listDataDepartments[0]?.code
+            code: listDataDepartments[0]?.code,
+            parentCode: listDataDepartments[0]?.parentCode
           }
         ]
       })
@@ -199,7 +203,8 @@ const Department: React.FC = () => {
       const dataTitle = [
         {
           code: listDataDepartments[0].code,
-          name: listDataDepartments[0].name
+          name: listDataDepartments[0].name,
+          parentCode: listDataDepartments[0]?.parentCode
         }
       ]
       setDataRender({
@@ -217,7 +222,8 @@ const Department: React.FC = () => {
         listDataTitle: [
           {
             code: listDataDepartments[0]?.code,
-            name: listDataDepartments[0]?.name
+            name: listDataDepartments[0]?.name,
+            parentCode: listDataDepartments[0]?.parentCode
           }
         ]
       })
@@ -291,8 +297,16 @@ const Department: React.FC = () => {
             return date
           }
         }
-      },
-      {
+      }
+    ]
+    if (
+      hasPermissionAndGroup(
+        [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+        userInfo?.groupProfiles,
+        dataRender.listDataTitle
+      ) === true
+    ) {
+      dataRenderColumns.push({
         title: () => {
           return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
         },
@@ -334,10 +348,10 @@ const Department: React.FC = () => {
             />
           </Space>
         )
-      }
-    ]
+      })
+    }
     return dataRenderColumns
-  }, [setShowModal, onDelete, t])
+  }, [setShowModal, onDelete, t, hasPermissionAndGroup])
 
   const onRendered = async (item: DataType) => {
     if (item.code === listDataDepartments[0].code) {
@@ -418,7 +432,16 @@ const Department: React.FC = () => {
         <Col span={12}>
           <CommonButton
             loading={false}
-            classNameProps='btn-add'
+            classNameProps={`btn-add ${
+              dataRender.listDataTitle &&
+              hasPermissionAndGroup(
+                [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+                userInfo?.groupProfiles,
+                dataRender.listDataTitle
+              ) === false
+                ? 'tw-hidden'
+                : 'tw-block'
+            }`}
             typeProps={{
               type: 'primary',
               size: 'middle'
