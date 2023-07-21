@@ -159,13 +159,13 @@ const Department: React.FC = () => {
           if (item.children && item.children.length > 0) {
             const child = item.children.find((childItem: DataType) => childItem.code === targetKey.code)
             if (child) {
-              parentList.push({ code: item.code, name: item.name })
-              parentList.push({ code: targetKey.code, name: targetKey.name })
+              parentList.push({ code: item.code, name: item.name, parentCode: item?.parentCode })
+              parentList.push({ code: targetKey.code, name: targetKey.name, parentCode: targetKey?.parentCode })
               break
             } else {
               const result = getParentByKey(item.children, targetKey)
               if (result.length > 0) {
-                parentList.push({ code: item.code, name: item.name })
+                parentList.push({ code: item.code, name: item.name, parentCode: item?.parentCode })
                 parentList.push(...result)
                 break
               }
@@ -190,7 +190,8 @@ const Department: React.FC = () => {
         listDataTitle: [
           {
             name: listDataDepartments[0]?.name,
-            code: listDataDepartments[0]?.code
+            code: listDataDepartments[0]?.code,
+            parentCode: listDataDepartments[0]?.parentCode
           }
         ]
       })
@@ -202,7 +203,8 @@ const Department: React.FC = () => {
       const dataTitle = [
         {
           code: listDataDepartments[0].code,
-          name: listDataDepartments[0].name
+          name: listDataDepartments[0].name,
+          parentCode: listDataDepartments[0]?.parentCode
         }
       ]
       setDataRender({
@@ -220,7 +222,8 @@ const Department: React.FC = () => {
         listDataTitle: [
           {
             code: listDataDepartments[0]?.code,
-            name: listDataDepartments[0]?.name
+            name: listDataDepartments[0]?.name,
+            parentCode: listDataDepartments[0]?.parentCode
           }
         ]
       })
@@ -294,8 +297,16 @@ const Department: React.FC = () => {
             return date
           }
         }
-      },
-      {
+      }
+    ]
+    if (
+      hasPermissionAndGroup(
+        [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+        userInfo?.groupProfiles,
+        dataRender.listDataTitle
+      ) === true
+    ) {
+      dataRenderColumns.push({
         title: () => {
           return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
         },
@@ -337,10 +348,10 @@ const Department: React.FC = () => {
             />
           </Space>
         )
-      }
-    ]
+      })
+    }
     return dataRenderColumns
-  }, [setShowModal, onDelete, t])
+  }, [setShowModal, onDelete, t, hasPermissionAndGroup])
 
   const onRendered = async (item: DataType) => {
     if (item.code === listDataDepartments[0].code) {
@@ -391,13 +402,6 @@ const Department: React.FC = () => {
       dataParent: []
     })
   }
-  console.log(
-    hasPermissionAndGroup(
-      [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
-      userInfo?.groupProfiles,
-      dataRender.listDataTitle
-    )
-  )
 
   return (
     <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
@@ -428,18 +432,19 @@ const Department: React.FC = () => {
         <Col span={12}>
           <CommonButton
             loading={false}
-            classNameProps='btn-add'
+            classNameProps={`btn-add ${
+              dataRender.listDataTitle &&
+              hasPermissionAndGroup(
+                [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
+                userInfo?.groupProfiles,
+                dataRender.listDataTitle
+              ) === false
+                ? 'tw-hidden'
+                : 'tw-block'
+            }`}
             typeProps={{
               type: 'primary',
-              size: 'middle',
-              display:
-                hasPermissionAndGroup(
-                  [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
-                  userInfo?.groupProfiles,
-                  dataRender.listDataTitle
-                ) === false
-                  ? 'block'
-                  : 'none'
+              size: 'middle'
             }}
             onClick={() => {
               setShowModal({

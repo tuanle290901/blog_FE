@@ -36,7 +36,6 @@ export const convertUTCToLocaleTime = (timeStr: string) => {
 
 export const hasPermission = (allowedRoles: ROLE[], groupProfiles?: GroupProfile[]) => {
   let isHasPermission = false
-  console.log(allowedRoles)
   if (allowedRoles.length === 0) {
     isHasPermission = true
   }
@@ -59,26 +58,32 @@ export const hasPermissionAndGroup = (
   if (allowedRoles.length === 0) {
     isHasPermission = false
   }
-  console.log(groupParrent)
-  if (!groupParrent) {
+
+  if ((groupParrent && groupParrent.length === 0) || (groupParrent && groupParrent[0].code === undefined)) {
     isHasPermission = false
-  }
-  for (const role of allowedRoles) {
-    const foundRole = groupProfiles?.find((group) => group.role === role)
-    console.log(foundRole)
-    if (foundRole) {
-      console.log(
-        groupParrent?.find((data) => data?.code === foundRole.groupCode),
-        '11'
-      )
-      if (groupParrent?.find((data) => data?.code === foundRole.groupCode)) {
-        isHasPermission = true
-        break
+  } else {
+    for (const role of allowedRoles) {
+      const foundRole = groupProfiles?.find((group) => group.role === role)
+      if (foundRole) {
+        if (foundRole.role === ROLE.SYSTEM_ADMIN) {
+          isHasPermission = true
+          break
+        } else if (
+          groupParrent &&
+          groupParrent.find(
+            (data) =>
+              data.code === foundRole.groupCode || (data.code === foundRole.groupCode && data.parentCode === null)
+          )
+        ) {
+          isHasPermission = true
+          break
+        } else {
+          isHasPermission = false
+          break
+        }
       }
-      break
     }
   }
-  console.log('groupProfiles', groupProfiles)
-  console.log('groupParrent', groupParrent)
+
   return isHasPermission
 }
