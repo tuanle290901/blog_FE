@@ -27,11 +27,7 @@ const ViolateAction: React.FC<{ data: IReportData }> = ({ data }) => {
                 <CheckOutlined /> Có lý do
               </>
             }
-            unCheckedChildren={
-              <>
-                <CloseOutlined /> Không lý do
-              </>
-            }
+            unCheckedChildren='Không lý do'
             onChange={(value) => console.log('Xin đến muộn', value)}
           />
         </div>
@@ -48,11 +44,7 @@ const ViolateAction: React.FC<{ data: IReportData }> = ({ data }) => {
                 <CheckOutlined /> Có lý do
               </>
             }
-            unCheckedChildren={
-              <>
-                <CloseOutlined /> Không lý do
-              </>
-            }
+            unCheckedChildren='Không lý do'
             onChange={(value) => console.log('Xin về sớm', value)}
           />
         </div>

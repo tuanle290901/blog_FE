@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notification } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Switch, Table, notification } from 'antd'
 import DaySelected from './component/DaySelected'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 // import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
-
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
 import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
@@ -185,8 +186,16 @@ const Timesheet: React.FC = () => {
     }
   }
 
+  const findViolateBoolean = (data: IViolate[] | null, violateType: string) => {
+    if (!data) return -1
+    if (data?.findIndex((item: IViolate) => item?.violateType === violateType) > -1) {
+      return data?.findIndex((item: IViolate) => item?.violateType === violateType)
+    } else {
+      return -1
+    }
+  }
+
   const handleUpdateAttendanceStatistic = async () => {
-    console.log('confirmAttendanceStatisticList', confirmAttendanceStatisticList)
     const response = await dispatch(updateAttendanceStatistic(confirmAttendanceStatisticList)).unwrap()
     if (response) {
       notification.success({
@@ -280,6 +289,54 @@ const Timesheet: React.FC = () => {
         reportData: {
           ...data?.reportData,
           note: newNote
+        }
+      }
+    }
+    confirmAttendanceStatisticList.push(payload)
+  }
+
+  const handleApproveViolate = (data: any, violateType: string, confirmed: boolean) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
+    let payload = {}
+    if (index > -1) {
+      let reportData = []
+      if (confirmAttendanceStatisticList[index]?.reportData?.violate) {
+        reportData = confirmAttendanceStatisticList[index].reportData.violate.map(
+          (item: { violateType: string; confirmed: boolean }) => {
+            if (item.violateType === violateType) {
+              return { violateType: item.violateType, confirmed: confirmed }
+            }
+            return item
+          }
+        )
+      }
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          violate: reportData
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      let reportData = []
+      if (data?.reportData?.violate) {
+        reportData = data.reportData.violate.map((item: { violateType: string; confirmed: boolean }) => {
+          if (item.violateType === violateType) {
+            return { ...item, confirmed: confirmed }
+          }
+          return item
+        })
+      }
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          violate: reportData
         }
       }
     }
@@ -406,9 +463,63 @@ const Timesheet: React.FC = () => {
       dataIndex: '',
       key: '',
       ellipsis: true,
-      width: '250px',
+      width: '230px',
       render: (record) => {
-        return record?.reportData ? <ViolateAction data={record?.reportData} /> : ''
+        return record?.reportData ? (
+          <div className='timesheet-violate'>
+            {findViolateBoolean(record?.reportData?.violate, 'LATE_COME') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable'>{t('timesheet.lateForWork')}</p>
+                <Switch
+                  className='tw-ml-auto'
+                  checkedChildren='Cho phép'
+                  unCheckedChildren='Không duyệt'
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'LATE_COME')]?.confirmed
+                  }
+                  onChange={(value) => handleApproveViolate(record, 'LATE_COME', value)}
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable timesheet-violate__lable--early'>
+                  {t('timesheet.leavingTheCompanyEarly')}
+                </p>
+                <Switch
+                  className='tw-ml-auto'
+                  checkedChildren='Cho phép'
+                  unCheckedChildren='Không duyệt'
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK')]
+                      ?.confirmed
+                  }
+                  onChange={(value) => handleApproveViolate(record, 'EARLY_BACK', value)}
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable timesheet-violate__lable--forget'>
+                  {t('timesheet.forgetTimeAttendance')}
+                </p>
+                <Switch
+                  className='tw-ml-auto'
+                  checkedChildren='Cho phép'
+                  unCheckedChildren='Không duyệt'
+                  defaultChecked={
+                    record?.reportData?.violate[
+                      findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
+                    ]?.confirmed
+                  }
+                  onChange={(value) => handleApproveViolate(record, 'FORGET_TIME_ATTENDANCE', value)}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          ''
+        )
       }
     },
     {
