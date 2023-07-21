@@ -4,7 +4,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Button, Col, Input, List, Modal, Row, notification } from 'antd'
-import { HttpStatusCode } from 'axios'
+import { AxiosResponse, HttpStatusCode } from 'axios'
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import IconNoData from '~/assets/svg/iconNoData'
@@ -13,6 +13,7 @@ import IconUserDownSVG from '~/assets/svg/iconUserDown'
 import IconUserUpSVG from '~/assets/svg/iconUserUp'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
+import { useAppSelector } from '~/stores/hook'
 import {
   DataInfoDepartment,
   DataMemberRender,
@@ -29,6 +30,7 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
   const prevDataRef = useRef<any>(null)
   const prevShowModalRef = useRef<any>(null)
   const [initLoading, setInitLoading] = useState(false)
+  const userTitle = useAppSelector((state) => state.masterData.listUserTitle)
   const [listDataRender, setListDataRender] = useState<DataMemberRender>({
     listDataUp: [],
     listDataDown: [],
@@ -89,9 +91,12 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
           }
         })
       }
-      const response = await HttpService.put(END_POINT_API.Department.updateUserRole(), payload)
+      const response: AxiosResponse<any, any> = await HttpService.put(
+        END_POINT_API.Department.updateUserRole(),
+        payload
+      )
       if (response.status === HttpStatusCode.Ok) {
-        notification.success({ message: response.data.message })
+        notification.success({ message: response?.data?.message || 'Cập nhật thành công' })
         onOk()
       }
     } catch (error: any) {
@@ -235,7 +240,15 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
                         <IconStartSVG />
                       )}
                     </h4>
-                    <p> {item.groupProfiles && item.groupProfiles[0].title}</p>
+                    <p>
+                      {item.groupProfiles &&
+                        item?.groupProfiles.length &&
+                        userTitle.find(
+                          (dataTitle) =>
+                            item?.groupProfiles?.find((dataG) => data?.code === dataG.groupCode)?.title ===
+                            dataTitle.code
+                        )?.nameTitle}{' '}
+                    </p>
                   </Col>
                   <Col span={1} className=' tw-justify-end tw-text-center tw-m-auto'>
                     <Button
@@ -280,7 +293,15 @@ const DepartmentMemberModal: React.FC<IDepartmentModal> = (props) => {
                     <h4 className='tw-font-normal tw-text-base tw-flex tw-items-center tw-gap-[5px]'>
                       {item.fullName}
                     </h4>
-                    <p> {item.groupProfiles && item.groupProfiles[0].title} </p>
+                    <p>
+                      {item.groupProfiles &&
+                        item?.groupProfiles.length &&
+                        userTitle.find(
+                          (dataTitle) =>
+                            item?.groupProfiles?.find((dataG) => data?.code === dataG.groupCode)?.title ===
+                            dataTitle.code
+                        )?.nameTitle}{' '}
+                    </p>
                   </Col>
                   <Col span={1} className='tw-justify-end tw-text-center tw-m-auto'>
                     <Button
