@@ -14,7 +14,8 @@ import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { GENDER } from '~/constants/app.constant.ts'
+import { GENDER, ROLE } from '~/constants/app.constant.ts'
+import { hasPermission } from '~/utils/helper.ts'
 
 const { Search } = Input
 
@@ -26,7 +27,6 @@ const UserList: React.FC = () => {
   const navigate = useNavigate()
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
-  const searchRef = useRef(null)
   const [query, setQuery] = useState<string>('')
   const fileSelect = useRef<any>(null)
   const [searchValue, setSearchValue] = useState<{
@@ -49,18 +49,8 @@ const UserList: React.FC = () => {
       }
     ]
   })
-  const hasPermissionAddNewUser = useMemo(() => {
-    const groupProfiles = userInfo?.groupProfiles
-    if (groupProfiles) {
-      for (const group of groupProfiles) {
-        if (group.groupCode === 'ADMIN') {
-          return true
-        } else {
-          //   TODO
-        }
-      }
-    }
-    return false
+  const permissionAddUser = useMemo(() => {
+    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
@@ -230,11 +220,11 @@ const UserList: React.FC = () => {
                 onClick={() => handleClickEditUser(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
-              <Button
-                size='small'
-                onClick={() => handleClickDeleteUser(record)}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
+              {/*<Button*/}
+              {/*  size='small'*/}
+              {/*  onClick={() => handleClickDeleteUser(record)}*/}
+              {/*  icon={<DeleteOutlined className='tw-text-red-600' />}*/}
+              {/*/>*/}
               {/*<Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />*/}
             </div>
           </div>
@@ -333,23 +323,26 @@ const UserList: React.FC = () => {
         </h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
-      <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
-        <div className='tw-gap-4 tw-flex'>
-          <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
-            {t('userList.addMember')}
-          </Button>
-          <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
-            Import thành viên
-          </Button>
-          <input
-            ref={fileSelect}
-            className='tw-hidden'
-            type='file'
-            accept='.xlxs,.xls'
-            onChange={(event) => handleFileChange(event.target.files)}
-          />
-        </div>
-        <div className='tw-flex tw-gap-4'>
+      <div className='tw-flex tw-gap-4 tw-mt-4'>
+        {permissionAddUser && (
+          <div className='tw-gap-4 tw-flex'>
+            <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
+              {t('userList.addMember')}
+            </Button>
+            <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
+              Import thành viên
+            </Button>
+            <input
+              ref={fileSelect}
+              className='tw-hidden'
+              type='file'
+              accept='.xlxs,.xls'
+              onChange={(event) => handleFileChange(event.target.files)}
+            />
+          </div>
+        )}
+
+        <div className='tw-flex tw-gap-4 tw-justify-end tw-flex-1'>
           <Select
             onChange={handleDepartmentChange}
             defaultValue={'all'}
