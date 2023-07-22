@@ -87,7 +87,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     path: PRIVATE_PATH.department.prefix,
     name: 'department',
     component: Department,
-    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'config',
