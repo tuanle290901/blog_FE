@@ -30,6 +30,7 @@ const Department: React.FC = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { userInfo } = useUserInfo()
+  const [valueSearch, setValueSearch] = useState<string>('')
   const listDataDepartments: DataType[] = useAppSelector((state: any) => state.department.listData)
   const isLoading = useAppSelector((state: any) => state.department.loading)
   const [dataRender, setDataRender] = useState<{
@@ -60,6 +61,7 @@ const Department: React.FC = () => {
           }
         ]
       })
+      setValueSearch(e.target.value)
     } else {
       setDataRender({
         listData: listDataDepartments,
@@ -70,6 +72,7 @@ const Department: React.FC = () => {
           }
         ]
       })
+      setValueSearch('')
     }
   }
 
@@ -387,9 +390,12 @@ const Department: React.FC = () => {
         listData: data,
         listDataTitle: listDataTitle
       })
+      setValueSearch('')
     } else if (dataRender.listDataTitle.length === 1) {
+      setValueSearch('')
       navigate(-1)
     } else {
+      setValueSearch('')
       navigate(-1)
     }
   }
@@ -402,6 +408,21 @@ const Department: React.FC = () => {
       dataParent: []
     })
   }
+
+  useEffect(() => {
+    if (valueSearch) {
+      const data: DataType[] = getListDataByNameOrCodeOrEmail(listDataDepartments, valueSearch)
+      setDataRender({
+        listData: data,
+        listDataTitle: [
+          {
+            name: data[0]?.name,
+            code: data[0]?.code
+          }
+        ]
+      })
+    }
+  }, [valueSearch])
 
   return (
     <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
@@ -463,6 +484,7 @@ const Department: React.FC = () => {
             placeholder={`${t('department.pleaseEnterSearch')}`}
             onChange={(value) => onSearch(value)}
             style={{ width: '30%' }}
+            value={valueSearch}
           />
         </Col>
       </Row>
