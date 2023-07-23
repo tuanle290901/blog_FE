@@ -52,6 +52,10 @@ const UserList: React.FC = () => {
   const permissionAddUser = useMemo(() => {
     return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER], userInfo?.groupProfiles)
   }, [userInfo])
+  const permissionImportUser = useMemo(() => {
+    return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
+  }, [userInfo])
+
   // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
   //   paging: {
   //     page: 0,
@@ -324,23 +328,28 @@ const UserList: React.FC = () => {
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <div className='tw-flex tw-gap-4 tw-mt-4'>
-        {permissionAddUser && (
-          <div className='tw-gap-4 tw-flex'>
+        <div className='tw-gap-4 tw-flex'>
+          {permissionAddUser && (
             <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
               {t('userList.addMember')}
             </Button>
-            <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
-              Import thành viên
-            </Button>
-            <input
-              ref={fileSelect}
-              className='tw-hidden'
-              type='file'
-              accept='.xlxs,.xls'
-              onChange={(event) => handleFileChange(event.target.files)}
-            />
-          </div>
-        )}
+          )}
+          {permissionImportUser && (
+            <>
+              {' '}
+              <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
+                Import thành viên
+              </Button>
+              <input
+                ref={fileSelect}
+                className='tw-hidden'
+                type='file'
+                accept='.xlxs,.xls'
+                onChange={(event) => handleFileChange(event.target.files)}
+              />
+            </>
+          )}
+        </div>
 
         <div className='tw-flex tw-gap-4 tw-justify-end tw-flex-1'>
           <Select
