@@ -1,17 +1,21 @@
 import { Button, Form, Input, Modal, notification } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IPosition } from '~/types/position.interface.ts'
 import FormItem from 'antd/es/form/FormItem'
 import TextArea from 'antd/es/input/TextArea'
 import { useAppDispatch } from '~/stores/hook.ts'
 import { createPosition, updatePosition } from '~/stores/features/position/position.slice.ts'
+import { IUser } from '~/types/user.interface.ts'
+import { hasPermission } from '~/utils/helper.ts'
+import { ROLE } from '~/constants/app.constant.ts'
 
 const CreateEditPosition: React.FC<{
+  userInfo: IUser | null
   open: boolean
   handleClose: (isCreateUserSuccess: boolean) => void
   position?: IPosition | null
-}> = ({ open, position, handleClose }) => {
+}> = ({ open, position, handleClose, userInfo }) => {
   const [t] = useTranslation()
   const [form] = Form.useForm<{ nameTitle: string; description: string }>()
   const dispatch = useAppDispatch()
@@ -48,19 +52,27 @@ const CreateEditPosition: React.FC<{
       setLoading(false)
     }
   }
+  const editAble = useMemo(() => {
+    if (userInfo) {
+      return hasPermission([ROLE.SYSTEM_ADMIN], userInfo.groupProfiles)
+    }
+    return false
+  }, [userInfo])
   const [loading, setLoading] = useState(false)
   return (
     <Modal
       open={open}
-      title={position ? 'Cập nhật chức vụ' : 'Thêm chức vụ'}
+      title={!editAble && position ? 'Thông tin chức vụ' : position ? 'Cập nhật chức vụ' : 'Thêm chức vụ'}
       onCancel={() => finishAndClose(false)}
       footer={
-        <div className={'tw-flex tw-justify-end'}>
-          <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
-          <Button type='primary' onClick={handleSubmit} loading={loading}>
-            {t('common.save')}
-          </Button>
-        </div>
+        editAble && (
+          <div className={'tw-flex tw-justify-end'}>
+            <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
+            <Button type='primary' onClick={handleSubmit} loading={loading}>
+              {t('common.save')}
+            </Button>
+          </div>
+        )
       }
       maskClosable={false}
       forceRender
@@ -78,10 +90,10 @@ const CreateEditPosition: React.FC<{
             }
           ]}
         >
-          <Input placeholder={'Nhập tên chúc vụ'} />
+          <Input disabled={!editAble} placeholder={'Nhập tên chúc vụ'} />
         </FormItem>
         <FormItem name='description' label='Mô tả'>
-          <TextArea placeholder={'Mô tả cho chức vụ'} />
+          <TextArea disabled={!editAble} placeholder={'Mô tả cho chức vụ'} />
         </FormItem>
       </Form>
     </Modal>

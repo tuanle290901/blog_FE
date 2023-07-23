@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Input, notification, Popconfirm, Table, TablePaginationConfig } from 'antd'
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
 import dayjs from 'dayjs'
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
@@ -17,6 +16,9 @@ import {
   startEditingPosition
 } from '~/stores/features/position/position.slice.ts'
 import CreateEditPosition from '~/pages/position-management/create-edit-position.tsx'
+import { hasPermission } from '~/utils/helper.ts'
+import { ROLE } from '~/constants/app.constant.ts'
+import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 
 const { Search } = Input
 
@@ -25,6 +27,7 @@ const PositionList: React.FC = () => {
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
   const positionState = useAppSelector((state) => state.position)
+  const { userInfo } = useUserInfo()
   const [searchValue, setSearchValue] = useState<{
     query: string
     paging: IPaging
@@ -114,21 +117,25 @@ const PositionList: React.FC = () => {
       render: (_, record) => {
         return (
           <div className='tw-absolute tw-left-0 tw-w-full'>
-            <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
-              <Button
-                size='small'
-                onClick={() => handleClickEditPosition(record)}
-                icon={<EditOutlined className='tw-text-blue-600' />}
-              />
-              <Popconfirm
-                onConfirm={() => handleClickDeletePosition(record)}
-                title={'Bạn có muốn xóa chức vụ'}
-                cancelText={t('common.cancel')}
-                okText={t('common.yes')}
-              >
-                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-              </Popconfirm>
-            </div>
+            {hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) ? (
+              <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+                <Button
+                  size='small'
+                  onClick={() => handleClickEditPosition(record)}
+                  icon={<EditOutlined className='tw-text-blue-600' />}
+                />
+                <Popconfirm
+                  onConfirm={() => handleClickDeletePosition(record)}
+                  title={'Bạn có muốn xóa chức vụ'}
+                  cancelText={t('common.cancel')}
+                  okText={t('common.yes')}
+                >
+                  <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                </Popconfirm>
+              </div>
+            ) : (
+              <Button size='small' onClick={() => handleClickEditPosition(record)} icon={<EyeOutlined />}></Button>
+            )}
           </div>
         )
       }
@@ -199,6 +206,7 @@ const PositionList: React.FC = () => {
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <CreateEditPosition
+        userInfo={userInfo}
         open={isOpenUserModal || !!positionState.editingPosition}
         position={positionState.editingPosition}
         handleClose={handleCloseUserModal}
@@ -208,10 +216,13 @@ const PositionList: React.FC = () => {
         <h5 className='tw-text-sm'>Danh sách chức vụ sử dụng trong hệ thống</h5>
       </div>
       <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
-        <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
-          Thêm chức vụ
-        </Button>
-        <div className='tw-flex tw-gap-4'>
+        {hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
+          <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
+            Thêm chức vụ
+          </Button>
+        )}
+
+        <div className='tw-flex tw-gap-4 tw-flex-1 tw-justify-end'>
           <Search
             placeholder={'Tìm kiếm chức vụ'}
             onChange={(event) => handleSearchValueChange(event.target.value)}
