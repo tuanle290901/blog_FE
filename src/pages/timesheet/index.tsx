@@ -660,7 +660,7 @@ const Timesheet: React.FC = () => {
     }
   ]
   return (
-    <Row className='timesheet tw-p-5'>
+    <Row className='timesheet'>
       <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
