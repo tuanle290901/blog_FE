@@ -20,10 +20,10 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE, hasPermissionAndGroup } from '~/utils/helper'
 
-import DepartmentMemberModal from './DepartmentMemberModal'
-import DepartmentModal from './DepartmentModal'
 import { ROLE } from '~/constants/app.constant'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import DepartmentMemberModal from './DepartmentMemberModal'
+import DepartmentModal from './DepartmentModal'
 
 const Department: React.FC = () => {
   const { t } = useTranslation()
@@ -302,13 +302,36 @@ const Department: React.FC = () => {
         }
       }
     ]
+
     if (
-      hasPermissionAndGroup(
-        [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
-        userInfo?.groupProfiles,
-        dataRender.listDataTitle
-      ) === true
+      hasPermissionAndGroup([ROLE.MANAGER, ROLE.SUB_MANAGER], userInfo?.groupProfiles, dataRender.listDataTitle) ===
+      true
     ) {
+      dataRenderColumns.push({
+        title: () => {
+          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
+        },
+        key: 'actions',
+        align: 'center',
+        width: '120px',
+        render: (text: string, record: DataType) => (
+          <Button
+            size='small'
+            onClick={() => {
+              setShowModal({
+                openModal: true,
+                type: ACTION_TYPE.View,
+                data: record,
+                dataParent: dataRender.listDataTitle
+              })
+            }}
+            icon={<UserOutlined className='tw-text-orange-600' />}
+          />
+        )
+      })
+    }
+
+    if (hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === true) {
       dataRenderColumns.push({
         title: () => {
           return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
