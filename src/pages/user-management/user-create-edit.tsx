@@ -86,7 +86,7 @@ const UserCreateEdit: React.FC<{
     if (!isJpgOrPng) {
       void message.error('You can only upload JPG/PNG file!')
     }
-    const isLt2M = file.size / 1024 / 1024 < 2
+    const isLt2M = file.size / 1024 / 1024 < 12
     if (!isLt2M) {
       void message.error('Kích thước ảnh phải nhỏ hơn 12MB!')
     }
