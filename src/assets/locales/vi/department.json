@@ -20,7 +20,12 @@
       "do-not-email-accents": "Email không hợp lệ hoặc thừa khoảng trắng",
       "do-not-phone-accents": "Số điện thoại không hợp lệ"
     },
-    "menber":  "Thành viên",
-    "manager": "Quản lý"
+    "menber": "Thành viên",
+    "manager": "Quản lý",
+    "tooltip": {
+      "update": "Cập nhật thông tin phòng ban",
+      "delete": "Xóa thông tin phòng ban",
+      "member": "Danh sách cán bộ quản lý"
+    }
   }
 }
