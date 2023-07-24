@@ -1,9 +1,11 @@
+import { EDIT_TYPE } from '~/constants/app.constant.ts'
+
 export interface IUser {
   id?: string
   address?: string
   avatarBase64: string
   birthday?: string | null
-  email: string
+  email: string | null
   password: string
   formalDate?: string | null
   fullName?: string
@@ -16,6 +18,7 @@ export interface IUser {
   phoneNumber: string
   status?: string
   userName: string
+  editType: EDIT_TYPE
 }
 export interface GroupProfile {
   title: string

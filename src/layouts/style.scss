@@ -1,6 +1,6 @@
 .app-container {
   .logo-vertical {
-    height: 57px;
+    height: 90px;
   }
 
   .header-container {
@@ -38,8 +38,12 @@
   }
 
   .logo-title-container {
-    .logo-text-color {
-      color: #69c0ff;
+    margin-top: 6px;
+    .logo-title {
+      font-family: 'IMFellEnglish';
+      color: #ffffff;
+      letter-spacing: 4px;
+      font-size: 1.5rem;
     }
   }
 }
@@ -166,6 +170,49 @@
       height: 40px;
       border-radius: 2px;
       padding: 5px 12px;
+    }
+  }
+}
+
+.sidebar-custom {
+  background: linear-gradient(to bottom, #156deb, #5220a1) !important;
+
+  .menu-top {
+    height: 94%;
+
+    .ant-menu-item,
+    .ant-menu-submenu {
+      margin-top: 30px;
+      .ant-menu-title-content {
+        font-size: 15px;
+        color: white;
+      }
+
+      .ant-menu-submenu-arrow {
+        color: white;
+      }
+    }
+
+    .ant-menu-item-selected {
+      background-color: #4c83ec;
+    }
+  }
+
+  .menu-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+
+    .bottom-main-text {
+      color: white;
+      font-size: 14px;
+    }
+
+    .bottom-extra-text {
+      color: rgb(148, 139, 139);
+      font-size: 14px;
     }
   }
 }

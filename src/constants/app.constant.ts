@@ -14,7 +14,8 @@ export enum ROLE {
   MANAGER = 'MANAGER',
   SUB_MANAGER = 'SUB_MANAGER',
   OFFICER = 'OFFICER',
-  SYSTEM_ADMIN = 'SYSTEM_ADMIN'
+  SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+  HR = 'HR'
 }
 export enum GROUP {
   ADMIN = 'ADMIN'
@@ -22,4 +23,10 @@ export enum GROUP {
 export enum GENDER {
   MALE = 'MALE',
   FEMALE = 'FEMALE'
+}
+export enum EDIT_TYPE {
+  SELF = 'SELF',
+  ADMIN = 'ADMIN',
+  HR = 'HR',
+  DIRECT_MANAGER = 'DIRECT_MANAGER'
 }
