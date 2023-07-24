@@ -88,7 +88,7 @@ const UserCreateEdit: React.FC<{
     }
     const isLt2M = file.size / 1024 / 1024 < 2
     if (!isLt2M) {
-      void message.error('Image must smaller than 2MB!')
+      void message.error('Kích thước ảnh phải nhỏ hơn 12MB!')
     }
     if (isJpgOrPng && isLt2M) {
       getBase64(file, (url) => {
