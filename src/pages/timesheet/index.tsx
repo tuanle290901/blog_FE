@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Switch, Table, notification } from 'antd'
-import DaySelected from './component/DaySelected'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notification } from 'antd'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
@@ -26,8 +25,6 @@ import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 // import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
-import ExcelExportButton from '~/components/ExportExcel/ExcelExportButton'
-import ViolateAction from './component/ViolateAction'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -349,6 +346,7 @@ const Timesheet: React.FC = () => {
       dataIndex: 'fullName',
       key: 'fullName',
       ellipsis: true,
+      width: '160px',
       sortOrder: getSortOrder('fullName')
     },
     {
@@ -359,6 +357,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('date'),
+      width: '155px',
       render: (date, record) => {
         return (
           <span
@@ -381,6 +380,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('startTime'),
+      width: '150px',
       render: (startTime, record) => {
         return (
           <span
@@ -403,6 +403,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('endTime'),
+      width: '150px',
       render: (endTime, record) => {
         return (
           <span className={findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#D46B08]' : ''}>
@@ -424,20 +425,21 @@ const Timesheet: React.FC = () => {
       title: t('Công nghỉ'),
       dataIndex: 'reportData',
       ellipsis: true,
+      width: '170px',
       render: (reportData, record) => {
-        return (
-          reportData?.workingAmount < 1 && (
-            <Select
-              onChange={(value) => handleSelectTypesOfLeave(record, value)}
-              defaultValue={reportData?.absenceType}
-              options={typesOfLeaveOptions}
-              className='tw-w-full'
-              showSearch
-              filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
-              // allowClear
-            />
-          )
-        )
+        return currentAuth?.groupProfiles[0]?.role === 'OFFICER'
+          ? reportData?.workingAmount
+          : reportData?.workingAmount < 1 && (
+              <Select
+                onChange={(value) => handleSelectTypesOfLeave(record, value)}
+                defaultValue={reportData?.absenceType}
+                options={typesOfLeaveOptions}
+                className='tw-w-full'
+                showSearch
+                filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
+                // allowClear
+              />
+            )
       }
     },
     {
@@ -446,16 +448,16 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '102px',
       render: (reportData, record) => {
-        return (
-          reportData?.workingAmount < 1 && (
-            <Select
-              className='tw-w-full'
-              onChange={(value) => handleSelectAbsenceAmount(record, value)}
-              defaultValue={parseFloat(reportData?.absenceAmount) || 0.0}
-              options={weightOptions}
-            />
-          )
-        )
+        return currentAuth?.groupProfiles[0]?.role === 'OFFICER'
+          ? reportData?.absenceAmount
+          : reportData?.workingAmount < 1 && (
+              <Select
+                className='tw-w-full'
+                onChange={(value) => handleSelectAbsenceAmount(record, value)}
+                defaultValue={parseFloat(reportData?.absenceAmount) || 0.0}
+                options={weightOptions}
+              />
+            )
       }
     },
     {
@@ -463,22 +465,13 @@ const Timesheet: React.FC = () => {
       dataIndex: '',
       key: '',
       ellipsis: true,
-      width: '230px',
+      width: '132px',
       render: (record) => {
         return record?.reportData ? (
           <div className='timesheet-violate'>
             {findViolateBoolean(record?.reportData?.violate, 'LATE_COME') > -1 && (
               <div className='tw-flex'>
                 <p className='timesheet-violate__lable'>{t('timesheet.lateForWork')}</p>
-                <Switch
-                  className='tw-ml-auto'
-                  checkedChildren='Cho phép'
-                  unCheckedChildren='Không duyệt'
-                  defaultChecked={
-                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'LATE_COME')]?.confirmed
-                  }
-                  onChange={(value) => handleApproveViolate(record, 'LATE_COME', value)}
-                />
               </div>
             )}
             {findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK') > -1 && (
@@ -486,16 +479,6 @@ const Timesheet: React.FC = () => {
                 <p className='timesheet-violate__lable timesheet-violate__lable--early'>
                   {t('timesheet.leavingTheCompanyEarly')}
                 </p>
-                <Switch
-                  className='tw-ml-auto'
-                  checkedChildren='Cho phép'
-                  unCheckedChildren='Không duyệt'
-                  defaultChecked={
-                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK')]
-                      ?.confirmed
-                  }
-                  onChange={(value) => handleApproveViolate(record, 'EARLY_BACK', value)}
-                />
               </div>
             )}
             {findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE') > -1 && (
@@ -503,16 +486,56 @@ const Timesheet: React.FC = () => {
                 <p className='timesheet-violate__lable timesheet-violate__lable--forget'>
                   {t('timesheet.forgetTimeAttendance')}
                 </p>
-                <Switch
-                  className='tw-ml-auto'
-                  checkedChildren='Cho phép'
-                  unCheckedChildren='Không duyệt'
+              </div>
+            )}
+          </div>
+        ) : (
+          ''
+        )
+      }
+    },
+    {
+      title: t('Duyệt phép'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true,
+      width: '110px',
+      render: (record) => {
+        return record?.reportData ? (
+          <div className='timesheet-violate'>
+            {findViolateBoolean(record?.reportData?.violate, 'LATE_COME') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'LATE_COME', e?.target?.checked)}
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'LATE_COME')]?.confirmed
+                  }
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'EARLY_BACK', e?.target?.checked)}
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK')]
+                      ?.confirmed
+                  }
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'FORGET_TIME_ATTENDANCE', e?.target?.checked)}
                   defaultChecked={
                     record?.reportData?.violate[
                       findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
                     ]?.confirmed
                   }
-                  onChange={(value) => handleApproveViolate(record, 'FORGET_TIME_ATTENDANCE', value)}
                 />
               </div>
             )}
@@ -527,6 +550,7 @@ const Timesheet: React.FC = () => {
       dataIndex: '',
       key: '',
       ellipsis: true,
+      width: '200px',
       render: (record) => {
         return (
           <Input
@@ -809,7 +833,7 @@ const Timesheet: React.FC = () => {
               </Row>
             </div>
             <div className='tw-mt-6'>
-              <Table
+              {/* <Table
                 rowKey='id'
                 columns={columns}
                 dataSource={timesheetSate.timesheetList}
@@ -817,8 +841,35 @@ const Timesheet: React.FC = () => {
                 pagination={{ total: timesheetSate?.meta?.total }}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+              /> */}
+              <Table
+                rowKey='id'
+                columns={columns}
+                dataSource={timesheetSate.timesheetList}
+                loading={timesheetSate.loading}
+                scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+                onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+                pagination={{
+                  className: 'd-flex justify-content-end align-items-center',
+                  current: timesheetSate?.meta && timesheetSate?.meta?.page + 1,
+                  total: timesheetSate?.meta?.total,
+                  defaultPageSize: timesheetSate?.meta?.size,
+                  pageSize: timesheetSate?.meta?.size,
+                  pageSizeOptions: ['5', '10', '25', '50'],
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  locale: {
+                    items_per_page: `/ ${t('common.page')}`,
+                    next_page: t('common.nextPage'),
+                    prev_page: t('common.prevPage'),
+                    jump_to: t('common.jumpTo'),
+                    page: t('common.page')
+                  },
+
+                  position: ['bottomRight']
+                }}
               />
-              <Checkbox onChange={() => void {}}>{t('timesheet.showOnlyViolateDate')}</Checkbox>
+              {/* <Checkbox onChange={() => void {}}>{t('timesheet.showOnlyViolateDate')}</Checkbox> */}
             </div>
           </>
         )}

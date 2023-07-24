@@ -217,14 +217,18 @@
       background: #f5222d;
       color: #fff;
       padding: 0 5px;
-      margin: 0 5px 6px;
-      min-width: 90px;
+      margin: 0 5px 6px 0;
+      min-width: 115px;
       &--early {
         background: orange;
       }
       &--forget {
         background: #1890ff;
       }
+    }
+    &__checkbox span {
+      width: 22px;
+      height: 22px;
     }
   }
 
