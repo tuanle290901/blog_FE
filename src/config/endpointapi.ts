@@ -14,5 +14,8 @@ export const END_POINT_API = {
     update: () => `/type-of-leave/update`,
     getPageSize: () => `/type-of-leave/filter`,
     delete: () => `/type-of-leave/delete`
+  },
+  Users: {
+    changePassword: () => `/system-user/change-password`
   }
 }
