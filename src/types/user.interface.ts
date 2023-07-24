@@ -5,7 +5,7 @@ export interface IUser {
   address?: string
   avatarBase64: string
   birthday?: string | null
-  email: string
+  email: string | null
   password: string
   formalDate?: string | null
   fullName?: string

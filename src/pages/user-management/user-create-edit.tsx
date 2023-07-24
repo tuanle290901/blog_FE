@@ -138,7 +138,8 @@ const UserCreateEdit: React.FC<{
         groupProfiles,
         birthday,
         formalDate,
-        joinDate
+        joinDate,
+        email: value.email || null
       }
       try {
         setLoading(true)
