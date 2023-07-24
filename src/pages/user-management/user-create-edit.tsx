@@ -294,6 +294,10 @@ const UserCreateEdit: React.FC<{
                     {
                       required: true,
                       message: t('userModal.errorMessage.fullNameIsEmpty')
+                    },
+                    {
+                      pattern: /^(?!\s+$).+/,
+                      message: t('userModal.errorMessage.fullNameIsEmpty')
                     }
                   ]}
                 >
