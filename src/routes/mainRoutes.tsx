@@ -5,6 +5,7 @@ import { PUBLIC_ROUTES } from '~/constants/public-routes.tsx'
 import RequireAuth from '~/utils/RequiredAuth.tsx'
 import MainLayout from '~/layouts/MainLayout.tsx'
 import AuthLayout from '~/layouts/AuthLayout'
+import NotFound from '~/components/NotFound'
 
 export const MainRoutes = () => {
   return (
@@ -28,15 +29,18 @@ export const MainRoutes = () => {
       <Route path='/' element={<MainLayout />}>
         {PRIVATE_ROUTES.map((item, index) => {
           return (
-            <Route
-              path={item.path}
-              key={index}
-              element={
-                <RequireAuth allowedRoles={item.allowedRoles}>
-                  <item.component />
-                </RequireAuth>
-              }
-            />
+            <>
+              <Route
+                path={item.path}
+                key={index}
+                element={
+                  <RequireAuth allowedRoles={item.allowedRoles}>
+                    <item.component />
+                  </RequireAuth>
+                }
+              />
+              <Route path='*' element={<NotFound />} />
+            </>
           )
         })}
       </Route>
