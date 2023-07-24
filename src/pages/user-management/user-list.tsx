@@ -14,7 +14,7 @@ import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { GENDER, ROLE } from '~/constants/app.constant.ts'
+import { COMMON_ERROR_CODE, GENDER, ROLE } from '~/constants/app.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 
 const { Search } = Input
@@ -50,21 +50,12 @@ const UserList: React.FC = () => {
     ]
   })
   const permissionAddUser = useMemo(() => {
-    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER], userInfo?.groupProfiles)
+    return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
   }, [userInfo])
   const permissionImportUser = useMemo(() => {
     return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
 
-  // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
-  //   paging: {
-  //     page: 0,
-  //     size: 10,
-  //     total: 0,
-  //     totalPage: 0
-  //   },
-  //   sorts: []
-  // })
   const timerId = useRef<any>(null)
   useEffect(() => {
     const promise = [dispatch(getAllGroup()), dispatch(getTitle())]
@@ -303,8 +294,10 @@ const UserList: React.FC = () => {
           await dispatch(importUser(file)).unwrap()
           notification.success({ message: 'Import thành viên thành công' })
           resetAndSearchUser()
-        } catch (e) {
-          console.log(e)
+        } catch (e: any) {
+          if (e.status && !COMMON_ERROR_CODE.includes(e.status)) {
+            notification.error({ message: e.message })
+          }
         }
       }
     }
