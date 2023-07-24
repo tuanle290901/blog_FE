@@ -1,3 +1,5 @@
+import { EDIT_TYPE } from '~/constants/app.constant.ts'
+
 export interface IUser {
   id?: string
   address?: string
@@ -16,6 +18,7 @@ export interface IUser {
   phoneNumber: string
   status?: string
   userName: string
+  editType: EDIT_TYPE
 }
 export interface GroupProfile {
   title: string

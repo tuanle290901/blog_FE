@@ -9,10 +9,11 @@ import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { GENDER, ROLE } from '~/constants/app.constant.ts'
+import { EDIT_TYPE, GENDER, ROLE } from '~/constants/app.constant.ts'
 import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
-import Password from 'antd/es/input/Password'
+import { hasPermission } from '~/utils/helper.ts'
+import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -41,7 +42,7 @@ const UserCreateEdit: React.FC<{
       return { value: item.code, label: item.nameTitle }
     })
   }, [userTitle])
-
+  const { userInfo } = useUserInfo()
   const roleOptions: { value: string; label: string }[] = [
     {
       label: t('common.role.officer'),
@@ -209,7 +210,15 @@ const UserCreateEdit: React.FC<{
     }
     return Promise.resolve()
   }
-
+  const hasPermissionAddAndChangeRole = () => {
+    if (userData) {
+      if (userData.editType === EDIT_TYPE.ADMIN || userData.editType === EDIT_TYPE.HR) {
+        return true
+      }
+    } else {
+      return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
+    }
+  }
   return (
     <Modal
       open={open}
@@ -370,6 +379,7 @@ const UserCreateEdit: React.FC<{
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
+                    disabled={!!userData && userData.editType === EDIT_TYPE.SELF}
                     showToday={false}
                     className='tw-w-full'
                     placeholder={t('userModal.enterDateJoin')}
@@ -396,6 +406,7 @@ const UserCreateEdit: React.FC<{
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
+                    disabled={!!userData && userData.editType === EDIT_TYPE.SELF}
                     showToday={false}
                     className='tw-w-full'
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
@@ -404,9 +415,9 @@ const UserCreateEdit: React.FC<{
                 <Form.List name='groupProfiles' initialValue={groupProfiles}>
                   {(fields = groupProfiles, { add, remove }) => (
                     <>
-                      {fields.map(({ key, name, ...restField }, index) => (
+                      {fields.map(({ key, name, ...restField }) => (
                         <div key={key} className='tw-relative'>
-                          {fields.length > 1 && (
+                          {fields.length > 1 && hasPermissionAddAndChangeRole() && (
                             <MinusCircleOutlined
                               className='tw-absolute tw-right-1 tw-top-1 tw-z-50 tw-text-red-600'
                               onClick={() => remove(name)}
@@ -420,7 +431,11 @@ const UserCreateEdit: React.FC<{
                             required
                             rules={[{ required: true, message: t('userModal.errorMessage.groupEmpty') }]}
                           >
-                            <Select options={groupOptions} placeholder={t('userModal.selectDepartment')}></Select>
+                            <Select
+                              disabled={!hasPermissionAddAndChangeRole()}
+                              options={groupOptions}
+                              placeholder={t('userModal.selectDepartment')}
+                            ></Select>
                           </Form.Item>
                           <div className='tw-grid tw-grid-cols-2 tw-gap-2'>
                             <Form.Item
@@ -430,7 +445,11 @@ const UserCreateEdit: React.FC<{
                               label={t('userModal.departmentRole')}
                               rules={[{ required: true, message: t('userModal.errorMessage.titleEmpty') }]}
                             >
-                              <Select options={titleOptions} placeholder={t('userModal.selectPosition')}></Select>
+                              <Select
+                                disabled={!hasPermissionAddAndChangeRole()}
+                                options={titleOptions}
+                                placeholder={t('userModal.selectPosition')}
+                              ></Select>
                             </Form.Item>
                             <Form.Item
                               {...restField}
@@ -439,15 +458,26 @@ const UserCreateEdit: React.FC<{
                               name={[name, 'role']}
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
-                              <Select options={roleOptions} placeholder={t('userModal.selectFunction')}></Select>
+                              <Select
+                                disabled={!hasPermissionAddAndChangeRole()}
+                                options={roleOptions}
+                                placeholder={t('userModal.selectFunction')}
+                              ></Select>
                             </Form.Item>
                           </div>
                         </div>
                       ))}
                       <Form.Item>
-                        <Button type='dashed' onClick={() => add({ role: ROLE.OFFICER })} block icon={<PlusOutlined />}>
-                          {t('userModal.addRole')}
-                        </Button>
+                        {hasPermissionAddAndChangeRole() && (
+                          <Button
+                            type='dashed'
+                            onClick={() => add({ role: ROLE.OFFICER })}
+                            block
+                            icon={<PlusOutlined />}
+                          >
+                            {t('userModal.addRole')}
+                          </Button>
+                        )}
                       </Form.Item>
                     </>
                   )}

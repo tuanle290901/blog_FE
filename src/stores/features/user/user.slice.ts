@@ -3,7 +3,7 @@ import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import HttpService from '~/config/api.ts'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
-import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
+import { COMMON_ERROR_CODE, EDIT_TYPE } from '~/constants/app.constant.ts'
 
 export interface IUserState {
   userList: IUser[]
@@ -191,7 +191,8 @@ const userSlice = createSlice({
         state.meta = action.payload.meta
       })
       .addCase(startEditingUser.fulfilled, (state, action) => {
-        state.editingUser = action.payload
+        const editType = state.userList.find((item) => item.id === action.payload.id)?.editType || EDIT_TYPE.SELF
+        state.editingUser = { ...action.payload, editType }
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),

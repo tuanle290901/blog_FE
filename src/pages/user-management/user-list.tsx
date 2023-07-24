@@ -50,21 +50,12 @@ const UserList: React.FC = () => {
     ]
   })
   const permissionAddUser = useMemo(() => {
-    return hasPermission([ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER], userInfo?.groupProfiles)
+    return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
   }, [userInfo])
   const permissionImportUser = useMemo(() => {
     return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
 
-  // const [pagingAndSort, setPagingAndSort] = useState<{ paging: IPaging; sorts: ISort[] }>({
-  //   paging: {
-  //     page: 0,
-  //     size: 10,
-  //     total: 0,
-  //     totalPage: 0
-  //   },
-  //   sorts: []
-  // })
   const timerId = useRef<any>(null)
   useEffect(() => {
     const promise = [dispatch(getAllGroup()), dispatch(getTitle())]
