@@ -3,6 +3,11 @@
   src: url('./assets/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'IMFellEnglish';
+  src: url('./assets/fonts/IM_Fell_English/IMFellEnglish-Regular.ttf') format('truetype');
+}
+
 body {
   font-family: 'Roboto', sans-serif !important;
 }
