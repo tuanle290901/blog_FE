@@ -19,6 +19,7 @@
     "port": "Port của thiết bị",
     "groupCode": "Phòng ban sử dụng thiết bị",
     "pleaseSelectAGroup": "Bạn chọn một phòng ban quản lý thiết bị",
-    "do-not-leave-spaces-special-accents": "Kí tự đặc biệt, dấu cách không được sử dụng"
+    "do-not-leave-spaces-special-accents": "Kí tự đặc biệt, dấu cách không được sử dụng",
+    "groupName": "Phòng ban sử dụng thiết bị"
   }
 }
