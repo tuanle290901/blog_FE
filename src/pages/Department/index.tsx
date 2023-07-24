@@ -7,7 +7,7 @@
 import './index.scss'
 
 import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Col, Input, Row, Space, Table, TableColumnsType } from 'antd'
+import { Button, Col, Input, Row, Space, Table, TableColumnsType, Tooltip } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
 import dayjs from 'dayjs'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -303,10 +303,7 @@ const Department: React.FC = () => {
       }
     ]
 
-    if (
-      hasPermissionAndGroup([ROLE.MANAGER, ROLE.SUB_MANAGER], userInfo?.groupProfiles, dataRender.listDataTitle) ===
-      true
-    ) {
+    if (hasPermissionAndGroup([ROLE.MANAGER, ROLE.SUB_MANAGER], userInfo?.groupProfiles, dataRender.listDataTitle)) {
       dataRenderColumns.push({
         title: () => {
           return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
@@ -315,44 +312,7 @@ const Department: React.FC = () => {
         align: 'center',
         width: '120px',
         render: (text: string, record: DataType) => (
-          <Button
-            size='small'
-            onClick={() => {
-              setShowModal({
-                openModal: true,
-                type: ACTION_TYPE.View,
-                data: record,
-                dataParent: dataRender.listDataTitle
-              })
-            }}
-            icon={<UserOutlined className='tw-text-orange-600' />}
-          />
-        )
-      })
-    }
-
-    if (hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === true) {
-      dataRenderColumns.push({
-        title: () => {
-          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
-        },
-        key: 'actions',
-        align: 'center',
-        width: '120px',
-        render: (text: string, record: DataType) => (
-          <Space size='small'>
-            <Button
-              size='small'
-              onClick={() => {
-                setShowModal({
-                  openModal: true,
-                  type: ACTION_TYPE.Updated,
-                  data: record,
-                  dataParent: dataRender.listDataTitle
-                })
-              }}
-              icon={<EditOutlined className='tw-text-blue-600' />}
-            />
+          <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
             <Button
               size='small'
               onClick={() => {
@@ -365,13 +325,58 @@ const Department: React.FC = () => {
               }}
               icon={<UserOutlined className='tw-text-orange-600' />}
             />
-            <Button
-              size='small'
-              onClick={() => {
-                onDelete(record)
-              }}
-              icon={<DeleteOutlined className='tw-text-red-600' />}
-            />
+          </Tooltip>
+        )
+      })
+    }
+
+    if (hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle)) {
+      dataRenderColumns.push({
+        title: () => {
+          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
+        },
+        key: 'actions',
+        align: 'center',
+        width: '120px',
+        render: (text: string, record: DataType) => (
+          <Space size='small'>
+            <Tooltip placement='topLeft' title={t('department.tooltip.update')}>
+              <Button
+                size='small'
+                onClick={() => {
+                  setShowModal({
+                    openModal: true,
+                    type: ACTION_TYPE.Updated,
+                    data: record,
+                    dataParent: dataRender.listDataTitle
+                  })
+                }}
+                icon={<EditOutlined className='tw-text-blue-600' />}
+              />
+            </Tooltip>
+            <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
+              <Button
+                size='small'
+                onClick={() => {
+                  setShowModal({
+                    openModal: true,
+                    type: ACTION_TYPE.View,
+                    data: record,
+                    dataParent: dataRender.listDataTitle
+                  })
+                }}
+                icon={<UserOutlined className='tw-text-orange-600' />}
+              />
+            </Tooltip>
+            <Tooltip placement='topLeft' title={t('department.tooltip.delete')}>
+              <Button
+                size='small'
+                onClick={() => {
+                  onDelete(record)
+                }}
+                icon={<DeleteOutlined className='tw-text-red-600' />}
+              />
+            </Tooltip>
           </Space>
         )
       })
