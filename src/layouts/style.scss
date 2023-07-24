@@ -178,7 +178,8 @@
   background: linear-gradient(to bottom, #156deb, #5220a1) !important;
 
   .menu-top {
-    height: 94%;
+    height: 90vh;
+    overflow-y: auto;
 
     .ant-menu-item,
     .ant-menu-submenu {
@@ -204,6 +205,7 @@
     justify-content: center;
     flex-direction: column;
     gap: 10px;
+    margin-top: 20px;
 
     .bottom-main-text {
       color: white;

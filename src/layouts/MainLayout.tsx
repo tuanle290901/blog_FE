@@ -143,13 +143,9 @@ const MainLayout: React.FC = () => {
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
-        <Tooltip placement='topLeft' title='Báo cáo'>
-          Báo cáo
-        </Tooltip>,
-        'reportFunction',
-        <img src={menuIconReport} alt='' className='menu-image' />,
-        [getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Báo cáo', 'report', null)],
-        null
+        'Báo cáo',
+        'report',
+        <img src={menuIconReport} alt='' className='menu-image' />
       ),
 
       getItemIfAllowed(
@@ -191,9 +187,9 @@ const MainLayout: React.FC = () => {
       >
         <div className='menu-top'>
           <div className='logo-vertical tw-flex tw-flex-col tw-items-center tw-justify-center'>
-            <img src={logo} alt='' className='logo-image' />
+            <img src={logo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
             {!collapsed && (
-              <span className='logo-title-container'>
+              <span className='logo-title-container tw-cursor-pointer' onClick={() => navigate('timesheet')}>
                 <span className='logo-title tw-ml-[5px] tw-font-extrabold tw-text-lg logo-text-color'>EMS</span>
               </span>
             )}
