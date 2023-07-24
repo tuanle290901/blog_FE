@@ -4,10 +4,12 @@ import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notificat
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
-import { CheckCircleOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+// import { PlusCircleFilled, CheckCircleFilled, MinusCircleFilled } from '@ant-design/icons'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
+// import TimesheetCalendar from './component/TimesheetCalendar'
 import TimesheetInfo from './component/TimesheetInfo'
 import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
@@ -21,6 +23,7 @@ import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
+// import { convertUTCToLocaleDate, convertUTCToLocaleTime } from '~/utils/helper'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 
 const Timesheet: React.FC = () => {
@@ -180,6 +183,15 @@ const Timesheet: React.FC = () => {
     }
   }
 
+  const findViolateBoolean = (data: IViolate[] | null, violateType: string) => {
+    if (!data) return -1
+    if (data?.findIndex((item: IViolate) => item?.violateType === violateType) > -1) {
+      return data?.findIndex((item: IViolate) => item?.violateType === violateType)
+    } else {
+      return -1
+    }
+  }
+
   const handleUpdateAttendanceStatistic = async () => {
     const response = await dispatch(updateAttendanceStatistic(confirmAttendanceStatisticList)).unwrap()
     if (response) {
@@ -220,6 +232,38 @@ const Timesheet: React.FC = () => {
     confirmAttendanceStatisticList.push(payload)
   }
 
+  const handleSelectAbsenceAmount = (data: IAttendance, absenceAmount: number) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
+    let payload = {}
+    if (index > -1) {
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          absenceAmount:
+            confirmAttendanceStatisticList[index]?.reportData?.workingAmount + absenceAmount < 1.5
+              ? absenceAmount
+              : 1 - confirmAttendanceStatisticList[index]?.reportData?.workingAmount
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          absenceAmount:
+            data?.reportData?.workingAmount + absenceAmount < 1.5 ? absenceAmount : 1 - data?.reportData?.workingAmount
+        }
+      }
+    }
+    confirmAttendanceStatisticList.push(payload)
+  }
+
   const handleAddNote = (data: IAttendance, newNote: string) => {
     const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
     let payload = {}
@@ -248,32 +292,52 @@ const Timesheet: React.FC = () => {
     confirmAttendanceStatisticList.push(payload)
   }
 
-  const renderStatusByWorkingAmount = (workingAmount: number) => {
-    switch (workingAmount) {
-      case 0.0:
-        return (
-          <div className='tw-text-[#E64D29]'>
-            <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>THIẾU CÔNG</span>
-          </div>
+  const handleApproveViolate = (data: any, violateType: string, confirmed: boolean) => {
+    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
+    let payload = {}
+    if (index > -1) {
+      let reportData = []
+      if (confirmAttendanceStatisticList[index]?.reportData?.violate) {
+        reportData = confirmAttendanceStatisticList[index].reportData.violate.map(
+          (item: { violateType: string; confirmed: boolean }) => {
+            if (item.violateType === violateType) {
+              return { violateType: item.violateType, confirmed: confirmed }
+            }
+            return item
+          }
         )
-      case 0.5:
-        return (
-          <div className='tw-text-[#25BD74]'>
-            <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>1/2 CÔNG</span>
-          </div>
-        )
-      case 1:
-        return (
-          <div className='tw-text-[#25BD74]'>
-            <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>ĐỦ CÔNG</span>
-          </div>
-        )
-      default:
-        return ''
+      }
+      payload = {
+        date: confirmAttendanceStatisticList[index]?.date,
+        id: confirmAttendanceStatisticList[index]?.id,
+        userId: confirmAttendanceStatisticList[index]?.userId,
+        reportData: {
+          ...confirmAttendanceStatisticList[index]?.reportData,
+          violate: reportData
+        }
+      }
+      confirmAttendanceStatisticList.splice(index, 1)
+    } else {
+      let reportData = []
+      if (data?.reportData?.violate) {
+        reportData = data.reportData.violate.map((item: { violateType: string; confirmed: boolean }) => {
+          if (item.violateType === violateType) {
+            return { ...item, confirmed: confirmed }
+          }
+          return item
+        })
+      }
+      payload = {
+        date: data?.date,
+        id: data?.id,
+        userId: data?.userId,
+        reportData: {
+          ...data?.reportData,
+          violate: reportData
+        }
+      }
     }
+    confirmAttendanceStatisticList.push(payload)
   }
 
   const columns: ColumnsType<IAttendance> = [
@@ -294,17 +358,19 @@ const Timesheet: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('date'),
       width: '155px',
-      render: (date) => {
-        return <span>{dayjs(date).format('DD/MM/YYYY')}</span>
-      }
-    },
-    {
-      title: t('Trạng thái'),
-      dataIndex: 'reportData',
-      ellipsis: true,
-      width: '120px',
-      render: (reportData) => {
-        return reportData ? renderStatusByWorkingAmount(reportData?.workingAmount) : ''
+      render: (date, record) => {
+        return (
+          <span
+            className={
+              findViolate(record?.reportData?.violate, 'LATE_COME') ||
+              findViolate(record?.reportData?.violate, 'EARLY_BACK')
+                ? 'tw-text-[#D46B08]'
+                : ''
+            }
+          >
+            {dayjs(date).format('DD/MM/YYYY')}
+          </span>
+        )
       }
     },
     {
@@ -321,7 +387,7 @@ const Timesheet: React.FC = () => {
             className={
               findViolate(record?.reportData?.violate, 'LATE_COME') ||
               findViolate(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
-                ? 'tw-text-[#E64D29]'
+                ? 'tw-text-[#D46B08]'
                 : ''
             }
           >
@@ -340,20 +406,20 @@ const Timesheet: React.FC = () => {
       width: '150px',
       render: (endTime, record) => {
         return (
-          <span className={findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#E64D29]' : ''}>
+          <span className={findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#D46B08]' : ''}>
             {endTime || '--'}
           </span>
         )
       }
     },
     {
-      title: t('Số giờ làm'),
-      dataIndex: '',
-      key: '',
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder(''),
-      width: '150px'
+      title: t('Ngày công'),
+      dataIndex: 'reportData',
+      ellipsis: true,
+      width: '102px',
+      render: (reportData) => {
+        return reportData ? reportData?.workingAmount : ''
+      }
     },
     {
       title: t('Công nghỉ'),
@@ -377,6 +443,109 @@ const Timesheet: React.FC = () => {
       }
     },
     {
+      title: t('Ngày phép'),
+      dataIndex: 'reportData',
+      ellipsis: true,
+      width: '102px',
+      render: (reportData, record) => {
+        return currentAuth?.groupProfiles[0]?.role === 'OFFICER'
+          ? reportData?.absenceAmount
+          : reportData?.workingAmount < 1 && (
+              <Select
+                className='tw-w-full'
+                onChange={(value) => handleSelectAbsenceAmount(record, value)}
+                defaultValue={parseFloat(reportData?.absenceAmount) || 0.0}
+                options={weightOptions}
+              />
+            )
+      }
+    },
+    {
+      title: t('timesheet.violate'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true,
+      width: '132px',
+      render: (record) => {
+        return record?.reportData ? (
+          <div className='timesheet-violate'>
+            {findViolateBoolean(record?.reportData?.violate, 'LATE_COME') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable'>{t('timesheet.lateForWork')}</p>
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable timesheet-violate__lable--early'>
+                  {t('timesheet.leavingTheCompanyEarly')}
+                </p>
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE') > -1 && (
+              <div className='tw-flex'>
+                <p className='timesheet-violate__lable timesheet-violate__lable--forget'>
+                  {t('timesheet.forgetTimeAttendance')}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          ''
+        )
+      }
+    },
+    {
+      title: t('Duyệt phép'),
+      dataIndex: '',
+      key: '',
+      ellipsis: true,
+      width: '110px',
+      render: (record) => {
+        return record?.reportData ? (
+          <div className='timesheet-violate'>
+            {findViolateBoolean(record?.reportData?.violate, 'LATE_COME') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'LATE_COME', e?.target?.checked)}
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'LATE_COME')]?.confirmed
+                  }
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'EARLY_BACK', e?.target?.checked)}
+                  defaultChecked={
+                    record?.reportData?.violate[findViolateBoolean(record?.reportData?.violate, 'EARLY_BACK')]
+                      ?.confirmed
+                  }
+                />
+              </div>
+            )}
+            {findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE') > -1 && (
+              <div className='tw-flex'>
+                <Checkbox
+                  className='timesheet-violate__checkbox'
+                  onChange={(e) => handleApproveViolate(record, 'FORGET_TIME_ATTENDANCE', e?.target?.checked)}
+                  defaultChecked={
+                    record?.reportData?.violate[
+                      findViolateBoolean(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
+                    ]?.confirmed
+                  }
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          ''
+        )
+      }
+    },
+    {
       title: t('timesheet.note'),
       dataIndex: '',
       key: '',
@@ -392,6 +561,40 @@ const Timesheet: React.FC = () => {
         )
       }
     }
+    // {
+    //   title: t('timesheet.status'),
+    //   key: 'status',
+    //   align: 'center',
+    //   width: '500px',
+    //   render: (_, record) => {
+    //     return (
+    //       <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+    //         {record?.status === 'ontime' ? (
+    //           <div>
+    //             <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-3' />
+    //             {t('timesheet.ontime')}
+    //           </div>
+    //         ) : record?.status === 'waiting' ? (
+    //           <div>
+    //             <MinusCircleFilled className='tw-text-[#096DD9] tw-mr-3' />
+    //             {t('timesheet.waiting')}
+    //           </div>
+    //         ) : (
+    //           <>
+    //             <Button
+    //               className='tw-border-none'
+    //               size='middle'
+    //               onClick={() => handleClickAddReason()}
+    //               icon={<PlusCircleFilled className='tw-text-[#ffe53b]' />}
+    //             >
+    //               {t('timesheet.addNewNote')}
+    //             </Button>
+    //           </>
+    //         )}
+    //       </div>
+    //     )
+    //   }
+    // }
   ]
 
   function handleTableChange(
@@ -482,15 +685,15 @@ const Timesheet: React.FC = () => {
   ]
   return (
     <Row className='timesheet tw-p-5'>
-      {/* <Col xs={24} xl={6} xxl={4}>
+      <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
           meta={timesheetSate?.meta}
           userInfo={currentAuth}
           handleOpenModal={setIsOpenModal}
         />
-      </Col> */}
-      <Col xs={24} className='timesheet-filter'>
+      </Col>
+      <Col xs={24} xl={18} xxl={20} className='timesheet-filter'>
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={18}>
             {mode === 'list' && (
