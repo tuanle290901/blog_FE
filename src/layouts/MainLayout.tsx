@@ -7,8 +7,8 @@ import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useState, useMemo, useEffect } from 'react'
 
 import logo from '../assets/images/logo.png'
-import menuIconTimeKeeping from '../assets/images/menu/carry-out.png'
-import menuIconDepartment from '../assets/images/menu/department.png'
+import menuIconTimeKeeping from '../assets/images/menu/attendance-confirm.png'
+import menuIconDepartment from '../assets/images/menu/human-resource.png'
 import menuIconMember from '../assets/images/menu/member.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconStatistical from '../assets/images/menu/statistical.png'
@@ -101,7 +101,14 @@ const MainLayout: React.FC = () => {
   }, [])
 
   const menuItems: MenuItem[] = useMemo(() => {
-    const getItemIfAllowed = (roles: ROLE[], title: any, key: string, icon?: any, subMenu?: any, group?: any) => {
+    const getItemIfAllowed = (
+      roles: ROLE[],
+      title: React.ReactNode,
+      key: React.Key,
+      icon?: React.ReactNode,
+      subMenu?: MenuItem[],
+      group?: any
+    ) => {
       const hasRole = hasPermission(roles, userInfo?.groupProfiles)
       if (!hasRole) return null
       return getItem(title, key, icon, subMenu, group)
@@ -110,99 +117,52 @@ const MainLayout: React.FC = () => {
     return [
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        <Tooltip placement='topLeft' title='Chức năng chính'>
-          Chức năng chính
-        </Tooltip>,
-        'mainFunction',
-        null,
-        [
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-            'Chấm công',
-            'timeKeeping',
-            <img src={menuIconTimeKeeping} alt='' className='menu-image' />,
-            [
-              getItemIfAllowed(
-                [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-                'Lịch sử chấm công',
-                'timesheet'
-              )
-            ]
-          )
-        ],
-        'group'
+        'Xác nhận ngày công',
+        'timesheet',
+        <img src={menuIconTimeKeeping} alt='' className='menu-image' />
       ),
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        <Tooltip placement='topLeft' title='Chức năng quản lý'>
-          Chức năng quản lý
+        <Tooltip placement='topLeft' title='Nhân sự'>
+          Nhân sự
         </Tooltip>,
         'manageFunction',
-        null,
+        <img src={menuIconDepartment} alt='' className='menu-image' />,
         [
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
             'Thành viên',
             'users',
-            <img src={menuIconMember} alt='' className='menu-image' />
+            null
           ),
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
-            'Phòng ban',
-            'department',
-            <img src={menuIconDepartment} alt='' className='menu-image' />
-          ),
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
-            'Chức vụ',
-            'positions',
-            <img src={menuIconDepartment} alt='' className='menu-image' />
-          )
-        ],
-        'group'
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Phòng ban', 'department', null),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Chức vụ', 'positions', null)
+        ]
       ),
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
-        <Tooltip placement='topLeft' title='Chức năng báo cáo'>
-          Chức năng báo cáo
+        <Tooltip placement='topLeft' title='Báo cáo'>
+          Báo cáo
         </Tooltip>,
         'reportFunction',
-        null,
-        [
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
-            'Báo cáo',
-            'report',
-            <img src={menuIconReport} alt='' className='menu-image' />
-          )
-        ],
-        'group'
+        <img src={menuIconReport} alt='' className='menu-image' />,
+        [getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Báo cáo', 'report', null)],
+        null
       ),
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN],
-        <Tooltip placement='topLeft' title='Cấu hình hệ thống'>
-          Cấu hình hệ thống
-        </Tooltip>,
-        'systemConfig',
-        null,
+        'Thiết lập',
+        'setting',
+        <img src={menuIconSetting} alt='' className='menu-image' />,
         [
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN],
-            'Cấu hình',
-            'setting',
-            <img src={menuIconSetting} alt='' className='menu-image' />,
-            [
-              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
-              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách thiết bị chấm công', 'devices'),
-              // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
-              getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
-            ]
-          )
-        ],
-        'group'
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách thiết bị chấm công', 'devices'),
+          // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
+        ]
       )
     ]
   }, [userInfo])
@@ -221,26 +181,42 @@ const MainLayout: React.FC = () => {
 
   return (
     <Layout className='app-container tw-min-h-screen'>
-      <Sider theme='light' collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className='logo-vertical tw-flex tw-items-center tw-justify-center'>
-          <img src={logo} alt='' className='logo-image' />
-          {!collapsed && (
-            <span className='logo-title-container'>
-              <span className='logo-title tw-ml-[5px] tw-font-extrabold tw-text-lg logo-text-color'>ATTENDANCE</span>
-            </span>
-          )}
+      <Sider
+        theme='light'
+        collapsible={false}
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+        width={250}
+        className='sidebar-custom'
+      >
+        <div className='menu-top'>
+          <div className='logo-vertical tw-flex tw-flex-col tw-items-center tw-justify-center'>
+            <img src={logo} alt='' className='logo-image' />
+            {!collapsed && (
+              <span className='logo-title-container'>
+                <span className='logo-title tw-ml-[5px] tw-font-extrabold tw-text-lg logo-text-color'>EMS</span>
+              </span>
+            )}
+          </div>
+          <Menu
+            style={{ backgroundColor: 'transparent' }}
+            theme='light'
+            defaultSelectedKeys={[sideBarMenuKey]}
+            defaultOpenKeys={[sideBarMenuKey]}
+            selectedKeys={[selectedKeyStatus]}
+            mode='inline'
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
         </div>
-        <hr className='hr-custom' />
-        <Menu
-          theme='light'
-          // defaultSelectedKeys={['1']}
-          defaultSelectedKeys={[sideBarMenuKey]}
-          defaultOpenKeys={[sideBarMenuKey]}
-          selectedKeys={[selectedKeyStatus]}
-          mode='inline'
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
+
+        <div className='menu-bottom'>
+          <div className='bottom-main-text'>Employee Management System</div>
+          <div>
+            <span className='bottom-extra-text tw-mr-2'>Powed by</span>
+            <span className='bottom-main-text tw-font-bold'>HTSC</span>
+          </div>
+        </div>
       </Sider>
       <Layout>
         <Header className='header-container'>
@@ -253,12 +229,12 @@ const MainLayout: React.FC = () => {
               placement='bottom'
             >
               <div className='space-custom'>
-                <Badge count={1}>
+                {/* <Badge count={1}>
                   <BellOutlined className='bell-icon-custom' />
-                </Badge>
+                </Badge> */}
                 <Space className='tw-cursor-pointer tw-ml-[15px]'>
                   <Avatar
-                    size='default'
+                    size='large'
                     icon={
                       userInfo?.avatarBase64 ? (
                         <img
