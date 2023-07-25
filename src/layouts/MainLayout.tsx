@@ -1,30 +1,28 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { BellOutlined, InfoCircleOutlined, LoginOutlined, UserOutlined } from '@ant-design/icons'
+import { InfoCircleOutlined, LoginOutlined, LockOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { Avatar, Badge, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
-import React, { useState, useMemo, useEffect } from 'react'
+import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import logo from '../assets/images/logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/attendance-confirm.png'
 import menuIconDepartment from '../assets/images/menu/human-resource.png'
-import menuIconMember from '../assets/images/menu/member.png'
-import menuIconSetting from '../assets/images/menu/setting.png'
-import menuIconStatistical from '../assets/images/menu/statistical.png'
 import menuIconReport from '../assets/images/menu/icon-report.png'
+import menuIconSetting from '../assets/images/menu/setting.png'
 
-import defaultImg from '~/assets/images/default-img.png'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import './style.scss'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { logout } from '~/stores/features/auth/auth.slice'
-import { PUBLIC_PATH } from '~/constants/public-routes'
-import { useUserInfo } from '~/stores/hooks/useUserProfile'
-import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
-import ChangePassword from '~/pages/change-password/change-password'
-import { hasPermission } from '~/utils/helper'
+import defaultImg from '~/assets/images/default-img.png'
 import { ROLE } from '~/constants/app.constant'
+import { PUBLIC_PATH } from '~/constants/public-routes'
+import ChangePassword from '~/pages/change-password/change-password'
+import { logout } from '~/stores/features/auth/auth.slice'
+import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
+import { useAppDispatch } from '~/stores/hook'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { hasPermission } from '~/utils/helper'
+import './style.scss'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -68,14 +66,14 @@ const MainLayout: React.FC = () => {
 
   const dropdownItems = useMemo(() => {
     return [
-      {
-        key: 'profile',
-        label: (
-          <div className='tw-flex tw-items-center'>
-            <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
-          </div>
-        )
-      },
+      // {
+      //   key: 'profile',
+      //   label: (
+      //     <div className='tw-flex tw-items-center'>
+      //       <InfoCircleOutlined /> <span className='tw-ml-[8px]'>Thông tin cá nhân</span>
+      //     </div>
+      //   )
+      // },
       {
         key: 'changePassword',
         label: (
@@ -85,7 +83,7 @@ const MainLayout: React.FC = () => {
               setShowChangePassword(!showChangePassword)
             }}
           >
-            <span className='tw-ml-[8px]'>Đổi mật khẩu</span>
+            <LockOutlined /> <span className='tw-ml-[8px]'>Đổi mật khẩu</span>
           </div>
         )
       },
