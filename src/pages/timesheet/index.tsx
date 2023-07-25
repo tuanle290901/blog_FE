@@ -543,7 +543,7 @@ const Timesheet: React.FC = () => {
 
   return (
     <Row className='timesheet tw-p-2'>
-      {isAllowedAccess && (
+      {/* {isAllowedAccess && (
         <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
           {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
             <div className='tw-w-1/2 tw-pt-2 '>
@@ -567,7 +567,7 @@ const Timesheet: React.FC = () => {
             </div>
           )}
         </div>
-      )}
+      )} */}
       {/* <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
@@ -579,7 +579,7 @@ const Timesheet: React.FC = () => {
       <Col xs={24} className='timesheet-detail'>
         {mode === 'list' && (
           <>
-            {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />}
+            {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
                 <Col xs={24} lg={8}>
