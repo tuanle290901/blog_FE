@@ -1,15 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notification } from 'antd'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
-import { CheckCircleOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import {
+  CheckCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  ClockCircleOutlined,
+  CalendarOutlined,
+  UploadOutlined,
+  MenuOutlined
+} from '@ant-design/icons'
 import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
-import TimesheetInfo from './component/TimesheetInfo'
-import localeVI from 'antd/es/date-picker/locale/vi_VN'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import {
   filterTimesheet,
@@ -22,9 +28,11 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
+import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
 import TimesheetChart from './component/TimesheetChart'
 
 const Timesheet: React.FC = () => {
+  const { Search } = Input
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
@@ -40,19 +48,19 @@ const Timesheet: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState(
     currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : ''
   )
+  const [isAllowedAccess, setIsAllowedAccess] = useState(
+    currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? true : false
+  )
   const [selectedStartDate, setSelectedStartDate] = useState(dayjs())
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
   const [mode, setMode] = useState('list')
   const [clickUpdateButton, setClickUpdateButton] = useState(false)
+  const timerId = useRef<any>(null)
+  const [query, setQuery] = useState<string>('')
   let confirmAttendanceStatisticList: any[] = []
   const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
     return { value: item?.code, label: item?.name }
   })
-  const weightOptions: { value: number; label: string }[] = [
-    { value: 0.0, label: '0' },
-    { value: 0.5, label: '0.5' },
-    { value: 1, label: '1' }
-  ]
 
   const [searchValue, setSearchValue] = useState<{
     query: string
@@ -66,7 +74,7 @@ const Timesheet: React.FC = () => {
     query: '',
     paging: {
       page: 0,
-      size: 10,
+      size: 5,
       total: 0,
       totalPage: 0
     },
@@ -81,10 +89,6 @@ const Timesheet: React.FC = () => {
       }
     ]
   })
-
-  // const handleClickAddReason = () => {
-  //   setIsOpenModal(true)
-  // }
 
   const handleCloseTimesheetModal = () => {
     setIsOpenModal(false)
@@ -202,7 +206,9 @@ const Timesheet: React.FC = () => {
         userId: confirmAttendanceStatisticList[index]?.userId,
         reportData: {
           ...confirmAttendanceStatisticList[index]?.reportData,
-          typesOfLeave: typesOfLeave
+          absenceType: typesOfLeave !== undefined ? typesOfLeave : null,
+          absenceAmount:
+            typesOfLeave !== undefined ? 1 - confirmAttendanceStatisticList[index]?.reportData?.workingAmount : 0.0
         }
       }
       confirmAttendanceStatisticList.splice(index, 1)
@@ -213,8 +219,8 @@ const Timesheet: React.FC = () => {
         userId: data?.userId,
         reportData: {
           ...data?.reportData,
-          absenceType: typesOfLeave,
-          absenceAmount: 1 - data?.reportData?.workingAmount
+          absenceType: typesOfLeave !== undefined ? typesOfLeave : null,
+          absenceAmount: typesOfLeave !== undefined ? 1 - data?.reportData?.workingAmount : 0.0
         }
       }
     }
@@ -277,6 +283,12 @@ const Timesheet: React.FC = () => {
     }
   }
 
+  const renderTypesOfLeaveName = (code: string) => {
+    if (!code) return
+    const result = typesOfLeaveSate?.listData?.find((item) => item?.code === code)
+    return result?.name || ''
+  }
+
   const columns: ColumnsType<IAttendance> = [
     {
       title: t('timesheet.fullName'),
@@ -287,6 +299,14 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('fullName')
     },
     {
+      title: t('Mã'),
+      dataIndex: 'userName',
+      key: 'userName',
+      ellipsis: true,
+      width: '160px',
+      sortOrder: getSortOrder('userName')
+    },
+    {
       title: t('timesheet.attendanceDate'),
       dataIndex: 'date',
       key: 'date',
@@ -294,9 +314,14 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('date'),
-      width: '155px',
+      width: '170px',
       render: (date) => {
-        return <span>{dayjs(date).format('DD/MM/YYYY')}</span>
+        return (
+          <div className='tw-flex tw-items-center'>
+            <CalendarOutlined className='tw-text-[12px] tw-text-[#B2C2D8] tw-mr-[5px]' />
+            {dayjs(date).format('DD/MM/YYYY')}
+          </div>
+        )
       }
     },
     {
@@ -315,19 +340,21 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('startTime'),
-      width: '150px',
+      width: '110px',
       render: (startTime, record) => {
         return (
-          <span
-            className={
-              findViolate(record?.reportData?.violate, 'LATE_COME') ||
-              findViolate(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
-                ? 'tw-text-[#E64D29]'
-                : ''
-            }
-          >
-            {startTime || '--'}
-          </span>
+          startTime && (
+            <div
+              className={`tw-flex tw-items-center ${
+                findViolate(record?.reportData?.violate, 'LATE_COME') ||
+                findViolate(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
+                  ? 'tw-text-[#E64D29]'
+                  : ''
+              }`}
+            >
+              <ClockCircleOutlined className='tw-text-[12px] tw-text-[#B2C2D8] tw-mr-[5px]' /> {startTime}
+            </div>
+          )
         )
       }
     },
@@ -338,12 +365,18 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('endTime'),
-      width: '150px',
+      width: '110px',
       render: (endTime, record) => {
         return (
-          <span className={findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#E64D29]' : ''}>
-            {endTime || '--'}
-          </span>
+          endTime && (
+            <div
+              className={`tw-flex tw-items-center ${
+                findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#E64D29]' : ''
+              }`}
+            >
+              <ClockCircleOutlined className='tw-text-[12px] tw-text-[#B2C2D8] tw-mr-[5px]' /> {endTime}
+            </div>
+          )
         )
       }
     },
@@ -354,7 +387,10 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder(''),
-      width: '150px'
+      width: '150px',
+      render: (text) => {
+        return `h`
+      }
     },
     {
       title: t('Công nghỉ'),
@@ -362,8 +398,8 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '170px',
       render: (reportData, record) => {
-        return currentAuth?.groupProfiles[0]?.role === 'OFFICER'
-          ? reportData?.workingAmount
+        return !isAllowedAccess
+          ? renderTypesOfLeaveName(reportData?.absenceType)
           : reportData?.workingAmount < 1 && (
               <Select
                 onChange={(value) => handleSelectTypesOfLeave(record, value)}
@@ -372,19 +408,21 @@ const Timesheet: React.FC = () => {
                 className='tw-w-full'
                 showSearch
                 filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
-                // allowClear
+                allowClear
               />
             )
       }
     },
     {
-      title: t('timesheet.note'),
+      title: t('timesheet.noteFromManager'),
       dataIndex: '',
       key: '',
       ellipsis: true,
       width: '200px',
       render: (record) => {
-        return (
+        return !isAllowedAccess ? (
+          record?.reportData?.note
+        ) : (
           <Input
             onChange={(e) => handleAddNote(record, e?.target?.value)}
             defaultValue={record?.reportData?.note || ''}
@@ -412,6 +450,16 @@ const Timesheet: React.FC = () => {
       }
       return { ...prevState, paging, sorts }
     })
+  }
+
+  const handleSearchValueChange = (value: string) => {
+    setQuery(value)
+    if (timerId.current) {
+      clearTimeout(timerId.current)
+    }
+    timerId.current = setTimeout(() => {
+      setSearchValue((prevState) => ({ ...prevState, query: value, paging: { ...prevState.paging, page: 0 } }))
+    }, 500)
   }
 
   useEffect(() => {
@@ -501,13 +549,50 @@ const Timesheet: React.FC = () => {
           handleOpenModal={setIsOpenModal}
         />
       </Col> */}
-      <Col xs={24} className='timesheet-filter'>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={18}>
-            {mode === 'list' && (
-              <Row gutter={[16, 16]}>
-                <Col xs={24} lg={6}>
-                  <p className='tw-mb-2'>{t('timesheet.filterByGroup')}</p>
+      <Col xs={24} className='timesheet-detail'>
+        {mode === 'list' && (
+          <>
+            {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />}
+            <div className='timesheet-filter'>
+              <Row gutter={[12, 16]} className='timesheet-filter-time'>
+                <Col xs={24} lg={8}>
+                  <div className='tw-font-bold'>
+                    {!isAllowedAccess ? 'Xác nhận ngày công của tôi' : 'Xác nhận ngày công'}
+                  </div>
+                </Col>
+                <Col xs={24} lg={16} className='tw-text-right'>
+                  <RangePicker
+                    onChange={handleSelectDate}
+                    format='DD/MM/YYYY'
+                    placeholder={[t('timesheet.from'), t('timesheet.to')]}
+                    defaultValue={[dayjs(), dayjs()]}
+                    value={[selectedStartDate, selectedEndDate]}
+                    allowClear={false}
+                    renderExtraFooter={() => (
+                      <div className='timesheet-filter-time__button'>
+                        <Button onClick={handleSelectToday} size='small'>
+                          {t('timesheet.today')}
+                        </Button>
+                        <Button onClick={handleSelectThisMonth} size='small'>
+                          {t('timesheet.thisMonth')}
+                        </Button>
+                        <Button onClick={handleSelectLastMonth} size='small'>
+                          {t('timesheet.lastMonth')}
+                        </Button>
+                      </div>
+                    )}
+                  />
+                  <Button
+                    icon={<UploadOutlined />}
+                    className='timesheet-filter__export'
+                    // onClick={dispatch(ExportExcel())}
+                  >
+                    {t('Xuất dữ liệu')}
+                  </Button>
+                </Col>
+              </Row>
+              <Row gutter={[16, 16]} className='tw-mt-[12px]'>
+                <Col xs={24} lg={5} xl={4}>
                   <Select
                     className='tw-w-full'
                     showSearch
@@ -527,8 +612,7 @@ const Timesheet: React.FC = () => {
                       ))}
                   </Select>
                 </Col>
-                <Col xs={24} lg={6}>
-                  <p className='tw-mb-2'>{t('timesheet.filterByEmployee')}</p>
+                <Col xs={24} lg={5} xl={4}>
                   <Select
                     className='tw-w-full'
                     showSearch
@@ -550,106 +634,27 @@ const Timesheet: React.FC = () => {
                       ))}
                   </Select>
                 </Col>
-                <Col xs={24} lg={12}>
-                  <div className='timesheet-filter-time'>
-                    <div className='tw-mb-2'>{t('timesheet.statisticalTime')}</div>
-                    <RangePicker
-                      onChange={handleSelectDate}
-                      format='DD/MM/YYYY'
-                      placeholder={[t('timesheet.from'), t('timesheet.to')]}
-                      locale={localeVI}
-                      defaultValue={[dayjs(), dayjs()]}
-                      value={[selectedStartDate, selectedEndDate]}
-                      allowClear={false}
-                      renderExtraFooter={() => (
-                        <div className='timesheet-filter-time__button'>
-                          <Button onClick={handleSelectToday} size='small'>
-                            {t('timesheet.today')}
-                          </Button>
-                          <Button onClick={handleSelectThisMonth} size='small'>
-                            {t('timesheet.thisMonth')}
-                          </Button>
-                          <Button onClick={handleSelectLastMonth} size='small'>
-                            {t('timesheet.lastMonth')}
-                          </Button>
-                        </div>
-                      )}
-                    />
-                  </div>
+                <Col xs={24} lg={14} xl={16} className='tw-text-right'>
+                  <Search
+                    value={query}
+                    placeholder={'Tìm kiếm'}
+                    onChange={(event) => handleSearchValueChange(event.target.value)}
+                    className='tw-w-full tw-max-w-[300px] tw-mr-2'
+                  />
+                  {/* <Button icon={<MenuOutlined />} type='default'>
+                    Lọc
+                  </Button> */}
                 </Col>
               </Row>
-            )}
-          </Col>
-          {/* {mode === 'list' && (
-            <Col xs={24} lg={6} className='tw-flex'>
-              <ExcelExportButton fileName='demo' sheetsData={sheetsData} />
-            </Col>
-          )} */}
-          {currentAuth?.groupProfiles[0]?.role !== 'OFFICER' && (
-            <Col xs={24} lg={6} className='timesheet-filter-tab tw-w-full'>
-              <div className='tw-text-right'>
+            </div>
+            {isAllowedAccess && (
+              <div className='tw-text-right tw-mt-[15px]'>
                 <Button icon={<CheckCircleOutlined />} type='primary' onClick={() => handleUpdateAttendanceStatistic()}>
                   Cập nhật
                 </Button>
               </div>
-              {/* <Segmented
-              options={[
-                { label: t('timesheet.calendar'), value: 'calendar' },
-                { label: t('timesheet.list'), value: 'list' }
-              ]}
-              defaultValue='calendar'
-              onChange={(v) => setMode(v.toString())}
-            /> */}
-            </Col>
-          )}
-        </Row>
-        {mode === 'list' && (
-          <>
-            {/* <DaySelected meta={timesheetSate?.meta} /> */}
-            <div className='tw-mt-6'>
-              {/* <div className='timesheet-listday'>
-                {data.map((item) => (
-                  <div key={item.id} className={`${handleGenderColor(item.status)} timesheet-listday-item`}>
-                    <p className='tw-mb-1'>{handleGenderDayOfWeek(dayjs(item.date).day())}</p>
-                    <p className='tw-text-[18px]'>{dayjs(item.date).date()}</p>
-                  </div>
-                ))}
-              </div> */}
-              <Row gutter={[16, 16]}>
-                <Col xs={24} lg={12}>
-                  <div className='timesheet-workday'>
-                    <p>{t('timesheet.totalWorkingDay')}</p>
-                    <span>{timesheetSate?.meta?.total}</span>
-                  </div>
-                </Col>
-                <Col xs={24} lg={12} className='tw-flex'>
-                  <div className='tw-flex tw-ml-auto'>
-                    <div className='timesheet-statistic'>
-                      <p>{t('timesheet.leavingTheCompanyEarly')}</p>
-                      {/* <span>2</span> */}
-                    </div>
-                    <div className='timesheet-statistic timesheet-statistic__violate'>
-                      <p>{t('timesheet.lateForWork')}</p>
-                      {/* <span>1</span> */}
-                    </div>
-                    <div className='timesheet-statistic timesheet-statistic__waiting'>
-                      <p>{t('timesheet.forgetTimeAttendance')}</p>
-                      {/* <span>1</span> */}
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-            </div>
-            <div className='tw-mt-6'>
-              {/* <Table
-                rowKey='id'
-                columns={columns}
-                dataSource={timesheetSate.timesheetList}
-                loading={timesheetSate.loading}
-                pagination={{ total: timesheetSate?.meta?.total }}
-                scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
-                onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
-              /> */}
+            )}
+            <div className='tw-mt-4'>
               <Table
                 rowKey='id'
                 columns={columns}

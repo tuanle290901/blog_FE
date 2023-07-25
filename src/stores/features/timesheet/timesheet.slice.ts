@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { IUser } from '~/types/user.interface'
 import { IGroup } from '../master-data/master-data.slice'
 import { IPayloadUpdateAttendance } from '~/types/attendance.interface'
+import { saveAs } from 'file-saver'
 import { employeeWorkingTimeRes } from './fake-data'
 
 export interface TimesheetStateInterface {
@@ -90,6 +91,16 @@ export const updateAttendanceStatistic = createAsyncThunk(
   }
 )
 
+export const ExportExcel = createAsyncThunk('time-attendance/export-time-attendance', async () => {
+  try {
+    const response = ''
+    const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+    saveAs(blob, 'Bao-cao.csv')
+  } catch (error) {
+    console.error('Lỗi khi tải xuống tệp Excel:', error)
+  }
+})
+
 const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-working-time', async (_, thunkAPI) => {
   // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
   //   signal: thunkAPI.signal
@@ -99,7 +110,6 @@ const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-wo
       resolve(employeeWorkingTimeRes)
     }, 100)
   })
-  console.log(response, 'response')
   return await response
 })
 
@@ -123,7 +133,7 @@ export const filterTimesheet = createAsyncThunk(
         size: params.paging.size,
         sort: params.sorts
       }
-      if (params.groupCode) {
+      if (!params.query && params.groupCode) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
@@ -143,7 +153,7 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (params.userId) {
+      if (!params.query && params.userId) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
@@ -163,7 +173,7 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (params.userId && params.groupCode) {
+      if (!params.query && params.userId && params.groupCode) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
@@ -177,6 +187,41 @@ export const filterTimesheet = createAsyncThunk(
                 field: 'user_id',
                 operator: 'IS',
                 value: params.userId
+              },
+              {
+                field: 'date',
+                operator: 'BETWEEN',
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
+              }
+            ]
+          }
+        ]
+      }
+      if (params.query && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                operator: 'OR_MULTIPLES',
+                children: [
+                  {
+                    field: 'full_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'user_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  }
+                ]
+              },
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
               },
               {
                 field: 'date',
