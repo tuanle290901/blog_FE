@@ -30,3 +30,7 @@ export enum EDIT_TYPE {
   HR = 'HR',
   DIRECT_MANAGER = 'DIRECT_MANAGER'
 }
+export enum USER_STATUS {
+  ACTIVE = 'ACTIVE',
+  DEACTIVE = 'DEACTIVE'
+}

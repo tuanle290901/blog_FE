@@ -1,4 +1,4 @@
-import { EDIT_TYPE } from '~/constants/app.constant.ts'
+import { EDIT_TYPE, USER_STATUS } from '~/constants/app.constant.ts'
 
 export interface IUser {
   id?: string
@@ -16,9 +16,9 @@ export interface IUser {
   notificationMethods?: string[]
   ownWeekWorkingTimeSetup?: OwnWeekWorkingTimeSetup[]
   phoneNumber: string
-  status?: string
   userName: string
   editType: EDIT_TYPE
+  status: USER_STATUS
 }
 export interface GroupProfile {
   title: string

@@ -1,20 +1,36 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, notification, Select, Table, TablePaginationConfig } from 'antd'
-import { DownloadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Input, notification, Popconfirm, Select, Table, TablePaginationConfig, Tooltip } from 'antd'
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  UndoOutlined,
+  SyncOutlined
+} from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, importUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import {
+  cancelEditingUser,
+  deleteUser,
+  importUser,
+  restoreUser,
+  searchUser,
+  startEditingUser,
+  startResetPassworkUser
+} from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 import { IPaging, ISort } from '~/types/api-response.interface.ts'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { COMMON_ERROR_CODE, GENDER, ROLE } from '~/constants/app.constant.ts'
+import { COMMON_ERROR_CODE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 
 const { Search } = Input
@@ -70,11 +86,30 @@ const UserList: React.FC = () => {
     return [{ value: 'all', label: t('userList.allGroup') }, ...options]
   }, [groups])
   const handleClickEditUser = async (user: IUser) => {
-    //   TODO
-    await dispatch(startEditingUser(user.id as string))
+    try {
+      await dispatch(startEditingUser(user.id as string))
+    } catch (e: any) {
+      if (e.status === 404) {
+        notification.error({ message: 'Thành viên đã bị xóa khỏi hệ thống' })
+      }
+      resetAndSearchUser()
+    }
   }
-  const handleClickDeleteUser = (user: IUser) => {
-    //   TODO
+  const handleClickDeleteUser = async (user: IUser) => {
+    try {
+      await dispatch(deleteUser(user))
+      notification.success({ message: 'Vô hiệu hóa tài khoản thành công' })
+      dispatch(
+        searchUser({
+          paging: searchValue.paging,
+          sorts: searchValue.sorts,
+          query: searchValue.query,
+          groupCode: searchValue.group === 'all' ? null : searchValue.group
+        })
+      )
+    } catch (e) {
+      console.log(e)
+    }
   }
   const handleClickViewUserHistory = (user: IUser) => {
     navigate('/user/history/' + user.id)
@@ -110,6 +145,31 @@ const UserList: React.FC = () => {
       return null
     }
   }
+  const handleClickResetPasswordUser = async (user: IUser) => {
+    try {
+      await dispatch(startResetPassworkUser({ userId: user.id as string }))
+      notification.success({ message: 'Khôi phục mật khẩu thành công' })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  const handleRestoreUser = async (user: IUser) => {
+    try {
+      await dispatch(restoreUser(user))
+      notification.success({ message: 'Khôi phục tài khoản thành công' })
+      dispatch(
+        searchUser({
+          paging: searchValue.paging,
+          sorts: searchValue.sorts,
+          query: searchValue.query,
+          groupCode: searchValue.group === 'all' ? null : searchValue.group
+        })
+      )
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const columns: ColumnsType<IUser> = [
     {
       title: t('userList.fullName'),
@@ -210,16 +270,70 @@ const UserList: React.FC = () => {
         return (
           <div className='tw-absolute tw-left-0 tw-w-full'>
             <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
-              <Button
-                size='small'
-                onClick={() => handleClickEditUser(record)}
-                icon={<EditOutlined className='tw-text-blue-600' />}
-              />
-              {/*<Button*/}
-              {/*  size='small'*/}
-              {/*  onClick={() => handleClickDeleteUser(record)}*/}
-              {/*  icon={<DeleteOutlined className='tw-text-red-600' />}*/}
-              {/*/>*/}
+              {record.status !== USER_STATUS.DEACTIVE && (
+                <>
+                  <Tooltip title={'Chỉnh sửa thành viên'}>
+                    <Button
+                      size='small'
+                      onClick={() => handleClickEditUser(record)}
+                      icon={<EditOutlined className='tw-text-blue-600' />}
+                    />
+                  </Tooltip>
+                  {hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
+                    <>
+                      <Tooltip title='Vô hiệu hóa tài khoản'>
+                        <Popconfirm
+                          title='Xác nhận vô hiệu hóa tài khoản'
+                          onConfirm={() => handleClickDeleteUser(record)}
+                        >
+                          <Button
+                            size='small'
+                            className='tw-bg-red-600'
+                            icon={<DeleteOutlined className='tw-text-white' />}
+                          />
+                        </Popconfirm>
+                      </Tooltip>
+                      <Tooltip title='Đặt lại mật khẩu'>
+                        <Popconfirm
+                          title={t('userList.descriptionConfirmResetPassword', {
+                            account: record.fullName
+                          })}
+                          onConfirm={() => handleClickResetPasswordUser(record)}
+                          okText={t('common.confirm')}
+                          cancelText={t('common.cancel')}
+                        >
+                          <Button size='small' type='primary' icon={<SyncOutlined />} />
+                        </Popconfirm>
+                      </Tooltip>
+                    </>
+                  )}
+                </>
+              )}
+              {record.status === USER_STATUS.DEACTIVE && (
+                <>
+                  <Tooltip title='Xem chi tiết'>
+                    <Button
+                      size='small'
+                      onClick={() => handleClickEditUser(record)}
+                      icon={<EyeOutlined className='tw-text-blue-600' />}
+                    />
+                  </Tooltip>
+                  {hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
+                    <>
+                      <Tooltip title='Khôi phục'>
+                        <Popconfirm
+                          title={'Xác nhận khôi phục thành viên' + `'${record.fullName}'`}
+                          okText={t('common.yes')}
+                          onConfirm={() => handleRestoreUser(record)}
+                        >
+                          <Button type='primary' size='small' icon={<UndoOutlined className='tw-text-white' />} />
+                        </Popconfirm>
+                      </Tooltip>
+                    </>
+                  )}
+                </>
+              )}
+
               {/*<Button size='small' onClick={() => handleClickViewUserHistory(record)} icon={<HistoryOutlined />} />*/}
             </div>
           </div>

@@ -545,22 +545,27 @@ const Timesheet: React.FC = () => {
     <Row className='timesheet tw-p-2'>
       {isAllowedAccess && (
         <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
-          <div className='tw-w-1/2 tw-pt-2 '>
-            <div className='tw-font-semibold'>Trung bình Giờ đến</div>
-            <TimesheetChart
-              categories={chartData?.arrivalTime?.workingDate ?? []}
-              seriesData={chartData?.arrivalTime?.workingHour ?? []}
-              seriesTitle='Thời gian đi làm'
-            />
-          </div>
-          <div className='tw-w-1/2 tw-pt-2'>
-            <div className='tw-font-semibold'>Trung bình Giờ về</div>
-            <TimesheetChart
-              categories={chartData?.offTime?.workingDate ?? []}
-              seriesData={chartData?.offTime?.workingHour ?? []}
-              seriesTitle='Thời gian về'
-            />
-          </div>
+          {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
+            <div className='tw-w-1/2 tw-pt-2 '>
+              <div className='tw-font-semibold'>Trung bình Giờ đến</div>
+              <TimesheetChart
+                categories={chartData?.arrivalTime?.workingDate ?? []}
+                seriesData={chartData?.arrivalTime?.workingHour ?? []}
+                seriesTitle='Thời gian đi làm'
+              />
+            </div>
+          )}
+
+          {chartData?.offTime && chartData?.offTime?.workingDate?.length > 0 && (
+            <div className='tw-w-1/2 tw-pt-2'>
+              <div className='tw-font-semibold'>Trung bình Giờ về</div>
+              <TimesheetChart
+                categories={chartData?.offTime?.workingDate ?? []}
+                seriesData={chartData?.offTime?.workingHour ?? []}
+                seriesTitle='Thời gian về'
+              />
+            </div>
+          )}
         </div>
       )}
       {/* <Col xs={24} xl={6} xxl={4}>
