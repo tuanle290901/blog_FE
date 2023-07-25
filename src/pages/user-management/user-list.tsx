@@ -486,6 +486,7 @@ const UserList: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true
           }}
+          rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />
