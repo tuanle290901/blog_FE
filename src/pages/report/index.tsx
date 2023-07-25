@@ -115,7 +115,7 @@ const Index = () => {
             autoComplete='off'
           >
             <Row className='tw-w-full tw-h-full'>
-              <Col span={9}>
+              {/* <Col span={9}>
                 <Form.Item
                   label='Phòng ban'
                   name='groupCode'
@@ -124,8 +124,8 @@ const Index = () => {
                 >
                   <TreeSelect {...treeProps} />
                 </Form.Item>
-              </Col>
-              <Col span={14} offset={1}>
+              </Col> */}
+              <Col span={16} offset={4}>
                 <Form.Item
                   label='Thời gian'
                   name='time'
@@ -141,7 +141,7 @@ const Index = () => {
                 </Form.Item>
               </Col>
 
-              <Col span={24}>
+              <Col span={16} offset={4}>
                 <Form.Item>
                   <Button className='login-button tw-w-1/10 tw-float-right' type='primary' htmlType='submit'>
                     Tải xuống
