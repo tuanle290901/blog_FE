@@ -112,7 +112,24 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
             }
           ]}
         >
-          <Input.Password placeholder={t('changePassword.inviteToEnterOldPassword')} maxLength={20} minLength={0} />
+          <Input.Password
+            placeholder={t('changePassword.inviteToEnterOldPassword')}
+            maxLength={20}
+            minLength={0}
+            onPaste={() => {
+              setServerError({
+                message: '',
+                status: 0
+              })
+            }}
+            onChange={() => {
+              console.log('ââ')
+              setServerError({
+                message: '',
+                status: 0
+              })
+            }}
+          />
         </Form.Item>
         <Form.Item
           label={<div className='tw-font-semibold'>{t('changePassword.newPassword')}</div>}
