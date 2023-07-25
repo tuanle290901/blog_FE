@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, notification, Select, Table, TablePaginationConfig } from 'antd'
-import { EditOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
+import { DownloadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
@@ -330,7 +330,7 @@ const UserList: React.FC = () => {
           {permissionImportUser && (
             <>
               {' '}
-              <Button icon={<UploadOutlined />} onClick={() => fileSelect?.current?.click()}>
+              <Button icon={<DownloadOutlined />} onClick={() => fileSelect?.current?.click()}>
                 Import thành viên
               </Button>
               <input
