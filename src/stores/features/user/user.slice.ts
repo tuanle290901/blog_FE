@@ -138,8 +138,39 @@ export const updateUser = createAsyncThunk('users/update', async (body: { userId
     throw error
   }
 })
-export const deleteUser = createAsyncThunk('users/create', (userId: string, thunkAPI) => {
-  return userId
+export const deleteUser = createAsyncThunk('users/delete', async (user: IUser, thunkAPI) => {
+  try {
+    const response = await HttpService.put(
+      '/system-user/deactivate',
+      { userId: user.id },
+      {
+        signal: thunkAPI.signal
+      }
+    )
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+export const restoreUser = createAsyncThunk('users/restore', async (user: IUser, thunkAPI) => {
+  try {
+    const response = await HttpService.post(
+      '/system-user/activate',
+      { userId: user.id },
+      {
+        signal: thunkAPI.signal
+      }
+    )
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
 })
 export const startEditingUser = createAsyncThunk('users/editUser', async (userId: string, thunkAPI) => {
   try {
