@@ -24,7 +24,7 @@
     "allGroup": "Tất cả phòng ban",
     "password": "Mật khẩu",
     "titleConfirmResetPassword":"Đặt lại mật khẩu",
-    "descriptionConfirmResetPassword":"Bạn có chắc chắn đặt lại mật khẩu tài khoản '{{account}}'"
+    "descriptionConfirmResetPassword":"Xác nhận đặt lại mật khẩu tài khoản '{{account}}'"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
