@@ -10,6 +10,8 @@ import { IUser } from '~/types/user.interface'
 import { IGroup } from '../master-data/master-data.slice'
 import { IPayloadUpdateAttendance } from '~/types/attendance.interface'
 import { saveAs } from 'file-saver'
+import { employeeWorkingTimeRes } from './fake-data'
+
 export interface TimesheetStateInterface {
   loading: boolean
   groups: IGroup[]
@@ -17,6 +19,7 @@ export interface TimesheetStateInterface {
   userInGroup: IUser[]
   timesheetList: []
   meta: IPaging
+  empWorkingTime: any
 }
 
 const initialState: TimesheetStateInterface = {
@@ -25,7 +28,8 @@ const initialState: TimesheetStateInterface = {
   usersName: [],
   userInGroup: [],
   timesheetList: [],
-  meta: { page: 0, size: 10, total: 0, totalPage: 0 }
+  meta: { page: 0, size: 10, total: 0, totalPage: 0 },
+  empWorkingTime: {}
 }
 
 const getAllGroup = createAsyncThunk('org/group/groups', async (_, thunkAPI) => {
@@ -95,6 +99,18 @@ export const ExportExcel = createAsyncThunk('time-attendance/export-time-attenda
   } catch (error) {
     console.error('Lỗi khi tải xuống tệp Excel:', error)
   }
+})
+
+const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-working-time', async (_, thunkAPI) => {
+  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
+  //   signal: thunkAPI.signal
+  // })
+  const response = new Promise<any>((resolve, reject) => {
+    setTimeout(() => {
+      resolve(employeeWorkingTimeRes)
+    }, 100)
+  })
+  return await response
 })
 
 export const filterTimesheet = createAsyncThunk(
@@ -257,6 +273,9 @@ const timesheetSlice = createSlice({
         state.timesheetList = action.payload.data
         state.meta = action.payload.meta
       })
+      .addCase(getEmployeeWorkingTime.fulfilled, (state: TimesheetStateInterface, action) => {
+        state.empWorkingTime = action.payload.data
+      })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
         (state, _) => {
@@ -275,5 +294,5 @@ const timesheetSlice = createSlice({
   }
 })
 
-export { getAllGroup, getUserInGroup, getUsersName }
+export { getAllGroup, getUserInGroup, getUsersName, getEmployeeWorkingTime }
 export default timesheetSlice.reducer
