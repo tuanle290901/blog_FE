@@ -41,7 +41,8 @@
     "today": "Hôm nay",
     "thisMonth": "Tháng này",
     "lastMonth": "Tháng trước",
-    "showOnlyViolateDate": "Chỉ hiển thị ngày vi phạm chưa có phép",
+    "onlyShowViolateDate": "Chỉ hiển thị ngày vi phạm chưa có phép",
+    "onlyShowWorkingDay": "Chỉ hiển thị ngày làm việc",
     "bout": "lượt",
     "noData": "Không có dữ liệu"
   }
