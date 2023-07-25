@@ -6,9 +6,13 @@ import { RuleObject } from 'antd/lib/form'
 import { AxiosResponse, HttpStatusCode } from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
+import { PUBLIC_PATH } from '~/constants/public-routes'
 import { REGEX_PASSWORD } from '~/constants/regex.constant'
+import { logout } from '~/stores/features/auth/auth.slice'
+import { useAppDispatch } from '~/stores/hook'
 import { ErrorResponse } from '~/types/error-response.interface'
 
 interface IChangePassword {
@@ -25,6 +29,9 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
     message: ''
   })
 
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
   const onCancel = async () => {
     await handClose()
     form.resetFields()
@@ -32,6 +39,11 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
       status: 0,
       message: ''
     })
+  }
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate(`auth/${PUBLIC_PATH.login}`)
   }
 
   const onSave = async () => {
@@ -50,6 +62,7 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
         if (response.status === HttpStatusCode.Ok) {
           notification.success({ message: response?.data?.message || t('changePassword.changePasswordSuccessfully') })
           await handClose()
+          handleLogout()
           setServerError({
             status: 0,
             message: ''
