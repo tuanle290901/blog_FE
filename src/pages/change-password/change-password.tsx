@@ -99,7 +99,7 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
             }
           ]}
         >
-          <Input.Password placeholder={t('changePassword.inviteToEnterOldPassword')} maxLength={20} minLength={5} />
+          <Input.Password placeholder={t('changePassword.inviteToEnterOldPassword')} maxLength={20} minLength={0} />
         </Form.Item>
         <Form.Item
           label={<div className='tw-font-semibold'>{t('changePassword.newPassword')}</div>}
