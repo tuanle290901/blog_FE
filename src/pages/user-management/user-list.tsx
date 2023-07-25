@@ -1,13 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, notification, Select, Table, TablePaginationConfig } from 'antd'
-import { EditOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
+import { Button, Input, notification, Popconfirm, Select, Table, TablePaginationConfig } from 'antd'
+import { EditOutlined, ReloadOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
 import defaultImg from '~/assets/images/default-img.png'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { cancelEditingUser, importUser, searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import {
+  cancelEditingUser,
+  importUser,
+  searchUser,
+  startEditingUser,
+  startResetPassworkUser
+} from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
@@ -72,6 +78,10 @@ const UserList: React.FC = () => {
   const handleClickEditUser = async (user: IUser) => {
     //   TODO
     await dispatch(startEditingUser(user.id as string))
+  }
+
+  const handleClickResetPassworkUser = async (user: IUser) => {
+    await dispatch(startResetPassworkUser({ userId: user.id as string }))
   }
   const handleClickDeleteUser = (user: IUser) => {
     //   TODO
@@ -215,6 +225,21 @@ const UserList: React.FC = () => {
                 onClick={() => handleClickEditUser(record)}
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
+              <Popconfirm
+                title={t('userList.titleConfirmResetPassword')}
+                description={t('userList.descriptionConfirmResetPassword', {
+                  account: record.fullName
+                })}
+                onConfirm={() => handleClickResetPassworkUser(record)}
+                okText={t('common.confirm')}
+                cancelText={t('common.cancel')}
+              >
+                <Button
+                  size='small'
+                  // onClick={() => handleClickResetPassworkUser(record)}
+                  icon={<ReloadOutlined className='tw-text-blue-600' />}
+                />
+              </Popconfirm>
               {/*<Button*/}
               {/*  size='small'*/}
               {/*  onClick={() => handleClickDeleteUser(record)}*/}

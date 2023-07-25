@@ -154,6 +154,22 @@ export const startEditingUser = createAsyncThunk('users/editUser', async (userId
     throw error
   }
 })
+export const startResetPassworkUser = createAsyncThunk(
+  'users/resetPassworkUser',
+  async (body: { userId: string }, thunkAPI) => {
+    try {
+      const response: IApiResponse<IUser> = await HttpService.post(`/system-user/admin-reset-password`, body, {
+        signal: thunkAPI.signal
+      })
+      return response.data
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
+    }
+  }
+)
 export const importUser = createAsyncThunk('users/importUser', async (payload: File, thunkAPI) => {
   try {
     const form = new FormData()

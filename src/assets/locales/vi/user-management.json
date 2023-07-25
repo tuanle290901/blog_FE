@@ -22,7 +22,9 @@
     "commonInfo": "Thông tin chung",
     "workInfo": "Thông tin làm việc",
     "allGroup": "Tất cả phòng ban",
-    "password": "Mật khẩu"
+    "password": "Mật khẩu",
+    "titleConfirmResetPassword":"Đặt lại mật khẩu",
+    "descriptionConfirmResetPassword":"Bạn có chắc chắn đặt lại mật khẩu tài khoản '{{account}}'"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
