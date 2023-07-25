@@ -9,7 +9,7 @@ import { getBase64 } from '~/utils/util.ts'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
-import { EDIT_TYPE, GENDER, ROLE } from '~/constants/app.constant.ts'
+import { EDIT_TYPE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
@@ -227,10 +227,14 @@ const UserCreateEdit: React.FC<{
       onCancel={() => finishAndClose(false)}
       footer={
         <div className={'tw-flex tw-justify-end'}>
-          <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
-          <Button type='primary' onClick={handleSubmit} loading={loading}>
-            {t('common.save')}
-          </Button>
+          {(userData?.status !== USER_STATUS.DEACTIVE || !userData) && (
+            <>
+              <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
+              <Button type='primary' onClick={handleSubmit} loading={loading}>
+                {t('common.save')}
+              </Button>
+            </>
+          )}
         </div>
       }
       maskClosable={false}
@@ -259,7 +263,11 @@ const UserCreateEdit: React.FC<{
           </Upload>
           <div className='tw-h-auto'>
             <div className='tw-flex tw-gap-2'>
-              <Button onClick={handleClickButtonUpdateAvatar} type='primary'>
+              <Button
+                disabled={userData?.status === USER_STATUS.DEACTIVE}
+                onClick={handleClickButtonUpdateAvatar}
+                type='primary'
+              >
                 {t(avatarBase64 ? 'userModal.updateAvatar' : 'userModal.chooseAvatar')}
               </Button>
               {/*<Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>*/}
@@ -302,14 +310,21 @@ const UserCreateEdit: React.FC<{
                     }
                   ]}
                 >
-                  <Input placeholder={t('userModal.enterMemberName')} />
+                  <Input
+                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    placeholder={t('userModal.enterMemberName')}
+                  />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
                   {/*<Select placeholder={t('userModal.selectGender')}>*/}
                   {/*  <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>*/}
                   {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
                   {/*</Select>*/}
-                  <Radio.Group name='genderType' className='tw-w-full'>
+                  <Radio.Group
+                    name='genderType'
+                    className='tw-w-full'
+                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                  >
                     <div className='tw-flex tw-gap-32 tw-border tw-border-gray-300 tw-border-solid  tw-bg-white tw-py-1 tw-px-2 tw-rounded-md'>
                       <Radio value={GENDER.MALE}>{t('userList.male')}</Radio>
                       <Radio value={GENDER.FEMALE}>{t('userList.female')}</Radio>
@@ -319,6 +334,7 @@ const UserCreateEdit: React.FC<{
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
                     format='DD/MM/YYYY'
+                    disabled={userData?.status === USER_STATUS.DEACTIVE}
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
@@ -338,7 +354,10 @@ const UserCreateEdit: React.FC<{
                     }
                   ]}
                 >
-                  <Input placeholder={t('userModal.enterPhoneNumber')} />
+                  <Input
+                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    placeholder={t('userModal.enterPhoneNumber')}
+                  />
                 </Form.Item>
                 <Form.Item
                   style={{ marginBottom: 24 }}
@@ -350,10 +369,13 @@ const UserCreateEdit: React.FC<{
                     }
                   ]}
                 >
-                  <Input placeholder={t('userModal.enterEmail')} />
+                  <Input disabled={userData?.status === USER_STATUS.DEACTIVE} placeholder={t('userModal.enterEmail')} />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.address')} name='address'>
-                  <Input placeholder={t('userModal.enterAddress')} />
+                  <Input
+                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    placeholder={t('userModal.enterAddress')}
+                  />
                 </Form.Item>
                 {/*{!userData && (*/}
                 {/*  <Form.Item*/}
@@ -384,7 +406,9 @@ const UserCreateEdit: React.FC<{
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
-                    disabled={!!userData && userData.editType === EDIT_TYPE.SELF}
+                    disabled={
+                      (!!userData && userData.editType === EDIT_TYPE.SELF) || userData?.status === USER_STATUS.DEACTIVE
+                    }
                     showToday={false}
                     className='tw-w-full'
                     placeholder={t('userModal.enterDateJoin')}
@@ -411,7 +435,9 @@ const UserCreateEdit: React.FC<{
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
-                    disabled={!!userData && userData.editType === EDIT_TYPE.SELF}
+                    disabled={
+                      (!!userData && userData.editType === EDIT_TYPE.SELF) || userData?.status === USER_STATUS.DEACTIVE
+                    }
                     showToday={false}
                     className='tw-w-full'
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
@@ -437,7 +463,7 @@ const UserCreateEdit: React.FC<{
                             rules={[{ required: true, message: t('userModal.errorMessage.groupEmpty') }]}
                           >
                             <Select
-                              disabled={!hasPermissionAddAndChangeRole()}
+                              disabled={!hasPermissionAddAndChangeRole() || userData?.status === USER_STATUS.DEACTIVE}
                               options={groupOptions}
                               placeholder={t('userModal.selectDepartment')}
                             ></Select>
@@ -451,7 +477,7 @@ const UserCreateEdit: React.FC<{
                               rules={[{ required: true, message: t('userModal.errorMessage.titleEmpty') }]}
                             >
                               <Select
-                                disabled={!hasPermissionAddAndChangeRole()}
+                                disabled={!hasPermissionAddAndChangeRole() || userData?.status === USER_STATUS.DEACTIVE}
                                 options={titleOptions}
                                 placeholder={t('userModal.selectPosition')}
                               ></Select>
@@ -464,7 +490,7 @@ const UserCreateEdit: React.FC<{
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}
                             >
                               <Select
-                                disabled={!hasPermissionAddAndChangeRole()}
+                                disabled={!hasPermissionAddAndChangeRole() || userData?.status === USER_STATUS.DEACTIVE}
                                 options={roleOptions}
                                 placeholder={t('userModal.selectFunction')}
                               ></Select>
@@ -473,7 +499,7 @@ const UserCreateEdit: React.FC<{
                         </div>
                       ))}
                       <Form.Item>
-                        {hasPermissionAddAndChangeRole() && (
+                        {hasPermissionAddAndChangeRole() && userData?.status !== USER_STATUS.DEACTIVE && (
                           <Button
                             type='dashed'
                             onClick={() => add({ role: ROLE.OFFICER })}
