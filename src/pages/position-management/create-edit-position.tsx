@@ -40,10 +40,10 @@ const CreateEditPosition: React.FC<{
       const value = form.getFieldsValue()
       if (!position?.id) {
         await dispatch(createPosition(value))
-        notification.success({ message: 'Tạo mới chức vụ thành công' })
+        notification.success({ message: t('position.message.createPositionSuccess') })
       } else {
         await dispatch(updatePosition({ ...value, id: position.id }))
-        notification.success({ message: 'Cập nhật chức vụ thành công' })
+        notification.success({ message: t('position.message.createPositionSuccess') })
       }
       finishAndClose(true)
     } catch (e) {
@@ -62,7 +62,6 @@ const CreateEditPosition: React.FC<{
   return (
     <Modal
       open={open}
-      title={!editAble && position ? 'Thông tin chức vụ' : position ? 'Cập nhật chức vụ' : 'Thêm chức vụ'}
       onCancel={() => finishAndClose(false)}
       footer={
         editAble && (
@@ -81,19 +80,19 @@ const CreateEditPosition: React.FC<{
       <Form form={form} layout='vertical'>
         <FormItem
           name='nameTitle'
-          label='Tên chức vụ'
+          label={t('position.positionName')}
           required
           rules={[
             {
               required: true,
-              message: 'Trường chức vụ không được để trống'
+              message: t('position.message.positionEmpty')
             }
           ]}
         >
-          <Input disabled={!editAble} placeholder={'Nhập tên chúc vụ'} />
+          <Input disabled={!editAble} placeholder={t('position.message.enterPositionName')} />
         </FormItem>
-        <FormItem name='description' label='Mô tả'>
-          <TextArea disabled={!editAble} placeholder={'Mô tả cho chức vụ'} />
+        <FormItem name='description' label={t('position.description')}>
+          <TextArea disabled={!editAble} placeholder={t('position.message.enterDescription')} />
         </FormItem>
       </Form>
     </Modal>
