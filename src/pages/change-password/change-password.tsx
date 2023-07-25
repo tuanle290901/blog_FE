@@ -123,7 +123,6 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
               })
             }}
             onChange={() => {
-              console.log('ââ')
               setServerError({
                 message: '',
                 status: 0
