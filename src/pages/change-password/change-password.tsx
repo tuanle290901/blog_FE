@@ -41,20 +41,21 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
         notification.warning({
           message: t('changePassword.twoPasswordsDoNotMatch')
         })
-      }
-      let payload = {
-        newPassword,
-        oldPassword
-      }
-      const response: AxiosResponse<any, any> = await HttpService.post(END_POINT_API.Users.changePassword(), payload)
-      if (response.status === HttpStatusCode.Ok) {
-        notification.success({ message: response?.data?.message || t('changePassword.changePasswordSuccessfully') })
-        await handClose()
-        setServerError({
-          status: 0,
-          message: ''
-        })
-        form.resetFields()
+      } else {
+        let payload = {
+          newPassword,
+          oldPassword
+        }
+        const response: AxiosResponse<any, any> = await HttpService.post(END_POINT_API.Users.changePassword(), payload)
+        if (response.status === HttpStatusCode.Ok) {
+          notification.success({ message: response?.data?.message || t('changePassword.changePasswordSuccessfully') })
+          await handClose()
+          setServerError({
+            status: 0,
+            message: ''
+          })
+          form.resetFields()
+        }
       }
     } catch (error: any) {
       const response = error.response.data as ErrorResponse
