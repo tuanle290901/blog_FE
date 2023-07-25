@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Input, notification, Popconfirm, Table, TablePaginationConfig } from 'antd'
-import { DeleteOutlined, EditOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
 import { IUser } from '~/types/user.interface.ts'
@@ -55,7 +55,7 @@ const PositionList: React.FC = () => {
   }
   const handleClickDeletePosition = async (position: IPosition) => {
     await dispatch(deletePosition(position))
-    notification.success({ message: 'Xóa chức vụ thành công' })
+    notification.success({ message: t('position.message.deleteSuccess') })
     dispatch(
       searchPosition({
         paging: searchValue.paging,
@@ -74,7 +74,7 @@ const PositionList: React.FC = () => {
   }
   const columns: ColumnsType<IPosition> = [
     {
-      title: 'Tên chức vụ',
+      title: t('position.positionName'),
       dataIndex: 'nameTitle',
       key: 'nameTitle',
       sorter: true,
@@ -83,7 +83,7 @@ const PositionList: React.FC = () => {
       ellipsis: true
     },
     {
-      title: 'Mô tả',
+      title: t('position.description'),
       dataIndex: 'description',
       key: 'description',
       sorter: true,
@@ -92,7 +92,7 @@ const PositionList: React.FC = () => {
       ellipsis: true
     },
     {
-      title: 'Ngày tạo',
+      title: t('position.createdDate'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       sorter: true,
@@ -103,8 +103,7 @@ const PositionList: React.FC = () => {
       align: 'center',
       render: (text, record) => {
         if (text) {
-          const date = dayjs(text).format('DD/MM/YYYY')
-          return date
+          return dayjs(text).format('DD/MM/YYYY')
         }
       }
     },
@@ -126,7 +125,7 @@ const PositionList: React.FC = () => {
                 />
                 <Popconfirm
                   onConfirm={() => handleClickDeletePosition(record)}
-                  title={'Bạn có muốn xóa chức vụ'}
+                  title={t('position.message.warnDelete')}
                   cancelText={t('common.cancel')}
                   okText={t('common.yes')}
                 >
@@ -212,19 +211,21 @@ const PositionList: React.FC = () => {
         handleClose={handleCloseUserModal}
       />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>Chức vụ({positionState.meta.total})</h1>
-        <h5 className='tw-text-sm'>Danh sách chức vụ sử dụng trong hệ thống</h5>
+        <h1 className='tw-text-3xl tw-font-semibold'>
+          {t('position.position')}({positionState.meta.total})
+        </h1>
+        <h5 className='tw-text-sm'>{t('position.list')}</h5>
       </div>
       <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
         {hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
           <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
-            Thêm chức vụ
+            {t('position.createPosition')}
           </Button>
         )}
 
         <div className='tw-flex tw-gap-4 tw-flex-1 tw-justify-end'>
           <Search
-            placeholder={'Tìm kiếm chức vụ'}
+            placeholder={t('position.search')}
             onChange={(event) => handleSearchValueChange(event.target.value)}
             className='tw-w-64'
           />
@@ -236,7 +237,12 @@ const PositionList: React.FC = () => {
           columns={columns}
           dataSource={positionState.positionList}
           loading={positionState.loading}
-          pagination={{ total: positionState.meta.total, showSizeChanger: true, showQuickJumper: true }}
+          pagination={{
+            total: positionState.meta.total,
+            pageSizeOptions: [5, 10, 25, 50],
+            showSizeChanger: true,
+            showQuickJumper: true
+          }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />
