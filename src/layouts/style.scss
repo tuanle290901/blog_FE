@@ -176,6 +176,7 @@
 
 .sidebar-custom {
   background: linear-gradient(to bottom, #156deb, #5220a1) !important;
+  position: relative;
 
   .menu-top {
     height: 90vh;
@@ -200,6 +201,9 @@
   }
 
   .menu-bottom {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
