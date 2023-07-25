@@ -7,7 +7,7 @@ import timesheetVI from './timesheet.json'
 import department from './department.json'
 import typesOfLeave from './types-of-leave.json'
 import changePassword from './change-password.json'
-
+import position from './position.json'
 export const vi = {
   ...common,
   ...initializeVI,
@@ -17,5 +17,6 @@ export const vi = {
   ...timesheetVI,
   ...department,
   ...typesOfLeave,
-  ...changePassword
+  ...changePassword,
+  ...position
 }
