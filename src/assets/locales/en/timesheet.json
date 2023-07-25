@@ -30,6 +30,7 @@
       "status": "Status",
       "note": "Note",
       "addNewNote": "Add Note",
+      "noteFromManager": "Note from manager",
       "time": "Time",
       "from": "From",
       "to": "To",

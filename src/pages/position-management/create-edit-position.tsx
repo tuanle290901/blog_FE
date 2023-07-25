@@ -90,7 +90,7 @@ const CreateEditPosition: React.FC<{
             }
           ]}
         >
-          <Input disabled={!editAble} placeholder={'Nhập tên chúc vụ'} />
+          <Input disabled={!editAble} placeholder={'Nhập tên chức vụ'} />
         </FormItem>
         <FormItem name='description' label='Mô tả'>
           <TextArea disabled={!editAble} placeholder={'Mô tả cho chức vụ'} />

@@ -155,11 +155,26 @@
     }
   }
 
-  &-filter {
+  &-detail {
     background: #fff;
     padding: 20px;
+  }
 
+  &-filter {
+    &__title {
+      font-weight: bold;
+    }
+    &__export {
+      background: #ffbc25;
+      margin-left: 15px;
+      ~ .ant-btn-default:hover {
+        color: #ffbc25 !important;
+      }
+    }
     &-time {
+      align-items: center;
+      border-bottom: 1px solid grey;
+      padding-bottom: 12px;
       &__button {
         display: flex;
         padding: 10px;
@@ -172,20 +187,6 @@
           :hover {
             color: #fff !important;
           }
-        }
-      }
-    }
-
-    &-tab {
-      text-align: right;
-
-      .ant-segmented-item {
-        text-transform: uppercase;
-
-        &-selected {
-          border: solid 1px #1890ff;
-          color: #1890ff;
-          background: #e6f7ff;
         }
       }
     }
@@ -235,10 +236,20 @@
   .ant-table-thead {
     th {
       text-align: center !important;
+      text-transform: uppercase;
     }
   }
 }
 
 .timesheet .ant-picker-calendar-header {
+  display: none;
+}
+
+.timesheet-chart-container {
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 10px;
+}
+
+.apexcharts-zoom-icon {
   display: none;
 }
