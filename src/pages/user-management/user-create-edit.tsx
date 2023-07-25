@@ -200,7 +200,7 @@ const UserCreateEdit: React.FC<{
   }
   const phoneNumberValidator = (rule: RuleObject | any, value: any) => {
     if (!value) {
-      return Promise.reject(t('userModal.errorMessage.phoneNumberEmpty'))
+      return Promise.resolve(true)
     }
     if (!REGEX_PHONE_NUMBER.test(value)) {
       return Promise.reject(t('userModal.errorMessage.invalidPhoneNumber'))
@@ -346,7 +346,6 @@ const UserCreateEdit: React.FC<{
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.phoneNumber')}
-                  required
                   name='phoneNumber'
                   rules={[
                     {

@@ -41,7 +41,8 @@
       "today": "Today",
       "thisMonth": "This month",
       "lastMonth": "Last Month",
-      "showOnlyViolateDate": "Show only the date of violation without permission",
+      "onlyShowViolateDate": "Only show the date of violation without permission",
+      "onlyShowWorkingDay": "Only show working day",
       "bout": "bout",
       "noData": "No data"
     }
