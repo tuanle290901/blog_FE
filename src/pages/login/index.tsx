@@ -94,12 +94,17 @@ const Index: React.FC = () => {
             <Input.Password placeholder='Mật khẩu' className='login-input-custom' maxLength={32} />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
+          {/* <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
             <div className='tw-text-end tw-text-sky-500'>{t('auth.forgotPassword')}</div>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item wrapperCol={{ xs: 24, md: { span: 16, offset: 4 } }}>
-            <Button className='login-button tw-w-full' type='primary' htmlType='submit' loading={loginState.loading}>
+            <Button
+              className='login-button tw-w-full tw-mt-4'
+              type='primary'
+              htmlType='submit'
+              loading={loginState.loading}
+            >
               {t('auth.login')}
             </Button>
           </Form.Item>
