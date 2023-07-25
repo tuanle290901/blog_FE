@@ -542,7 +542,7 @@ const Timesheet: React.FC = () => {
 
   return (
     <Row className='timesheet tw-p-2'>
-      <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
+      {/* <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
         {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
           <div className='tw-w-1/2 tw-pt-2 '>
             <div className='tw-font-semibold'>Trung bình Giờ đến</div>
@@ -564,7 +564,7 @@ const Timesheet: React.FC = () => {
             />
           </div>
         )}
-      </div>
+      </div> */}
       {/* <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
