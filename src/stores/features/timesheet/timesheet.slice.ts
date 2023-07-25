@@ -208,12 +208,12 @@ export const filterTimesheet = createAsyncThunk(
                 children: [
                   {
                     field: 'full_name',
-                    operator: 'LIKE_IGNORE_CASE',
+                    operator: 'LIKE',
                     value: params.query
                   },
                   {
                     field: 'user_name',
-                    operator: 'LIKE_IGNORE_CASE',
+                    operator: 'LIKE',
                     value: params.query
                   }
                 ]
