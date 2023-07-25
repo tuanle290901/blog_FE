@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import {
   filterTimesheet,
   getAllGroup,
+  getEmployeeWorkingTime,
   getUserInGroup,
   updateAttendanceStatistic
 } from '~/stores/features/timesheet/timesheet.slice'
@@ -30,6 +31,7 @@ import { IUser } from '~/types/user.interface'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
 import TimesheetChart from './component/TimesheetChart'
+import { IEmployeeWorkingTime } from '~/types/timesheet'
 
 const Timesheet: React.FC = () => {
   const { Search } = Input
@@ -61,6 +63,9 @@ const Timesheet: React.FC = () => {
   const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
     return { value: item?.code, label: item?.name }
   })
+
+  const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
+  const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
 
   const [searchValue, setSearchValue] = useState<{
     query: string
@@ -463,6 +468,7 @@ const Timesheet: React.FC = () => {
   }
 
   useEffect(() => {
+    dispatch(getEmployeeWorkingTime())
     const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
@@ -479,6 +485,10 @@ const Timesheet: React.FC = () => {
       promiseFilterTypesOfLeave.abort()
     }
   }, [])
+
+  useEffect(() => {
+    setChartData(emplWorkingTime)
+  }, [emplWorkingTime])
 
   useEffect(() => {
     const promise = dispatch(getUserInGroup(selectedGroup))
@@ -529,16 +539,25 @@ const Timesheet: React.FC = () => {
       ]
     }
   ]
+
   return (
     <Row className='timesheet tw-p-2'>
       <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
         <div className='tw-w-1/2 tw-pt-2 '>
           <div className='tw-font-semibold'>Trung bình Giờ đến</div>
-          <TimesheetChart categories={[]} seriesData={[]} seriesTitle='Thời gian đi làm' />
+          <TimesheetChart
+            categories={chartData?.arrivalTime?.workingDate ?? []}
+            seriesData={chartData?.arrivalTime?.workingHour ?? []}
+            seriesTitle='Thời gian đi làm'
+          />
         </div>
         <div className='tw-w-1/2 tw-pt-2'>
           <div className='tw-font-semibold'>Trung bình Giờ về</div>
-          <TimesheetChart categories={[]} seriesData={[]} seriesTitle='Thời gian về' />
+          <TimesheetChart
+            categories={chartData?.offTime?.workingDate ?? []}
+            seriesData={chartData?.offTime?.workingHour ?? []}
+            seriesTitle='Thời gian về'
+          />
         </div>
       </div>
       {/* <Col xs={24} xl={6} xxl={4}>
