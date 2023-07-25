@@ -22,6 +22,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
+import TimesheetChart from './component/TimesheetChart'
 
 const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -481,7 +482,17 @@ const Timesheet: React.FC = () => {
     }
   ]
   return (
-    <Row className='timesheet tw-p-5'>
+    <Row className='timesheet tw-p-2'>
+      <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
+        <div className='tw-w-1/2 tw-pt-2 '>
+          <div className='tw-font-semibold'>Trung bình Giờ đến</div>
+          <TimesheetChart categories={[]} seriesData={[]} seriesTitle='Thời gian đi làm' />
+        </div>
+        <div className='tw-w-1/2 tw-pt-2'>
+          <div className='tw-font-semibold'>Trung bình Giờ về</div>
+          <TimesheetChart categories={[]} seriesData={[]} seriesTitle='Thời gian về' />
+        </div>
+      </div>
       {/* <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
