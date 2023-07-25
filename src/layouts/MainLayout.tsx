@@ -215,7 +215,7 @@ const MainLayout: React.FC = () => {
         <div className='menu-bottom'>
           <div className='bottom-main-text'>Employee Management System</div>
           <div>
-            <span className='bottom-extra-text tw-mr-2'>Powed by</span>
+            <span className='bottom-extra-text tw-mr-2'>Powered by</span>
             <span className='bottom-main-text tw-font-bold'>HTSC</span>
           </div>
         </div>
