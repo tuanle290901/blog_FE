@@ -303,32 +303,32 @@ const Department: React.FC = () => {
       }
     ]
 
-    if (hasPermissionAndGroup([ROLE.MANAGER, ROLE.SUB_MANAGER], userInfo?.groupProfiles, dataRender.listDataTitle)) {
-      dataRenderColumns.push({
-        title: () => {
-          return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
-        },
-        key: 'actions',
-        align: 'center',
-        width: '120px',
-        render: (text: string, record: DataType) => (
-          <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
-            <Button
-              size='small'
-              onClick={() => {
-                setShowModal({
-                  openModal: true,
-                  type: ACTION_TYPE.View,
-                  data: record,
-                  dataParent: dataRender.listDataTitle
-                })
-              }}
-              icon={<UserOutlined className='tw-text-orange-600' />}
-            />
-          </Tooltip>
-        )
-      })
-    }
+    // if (hasPermissionAndGroup([ROLE.MANAGER, ROLE.SUB_MANAGER], userInfo?.groupProfiles, dataRender.listDataTitle)) {
+    //   dataRenderColumns.push({
+    //     title: () => {
+    //       return <div className='tw-text-center'>{`${t('department.actions')}`}</div>
+    //     },
+    //     key: 'actions',
+    //     align: 'center',
+    //     width: '120px',
+    //     render: (text: string, record: DataType) => (
+    //       <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
+    //         <Button
+    //           size='small'
+    //           onClick={() => {
+    //             setShowModal({
+    //               openModal: true,
+    //               type: ACTION_TYPE.View,
+    //               data: record,
+    //               dataParent: dataRender.listDataTitle
+    //             })
+    //           }}
+    //           icon={<UserOutlined className='tw-text-orange-600' />}
+    //         />
+    //       </Tooltip>
+    //     )
+    //   })
+    // }
 
     if (hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle)) {
       dataRenderColumns.push({
@@ -354,7 +354,7 @@ const Department: React.FC = () => {
                 icon={<EditOutlined className='tw-text-blue-600' />}
               />
             </Tooltip>
-            <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
+            {/* <Tooltip placement='topLeft' title={t('department.tooltip.mmenber')}>
               <Button
                 size='small'
                 onClick={() => {
@@ -367,7 +367,7 @@ const Department: React.FC = () => {
                 }}
                 icon={<UserOutlined className='tw-text-orange-600' />}
               />
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip placement='topLeft' title={t('department.tooltip.delete')}>
               <Button
                 size='small'
