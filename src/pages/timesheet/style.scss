@@ -155,11 +155,26 @@
     }
   }
 
-  &-filter {
+  &-detail {
     background: #fff;
     padding: 20px;
+  }
 
+  &-filter {
+    &__title {
+      font-weight: bold;
+    }
+    &__export {
+      background: #ffbc25;
+      margin-left: 15px;
+      ~ .ant-btn-default:hover {
+        color: #ffbc25 !important;
+      }
+    }
     &-time {
+      align-items: center;
+      border-bottom: 1px solid grey;
+      padding-bottom: 12px;
       &__button {
         display: flex;
         padding: 10px;
@@ -172,20 +187,6 @@
           :hover {
             color: #fff !important;
           }
-        }
-      }
-    }
-
-    &-tab {
-      text-align: right;
-
-      .ant-segmented-item {
-        text-transform: uppercase;
-
-        &-selected {
-          border: solid 1px #1890ff;
-          color: #1890ff;
-          background: #e6f7ff;
         }
       }
     }
@@ -217,8 +218,8 @@
       background: #f5222d;
       color: #fff;
       padding: 0 5px;
-      margin: 0 5px 6px;
-      min-width: 90px;
+      margin: 0 5px 6px 0;
+      min-width: 115px;
       &--early {
         background: orange;
       }
@@ -226,11 +227,16 @@
         background: #1890ff;
       }
     }
+    &__checkbox span {
+      width: 22px;
+      height: 22px;
+    }
   }
 
   .ant-table-thead {
     th {
       text-align: center !important;
+      text-transform: uppercase;
     }
   }
 }

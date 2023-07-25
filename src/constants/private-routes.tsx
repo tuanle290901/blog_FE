@@ -47,9 +47,9 @@ export const PRIVATE_PATH = {
 
 export const PRIVATE_ROUTES: IRoutes[] = [
   {
-    name: 'dashboard',
+    name: '',
     path: PRIVATE_PATH.home,
-    component: Dashboard,
+    component: Timesheet,
     allowedRoles: []
   },
   {
