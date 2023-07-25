@@ -108,8 +108,16 @@ const MainLayout: React.FC = () => {
       group?: any
     ) => {
       const hasRole = hasPermission(roles, userInfo?.groupProfiles)
-      if (!hasRole) return null
-      return getItem(title, key, icon, subMenu, group)
+      if (hasRole) return getItem(title, key, icon, subMenu, group)
+      const isHrManager = userInfo?.groupProfiles.find(
+        (item) => item.groupCode === ROLE.HR && (item.role === ROLE.MANAGER || item.role === ROLE.SUB_MANAGER)
+      )
+      if (key === 'report') {
+        if (isHrManager) {
+          return getItem(title, key, icon, subMenu, group)
+        }
+      }
+      return null
     }
 
     return [
@@ -140,7 +148,7 @@ const MainLayout: React.FC = () => {
       ),
 
       getItemIfAllowed(
-        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER],
+        [ROLE.SYSTEM_ADMIN],
         'Báo cáo',
         'report',
         <img src={menuIconReport} alt='' className='menu-image' />

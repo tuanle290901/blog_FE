@@ -54,7 +54,32 @@ const TimesheetChartForAdmin: React.FC<{ data: IAttendance[] }> = ({ data }) => 
 
   const formatData = (data: any) => {
     const newData = []
-    const categories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
+    const categories = [
+      'Tuần 1',
+      'Tuần 2',
+      'Tuần 4',
+      'Tuần 3',
+      'Tuần 5',
+      'Tuần 6',
+      'Tuần 7',
+      'Tuần 8',
+      'Tuần 9',
+      'Tuần 10',
+      'Tuần 11',
+      'Tuần 12',
+      'Tuần 13',
+      'Tuần 14',
+      'Tuần 15',
+      'Tuần 16',
+      'Tuần 17',
+      'Tuần 18',
+      'Tuần 19',
+      'Tuần 20',
+      'Tuần 21',
+      'Tuần 22',
+      'Tuần 23',
+      'Tuần 24'
+    ]
 
     for (let i = 0; i < categories.length; i++) {
       newData.push({
@@ -67,24 +92,32 @@ const TimesheetChartForAdmin: React.FC<{ data: IAttendance[] }> = ({ data }) => 
 
   const serie = [
     {
-      name: 'T2',
-      data: formatData([0, 2, 3, 0, 2, 3, 0, 6, 8, 5, 0, 9, 6, 8, 5, 0, 9])
+      name: 'Thứ 2',
+      data: formatData([0, 2, 3, 0, 2, 3, 0, 6, 8, 3, 0, 6, 8, 5, 0, 9, 5, 0, 9, 6, 8, 5, 0, 9])
     },
     {
-      name: 'T3',
-      data: formatData([4, 5, 7, 8, 0, 8, 0, 2, 3, 0, 6, 8, 5, 0, 9, 6, 8])
+      name: 'Thứ 3',
+      data: formatData([4, 5, 7, 8, 0, 8, 0, 2, 3, 0, 6, 8, 5, 0, 9, 6, 8, 6, 8, 3, 0, 6, 8, 5])
     },
     {
-      name: 'T4',
-      data: formatData([0, 2, 6, 8, 2, 3, 0, 6, 8, 5, 0, 9, 7, 6, 1, 0, 0])
+      name: 'Thứ 4',
+      data: formatData([0, 2, 6, 8, 2, 3, 6, 8, 3, 0, 6, 8, 5, 0, 6, 8, 5, 0, 9, 7, 6, 1, 0, 0])
     },
     {
-      name: 'T5',
-      data: formatData([0, 5, 2, 3, 0, 6, 8, 5, 0, 9, 8, 8, 7, 6, 3, 5, 7])
+      name: 'Thứ 5',
+      data: formatData([0, 5, 2, 3, 0, 6, 8, 5, 0, 9, 6, 8, 3, 0, 6, 8, 5, 8, 8, 7, 6, 3, 5, 7])
     },
     {
-      name: 'T6',
-      data: formatData([0, 5, 0, 7, 2, 3, 0, 6, 8, 5, 0, 9, 8, 8, 5, 9, 0])
+      name: 'Thứ 6',
+      data: formatData([0, 5, 0, 7, 2, 3, 0, 6, 8, 5, 6, 8, 3, 0, 6, 8, 5, 0, 9, 8, 8, 5, 9, 0])
+    },
+    {
+      name: 'Thứ 7',
+      data: formatData([0, 5, 0, 7, 2, 3, 0, 6, 8, 3, 0, 6, 8, 5, 6, 8, 5, 0, 9, 8, 8, 5, 9, 0])
+    },
+    {
+      name: 'CN',
+      data: formatData([0, 0, 0, 0, 0, 0, 0, 6, 8, 3, 0, 6, 8, 5, 0, 0, 5, 0, 0, 0, 0, 5, 9, 0])
     }
   ]
 

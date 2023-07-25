@@ -304,7 +304,7 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('fullName')
     },
     {
-      title: t('Mã'),
+      title: t('Mã chấm công'),
       dataIndex: 'userName',
       key: 'userName',
       ellipsis: true,
@@ -335,7 +335,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return reportData ? renderStatusByWorkingAmount(reportData?.workingAmount) : ''
+        return reportData?.noneWorkingDay ? '' : renderStatusByWorkingAmount(reportData?.workingAmount)
       }
     },
     {
@@ -392,10 +392,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder(''),
-      width: '150px',
-      render: (text) => {
-        return `h`
-      }
+      width: '150px'
     },
     {
       title: t('Công nghỉ'),
@@ -403,7 +400,9 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '170px',
       render: (reportData, record) => {
-        return !isAllowedAccess
+        return reportData?.noneWorkingDay
+          ? ''
+          : !isAllowedAccess
           ? renderTypesOfLeaveName(reportData?.absenceType)
           : reportData?.workingAmount < 1 && (
               <Select
@@ -425,7 +424,9 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '200px',
       render: (record) => {
-        return !isAllowedAccess ? (
+        return record?.reportData?.noneWorkingDay ? (
+          ''
+        ) : !isAllowedAccess ? (
           record?.reportData?.note
         ) : (
           <Input
@@ -542,29 +543,31 @@ const Timesheet: React.FC = () => {
 
   return (
     <Row className='timesheet tw-p-2'>
-      <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
-        {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
-          <div className='tw-w-1/2 tw-pt-2 '>
-            <div className='tw-font-semibold'>Trung bình Giờ đến</div>
-            <TimesheetChart
-              categories={chartData?.arrivalTime?.workingDate ?? []}
-              seriesData={chartData?.arrivalTime?.workingHour ?? []}
-              seriesTitle='Thời gian đi làm'
-            />
-          </div>
-        )}
+      {/* {isAllowedAccess && (
+        <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
+          {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
+            <div className='tw-w-1/2 tw-pt-2 '>
+              <div className='tw-font-semibold'>Trung bình Giờ đến</div>
+              <TimesheetChart
+                categories={chartData?.arrivalTime?.workingDate ?? []}
+                seriesData={chartData?.arrivalTime?.workingHour ?? []}
+                seriesTitle='Thời gian đi làm'
+              />
+            </div>
+          )}
 
-        {chartData?.offTime && chartData?.offTime?.workingDate?.length > 0 && (
-          <div className='tw-w-1/2 tw-pt-2'>
-            <div className='tw-font-semibold'>Trung bình Giờ về</div>
-            <TimesheetChart
-              categories={chartData?.offTime?.workingDate ?? []}
-              seriesData={chartData?.offTime?.workingHour ?? []}
-              seriesTitle='Thời gian về'
-            />
-          </div>
-        )}
-      </div>
+          {chartData?.offTime && chartData?.offTime?.workingDate?.length > 0 && (
+            <div className='tw-w-1/2 tw-pt-2'>
+              <div className='tw-font-semibold'>Trung bình Giờ về</div>
+              <TimesheetChart
+                categories={chartData?.offTime?.workingDate ?? []}
+                seriesData={chartData?.offTime?.workingHour ?? []}
+                seriesTitle='Thời gian về'
+              />
+            </div>
+          )}
+        </div>
+      )} */}
       {/* <Col xs={24} xl={6} xxl={4}>
         <TimesheetInfo
           data={timesheetSate.timesheetList}
@@ -576,7 +579,7 @@ const Timesheet: React.FC = () => {
       <Col xs={24} className='timesheet-detail'>
         {mode === 'list' && (
           <>
-            {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />}
+            {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
                 <Col xs={24} lg={8}>
@@ -663,7 +666,7 @@ const Timesheet: React.FC = () => {
                     value={query}
                     placeholder={'Tìm kiếm'}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
-                    className='tw-w-full tw-max-w-[300px] tw-mr-2'
+                    className='tw-w-full tw-max-w-[300px]'
                   />
                   {/* <Button icon={<MenuOutlined />} type='default'>
                     Lọc
@@ -678,13 +681,14 @@ const Timesheet: React.FC = () => {
                 </Button>
               </div>
             )}
-            <div className='tw-mt-4'>
+            <div className='timesheet-table'>
               <Table
                 rowKey='id'
                 columns={columns}
                 dataSource={timesheetSate.timesheetList}
                 loading={timesheetSate.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+                rowClassName={(record: IAttendance) => (record.reportData.noneWorkingDay ? 'dayoff' : '')}
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
                 pagination={{
                   className: 'd-flex justify-content-end align-items-center',
@@ -706,7 +710,9 @@ const Timesheet: React.FC = () => {
                   position: ['bottomRight']
                 }}
               />
-              {/* <Checkbox onChange={() => void {}}>{t('timesheet.showOnlyViolateDate')}</Checkbox> */}
+              <Checkbox className='timesheet-table__checkbox' onChange={() => void {}}>
+                {t('timesheet.onlyShowWorkingDay')}
+              </Checkbox>
             </div>
           </>
         )}

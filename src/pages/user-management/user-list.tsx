@@ -6,7 +6,8 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
-  UndoOutlined
+  UndoOutlined,
+  SyncOutlined
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
@@ -20,7 +21,8 @@ import {
   importUser,
   restoreUser,
   searchUser,
-  startEditingUser
+  startEditingUser,
+  startResetPassworkUser
 } from '~/stores/features/user/user.slice.ts'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
@@ -143,7 +145,14 @@ const UserList: React.FC = () => {
       return null
     }
   }
-
+  const handleClickResetPasswordUser = async (user: IUser) => {
+    try {
+      await dispatch(startResetPassworkUser({ userId: user.id as string }))
+      notification.success({ message: 'Khôi phục mật khẩu thành công' })
+    } catch (e) {
+      console.log(e)
+    }
+  }
   const handleRestoreUser = async (user: IUser) => {
     try {
       await dispatch(restoreUser(user))
@@ -271,18 +280,32 @@ const UserList: React.FC = () => {
                     />
                   </Tooltip>
                   {hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
-                    <Tooltip title='Vô hiệu hóa tài khoản'>
-                      <Popconfirm
-                        title='Xác nhận vô hiệu hóa tài khoản'
-                        onConfirm={() => handleClickDeleteUser(record)}
-                      >
-                        <Button
-                          size='small'
-                          className='tw-bg-red-600'
-                          icon={<DeleteOutlined className='tw-text-white' />}
-                        />
-                      </Popconfirm>
-                    </Tooltip>
+                    <>
+                      <Tooltip title='Vô hiệu hóa tài khoản'>
+                        <Popconfirm
+                          title='Xác nhận vô hiệu hóa tài khoản'
+                          onConfirm={() => handleClickDeleteUser(record)}
+                        >
+                          <Button
+                            size='small'
+                            className='tw-bg-red-600'
+                            icon={<DeleteOutlined className='tw-text-white' />}
+                          />
+                        </Popconfirm>
+                      </Tooltip>
+                      <Tooltip title='Đặt lại mật khẩu'>
+                        <Popconfirm
+                          title={t('userList.descriptionConfirmResetPassword', {
+                            account: record.fullName
+                          })}
+                          onConfirm={() => handleClickResetPasswordUser(record)}
+                          okText={t('common.confirm')}
+                          cancelText={t('common.cancel')}
+                        >
+                          <Button size='small' type='primary' icon={<SyncOutlined />} />
+                        </Popconfirm>
+                      </Tooltip>
+                    </>
                   )}
                 </>
               )}
@@ -296,15 +319,17 @@ const UserList: React.FC = () => {
                     />
                   </Tooltip>
                   {hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
-                    <Tooltip title='Khôi phục'>
-                      <Popconfirm
-                        title={'Xác nhận khôi phục thành viên'}
-                        okText={t('common.yes')}
-                        onConfirm={() => handleRestoreUser(record)}
-                      >
-                        <Button type='primary' size='small' icon={<UndoOutlined className='tw-text-white' />} />
-                      </Popconfirm>
-                    </Tooltip>
+                    <>
+                      <Tooltip title='Khôi phục'>
+                        <Popconfirm
+                          title={'Xác nhận khôi phục thành viên' + `'${record.fullName}'`}
+                          okText={t('common.yes')}
+                          onConfirm={() => handleRestoreUser(record)}
+                        >
+                          <Button type='primary' size='small' icon={<UndoOutlined className='tw-text-white' />} />
+                        </Popconfirm>
+                      </Tooltip>
+                    </>
                   )}
                 </>
               )}
@@ -461,6 +486,7 @@ const UserList: React.FC = () => {
             showSizeChanger: true,
             showQuickJumper: true
           }}
+          rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />

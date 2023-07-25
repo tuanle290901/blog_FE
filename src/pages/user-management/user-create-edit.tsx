@@ -200,7 +200,7 @@ const UserCreateEdit: React.FC<{
   }
   const phoneNumberValidator = (rule: RuleObject | any, value: any) => {
     if (!value) {
-      return Promise.reject(t('userModal.errorMessage.phoneNumberEmpty'))
+      return Promise.resolve(true)
     }
     if (!REGEX_PHONE_NUMBER.test(value)) {
       return Promise.reject(t('userModal.errorMessage.invalidPhoneNumber'))
@@ -248,13 +248,13 @@ const UserCreateEdit: React.FC<{
             <div ref={uploadRef}>
               {avatarBase64 ? (
                 <img
-                  className='tw-w-16 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-16 tw-rounded-full tw-object-cover'
+                  className='tw-w-20 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-20 tw-rounded-full tw-object-cover'
                   src={avatarBase64}
                   alt='avatar'
                 />
               ) : (
                 <img
-                  className='tw-w-16 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-16 tw-rounded-full tw-object-cover'
+                  className='tw-w-20 tw-border-2 tw-border-solid tw-border-gray-300 tw-h-20 tw-rounded-full tw-object-cover'
                   src={defaultImg}
                   alt='avatar'
                 />
@@ -273,7 +273,7 @@ const UserCreateEdit: React.FC<{
               {/*<Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>*/}
             </div>
             <div className='tw-mt-1'>
-              <p className='tw-text-[#BFBFBF]'>{t('userModal.avatarAccept')}</p>
+              <p className='tw-text-yellow-600 tw-w-2/3'>{t('userModal.avatarAccept')}</p>
               {avtError && <p className='tw-text-red-600'>{t('userModal.errorMessage.avatarEmpty')}</p>}
             </div>
           </div>
@@ -346,7 +346,6 @@ const UserCreateEdit: React.FC<{
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.phoneNumber')}
-                  required
                   name='phoneNumber'
                   rules={[
                     {

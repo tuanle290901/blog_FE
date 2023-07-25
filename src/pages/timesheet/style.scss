@@ -157,7 +157,7 @@
 
   &-detail {
     background: #fff;
-    padding: 20px;
+    padding: 10px 20px 0;
   }
 
   &-filter {
@@ -166,7 +166,7 @@
     }
     &__export {
       background: #ffbc25;
-      margin-left: 15px;
+      margin: 10px 0 0 15px;
       ~ .ant-btn-default:hover {
         color: #ffbc25 !important;
       }
@@ -233,10 +233,27 @@
     }
   }
 
+  &-table {
+    margin-top: 20px;
+    position: relative;
+    &__checkbox {
+      position: absolute;
+      bottom: 23px;
+      left: 0;
+    }
+  }
+
   .ant-table-thead {
     th {
       text-align: center !important;
       text-transform: uppercase;
+    }
+  }
+
+  .ant-table-row.dayoff {
+    background: #f5f4f4;
+    .ant-table-column-sort {
+      background: #f5f4f4;
     }
   }
 }
