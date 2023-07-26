@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react'
-import './style.scss'
-import { Button, Col, DatePicker, Empty, Form, Result, Row, Select, TreeSelect } from 'antd'
-import { FormValues } from '../setting/ticket-defination/type/ItemTypes'
-import dayjs from 'dayjs'
+import type { DatePickerProps } from 'antd'
+import { Button, Col, DatePicker, Form, Result, Row, TreeSelect } from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 import type { Dayjs } from 'dayjs'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { downloadExcelFile } from '~/stores/features/report/report.slice'
-import { convertUTCToLocaleDate } from '~/utils/helper'
-import { getListDepartments } from '~/stores/features/department/department.silce'
-import { DataType } from '~/types/department.interface'
+import dayjs from 'dayjs'
 import { saveAs } from 'file-saver'
+import { useEffect, useState } from 'react'
+import { getListDepartments } from '~/stores/features/department/department.silce'
+import { downloadExcelFile } from '~/stores/features/report/report.slice'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { DataType } from '~/types/department.interface'
+import { FormValues } from '../setting/ticket-defination/type/ItemTypes'
+import './style.scss'
 
 const { RangePicker } = DatePicker
-import type { DatePickerProps } from 'antd'
-import { RangePickerProps } from 'antd/es/date-picker'
 
 const rangePresets: {
   label: string
@@ -78,7 +77,7 @@ const Index = () => {
     try {
       const response: any = await downloadExcelFile(params)
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-      saveAs(blob, 'Bang-chi-tiet-cham-cong.xlsx')
+      saveAs(blob, 'Bang-chi-tiet-cham-cong-cbcnv.xlsx')
       setIsDownloadFinished({
         status: true,
         msg: 'Tải xuống tệp thành công'
@@ -111,7 +110,7 @@ const Index = () => {
   }
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
-    return current && (current >= dayjs().endOf('day') || current < dayjs().subtract(1, 'year').startOf('day'))
+    return current && current < dayjs().startOf('year')
   }
 
   useEffect(() => {
