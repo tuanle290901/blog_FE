@@ -39,7 +39,7 @@ const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.timesheet.groups)
@@ -48,6 +48,7 @@ const Timesheet: React.FC = () => {
   const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
+  const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
   const [selectedUser, setSelectedUser] = useState(
     currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : ''
   )
@@ -76,6 +77,7 @@ const Timesheet: React.FC = () => {
     endDate?: string | null
     paging: IPaging
     sorts: ISort[]
+    onlyShowWorkingDay?: boolean
   }>({
     query: '',
     paging: {
@@ -94,6 +96,10 @@ const Timesheet: React.FC = () => {
   const handleSelectDate = (dataSelected: any) => {
     setSelectedStartDate(dayjs(dataSelected[0]))
     setSelectedEndDate(dayjs(dataSelected[1]))
+    if (dayjs(dataSelected[0]).year() !== dayjs(dataSelected[1]).year()) {
+      notification.warning({ message: 'Chỉ được chọn ngày trong cùng một năm' })
+      return
+    }
     if (dataSelected[0] && dataSelected[1]) {
       setSearchValue((prevState) => {
         return {
@@ -502,6 +508,12 @@ const Timesheet: React.FC = () => {
   }, [selectedUser])
 
   useEffect(() => {
+    setSearchValue((prevState) => {
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, onlyShowWorkingDay: onlyShowWorkingDay }
+    })
+  }, [onlyShowWorkingDay])
+
+  useEffect(() => {
     const promise = dispatch(
       filterTimesheet({
         paging: searchValue.paging,
@@ -510,7 +522,8 @@ const Timesheet: React.FC = () => {
         groupCode: searchValue.group,
         startDate: searchValue.startDate,
         endDate: searchValue.endDate,
-        userId: searchValue.userId
+        userId: searchValue.userId,
+        onlyShowWorkingDay: searchValue.onlyShowWorkingDay
       })
     )
     return () => {
@@ -718,7 +731,11 @@ const Timesheet: React.FC = () => {
                   position: ['bottomRight']
                 }}
               />
-              <Checkbox className='timesheet-table__checkbox' onChange={() => void {}}>
+              <Checkbox
+                className='timesheet-table__checkbox'
+                onChange={() => setOnlyShowWorkingDay(!onlyShowWorkingDay)}
+                defaultChecked={onlyShowWorkingDay}
+              >
                 {t('timesheet.onlyShowWorkingDay')}
               </Checkbox>
             </div>

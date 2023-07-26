@@ -6,7 +6,7 @@ import { IPaging } from '~/types/api-response.interface'
 // import dayjs from 'dayjs'
 
 const DaySelected: React.FC<{ meta: IPaging }> = ({ meta }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   // const handleGenderColor = (status: string) => {
   //   switch (status) {
   //     case 'ontime':
