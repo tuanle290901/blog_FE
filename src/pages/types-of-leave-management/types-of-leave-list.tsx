@@ -125,33 +125,33 @@ const TypesOfLeave: React.FC = () => {
         render: (createdAt) => {
           return dayjs(createdAt).format('DD/MM/YYYY')
         }
-      },
-      {
-        key: '',
-        title: t('device.action'),
-        width: '120px',
-        align: 'center',
-        render: (_, record: ITypesOfLeave) => {
-          return (
-            <Space size='small'>
-              <Button
-                size='small'
-                onClick={() => handleClickUpdate(record)}
-                icon={<EditOutlined className='tw-text-blue-600' />}
-              />
-              <Popconfirm
-                title={t('typesOfLeave.confirmDeleteTitle')}
-                description={t('typesOfLeave.confirmDelete')}
-                onConfirm={() => handleClickDelete(record)}
-                okText={t('common.yes')}
-                cancelText={t('common.no')}
-              >
-                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-              </Popconfirm>
-            </Space>
-          )
-        }
       }
+      // {
+      //   key: '',
+      //   title: t('device.action'),
+      //   width: '120px',
+      //   align: 'center',
+      //   render: (_, record: ITypesOfLeave) => {
+      //     return (
+      //       <Space size='small'>
+      //         <Button
+      //           size='small'
+      //           onClick={() => handleClickUpdate(record)}
+      //           icon={<EditOutlined className='tw-text-blue-600' />}
+      //         />
+      //         <Popconfirm
+      //           title={t('typesOfLeave.confirmDeleteTitle')}
+      //           description={t('typesOfLeave.confirmDelete')}
+      //           onConfirm={() => handleClickDelete(record)}
+      //           okText={t('common.yes')}
+      //           cancelText={t('common.no')}
+      //         >
+      //           <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+      //         </Popconfirm>
+      //       </Space>
+      //     )
+      //   }
+      // }
     ]
     return columns
   }, [handleClickDelete, getSortOrder, handleClickUpdate, t])
@@ -229,16 +229,16 @@ const TypesOfLeave: React.FC = () => {
       </div>
       <Row gutter={[16, 16]} className='tw-flex tw-my-5 tw-justify-between'>
         <Col xs={24} lg={12}>
-          <Button
+          {/* <Button
             onClick={() => {
               setIsOpenModal(true)
               dispatch(setValueFilter(JSON.stringify(searchValue)))
             }}
             icon={<PlusOutlined />}
-            type='primary'
+            type='default'
           >
             {t('typesOfLeave.createNew')}
-          </Button>
+          </Button> */}
         </Col>
         <Col xs={24} lg={12} className=' tw-text-right'>
           <Input.Search
