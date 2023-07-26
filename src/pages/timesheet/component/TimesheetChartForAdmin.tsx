@@ -6,7 +6,7 @@ import { ClockCircleOutlined } from '@ant-design/icons'
 import ApexCharts from 'react-apexcharts'
 
 const TimesheetChartForAdmin: React.FC<{ data: IAttendance[] }> = ({ data }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
 
   const option: any = {
     chart: {

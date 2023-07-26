@@ -16,7 +16,7 @@ const CreateEditPosition: React.FC<{
   handleClose: (isCreateUserSuccess: boolean) => void
   position?: IPosition | null
 }> = ({ open, position, handleClose, userInfo }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [form] = Form.useForm<{ nameTitle: string; description: string }>()
   const dispatch = useAppDispatch()
   function finishAndClose(isSuccess: boolean) {

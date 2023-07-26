@@ -10,7 +10,7 @@ const SelectGroupModal: React.FC<{
   handleClose: (group?: { code: string; name: string }) => void
   ignoreGroupCode: string[]
 }> = ({ open, handleClose, ignoreGroupCode }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [selectedGroup, setSelectedGroup] = useState<any>()
   const groups = useAppSelector((state) => state.masterData.groups)

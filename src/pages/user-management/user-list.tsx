@@ -36,7 +36,7 @@ import { hasPermission } from '~/utils/helper.ts'
 const { Search } = Input
 
 const UserList: React.FC = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
   const { userInfo, setUserProfileInfo } = useUserInfo()
