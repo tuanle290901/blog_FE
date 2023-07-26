@@ -66,7 +66,7 @@ const UserList: React.FC = () => {
     ]
   })
   const permissionAddUser = useMemo(() => {
-    return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
+    return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
   const permissionImportUser = useMemo(() => {
     return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
