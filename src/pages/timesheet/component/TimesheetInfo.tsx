@@ -13,7 +13,7 @@ const TimesheetInfo: React.FC<{ data: IAttendance[]; handleOpenModal: any; userI
   userInfo,
   meta
 }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <div className='timesheet-short'>

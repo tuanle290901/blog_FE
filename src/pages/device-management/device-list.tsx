@@ -19,7 +19,7 @@ import { IDevice } from '~/types/device.interface.ts'
 import { ACTION_TYPE } from '~/utils/helper'
 
 const DeviceList: React.FC = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [isOpenModal, setIsOpenModal] = useState<{
     openModel: boolean
     typeAction: string

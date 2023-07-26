@@ -6,7 +6,7 @@ import defaultImg from '~/assets/images/default-img.png'
 import React from 'react'
 
 const PersonalWokingTimeRequestList = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const columns: ColumnsType<IRequestWorkTime> = [
     {
       title: 'Người yêu cầu',

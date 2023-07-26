@@ -18,7 +18,7 @@ interface ITimeKeeping {
 }
 
 const TimesheetCalendar: React.FC<{ data: IAttendance[]; handleOpenModal: any }> = ({ handleOpenModal }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [currentMonth, setCurrentMonth] = useState(dayjs())
 
   const listTimeKeeping = [

@@ -20,7 +20,7 @@ const UserCreateEdit: React.FC<{
   handleClose: (isCreateUserSuccess: boolean) => void
   userData?: IUser | null
 }> = ({ open, handleClose, userData }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [avatarBase64, setAvatarBase64] = useState<string>('')

@@ -38,7 +38,7 @@ const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.timesheet.groups)

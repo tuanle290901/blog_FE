@@ -23,7 +23,7 @@ import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 const { Search } = Input
 
 const PositionList: React.FC = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
   const positionState = useAppSelector((state) => state.position)
