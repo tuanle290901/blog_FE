@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver'
 
 const { RangePicker } = DatePicker
 import type { DatePickerProps } from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 
 const rangePresets: {
   label: string
@@ -57,21 +58,22 @@ const Index = () => {
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
-  const [timeReport, setTimReport] = useState<string>('')
+  const [timeReport, setTimReport] = useState<Dayjs | null>(null)
   const [isDownloadFinished, setIsDownloadFinished] = useState({
     status: false,
     msg: ''
   })
 
-  const onChangeTime: DatePickerProps['onChange'] = (date, dateString) => {
-    setTimReport(dateString)
+  const onChangeTime: DatePickerProps['onChange'] = (date) => {
+    setTimReport(date)
   }
 
   const onFinish = async () => {
     setIsSubmit(true)
+    const timeString = timeReport?.format('MM/YYYY') || ''
     const params = {
-      month: timeReport.split('/')[0],
-      year: timeReport.split('/')[1]
+      month: timeString.split('/')[0],
+      year: timeString.split('/')[1]
     }
     try {
       const response: any = await downloadExcelFile(params)
@@ -108,8 +110,16 @@ const Index = () => {
     placeholder: 'Phòng ban'
   }
 
+  const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    return current && (current >= dayjs().endOf('day') || current < dayjs().subtract(1, 'year').startOf('day'))
+  }
+
   useEffect(() => {
     dispatch(getListDepartments())
+    setTimReport(dayjs())
+    reportForm.setFieldsValue({
+      time: dayjs()
+    })
   }, [])
 
   useEffect(() => {
@@ -161,11 +171,13 @@ const Index = () => {
                     placeholder={['Thời gian bắt đầu', 'Thời gian kết thúc']}
                   /> */}
                   <DatePicker
+                    value={timeReport}
                     onChange={onChangeTime}
                     format={'MM/YYYY'}
                     className='tw-w-full'
                     placeholder='Chọn thời gian báo cáo'
                     picker='month'
+                    disabledDate={disabledDate}
                   />
                 </Form.Item>
               </Col>
