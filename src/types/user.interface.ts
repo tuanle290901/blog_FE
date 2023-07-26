@@ -15,7 +15,7 @@ export interface IUser {
   note?: string
   notificationMethods?: string[]
   ownWeekWorkingTimeSetup?: OwnWeekWorkingTimeSetup[]
-  phoneNumber: string
+  phoneNumber: string | null
   userName: string
   editType: EDIT_TYPE
   status: USER_STATUS

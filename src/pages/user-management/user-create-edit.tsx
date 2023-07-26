@@ -146,7 +146,8 @@ const UserCreateEdit: React.FC<{
         birthday,
         formalDate,
         joinDate,
-        email: value.email || null
+        email: value.email || null,
+        phoneNumber: value.phoneNumber || null
       }
       try {
         setLoading(true)
