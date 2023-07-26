@@ -80,15 +80,12 @@
         align-items: center;
 
         .modal-inner {
-          width: 65%;
-          height: 60%;
+          width: 90%;
+          height: 80%;
           box-sizing: border-box;
           margin: auto;
           border-radius: 15px;
           // background-color: rgba(0, 0, 0, 0.3);
-          display: flex;
-          justify-content: center;
-          // flex-direction: column;
           gap: 10px;
           .login-title-note {
             color: white;
@@ -222,5 +219,5 @@
 }
 .login-background {
   background-size: 100% 103%;
-  background-image: url('https://www.lystloc.com/blog/wp-content/uploads/2022/11/ezgif.com-gif-maker-6.webp');
+  background-image: url('../assets/images/login/backgroundLogin.png');
 }
