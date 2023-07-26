@@ -2,7 +2,6 @@
   .logo-vertical {
     height: 90px;
   }
-
   .header-container {
     background-color: white;
     display: flex;
@@ -81,17 +80,16 @@
         align-items: center;
 
         .modal-inner {
-          width: 60%;
-          height: 50%;
+          width: 65%;
+          height: 60%;
           box-sizing: border-box;
           margin: auto;
           border-radius: 15px;
-          background-color: rgba(0, 0, 0, 0.3);
+          // background-color: rgba(0, 0, 0, 0.3);
           display: flex;
           justify-content: center;
-          flex-direction: column;
+          // flex-direction: column;
           gap: 10px;
-
           .login-title-note {
             color: white;
             font-weight: 100;
@@ -221,4 +219,8 @@
       font-size: 14px;
     }
   }
+}
+.login-background {
+  background-size: 100% 103%;
+  background-image: url('https://www.lystloc.com/blog/wp-content/uploads/2022/11/ezgif.com-gif-maker-6.webp');
 }
