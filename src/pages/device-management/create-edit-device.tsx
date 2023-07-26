@@ -83,6 +83,8 @@ const CreateEditDevice: React.FC<{
     form.resetFields()
   }
 
+  console.log(typeAction)
+
   return (
     <Modal
       open={open}
@@ -94,7 +96,8 @@ const CreateEditDevice: React.FC<{
       maskClosable={false}
       forceRender
       centered
-      footer={typeAction === ACTION_TYPE.View && null}
+      cancelButtonProps={{ style: { display: typeAction === ACTION_TYPE.View ? 'none' : '' } }}
+      okButtonProps={{ style: { display: typeAction === ACTION_TYPE.View ? 'none' : '' } }}
     >
       <div className='tw-my-4'>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
