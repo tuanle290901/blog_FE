@@ -127,7 +127,7 @@ const UserList: React.FC = () => {
       return {
         group: 'all',
         query: '',
-        paging: prevState.paging,
+        paging: { ...prevState.paging, page: 0 },
         sorts: [
           {
             direction: 'DESC',

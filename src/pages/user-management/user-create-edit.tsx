@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
-import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
@@ -15,7 +14,6 @@ import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { error } from 'console'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -35,7 +33,6 @@ const UserCreateEdit: React.FC<{
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
   const userTitle = useAppSelector((state) => state.masterData.listUserTitle)
-  const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
     return groups.map((item) => {
       return { value: item.code, label: item.name }
@@ -115,8 +112,8 @@ const UserCreateEdit: React.FC<{
       if (userData.avatarBase64) {
         setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
       }
-      if (!hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], currentAuth?.groupProfiles)) {
-        if (currentAuth?.userName !== userData.userName) {
+      if (!hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)) {
+        if (userInfo?.userName !== userData.userName) {
           setCheckDisableUpdateUser(false)
         }
       }
