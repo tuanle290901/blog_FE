@@ -404,7 +404,6 @@ export const exportTimesheet = createAsyncThunk(
         responseType: 'blob',
         signal: thunkAPI.signal
       })
-      console.log(response?.size)
       if (response?.size > 0) {
         const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
         saveAs(
