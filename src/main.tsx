@@ -9,6 +9,7 @@ import i18n from '~/config/i18n.ts'
 import { BrowserRouter } from 'react-router-dom'
 import { ConfigProvider } from 'antd'
 import vi_VN from 'antd/es/locale/vi_VN'
+import 'dayjs/locale/vi'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
