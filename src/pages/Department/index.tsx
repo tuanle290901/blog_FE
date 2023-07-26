@@ -6,7 +6,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import './index.scss'
 
-import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Input, Row, Space, Table, TableColumnsType, Tooltip } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
 import dayjs from 'dayjs'

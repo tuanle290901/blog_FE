@@ -36,7 +36,7 @@ import { hasPermission } from '~/utils/helper.ts'
 const { Search } = Input
 
 const UserList: React.FC = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
   const { userInfo, setUserProfileInfo } = useUserInfo()
@@ -66,7 +66,7 @@ const UserList: React.FC = () => {
     ]
   })
   const permissionAddUser = useMemo(() => {
-    return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
+    return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
   }, [userInfo])
   const permissionImportUser = useMemo(() => {
     return hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles)
@@ -127,7 +127,7 @@ const UserList: React.FC = () => {
       return {
         group: 'all',
         query: '',
-        paging: prevState.paging,
+        paging: { ...prevState.paging, page: 0 },
         sorts: [
           {
             direction: 'DESC',
@@ -286,11 +286,7 @@ const UserList: React.FC = () => {
                           title='Xác nhận vô hiệu hóa tài khoản'
                           onConfirm={() => handleClickDeleteUser(record)}
                         >
-                          <Button
-                            size='small'
-                            className='tw-bg-red-600'
-                            icon={<DeleteOutlined className='tw-text-white' />}
-                          />
+                          <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
                         </Popconfirm>
                       </Tooltip>
                       <Tooltip title='Đặt lại mật khẩu'>
@@ -302,7 +298,7 @@ const UserList: React.FC = () => {
                           okText={t('common.confirm')}
                           cancelText={t('common.cancel')}
                         >
-                          <Button size='small' type='primary' icon={<SyncOutlined />} />
+                          <Button size='small' icon={<SyncOutlined className='tw-text-blue-600' />} />
                         </Popconfirm>
                       </Tooltip>
                     </>
@@ -326,7 +322,7 @@ const UserList: React.FC = () => {
                           okText={t('common.yes')}
                           onConfirm={() => handleRestoreUser(record)}
                         >
-                          <Button type='primary' size='small' icon={<UndoOutlined className='tw-text-white' />} />
+                          <Button size='small' icon={<UndoOutlined className='tw-text-blue-600' />} />
                         </Popconfirm>
                       </Tooltip>
                     </>
@@ -355,6 +351,23 @@ const UserList: React.FC = () => {
       setSearchValue((prevState) => ({ ...prevState, query: value, paging: { ...prevState.paging, page: 0 } }))
     }, 500)
   }
+  const resetPageUser = () => {
+    setSearchValue({
+      query: '',
+      paging: {
+        page: 0,
+        size: 10,
+        total: 0,
+        totalPage: 0
+      },
+      sorts: [
+        {
+          direction: 'DESC',
+          field: 'created_at'
+        }
+      ]
+    })
+  }
   useEffect(() => {
     const promise = dispatch(
       searchUser({
@@ -364,6 +377,7 @@ const UserList: React.FC = () => {
         groupCode: searchValue.group === 'all' ? null : searchValue.group
       })
     )
+
     return () => {
       promise.abort()
     }
@@ -426,6 +440,7 @@ const UserList: React.FC = () => {
           open={isOpenUserModal || !!userState.editingUser}
           userData={userState.editingUser}
           handleClose={handleCloseUserModal}
+          resetPageUser={resetPageUser}
         />
       )}
       <div>
@@ -484,7 +499,8 @@ const UserList: React.FC = () => {
             total: userState.meta.total,
             pageSizeOptions: [5, 10, 25, 50],
             showSizeChanger: true,
-            showQuickJumper: true
+            showQuickJumper: true,
+            current: searchValue.paging.page + 1
           }}
           rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}

@@ -17,7 +17,7 @@ const CreateEditDevice: React.FC<{
   deviceData?: IDevice | null
   typeAction?: string
 }> = ({ open, handleClose, deviceData, typeAction }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [form] = Form.useForm<IDevice>()
   const dispatch = useAppDispatch()
   const groups = useAppSelector((state: any) => state.masterData.groups)

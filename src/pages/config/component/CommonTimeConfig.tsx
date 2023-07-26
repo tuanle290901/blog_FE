@@ -247,6 +247,7 @@ const CommonTimeConfig: React.FC = () => {
       })
     }
     setItems(listTabPanel)
+    setActiveKey(listTabPanel[0].key)
   }, [listWKTC, groups])
   const add = (code: string, name: string) => {
     setOpenModal(false)
@@ -302,7 +303,7 @@ const CommonTimeConfig: React.FC = () => {
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
       </div>
       <div className='tw-mt-4'>
-        <Tabs type='editable-card' onChange={onChange} activeKey={activeKey} onEdit={onEdit} items={items} />
+        <Tabs type='card' onChange={onChange} activeKey={activeKey} onEdit={onEdit} items={items} />
       </div>
     </div>
   )

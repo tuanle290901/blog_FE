@@ -143,7 +143,7 @@ const MainLayout: React.FC = () => {
             null
           ),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Phòng ban', 'department', null),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Chức vụ', 'positions', null)
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Chức vụ', 'positions', null)
         ]
       ),
 

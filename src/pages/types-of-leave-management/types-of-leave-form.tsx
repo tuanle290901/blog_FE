@@ -13,7 +13,7 @@ const TypesOfLeaveForm: React.FC<{ open: boolean; handleClose: () => void; data?
   handleClose,
   data
 }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [form] = Form.useForm<ITypesOfLeave>()
   const dispatch = useAppDispatch()
 
