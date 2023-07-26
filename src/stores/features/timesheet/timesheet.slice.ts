@@ -108,6 +108,7 @@ export const filterTimesheet = createAsyncThunk(
   async (
     params: {
       query: string
+      onlyShowWorkingDay?: boolean | null
       groupCode?: string | null
       userId?: string | null
       startDate?: string | null
@@ -233,6 +234,22 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
+      if (params.onlyShowWorkingDay) {
+        body.criteria[0].children.push({
+          field: 'report_data.is_none_working_day',
+          operator: 'IS',
+          type: 'BOOLEAN',
+          value: false
+        })
+      }
+      if (!params.onlyShowWorkingDay) {
+        const index = body.criteria[0].children.findIndex(
+          (item: any) => item.field === 'report_data.is_none_working_day'
+        )
+        if (index > -1) {
+          body.criteria[0].children.splice(index, 1)
+        }
+      }
       const response: IApiResponse<[]> = await HttpService.post('/time-attendance/filter', body, {
         signal: thunkAPI.signal
       })
@@ -251,6 +268,7 @@ export const exportTimesheet = createAsyncThunk(
   async (
     params: {
       query: string
+      onlyShowWorkingDay?: boolean | null
       groupCode?: string | null
       userId?: string | null
       startDate?: string | null
@@ -366,17 +384,38 @@ export const exportTimesheet = createAsyncThunk(
           }
         ]
       }
+      if (params.onlyShowWorkingDay) {
+        body.criteria[0].children.push({
+          field: 'report_data.is_none_working_day',
+          operator: 'IS',
+          type: 'BOOLEAN',
+          value: false
+        })
+      }
+      if (!params.onlyShowWorkingDay) {
+        const index = body.criteria[0].children.findIndex(
+          (item: any) => item.field === 'report_data.is_none_working_day'
+        )
+        if (index > -1) {
+          body.criteria[0].children.splice(index, 1)
+        }
+      }
       const response: any = await HttpService.post('/time-attendance/export-search-attendance', body, {
         responseType: 'blob',
         signal: thunkAPI.signal
       })
-      const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-      saveAs(
-        blob,
-        `Dữ liệu chấm công từ ngày ${params.startDate || dayjs().format('YYYY-MM-DD')} đến ngày ${
-          params.endDate || dayjs().format('YYYY-MM-DD')
-        }.xlsx`
-      )
+      console.log(response?.size)
+      if (response?.size > 0) {
+        const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+        saveAs(
+          blob,
+          `Dữ liệu chấm công từ ngày ${params.startDate || dayjs().format('YYYY-MM-DD')} đến ngày ${
+            params.endDate || dayjs().format('YYYY-MM-DD')
+          }.xlsx`
+        )
+      } else {
+        notification.warning({ message: 'Chỉ được chọn khoảng thời gian không quá 31 ngày' })
+      }
     } catch (error: any) {
       if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
         return thunkAPI.rejectWithValue(error.response.data)
