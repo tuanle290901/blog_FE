@@ -1,13 +1,23 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Input, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import {
+  CheckCircleFilled,
+  DeleteOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  MinusCircleFilled,
+  PlusOutlined,
+  EyeOutlined
+} from '@ant-design/icons'
+import { Button, Input, notification, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateEditDevice from '~/pages/device-management/create-edit-device.tsx'
 import {
   cancelEditingDevice,
+  deleteDevice,
   getListDevice,
   resetValueFilter,
   setValueFilter,
@@ -16,6 +26,7 @@ import {
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { IDevice } from '~/types/device.interface.ts'
+import { DEVICE_STATUS } from '~/utils/Constant'
 import { ACTION_TYPE } from '~/utils/helper'
 
 const DeviceList: React.FC = () => {
@@ -30,10 +41,6 @@ const DeviceList: React.FC = () => {
   const listData: IDevice[] = useAppSelector((state: any) => state.device.listData)
   const timerId = useRef<any>(null)
   const meta: IPaging = useAppSelector((state: any) => state.device.meta)
-  const handleClickDeleteUser = (record: IDevice) => {
-    console.log(record)
-  }
-
   const editingDevice = useAppSelector((state: any) => state.device.editingDevice)
   const filter = useAppSelector((state: any) => state.device.filter)
 
@@ -59,10 +66,10 @@ const DeviceList: React.FC = () => {
     ]
   })
 
-  const handleClickEditDevice = (record: IDevice) => {
+  const handleClickEditDevice = (record: IDevice, typeAction: string) => {
     setIsOpenModal({
       openModel: !isOpenModal.openModel,
-      typeAction: ACTION_TYPE.Updated
+      typeAction: typeAction
     })
     dispatch(startEditingDevice(record.id as string))
   }
@@ -73,6 +80,21 @@ const DeviceList: React.FC = () => {
       return searchValue.sorts[0].direction === 'ASC' ? 'ascend' : 'descend'
     } else {
       return null
+    }
+  }
+
+  const handleClickDeleteUser = async (record: IDevice) => {
+    if (record?.id) {
+      try {
+        const response = await dispatch(deleteDevice(record?.id)).unwrap()
+        notification.success({
+          message: response.message
+        })
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
     }
   }
 
@@ -104,25 +126,61 @@ const DeviceList: React.FC = () => {
         ellipsis: true
       },
       {
+        key: 'status',
+        title: t('device.status'),
+        dataIndex: 'status',
+        ellipsis: true,
+        render: (_, record) => {
+          return (
+            <div className='tw-flex tw-justify-left tw-items-left'>
+              {record?.status === DEVICE_STATUS.INITIAL ? (
+                <div>
+                  <InfoCircleOutlined className='tw-text-[#096DD9] tw-mr-1' />
+                  {t(`device.${record?.status}`)}
+                </div>
+              ) : record?.status === DEVICE_STATUS.ACTIVE ? (
+                <div>
+                  <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-1' /> {t(`device.${record?.status}`)}
+                </div>
+              ) : (
+                <div>
+                  <MinusCircleFilled className='tw-text-[#f33c3c] tw-mr-1' /> {t(`device.${record?.status}`)}
+                </div>
+              )}
+            </div>
+          )
+        }
+      },
+      {
         key: '',
         title: t('device.action'),
         width: '120px',
         align: 'center',
         render: (_, record: IDevice) => {
-          return (
-            <Space size='small'>
+          if (record?.status !== DEVICE_STATUS.DEACTIVE) {
+            return (
+              <Space size='small'>
+                <Button
+                  size='small'
+                  onClick={() => handleClickEditDevice(record, ACTION_TYPE.Updated)}
+                  icon={<EditOutlined className='tw-text-blue-600' />}
+                />
+                <Button
+                  size='small'
+                  onClick={() => handleClickDeleteUser(record)}
+                  icon={<DeleteOutlined className='tw-text-red-600' />}
+                />
+              </Space>
+            )
+          } else {
+            return (
               <Button
                 size='small'
-                onClick={() => handleClickEditDevice(record)}
-                icon={<EditOutlined className='tw-text-blue-600' />}
+                onClick={() => handleClickEditDevice(record, ACTION_TYPE.View)}
+                icon={<EyeOutlined className='tw-text-blue-600' />}
               />
-              <Button
-                size='small'
-                onClick={() => handleClickDeleteUser(record)}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
-            </Space>
-          )
+            )
+          }
         }
       }
     ]

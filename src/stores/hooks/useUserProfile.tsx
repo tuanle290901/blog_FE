@@ -23,6 +23,7 @@ export const useUserInfo = () => {
   const setUserProfileInfo = (userProfileInfo: IUser) => {
     setLocal(userProfileInfo)
     setUserInfo(userProfileInfo)
+    dispatch(setUserInfo({ userInfo: userProfileInfo }))
   }
 
   return {

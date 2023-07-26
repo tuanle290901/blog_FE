@@ -91,16 +91,6 @@ export const updateAttendanceStatistic = createAsyncThunk(
   }
 )
 
-export const ExportExcel = createAsyncThunk('time-attendance/export-time-attendance', async () => {
-  try {
-    const response = ''
-    const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-    saveAs(blob, 'Bao-cao.csv')
-  } catch (error) {
-    console.error('Lỗi khi tải xuống tệp Excel:', error)
-  }
-})
-
 const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-working-time', async (_, thunkAPI) => {
   // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
   //   signal: thunkAPI.signal
@@ -115,6 +105,149 @@ const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-wo
 
 export const filterTimesheet = createAsyncThunk(
   'time-attendance/filter',
+  async (
+    params: {
+      query: string
+      groupCode?: string | null
+      userId?: string | null
+      startDate?: string | null
+      endDate?: string | null
+      paging: IPaging
+      sorts: ISort[]
+    },
+    thunkAPI
+  ) => {
+    try {
+      const defaultSorts = [
+        {
+          direction: 'DESC',
+          field: 'date'
+        },
+        {
+          direction: 'DESC',
+          field: 'startTime'
+        }
+      ]
+      const body: any = {
+        page: params.paging.page,
+        size: params.paging.size,
+        sort: params.sorts?.length > 0 ? params.sorts : defaultSorts
+      }
+      if (!params.query && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              {
+                field: 'date',
+                operator: 'BETWEEN',
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
+              }
+            ]
+          }
+        ]
+      }
+      if (!params.query && params.userId) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'user_id',
+                operator: 'IS',
+                value: params.userId
+              },
+              {
+                field: 'date',
+                operator: 'BETWEEN',
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
+              }
+            ]
+          }
+        ]
+      }
+      if (!params.query && params.userId && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              {
+                field: 'user_id',
+                operator: 'IS',
+                value: params.userId
+              },
+              {
+                field: 'date',
+                operator: 'BETWEEN',
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
+              }
+            ]
+          }
+        ]
+      }
+      if (params.query && params.groupCode) {
+        body.criteria = [
+          {
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                operator: 'OR_MULTIPLES',
+                children: [
+                  {
+                    field: 'full_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'user_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  }
+                ]
+              },
+              {
+                field: 'group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              {
+                field: 'date',
+                operator: 'BETWEEN',
+                min: params.startDate || dayjs().format('YYYY-MM-DD'),
+                max: params.endDate || dayjs().format('YYYY-MM-DD')
+              }
+            ]
+          }
+        ]
+      }
+      const response: IApiResponse<[]> = await HttpService.post('/time-attendance/filter', body, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
+    }
+  }
+)
+
+export const exportTimesheet = createAsyncThunk(
+  'time-attendance/export-search-attendance',
   async (
     params: {
       query: string
@@ -208,12 +341,12 @@ export const filterTimesheet = createAsyncThunk(
                 children: [
                   {
                     field: 'full_name',
-                    operator: 'LIKE',
+                    operator: 'LIKE_IGNORE_CASE',
                     value: params.query
                   },
                   {
                     field: 'user_name',
-                    operator: 'LIKE',
+                    operator: 'LIKE_IGNORE_CASE',
                     value: params.query
                   }
                 ]
@@ -233,10 +366,17 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
-      const response: IApiResponse<[]> = await HttpService.post('/time-attendance/filter', body, {
+      const response: any = await HttpService.post('/time-attendance/export-search-attendance', body, {
+        responseType: 'blob',
         signal: thunkAPI.signal
       })
-      return response
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+      saveAs(
+        blob,
+        `Dữ liệu chấm công từ ngày ${params.startDate || dayjs().format('YYYY-MM-DD')} đến ngày ${
+          params.endDate || dayjs().format('YYYY-MM-DD')
+        }.xlsx`
+      )
     } catch (error: any) {
       if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
         return thunkAPI.rejectWithValue(error.response.data)

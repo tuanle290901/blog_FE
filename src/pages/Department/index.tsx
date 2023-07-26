@@ -6,7 +6,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import './index.scss'
 
-import { DeleteOutlined, EditOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Input, Row, Space, Table, TableColumnsType, Tooltip } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
 import dayjs from 'dayjs'
@@ -483,11 +483,7 @@ const Department: React.FC = () => {
             loading={false}
             classNameProps={`btn-add ${
               dataRender.listDataTitle &&
-              hasPermissionAndGroup(
-                [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
-                userInfo?.groupProfiles,
-                dataRender.listDataTitle
-              ) === false
+              hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === false
                 ? 'tw-hidden'
                 : 'tw-block'
             }`}

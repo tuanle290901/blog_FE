@@ -136,7 +136,7 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
           rules={[
             {
               required: true,
-              message: `${t('changePassword.inviteToEnterOldPassword')}`
+              message: `${t('changePassword.inviteToEnterNewPassword')}`
             },
             {
               pattern: REGEX_PASSWORD,

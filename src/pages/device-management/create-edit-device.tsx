@@ -83,6 +83,8 @@ const CreateEditDevice: React.FC<{
     form.resetFields()
   }
 
+  console.log(typeAction)
+
   return (
     <Modal
       open={open}
@@ -94,6 +96,8 @@ const CreateEditDevice: React.FC<{
       maskClosable={false}
       forceRender
       centered
+      cancelButtonProps={{ style: { display: typeAction === ACTION_TYPE.View ? 'none' : '' } }}
+      okButtonProps={{ style: { display: typeAction === ACTION_TYPE.View ? 'none' : '' } }}
     >
       <div className='tw-my-4'>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
@@ -113,7 +117,7 @@ const CreateEditDevice: React.FC<{
               }
             ]}
           >
-            <Input placeholder={t('device.enterName')} />
+            <Input placeholder={t('device.enterName')} disabled={typeAction === ACTION_TYPE.View ? true : false} />
           </Form.Item>
           <Form.Item
             style={{ marginBottom: 8 }}
@@ -127,10 +131,7 @@ const CreateEditDevice: React.FC<{
               }
             ]}
           >
-            <Input
-              placeholder={t('device.enterIpAddress')}
-              disabled={typeAction === ACTION_TYPE.Updated ? true : false}
-            />
+            <Input placeholder={t('device.enterIpAddress')} disabled={typeAction === ACTION_TYPE.View ? true : false} />
           </Form.Item>
           <Form.Item
             required
@@ -157,6 +158,7 @@ const CreateEditDevice: React.FC<{
                   event.preventDefault()
                 }
               }}
+              disabled={typeAction === ACTION_TYPE.View ? true : false}
             />
           </Form.Item>
           <Form.Item
@@ -178,6 +180,7 @@ const CreateEditDevice: React.FC<{
               filterOption={(input: string, option: any) =>
                 option.props.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
+              disabled={typeAction === ACTION_TYPE.View ? true : false}
             ></Select>
           </Form.Item>
         </Form>

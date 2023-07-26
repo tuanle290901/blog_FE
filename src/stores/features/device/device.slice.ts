@@ -128,6 +128,20 @@ export const updateDevice = createAsyncThunk('devices/update', async (body: IDev
   }
 })
 
+export const deleteDevice = createAsyncThunk('devices/delete', async (id: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<IDevice> = await HttpService.delete(END_POINT_API.Devices.delete(id), {
+      signal: thunkAPI.signal
+    })
+    return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
+  }
+})
+
 const devicesSlice = createSlice({
   name: 'devices',
   initialState,
@@ -169,6 +183,11 @@ const devicesSlice = createSlice({
       })
       .addCase(updateDevice.fulfilled, (state, action) => {
         const updatedDevice = action.payload
+        const index = state.listData.findIndex((item) => item.id === updatedDevice.id)
+        state.listData[index] = updatedDevice
+      })
+      .addCase(deleteDevice.fulfilled, (state, action) => {
+        const updatedDevice = action.payload.data
         const index = state.listData.findIndex((item) => item.id === updatedDevice.id)
         state.listData[index] = updatedDevice
       })

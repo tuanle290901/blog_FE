@@ -235,7 +235,7 @@ const TypesOfLeave: React.FC = () => {
               dispatch(setValueFilter(JSON.stringify(searchValue)))
             }}
             icon={<PlusOutlined />}
-            type='default'
+            type='primary'
           >
             {t('typesOfLeave.createNew')}
           </Button>
