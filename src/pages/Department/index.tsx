@@ -483,11 +483,7 @@ const Department: React.FC = () => {
             loading={false}
             classNameProps={`btn-add ${
               dataRender.listDataTitle &&
-              hasPermissionAndGroup(
-                [ROLE.MANAGER, ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER],
-                userInfo?.groupProfiles,
-                dataRender.listDataTitle
-              ) === false
+              hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === false
                 ? 'tw-hidden'
                 : 'tw-block'
             }`}
