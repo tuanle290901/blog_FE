@@ -18,6 +18,7 @@ import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import {
+  exportTimesheet,
   filterTimesheet,
   getAllGroup,
   getEmployeeWorkingTime,
@@ -38,7 +39,7 @@ const Timesheet: React.FC = () => {
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
   const { Option } = Select
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.timesheet.groups)
@@ -79,20 +80,11 @@ const Timesheet: React.FC = () => {
     query: '',
     paging: {
       page: 0,
-      size: 5,
+      size: 10,
       total: 0,
       totalPage: 0
     },
-    sorts: [
-      {
-        direction: 'DESC',
-        field: 'date'
-      },
-      {
-        direction: 'DESC',
-        field: 'startTime'
-      }
-    ]
+    sorts: []
   })
 
   const handleCloseTimesheetModal = () => {
@@ -308,6 +300,8 @@ const Timesheet: React.FC = () => {
       dataIndex: 'userName',
       key: 'userName',
       ellipsis: true,
+      sorter: true,
+      showSorterTooltip: false,
       width: '160px',
       sortOrder: getSortOrder('userName')
     },
@@ -320,6 +314,7 @@ const Timesheet: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('date'),
       width: '170px',
+      align: 'center',
       render: (date) => {
         return (
           <div className='tw-flex tw-items-center'>
@@ -345,6 +340,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('startTime'),
+      align: 'center',
       width: '110px',
       render: (startTime, record) => {
         return (
@@ -370,6 +366,7 @@ const Timesheet: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('endTime'),
+      align: 'center',
       width: '110px',
       render: (endTime, record) => {
         return (
@@ -387,12 +384,11 @@ const Timesheet: React.FC = () => {
     },
     {
       title: t('Số giờ làm'),
-      dataIndex: '',
-      key: '',
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder(''),
-      width: '150px'
+      dataIndex: 'workingHour',
+      key: 'workingHour',
+      sortOrder: getSortOrder('workingHour'),
+      align: 'center',
+      width: '120px'
     },
     {
       title: t('Công nghỉ'),
@@ -522,24 +518,24 @@ const Timesheet: React.FC = () => {
     }
   }, [searchValue, clickUpdateButton])
 
-  const sheetsData = [
-    {
-      sheetName: 'Sheet1',
-      headers: ['1', '23'],
-      data: [
-        ['John', 25],
-        ['Jane', 30]
-      ]
-    },
-    {
-      sheetName: 'Sheet2',
-      headers: ['City', 'Population'],
-      data: [
-        ['New York', 8500000],
-        ['London', 8900000]
-      ]
-    }
-  ]
+  // const sheetsData = [
+  //   {
+  //     sheetName: 'Sheet1',
+  //     headers: ['1', '23'],
+  //     data: [
+  //       ['John', 25],
+  //       ['Jane', 30]
+  //     ]
+  //   },
+  //   {
+  //     sheetName: 'Sheet2',
+  //     headers: ['City', 'Population'],
+  //     data: [
+  //       ['New York', 8500000],
+  //       ['London', 8900000]
+  //     ]
+  //   }
+  // ]
 
   return (
     <Row className='timesheet tw-p-2'>
@@ -612,7 +608,19 @@ const Timesheet: React.FC = () => {
                   <Button
                     icon={<UploadOutlined />}
                     className='timesheet-filter__export'
-                    // onClick={dispatch(ExportExcel())}
+                    onClick={() =>
+                      dispatch(
+                        exportTimesheet({
+                          paging: searchValue.paging,
+                          sorts: searchValue.sorts,
+                          query: searchValue.query,
+                          groupCode: searchValue.group,
+                          startDate: searchValue.startDate,
+                          endDate: searchValue.endDate,
+                          userId: searchValue.userId
+                        })
+                      )
+                    }
                   >
                     {t('Xuất dữ liệu')}
                   </Button>
@@ -664,7 +672,7 @@ const Timesheet: React.FC = () => {
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search
                     value={query}
-                    placeholder={'Tìm kiếm'}
+                    placeholder={'Tìm kiếm theo mã chấm công'}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
                     className='tw-w-full tw-max-w-[300px]'
                   />

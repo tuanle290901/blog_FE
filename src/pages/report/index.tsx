@@ -9,8 +9,11 @@ import { downloadExcelFile } from '~/stores/features/report/report.slice'
 import { convertUTCToLocaleDate } from '~/utils/helper'
 import { getListDepartments } from '~/stores/features/department/department.silce'
 import { DataType } from '~/types/department.interface'
+import { saveAs } from 'file-saver'
 
 const { RangePicker } = DatePicker
+import type { DatePickerProps } from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 
 const rangePresets: {
   label: string
@@ -49,22 +52,43 @@ const generateTreeData = (data: DataType[]) => {
 }
 
 const Index = () => {
-  const downloaded = useAppSelector((item) => item.report.downloaded)
   const [reportForm] = Form.useForm()
   const dispatch = useAppDispatch()
   const departments = useAppSelector((item) => item.department.listData)
 
   const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
+  const [timeReport, setTimReport] = useState<Dayjs | null>(null)
+  const [isDownloadFinished, setIsDownloadFinished] = useState({
+    status: false,
+    msg: ''
+  })
 
-  const onFinish = (formValue: { groupCode: string; time: string[] }) => {
+  const onChangeTime: DatePickerProps['onChange'] = (date) => {
+    setTimReport(date)
+  }
+
+  const onFinish = async () => {
     setIsSubmit(true)
-    const payload = {
-      groupCode: formValue.groupCode,
-      startTime: convertUTCToLocaleDate(formValue.time[0]),
-      endTime: convertUTCToLocaleDate(formValue.time[1])
+    const timeString = timeReport?.format('MM/YYYY') || ''
+    const params = {
+      month: timeString.split('/')[0],
+      year: timeString.split('/')[1]
     }
-    dispatch(downloadExcelFile(payload))
+    try {
+      const response: any = await downloadExcelFile(params)
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+      saveAs(blob, 'Bang-chi-tiet-cham-cong.xlsx')
+      setIsDownloadFinished({
+        status: true,
+        msg: 'Tải xuống tệp thành công'
+      })
+    } catch (error: any) {
+      setIsDownloadFinished({
+        status: false,
+        msg: 'Không có dữ liệu của tháng đã chọn'
+      })
+    }
   }
 
   const onFinishFailed = (formValue: FormValues) => {
@@ -86,8 +110,16 @@ const Index = () => {
     placeholder: 'Phòng ban'
   }
 
+  const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    return current && (current >= dayjs().endOf('day') || current < dayjs().subtract(1, 'year').startOf('day'))
+  }
+
   useEffect(() => {
     dispatch(getListDepartments())
+    setTimReport(dayjs())
+    reportForm.setFieldsValue({
+      time: dayjs()
+    })
   }, [])
 
   useEffect(() => {
@@ -102,7 +134,7 @@ const Index = () => {
       <div className='report-container'>
         <div className='report-title tw-text-lg tw-font-semibold'>Xuất báo cáo</div>
         <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
-          Tải xuống báo cáo của phòng ban theo thời gian dưới dạng tệp Excel
+          Tải xuống bảng chấm công theo tháng của CBNV dưới dạng tệp Excel
         </div>
 
         <div className='report-filter-container'>
@@ -125,23 +157,32 @@ const Index = () => {
                   <TreeSelect {...treeProps} />
                 </Form.Item>
               </Col> */}
-              <Col span={16} offset={4}>
+              <Col span={12} offset={6}>
                 <Form.Item
-                  label='Thời gian'
+                  label='Thời gian báo cáo'
                   name='time'
                   required
                   rules={[{ required: true, message: 'Trường bắt buộc' }]}
                 >
-                  <RangePicker
+                  {/* <RangePicker
                     format={'DD/MM/YYYY'}
                     className='tw-w-full'
                     presets={rangePresets}
                     placeholder={['Thời gian bắt đầu', 'Thời gian kết thúc']}
+                  /> */}
+                  <DatePicker
+                    value={timeReport}
+                    onChange={onChangeTime}
+                    format={'MM/YYYY'}
+                    className='tw-w-full'
+                    placeholder='Chọn thời gian báo cáo'
+                    picker='month'
+                    disabledDate={disabledDate}
                   />
                 </Form.Item>
               </Col>
 
-              <Col span={16} offset={4}>
+              <Col span={12} offset={6}>
                 <Form.Item>
                   <Button className='login-button tw-w-1/10 tw-float-right' type='primary' htmlType='submit'>
                     Tải xuống
@@ -154,10 +195,7 @@ const Index = () => {
         <hr style={{ borderTop: '1px solid #fefefe' }} />
         <div className='report-list'>
           {isSubmit && (
-            <Result
-              status={downloaded ? 'success' : 'error'}
-              title={downloaded ? 'Tải xuống thành công' : 'Tải xuống thất bại'}
-            />
+            <Result status={isDownloadFinished.status ? 'success' : '500'} title={isDownloadFinished?.msg} />
           )}
         </div>
       </div>

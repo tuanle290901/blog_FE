@@ -32,7 +32,7 @@ import { ITypesOfLeave } from '~/types/types-of-leave'
 import dayjs from 'dayjs'
 
 const TypesOfLeave: React.FC = () => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const listData: ITypesOfLeave[] = useAppSelector((state: any) => state.typesOfLeave.listData)
   const timerId = useRef<any>(null)
@@ -235,7 +235,7 @@ const TypesOfLeave: React.FC = () => {
               dispatch(setValueFilter(JSON.stringify(searchValue)))
             }}
             icon={<PlusOutlined />}
-            type='default'
+            type='primary'
           >
             {t('typesOfLeave.createNew')}
           </Button>

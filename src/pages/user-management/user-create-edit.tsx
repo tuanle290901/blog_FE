@@ -15,6 +15,7 @@ import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { error } from 'console'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -22,7 +23,7 @@ const UserCreateEdit: React.FC<{
   userData?: IUser | null
   resetPageUser: any
 }> = ({ open, handleClose, userData, resetPageUser }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [avatarBase64, setAvatarBase64] = useState<string>('')
@@ -45,7 +46,7 @@ const UserCreateEdit: React.FC<{
       return { value: item.code, label: item.nameTitle }
     })
   }, [userTitle])
-  const { userInfo } = useUserInfo()
+  const { userInfo, setUserProfileInfo } = useUserInfo()
   const roleOptions: { value: string; label: string }[] = [
     {
       label: t('common.role.officer'),
@@ -156,6 +157,9 @@ const UserCreateEdit: React.FC<{
           await dispatch(
             updateUser({ userId: userData.id as string, user: { ...payload, userName: userData.userName } })
           ).unwrap()
+          if (userData && userInfo && (userData.userName === userInfo?.userName || userData.id === userInfo?.id)) {
+            setUserProfileInfo(payload)
+          }
         } else {
           await dispatch(createUser(payload)).unwrap()
           resetPageUser()

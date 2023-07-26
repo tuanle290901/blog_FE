@@ -22,7 +22,7 @@ interface IChangePassword {
 
 const ChangePassword: React.FC<IChangePassword> = (props) => {
   const { showModal, handClose } = props
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [form] = Form.useForm()
   const [serverError, setServerError] = useState<ErrorResponse>({
     status: 0,
@@ -136,7 +136,7 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
           rules={[
             {
               required: true,
-              message: `${t('changePassword.inviteToEnterOldPassword')}`
+              message: `${t('changePassword.inviteToEnterNewPassword')}`
             },
             {
               pattern: REGEX_PASSWORD,

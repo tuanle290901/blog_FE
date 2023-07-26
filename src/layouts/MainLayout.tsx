@@ -143,7 +143,7 @@ const MainLayout: React.FC = () => {
             null
           ),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Phòng ban', 'department', null),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Chức vụ', 'positions', null)
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Chức vụ', 'positions', null)
         ]
       ),
 
@@ -161,7 +161,7 @@ const MainLayout: React.FC = () => {
         <img src={menuIconSetting} alt='' className='menu-image' />,
         [
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách thiết bị chấm công', 'devices'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices'),
           // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
         ]

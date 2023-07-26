@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 
 const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ open, handleClose }) => {
-  const [t] = useTranslation()
+  const { t } = useTranslation()
   const [form] = Form.useForm()
 
   const handleSubmit = () => {
