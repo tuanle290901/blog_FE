@@ -161,7 +161,7 @@ const MainLayout: React.FC = () => {
         <img src={menuIconSetting} alt='' className='menu-image' />,
         [
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách thiết bị chấm công', 'devices'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices'),
           // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
         ]
@@ -215,7 +215,7 @@ const MainLayout: React.FC = () => {
         <div className='menu-bottom'>
           <div className='bottom-main-text'>Employee Management System</div>
           <div>
-            <span className='bottom-extra-text tw-mr-2'>Powed by</span>
+            <span className='bottom-extra-text tw-mr-2'>Powered by</span>
             <span className='bottom-main-text tw-font-bold'>HTSC</span>
           </div>
         </div>
