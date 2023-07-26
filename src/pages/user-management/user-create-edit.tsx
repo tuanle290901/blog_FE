@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
 import defaultImg from '~/assets/images/default-img.png'
 import { getBase64 } from '~/utils/util.ts'
+import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface.ts'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
@@ -20,7 +21,8 @@ const UserCreateEdit: React.FC<{
   open: boolean
   handleClose: (isCreateUserSuccess: boolean) => void
   userData?: IUser | null
-}> = ({ open, handleClose, userData }) => {
+  resetPageUser: any
+}> = ({ open, handleClose, userData, resetPageUser }) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
@@ -33,6 +35,7 @@ const UserCreateEdit: React.FC<{
   const uploadRef = useRef<HTMLDivElement>(null)
   const groups = useAppSelector((state) => state.masterData.groups)
   const userTitle = useAppSelector((state) => state.masterData.listUserTitle)
+  const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
     return groups.map((item) => {
       return { value: item.code, label: item.name }
@@ -100,6 +103,7 @@ const UserCreateEdit: React.FC<{
     }
     return false
   }
+  const [checkDisableUpdateUser, setCheckDisableUpdateUser] = useState(true)
   useEffect(() => {
     if (userData) {
       form.setFieldsValue({
@@ -110,6 +114,11 @@ const UserCreateEdit: React.FC<{
       })
       if (userData.avatarBase64) {
         setAvatarBase64('data:image/png;base64,' + userData.avatarBase64)
+      }
+      if (!hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], currentAuth?.groupProfiles)) {
+        if (currentAuth?.userName !== userData.userName) {
+          setCheckDisableUpdateUser(false)
+        }
       }
     } else {
       form.resetFields()
@@ -153,6 +162,7 @@ const UserCreateEdit: React.FC<{
           }
         } else {
           await dispatch(createUser(payload)).unwrap()
+          resetPageUser()
         }
         setServerError(null)
         finishAndClose(true)
@@ -224,19 +234,28 @@ const UserCreateEdit: React.FC<{
       return hasPermission([ROLE.SYSTEM_ADMIN, ROLE.HR], userInfo?.groupProfiles)
     }
   }
+
   return (
     <Modal
       open={open}
-      title={t('userList.addMember')}
+      title={userData ? t('userList.editMember') : t('userList.addMember')}
       onCancel={() => finishAndClose(false)}
       footer={
         <div className={'tw-flex tw-justify-end'}>
           {(userData?.status !== USER_STATUS.DEACTIVE || !userData) && (
             <>
               <Button onClick={() => finishAndClose(false)}>{t('common.cancel')}</Button>
-              <Button type='primary' onClick={handleSubmit} loading={loading}>
-                {t('common.save')}
-              </Button>
+              {userData ? (
+                checkDisableUpdateUser && (
+                  <Button type='primary' onClick={handleSubmit} loading={loading}>
+                    {t('common.save')}
+                  </Button>
+                )
+              ) : (
+                <Button type='primary' onClick={handleSubmit} loading={loading}>
+                  {t('common.save')}
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -315,7 +334,7 @@ const UserCreateEdit: React.FC<{
                   ]}
                 >
                   <Input
-                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterMemberName')}
                   />
                 </Form.Item>
@@ -327,7 +346,7 @@ const UserCreateEdit: React.FC<{
                   <Radio.Group
                     name='genderType'
                     className='tw-w-full'
-                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                   >
                     <div className='tw-flex tw-gap-32 tw-border tw-border-gray-300 tw-border-solid  tw-bg-white tw-py-1 tw-px-2 tw-rounded-md'>
                       <Radio value={GENDER.MALE}>{t('userList.male')}</Radio>
@@ -338,7 +357,7 @@ const UserCreateEdit: React.FC<{
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
                     format='DD/MM/YYYY'
-                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     disabledDate={(date) => {
                       return date.isAfter(new Date())
                     }}
@@ -358,7 +377,7 @@ const UserCreateEdit: React.FC<{
                   ]}
                 >
                   <Input
-                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterPhoneNumber')}
                   />
                 </Form.Item>
@@ -372,11 +391,14 @@ const UserCreateEdit: React.FC<{
                     }
                   ]}
                 >
-                  <Input disabled={userData?.status === USER_STATUS.DEACTIVE} placeholder={t('userModal.enterEmail')} />
+                  <Input
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
+                    placeholder={t('userModal.enterEmail')}
+                  />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.address')} name='address'>
                   <Input
-                    disabled={userData?.status === USER_STATUS.DEACTIVE}
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterAddress')}
                   />
                 </Form.Item>
