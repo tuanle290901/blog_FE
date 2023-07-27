@@ -15,13 +15,13 @@ const AuthLayout: React.FC = () => {
                   <span className='tw-text-4xl tw-text-white'>HỆ THỐNG QUẢN LÝ </span>
                 </div>
                 <div className='tw-flex tw-items-center tw-w-full'>
-                  <span className='tw-text-4xl tw-mt-4 tw-mb-4' style={{ color: '#50BDFE' }}>
+                  <span className='tw-text-4xl tw-mt-4 tw-mb-4' style={{ color: '#00fdff' }}>
                     kết hợp
                   </span>
                   <span className='tw-text-4xl tw-mt-4 tw-ml-2 tw-mb-4 tw-text-white'> CHẤM CÔNG </span>
                 </div>
                 <div className='tw-flex tw-items-center tw-w-full'>
-                  <span className='tw-text-4xl' style={{ color: '#50BDFE' }}>
+                  <span className='tw-text-4xl' style={{ color: '#00fdff' }}>
                     bằng khuôn mặt
                   </span>
                 </div>

@@ -11,6 +11,7 @@ import { IGroup } from '../master-data/master-data.slice'
 import { IPayloadUpdateAttendance } from '~/types/attendance.interface'
 import { saveAs } from 'file-saver'
 import { employeeWorkingTimeRes } from './fake-data'
+import { convertBlobToString } from '~/utils/helper'
 
 export interface TimesheetStateInterface {
   loading: boolean
@@ -404,7 +405,6 @@ export const exportTimesheet = createAsyncThunk(
         responseType: 'blob',
         signal: thunkAPI.signal
       })
-      console.log(response?.size)
       if (response?.size > 0) {
         const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
         saveAs(
@@ -418,6 +418,10 @@ export const exportTimesheet = createAsyncThunk(
       }
     } catch (error: any) {
       if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        const dataResponse = await convertBlobToString(error.response.data)
+        if (dataResponse) {
+          notification.error({ message: dataResponse.message })
+        }
         return thunkAPI.rejectWithValue(error.response.data)
       }
       throw error

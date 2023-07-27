@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType } from '~/types/department.interface'
 import { FormValues } from '../setting/ticket-defination/type/ItemTypes'
 import './style.scss'
+import { convertBlobToString } from '~/utils/helper'
 
 const { RangePicker } = DatePicker
 
@@ -54,7 +55,6 @@ const Index = () => {
   const [reportForm] = Form.useForm()
   const dispatch = useAppDispatch()
   const departments = useAppSelector((item) => item.department.listData)
-
   const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
   const [timeReport, setTimReport] = useState<Dayjs | null>(null)
@@ -62,6 +62,8 @@ const Index = () => {
     status: false,
     msg: ''
   })
+
+  const groups = useAppSelector((state: any) => state.masterData.groups)
 
   const onChangeTime: DatePickerProps['onChange'] = (date) => {
     setTimReport(date)
@@ -75,18 +77,25 @@ const Index = () => {
       year: timeString.split('/')[1]
     }
     try {
-      const response: any = await downloadExcelFile(params)
+      const response = (await downloadExcelFile(params)) as any
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-      saveAs(blob, 'Bang-chi-tiet-cham-cong-cbcnv.xlsx')
+      const fileName =
+        groups && groups.length > 0
+          ? `${groups[groups.length - 1]?.name}_ChamCong_${params.month}${params.year}.xlsx`
+          : `ChamCong_${params.month}${params.year}.xlsx`
+      saveAs(blob, fileName)
       setIsDownloadFinished({
         status: true,
         msg: 'Tải xuống tệp thành công'
       })
     } catch (error: any) {
-      setIsDownloadFinished({
-        status: false,
-        msg: 'Không có dữ liệu của tháng đã chọn'
-      })
+      const dataResponse = await convertBlobToString(error.response.data)
+      if (dataResponse) {
+        setIsDownloadFinished({
+          status: false,
+          msg: dataResponse.message
+        })
+      }
     }
   }
 
