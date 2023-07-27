@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType } from '~/types/department.interface'
 import { FormValues } from '../setting/ticket-defination/type/ItemTypes'
 import './style.scss'
+import { convertBlobToString } from '~/utils/helper'
 
 const { RangePicker } = DatePicker
 
@@ -75,7 +76,7 @@ const Index = () => {
       year: timeString.split('/')[1]
     }
     try {
-      const response: any = await downloadExcelFile(params)
+      const response = (await downloadExcelFile(params)) as any
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
       saveAs(blob, 'Bang-chi-tiet-cham-cong-cbcnv.xlsx')
       setIsDownloadFinished({
@@ -83,10 +84,13 @@ const Index = () => {
         msg: 'Tải xuống tệp thành công'
       })
     } catch (error: any) {
-      setIsDownloadFinished({
-        status: false,
-        msg: 'Không có dữ liệu của tháng đã chọn'
-      })
+      const dataResponse = await convertBlobToString(error.response.data)
+      if (dataResponse) {
+        setIsDownloadFinished({
+          status: false,
+          msg: dataResponse.message
+        })
+      }
     }
   }
 
