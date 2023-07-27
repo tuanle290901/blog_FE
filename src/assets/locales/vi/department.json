@@ -15,8 +15,8 @@
     "pleaseEnterSearch": "Mời nhập thông tin tìm kiếm",
     "please-insert-input": "Mời nhập thông tin ",
     "alter-notification": {
-      "do-not-leave-spaces-special-characters-vietnamese-accents": "Kí tự đặc biệt, dấu cách, chữ tiếng Việt có dấu không được sử dụng.",
-      "do-not-leave-spaces-special-accents": "Kí tự đặc biệt, dấu cách không được sử dụng",
+      "do-not-leave-spaces-special-characters-vietnamese-accents": "Không được Kí tự đặc biệt, dấu cách, chữ tiếng Việt có dấu.",
+      "do-not-leave-spaces-special-accents": "Không được sử Kí tự đặc biệt, dấu cách.",
       "do-not-email-accents": "Email không hợp lệ hoặc thừa khoảng trắng",
       "do-not-phone-accents": "Số điện thoại không hợp lệ"
     },
