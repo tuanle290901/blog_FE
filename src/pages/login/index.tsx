@@ -46,6 +46,22 @@ const Index: React.FC = () => {
     }
   }, [loginState.userInfo, navigate])
 
+  useEffect(() => {
+    const handleStorageChange = (event: any) => {
+      if (event.key === LOCAL_STORAGE.AUTH_INFO) {
+        if (event.newValue) {
+          setTimeout(() => {
+            navigate('/')
+          }, 1000)
+        }
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
+
   return (
     <div className='login-container tw-pt-[15%]'>
       <Row className='login-logo-container tw-h-[12%]' align='middle'>

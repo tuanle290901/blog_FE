@@ -23,6 +23,7 @@ import { useAppDispatch } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { hasPermission } from '~/utils/helper'
 import './style.scss'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -180,6 +181,20 @@ const MainLayout: React.FC = () => {
     setSideBarMenuKey(pathname)
     setSelectedKeyStatus(pathname)
   }, [window.location.pathname])
+
+  useEffect(() => {
+    const handleStorageChange = (event: any) => {
+      if (event.key === LOCAL_STORAGE.AUTH_INFO) {
+        if (!event.newValue) {
+          handleLogout()
+        }
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
 
   return (
     <Layout className='app-container tw-min-h-screen'>
