@@ -26,8 +26,8 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       address,
       name,
       publishDate: publishDate ? publishDate.format('YYYY-MM-DD') : null,
-      contactEmail,
-      contactPhoneNumber,
+      contactEmail: contactEmail ? contactEmail : null,
+      contactPhoneNumber: contactPhoneNumber ? contactPhoneNumber : null,
       parentCode: ''
     }
     if (data) {
