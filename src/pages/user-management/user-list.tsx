@@ -237,7 +237,7 @@ const UserList: React.FC = () => {
       render: (text, record) => {
         return record.groupProfiles
           .map((item, index) => {
-            return `${item.groupName}(${t(`common.role.${item.role.toLowerCase()}`)})`
+            return `${item.groupName} (${t(`common.role.${item.role.toLowerCase()}`)})`
           })
           .join(',')
       },
