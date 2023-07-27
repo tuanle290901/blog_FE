@@ -1,3 +1,4 @@
+import { notification } from 'antd'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { ROLE } from '~/constants/app.constant.ts'
@@ -86,4 +87,12 @@ export const hasPermissionAndGroup = (
   }
 
   return isHasPermission
+}
+
+export const convertBlobToString = async (bobData: Blob) => {
+  const responseStr = (await new Response(bobData).text()) as string
+  if (responseStr) {
+    return JSON.parse(responseStr)
+  }
+  return null
 }

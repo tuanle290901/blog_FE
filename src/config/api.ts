@@ -47,6 +47,10 @@ HttpService.interceptors.response.use(
         })
       }
     }
+    console.log(error, 'error response')
+    if (error.response?.status === 401) {
+      notification.error({ message: error.response?.data?.message })
+    }
     if (error.response?.status === 500) {
       notification.error({ message: 'Có một lỗi không xác định xảy ra vui lòng liên hệ bộ phận hỗ trợ kĩ thuật' })
     }
