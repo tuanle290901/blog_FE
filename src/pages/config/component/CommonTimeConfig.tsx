@@ -247,6 +247,7 @@ const CommonTimeConfig: React.FC = () => {
       })
     }
     setItems(listTabPanel)
+    setActiveKey(listTabPanel[0].key)
   }, [listWKTC, groups])
   const add = (code: string, name: string) => {
     setOpenModal(false)
