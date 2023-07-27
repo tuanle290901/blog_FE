@@ -50,7 +50,7 @@ const Timesheet: React.FC = () => {
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
   const [selectedUser, setSelectedUser] = useState(
-    currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : ''
+    currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
   )
   const [isAllowedAccess, setIsAllowedAccess] = useState(
     currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? true : false
@@ -61,9 +61,13 @@ const Timesheet: React.FC = () => {
   const [clickUpdateButton, setClickUpdateButton] = useState(false)
   const timerId = useRef<any>(null)
   const [query, setQuery] = useState<string>('')
+  const [selectedTimeRange, setSelectedTimeRange] = useState('')
   let confirmAttendanceStatisticList: any[] = []
   const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
     return { value: item?.code, label: item?.name }
+  })
+  const userOptions = usersInGroupSate?.map((item) => {
+    return { value: item?.id, label: item?.fullName }
   })
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
@@ -113,6 +117,7 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectToday = () => {
+    setSelectedTimeRange('today')
     setSelectedStartDate(dayjs())
     setSelectedEndDate(dayjs())
     setSearchValue((prevState) => {
@@ -126,6 +131,7 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectThisMonth = () => {
+    setSelectedTimeRange('this_month')
     setSelectedStartDate(dayjs().startOf('M'))
     setSelectedEndDate(dayjs().endOf('M'))
     setSearchValue((prevState) => {
@@ -139,6 +145,7 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectLastMonth = () => {
+    setSelectedTimeRange('last_month')
     setSelectedStartDate(
       dayjs()
         .month(dayjs().month() - 1)
@@ -166,8 +173,8 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectGroup = (value: string) => {
+    setSelectedUser(null)
     setSelectedGroup(value)
-    setSelectedUser('')
   }
 
   const getSortOrder = (filed: string) => {
@@ -606,13 +613,25 @@ const Timesheet: React.FC = () => {
                     allowClear={false}
                     renderExtraFooter={() => (
                       <div className='timesheet-filter-time__button'>
-                        <Button onClick={handleSelectToday} size='small'>
+                        <Button
+                          onClick={handleSelectToday}
+                          size='small'
+                          className={selectedTimeRange === 'today' ? 'selected' : ''}
+                        >
                           {t('timesheet.today')}
                         </Button>
-                        <Button onClick={handleSelectThisMonth} size='small'>
+                        <Button
+                          onClick={handleSelectThisMonth}
+                          size='small'
+                          className={selectedTimeRange === 'this_month' ? 'selected' : ''}
+                        >
                           {t('timesheet.thisMonth')}
                         </Button>
-                        <Button onClick={handleSelectLastMonth} size='small'>
+                        <Button
+                          onClick={handleSelectLastMonth}
+                          size='small'
+                          className={selectedTimeRange === 'last_month' ? 'selected' : ''}
+                        >
                           {t('timesheet.lastMonth')}
                         </Button>
                       </div>
@@ -672,15 +691,10 @@ const Timesheet: React.FC = () => {
                     allowClear
                     // onClear={() => setUserOptions([])}
                     value={selectedUser}
+                    defaultValue={selectedUser}
                     onChange={(value) => setSelectedUser(value)}
-                  >
-                    {usersInGroupSate?.length > 0 &&
-                      usersInGroupSate?.map((i) => (
-                        <Option key={i?.id} label={i?.fullName} value={i?.id}>
-                          {i?.fullName || i?.userName}
-                        </Option>
-                      ))}
-                  </Select>
+                    options={userOptions}
+                  />
                 </Col>
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search

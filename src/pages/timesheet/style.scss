@@ -178,9 +178,10 @@
       &__button {
         display: flex;
         padding: 10px;
-
         button {
-          margin-right: 10px;
+          margin-right: 8px;
+        }
+        .selected {
           background: #1890ff;
           color: #fff;
 
