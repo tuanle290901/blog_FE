@@ -27,7 +27,10 @@ HttpService.interceptors.request.use((config: any) => {
   }
 })
 HttpService.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    console.log(response)
+    return response.data
+  },
   (error) => {
     if (
       error instanceof AxiosError &&
@@ -47,7 +50,6 @@ HttpService.interceptors.response.use(
         })
       }
     }
-    console.log(error, 'error response')
     if (error.response?.status === 401) {
       notification.error({ message: error.response?.data?.message })
     }

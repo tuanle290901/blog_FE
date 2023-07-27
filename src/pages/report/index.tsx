@@ -55,7 +55,6 @@ const Index = () => {
   const [reportForm] = Form.useForm()
   const dispatch = useAppDispatch()
   const departments = useAppSelector((item) => item.department.listData)
-
   const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
   const [timeReport, setTimReport] = useState<Dayjs | null>(null)
@@ -63,6 +62,8 @@ const Index = () => {
     status: false,
     msg: ''
   })
+
+  const groups = useAppSelector((state: any) => state.masterData.groups)
 
   const onChangeTime: DatePickerProps['onChange'] = (date) => {
     setTimReport(date)
@@ -78,7 +79,11 @@ const Index = () => {
     try {
       const response = (await downloadExcelFile(params)) as any
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-      saveAs(blob, 'Bang-chi-tiet-cham-cong-cbcnv.xlsx')
+      const fileName =
+        groups && groups.length > 0
+          ? `${groups[groups.length - 1]?.name}_ChamCong_${params.month}${params.year}.xlsx`
+          : `ChamCong_${params.month}${params.year}.xlsx`
+      saveAs(blob, fileName)
       setIsDownloadFinished({
         status: true,
         msg: 'Tải xuống tệp thành công'
