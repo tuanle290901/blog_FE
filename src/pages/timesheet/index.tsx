@@ -66,6 +66,9 @@ const Timesheet: React.FC = () => {
   const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
     return { value: item?.code, label: item?.name }
   })
+  const userOptions = usersInGroupSate?.map((item) => {
+    return { value: item?.id, label: item?.fullName }
+  })
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
@@ -170,8 +173,8 @@ const Timesheet: React.FC = () => {
   }
 
   const handleSelectGroup = (value: string) => {
+    setSelectedUser(null)
     setSelectedGroup(value)
-    setSelectedUser('')
   }
 
   const getSortOrder = (filed: string) => {
@@ -688,15 +691,10 @@ const Timesheet: React.FC = () => {
                     allowClear
                     // onClear={() => setUserOptions([])}
                     value={selectedUser}
+                    defaultValue={selectedUser}
                     onChange={(value) => setSelectedUser(value)}
-                  >
-                    {usersInGroupSate?.length > 0 &&
-                      usersInGroupSate?.map((i) => (
-                        <Option key={i?.id} label={i?.fullName} value={i?.id}>
-                          {i?.fullName || i?.userName}
-                        </Option>
-                      ))}
-                  </Select>
+                    options={userOptions}
+                  />
                 </Col>
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search
