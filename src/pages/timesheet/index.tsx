@@ -46,6 +46,12 @@ const Timesheet: React.FC = () => {
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
+  const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
+    return { value: item?.code, label: item?.name }
+  })
+  const userOptions = usersInGroupSate?.map((item) => {
+    return { value: item?.id, label: item?.fullName }
+  })
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
@@ -63,12 +69,6 @@ const Timesheet: React.FC = () => {
   const [query, setQuery] = useState<string>('')
   const [selectedTimeRange, setSelectedTimeRange] = useState('')
   let confirmAttendanceStatisticList: any[] = []
-  const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
-    return { value: item?.code, label: item?.name }
-  })
-  const userOptions = usersInGroupSate?.map((item) => {
-    return { value: item?.id, label: item?.fullName }
-  })
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)

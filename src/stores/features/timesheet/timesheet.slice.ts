@@ -280,10 +280,20 @@ export const exportTimesheet = createAsyncThunk(
     thunkAPI
   ) => {
     try {
+      const defaultSorts = [
+        {
+          direction: 'DESC',
+          field: 'date'
+        },
+        {
+          direction: 'DESC',
+          field: 'startTime'
+        }
+      ]
       const body: any = {
         page: params.paging.page,
         size: params.paging.size,
-        sort: params.sorts
+        sort: params.sorts?.length > 0 ? params.sorts : defaultSorts
       }
       if (!params.query && params.groupCode) {
         body.criteria = [
