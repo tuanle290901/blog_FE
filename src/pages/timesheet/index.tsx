@@ -55,9 +55,10 @@ const Timesheet: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(
-    currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
-  )
+  // const [selectedUser, setSelectedUser] = useState(
+  //   currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
+  // )
+  const [selectedUser, setSelectedUser] = useState(null)
   const [isAllowedAccess, setIsAllowedAccess] = useState(
     currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? true : false
   )
