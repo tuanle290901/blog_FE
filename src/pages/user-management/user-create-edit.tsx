@@ -138,7 +138,7 @@ const UserCreateEdit: React.FC<{
       const index = avatarBase64.indexOf(',')
       value.avatarBase64 = avatarBase64.slice(index + 1)
       const birthday = value.birthday ? value.birthday.format('YYYY-MM-DD') : null
-      const joinDate = value.joinDate ? value.joinDate.format('YYYY-MM-DD') : null
+      const joinDate = value.joinDate ? value.joinDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
       const formalDate = value.formalDate ? value.formalDate.format('YYYY-MM-DD') : null
       const payload: IUser = {
         ...value,
@@ -424,18 +424,34 @@ const UserCreateEdit: React.FC<{
                 }   tw-overflow-auto`}
               >
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
-                  <DatePicker
-                    format='DD/MM/YYYY'
-                    disabledDate={(date) => {
-                      return date.isAfter(new Date())
-                    }}
-                    disabled={
-                      (!!userData && userData.editType === EDIT_TYPE.SELF) || userData?.status === USER_STATUS.DEACTIVE
-                    }
-                    showToday={false}
-                    className='tw-w-full'
-                    placeholder={t('userModal.enterDateJoin')}
-                  />
+                  {userData ? (
+                    <DatePicker
+                      format='DD/MM/YYYY'
+                      disabledDate={(date) => {
+                        return date.isAfter(new Date())
+                      }}
+                      disabled={
+                        (!!userData && userData.editType === EDIT_TYPE.SELF) ||
+                        userData?.status === USER_STATUS.DEACTIVE
+                      }
+                      showToday={false}
+                      defaultValue={userData?.joinDate ? dayjs(userData?.joinDate) : undefined}
+                      className='tw-w-full'
+                      placeholder={t('userModal.enterDateJoin')}
+                    />
+                  ) : (
+                    <DatePicker
+                      format='DD/MM/YYYY'
+                      disabledDate={(date) => {
+                        return date.isAfter(new Date())
+                      }}
+                      disabled={!!userData}
+                      showToday={false}
+                      defaultValue={dayjs()}
+                      className='tw-w-full'
+                      placeholder={t('userModal.enterDateJoin')}
+                    />
+                  )}
                 </Form.Item>
                 {/*<Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>*/}
                 {/*  <DatePicker*/}
