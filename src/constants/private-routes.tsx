@@ -15,6 +15,7 @@ import Department from '~/pages/Department'
 import TypesOfLeave from '~/pages/types-of-leave-management/types-of-leave-list'
 import Report from '~/pages/report'
 import { ROLE } from '~/constants/app.constant.ts'
+import LeaveRequest from '~/pages/leave-request'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -43,7 +44,8 @@ export const PRIVATE_PATH = {
   },
   position: '/positions',
   typesOfleave: '/types-of-leave',
-  report: 'report'
+  report: 'report',
+  leaveRequest: '/leave-request'
 }
 
 export const PRIVATE_ROUTES: IRoutes[] = [
@@ -113,5 +115,11 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     path: PRIVATE_PATH.report,
     component: Report,
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
+  },
+  {
+    name: 'leaveRequest',
+    path: PRIVATE_PATH.leaveRequest,
+    component: LeaveRequest,
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   }
 ]
