@@ -108,3 +108,57 @@ export const DEFAULT_CONFIG: IWorkingTimeConfig = {
     }
   ]
 }
+
+export interface IWorkingInfo {
+  year: string
+  groupCode: string
+  policySetup: PolicySetup
+  timeWorkSetup: TimeWorkSetup
+}
+
+export interface PolicySetup {
+  reportMethod: string
+  reportViolateTime: string
+  reportMonthlyStatisticTime: string
+  defaultLeaveDay: number
+}
+
+export interface TimeWorkSetup {
+  workingTime: WorkingTime
+  dailyOverTimeSetups: DailyOverTimeSetup[]
+  weekendTimeSetups: WeekendTimeSetup[]
+  timeWorkQuaterSetups: TimeWorkQuaterSetup[]
+}
+
+export interface WorkingTime {
+  startTime: string
+  endTime: string
+}
+
+export interface DailyOverTimeSetup {
+  shiftNo: number
+  overTimeShift: OverTimeShift
+  coefficientSalary: number
+}
+
+export interface OverTimeShift {
+  startTime: string
+  endTime: string
+}
+
+export interface WeekendTimeSetup {
+  coefficient: number
+  dayOfWeek: string
+}
+
+export interface TimeWorkQuaterSetup {
+  startTime: string
+  endTime: string
+  saturdayWorkingConfigs: SaturdayWorkingConfig[]
+  quarter: string
+}
+
+export interface SaturdayWorkingConfig {
+  saturdayDate: string
+  working: boolean
+}
