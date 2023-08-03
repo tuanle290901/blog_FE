@@ -131,6 +131,13 @@ const MainLayout: React.FC = () => {
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+        'Xin nghỉ phép',
+        'leave-request',
+        <img src={menuIconTimeKeeping} alt='' className='menu-image' />
+      ),
+
+      getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
         <Tooltip placement='topLeft' title='Nhân sự'>
           Nhân sự
         </Tooltip>,

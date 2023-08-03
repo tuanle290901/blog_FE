@@ -1,0 +1,23 @@
+{
+  "leaveRequest": {
+    "typeOfLeave": "Công nghỉ",
+    "title": "Yêu cầu nghỉ phép",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "from": "Từ",
+    "to": "Đến",
+    "timeLeave": "Thời gian nghỉ",
+    "selectDate": "Chọn ngày",
+    "selectHour": "Chọn giờ",
+    "requestMessage": "Ghi chú",
+    "AmountTimeLeave": "Tổng thời gian nghỉ",
+    "requestDate": "Ngày yêu cầu",
+    "status": "Trạng thái",
+    "name": "Tên nghỉ phép",
+    "createNew": "Thêm yêu cầu nghỉ phép",
+    "createdAt": "Ngày tạo",
+    "search": "Tìm kiếm...",
+    "confirmDeleteTitle": "Xóa yêu cầu nghỉ phép",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa không?"
+  }
+}

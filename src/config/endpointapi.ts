@@ -18,5 +18,11 @@ export const END_POINT_API = {
   },
   Users: {
     changePassword: () => `/system-user/change-password`
+  },
+  LeaveRequest: {
+    create: () => `/leave-request/create`,
+    update: () => `/leave-request/update`,
+    getPageSize: () => `/leave-request/filter`,
+    delete: () => `/leave-request/delete`
   }
 }

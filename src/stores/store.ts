@@ -11,6 +11,7 @@ import timesheetSlice from './features/timesheet/timesheet.slice'
 import workingTimeConfigSlice from '~/stores/features/working-time-config/working-time-config.slice.ts'
 import typesOfLeaveSlice from './features/types-of-leave/types-of-leave.slice'
 import report from './features/report/report.slice'
+import leaveRequestSlice from './features/leave-request/leave-request.slice'
 
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -25,6 +26,7 @@ export const store = configureStore({
     position: positionSlice,
     device: devicesSlice,
     typesOfLeave: typesOfLeaveSlice,
+    leaveRequest: leaveRequestSlice,
     workingTime: workingTimeConfigSlice,
     report
   }
