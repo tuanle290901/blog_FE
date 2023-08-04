@@ -1,5 +1,6 @@
 import type { RadioChangeEvent } from 'antd'
 import { Button, Checkbox, Col, Radio, Row, Space, notification } from 'antd'
+import { UpOutlined, DownOutlined } from '@ant-design/icons'
 import type { CheckboxValueType } from 'antd/es/checkbox/Group'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -77,8 +78,15 @@ const Index = () => {
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuater)
   const [saturdayList, setSaturdayList] = useState<SaturdayWorkingConfig[]>([])
   const [saturdayListFilter, setSaturdayListFilter] = useState<string[]>([])
+  const [collapseRow, setCollapseRow] = useState<boolean[]>([false, false, false, false])
 
   const overtimeOptions: DailyOverTimeSetup[] = workingTimeInfo?.timeWorkSetup?.dailyOverTimeSetups || []
+
+  const updateCollapseRow = (index: number) => {
+    const newCollapseRow = [...collapseRow]
+    newCollapseRow[index] = !newCollapseRow[index]
+    setCollapseRow(newCollapseRow)
+  }
 
   const onChangeQuarter = (e: RadioChangeEvent) => {
     setSelectedQuarter(e.target.value)
@@ -151,133 +159,172 @@ const Index = () => {
   return (
     <div className='tw-h-[calc(100%-48px)] tw-m-3 tw-p-3 '>
       <div className='tw-bg-white tw-p-4 tw-rounded-md tw-mb-4 box-style'>
-        <div className='tw-flex tw-items-center tw-justify-between'>{renderTitle('I. Thời gian làm hành chính')}</div>
-
-        <div className='tw-mt-2'>
-          {renderRow(
-            'double',
-            '1. Giờ làm việc hành chính (Thứ 2 - Thứ 6)',
-            workingTimeInfo?.timeWorkSetup?.workingTime?.startTime,
-            workingTimeInfo?.timeWorkSetup?.workingTime?.endTime
-          )}
-          <div className='tw-text-base tw-mt-4'>
-            <Row align={'middle'} justify={'space-between'}>
-              <Col>
-                {renderRow(
-                  'double',
-                  '2. Lịch làm việc thứ 7',
-                  workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find((item) => item.quarter === selectedQuarter)
-                    ?.startTime || '',
-                  workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find((item) => item.quarter === selectedQuarter)
-                    ?.endTime || ''
-                )}
-              </Col>
-              <Col>
-                <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
-                  {quarterOptions.map((opt, index) => {
-                    return (
-                      <Radio.Button key={index} value={opt.value}>
-                        {convertQuarterName(opt.value)}
-                      </Radio.Button>
-                    )
-                  })}
-                </Radio.Group>
-              </Col>
-            </Row>
-
-            <div className='tw-mt-2'>
-              <Checkbox.Group value={checkedValues} onChange={onChangeSatOptions} className='tw-w-full'>
-                <div className='tw-flex tw-flex-wrap tw-w-full'>
-                  {saturdayList.map((option, index) => {
-                    return (
-                      <div
-                        key={index}
-                        className='tw-mt-2 xs-tw-w-[50%] md:tw-w-[33%] xl:tw-w-[20%]'
-                        style={{
-                          display: saturdayListFilter.includes(option.saturdayDate) ? 'block' : 'none'
-                        }}
-                      >
-                        <Checkbox value={option.saturdayDate} disabled={dayjs().isAfter(option.saturdayDate)}>
-                          {dayjs(option.saturdayDate).format('DD/MM/YYYY')}
-                        </Checkbox>
-                      </div>
-                    )
-                  })}
-                </div>
-              </Checkbox.Group>
-            </div>
+        <div className='tw-flex tw-items-center tw-justify-between'>
+          {renderTitle('I. Thời gian làm hành chính')}{' '}
+          <div className='tw-ml-auto' onClick={() => updateCollapseRow(0)}>
+            {!collapseRow[0] && <UpOutlined className='tw-cursor-pointer' />}
+            {collapseRow[0] && <DownOutlined className='tw-cursor-pointer' />}
           </div>
         </div>
+
+        {!collapseRow[0] && (
+          <div className='tw-mt-2'>
+            {renderRow(
+              'double',
+              '1. Giờ làm việc hành chính (Thứ 2 - Thứ 6)',
+              workingTimeInfo?.timeWorkSetup?.workingTime?.startTime,
+              workingTimeInfo?.timeWorkSetup?.workingTime?.endTime
+            )}
+            <div className='tw-text-base tw-mt-4'>
+              <Row align={'middle'} justify={'space-between'}>
+                <Col>
+                  {renderRow(
+                    'double',
+                    '2. Lịch làm việc thứ 7',
+                    workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find(
+                      (item) => item.quarter === selectedQuarter
+                    )?.startTime || '',
+                    workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find(
+                      (item) => item.quarter === selectedQuarter
+                    )?.endTime || ''
+                  )}
+                </Col>
+                <Col>
+                  <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
+                    {quarterOptions.map((opt, index) => {
+                      return (
+                        <Radio.Button key={index} value={opt.value}>
+                          {convertQuarterName(opt.value)}
+                        </Radio.Button>
+                      )
+                    })}
+                  </Radio.Group>
+                </Col>
+              </Row>
+
+              <div className='tw-mt-2'>
+                <Checkbox.Group value={checkedValues} onChange={onChangeSatOptions} className='tw-w-full'>
+                  <div className='tw-flex tw-flex-wrap tw-w-full'>
+                    {saturdayList.map((option, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className='tw-mt-2 xs-tw-w-[50%] md:tw-w-[33%] xl:tw-w-[20%]'
+                          style={{
+                            display: saturdayListFilter.includes(option.saturdayDate) ? 'block' : 'none'
+                          }}
+                        >
+                          <Checkbox value={option.saturdayDate} disabled={dayjs().isAfter(option.saturdayDate)}>
+                            {dayjs(option.saturdayDate).format('DD/MM/YYYY')}
+                          </Checkbox>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </Checkbox.Group>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Section 2 */}
       <section className='tw-bg-white tw-p-3 tw-rounded-md tw-mb-4 box-style'>
-        {renderTitle('II. Quy định thời gian làm thêm và hệ số lương')}
-        <div className='tw-mt-4'>
-          <div className='tw-mt-4'>
-            <Row align={'middle'}>
-              <Col>
-                <div className='tw-text-base tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
-              </Col>
+        <div className='tw-flex'>
+          {renderTitle('II. Quy định thời gian làm thêm và hệ số lương')}
 
-              <Col>
-                <div className='tw-flex tw-flex-col tw-justify-center tw-gap-[15px]'>
-                  {overtimeOptions.map((item, index) => {
-                    return (
-                      <Space key={index} className='tw-ml-4'>
-                        <div className='time-box'>{item?.overTimeShift?.startTime}</div>
-                        <span className='tw-font-bold'>-</span>
-                        <div className='time-box'>{item?.overTimeShift?.endTime}</div>
-                        <div className='time-circle'>x{item?.coefficientSalary}</div>
-                      </Space>
-                    )
-                  })}
-                </div>
-              </Col>
-            </Row>
-            <div className='tw-mt-4'>
-              {renderRow(
-                'doubleComma',
-                '2. Ngày làm thêm cuối tuần',
-                'Thứ 7',
-                'Chủ nhật',
-                `x${workingTimeInfo?.timeWorkSetup?.weekendTimeSetups[0]?.coefficient}`
-              )}
-            </div>
+          <div className='tw-ml-auto' onClick={() => updateCollapseRow(1)}>
+            {!collapseRow[1] && <UpOutlined className='tw-cursor-pointer' />}
+            {collapseRow[1] && <DownOutlined className='tw-cursor-pointer' />}
           </div>
         </div>
+
+        {!collapseRow[1] && (
+          <div className='tw-mt-4'>
+            <div className='tw-mt-4'>
+              <Row align={'middle'}>
+                <Col>
+                  <div className='tw-text-base tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
+                </Col>
+
+                <Col>
+                  <div className='tw-flex tw-flex-col tw-justify-center tw-gap-[15px]'>
+                    {overtimeOptions.map((item, index) => {
+                      return (
+                        <Space key={index} className='tw-ml-4'>
+                          <div className='time-box'>{item?.overTimeShift?.startTime}</div>
+                          <span className='tw-font-bold'>-</span>
+                          <div className='time-box'>{item?.overTimeShift?.endTime}</div>
+                          <div className='time-circle'>x{item?.coefficientSalary}</div>
+                        </Space>
+                      )
+                    })}
+                  </div>
+                </Col>
+              </Row>
+              <div className='tw-mt-[30px]'>
+                {renderRow(
+                  'doubleComma',
+                  '2. Ngày làm thêm cuối tuần',
+                  'Thứ 7',
+                  'Chủ nhật',
+                  `x${workingTimeInfo?.timeWorkSetup?.weekendTimeSetups[0]?.coefficient}`
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Section 3 */}
       <section className='tw-bg-white tw-p-3 tw-rounded-md tw-mb-4 box-style'>
-        {renderTitle('III. Lịch gửi email thông báo')}
-        <div className='tw-mt-4'>
-          {renderRow(
-            'single',
-            '1. Thông báo đi muộn/ về sớm hàng ngày',
-            workingTimeInfo?.policySetup?.reportViolateTime
-          )}
+        <div className='tw-flex'>
+          {renderTitle('III. Lịch gửi email thông báo')}
+
+          <div className='tw-ml-auto' onClick={() => updateCollapseRow(2)}>
+            {!collapseRow[2] && <UpOutlined className='tw-cursor-pointer' />}
+            {collapseRow[2] && <DownOutlined className='tw-cursor-pointer' />}
+          </div>
+        </div>
+
+        {!collapseRow[2] && (
           <div className='tw-mt-4'>
             {renderRow(
               'single',
-              '2. Thông báo ngày công của tháng',
-              workingTimeInfo?.policySetup?.reportMonthlyStatisticTime
+              '1. Thông báo đi muộn/ về sớm hàng ngày',
+              workingTimeInfo?.policySetup?.reportViolateTime
             )}
+            <div className='tw-mt-4'>
+              {renderRow(
+                'single',
+                '2. Thông báo ngày công của tháng',
+                workingTimeInfo?.policySetup?.reportMonthlyStatisticTime
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Section 4 */}
       <section className='tw-bg-white tw-p-3 tw-rounded-md tw-mb-4 box-style'>
-        {renderTitle('IV. Số ngày nghỉ phép mặc định')}
-        <div className='tw-flex tw-items-center tw-mt-4'>
-          {renderRow(
-            'single',
-            'Số ngày nghỉ phép mặc định của năm',
-            `${workingTimeInfo?.policySetup?.defaultLeaveDay}`
-          )}
-          <div className='tw-ml-2'>(ngày)</div>
+        <div className='tw-flex'>
+          {renderTitle('IV. Số ngày nghỉ phép mặc định')}
+          <div className='tw-ml-auto' onClick={() => updateCollapseRow(3)}>
+            {!collapseRow[3] && <UpOutlined className='tw-cursor-pointer' />}
+            {collapseRow[3] && <DownOutlined className='tw-cursor-pointer' />}
+          </div>
         </div>
+
+        {!collapseRow[3] && (
+          <div className='tw-flex tw-items-center tw-mt-4'>
+            {renderRow(
+              'single',
+              'Số ngày nghỉ phép mặc định của năm',
+              `${workingTimeInfo?.policySetup?.defaultLeaveDay}`
+            )}
+            <div className='tw-ml-2'>(ngày)</div>
+          </div>
+        )}
       </section>
 
       <div className='tw-w-full'>
