@@ -47,7 +47,7 @@ const userHistory: React.FC = () => {
   })
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <h1 className='tw-text-3xl tw-font-semibold tw-mb-6'>User history</h1>
+      <h1 className='tw-text-2xl tw-font-semibold tw-mb-6'>User history</h1>
       <div className='tw-mt-14'>
         <Table
           rowKey='id'

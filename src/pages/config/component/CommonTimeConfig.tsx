@@ -299,7 +299,7 @@ const CommonTimeConfig: React.FC = () => {
         handleClose={handleAddConfigForGroup}
       />
       <div className='tw-mb-2'>
-        <h1 className='tw-text-3xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
+        <h1 className='tw-text-2xl tw-font-semibold tw-mb-2'>Cấu hình thời gian làm việc</h1>
         <p>Tùy chỉnh thời gian làm việc chung áp dụng cho tất cả các thành viên nếu không có thay đổi</p>
       </div>
       <div className='tw-mt-4'>

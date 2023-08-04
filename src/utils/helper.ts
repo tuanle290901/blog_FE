@@ -96,3 +96,32 @@ export const convertBlobToString = async (bobData: Blob) => {
   }
   return null
 }
+
+export const convertMonthToLocaleVi = (month: string) => {
+  switch (month.toLowerCase()) {
+    case 'jan':
+      return 'Tháng 01'
+    case 'feb':
+      return 'Tháng 02'
+    case 'mar':
+      return 'Tháng 03'
+    case 'apr':
+      return 'Tháng 04'
+    case 'may':
+      return 'Tháng 05'
+    case 'jun':
+      return 'Tháng 06'
+    case 'jul':
+      return 'Tháng 07'
+    case 'aug':
+      return 'Tháng 08'
+    case 'sep':
+      return 'Tháng 09'
+    case 'oct':
+      return 'Tháng 10'
+    case 'nov':
+      return 'Tháng 11'
+    case 'dec':
+      return 'Tháng 12'
+  }
+}

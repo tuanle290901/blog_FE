@@ -12,6 +12,7 @@ import workingTimeConfigSlice from '~/stores/features/working-time-config/workin
 import typesOfLeaveSlice from './features/types-of-leave/types-of-leave.slice'
 import report from './features/report/report.slice'
 import leaveRequestSlice from './features/leave-request/leave-request.slice'
+import holidaySchedule from './features/holiday-schedule/holiday-schedule.slice'
 
 export const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
@@ -28,7 +29,7 @@ export const store = configureStore({
     typesOfLeave: typesOfLeaveSlice,
     leaveRequest: leaveRequestSlice,
     workingTime: workingTimeConfigSlice,
-    report
+    holidaySchedule
   }
 })
 

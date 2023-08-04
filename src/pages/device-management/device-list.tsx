@@ -266,7 +266,7 @@ const DeviceList: React.FC = () => {
         typeAction={isOpenModal.typeAction}
       />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>
+        <h1 className='tw-text-2xl tw-font-semibold'>
           {t('device.deviceListTitle')}({meta.total})
         </h1>
         <h5 className='tw-text-sm'>{t('device.deviceListSubTitle')}</h5>

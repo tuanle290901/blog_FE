@@ -211,7 +211,7 @@ const PositionList: React.FC = () => {
         handleClose={handleCloseUserModal}
       />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>
+        <h1 className='tw-text-2xl tw-font-semibold'>
           {t('position.position')}({positionState.meta.total})
         </h1>
         <h5 className='tw-text-sm'>{t('position.list')}</h5>

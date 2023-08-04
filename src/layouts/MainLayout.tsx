@@ -168,7 +168,8 @@ const MainLayout: React.FC = () => {
         'setting',
         <img src={menuIconSetting} alt='' className='menu-image' />,
         [
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'timeWorking'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices'),
           // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')

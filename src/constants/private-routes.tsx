@@ -1,7 +1,8 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
-import CommonTimeConfigBateco from '~/pages/config/component-bateco'
+import CommonTimeConfigBateco from '~/pages/config/component-bateco/WorkingTimeConfig'
+import HolidayScheduleConfig from '~/pages/config/component-bateco/HolidayScheduleConfig'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
 import TicketDefinationNew from '~/pages/setting/ticket-defination-new'
@@ -36,7 +37,8 @@ export const PRIVATE_PATH = {
   },
   devices: '/devices',
   config: {
-    prefix: '/timeWorking'
+    prefix: '/working-time',
+    holidaySchedule: '/holiday-schedule'
   },
   timeManagement: {
     prefix: '/work-time',
@@ -93,9 +95,15 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER]
   },
   {
-    name: 'config',
+    name: 'working-time',
     path: PRIVATE_PATH.config.prefix,
     component: CommonTimeConfigBateco,
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
+  },
+  {
+    name: 'holiday-schedule',
+    path: PRIVATE_PATH.config.holidaySchedule,
+    component: HolidayScheduleConfig,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
