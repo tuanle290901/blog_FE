@@ -56,7 +56,6 @@ const reportSlice = createSlice({
           if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
             state.currentRequestId = null
-            console.log(action, 'action')
           }
         }
       )

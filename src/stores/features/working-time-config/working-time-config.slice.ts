@@ -4,7 +4,6 @@ import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { IApiResponse } from '~/types/api-response.interface.ts'
 import { IWorkingInfo, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
-import { WorkingTimeInfo } from './fake-data'
 
 export interface IWorkingTimeConfigState {
   listWKTC: IWorkingTimeConfig[]
@@ -77,6 +76,24 @@ export const getWorkingTimeSettingInfo = createAsyncThunk('workingTimeConfig/get
     throw error
   }
 })
+
+export const updateWorkingTime = createAsyncThunk(
+  'workingTimeConfig/updateOne',
+  async (payload: IWorkingInfo, thunkAPI) => {
+    try {
+      const response = await HttpService.put('/group-working-time-setup/update', payload, {
+        signal: thunkAPI.signal
+      })
+      return response.data
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
+    }
+  }
+)
+
 const workingTimeConfigSlice = createSlice({
   name: 'workingTimeConfig',
   initialState,
@@ -110,7 +127,6 @@ const workingTimeConfigSlice = createSlice({
           if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
             state.currentRequestId = null
-            //   TODO handle error
           }
         }
       )

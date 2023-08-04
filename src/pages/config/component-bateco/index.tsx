@@ -1,15 +1,24 @@
 import type { RadioChangeEvent } from 'antd'
-import { Checkbox, Col, Radio, Row, Space } from 'antd'
+import { Button, Checkbox, Col, Radio, Row, Space, notification } from 'antd'
 import type { CheckboxValueType } from 'antd/es/checkbox/Group'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import '../index.scss'
-import { SAT_LIST_OPTIONS } from './fake-data'
+import {
+  getWorkingTimeSettingInfo,
+  updateWorkingTime
+} from '~/stores/features/working-time-config/working-time-config.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { getWorkingTimeSettingInfo } from '~/stores/features/working-time-config/working-time-config.slice'
-import { DailyOverTimeSetup, IWorkingInfo, SaturdayWorkingConfig } from '~/types/working-time.interface'
+import {
+  DailyOverTimeSetup,
+  IWorkingInfo,
+  SaturdayWorkingConfig,
+  TimeWorkQuaterSetup
+} from '~/types/working-time.interface'
+import '../index.scss'
+import { useNavigate } from 'react-router-dom'
 
 const currentQuater = `Q${Math.floor((new Date().getMonth() + 3) / 3)}`
+const quarterOptions: { value: string }[] = [{ value: 'Q1' }, { value: 'Q2' }, { value: 'Q3' }, { value: 'Q4' }]
 
 const convertQuarterName = (value: string) => {
   switch (value) {
@@ -32,7 +41,7 @@ const renderTitle = (title: string) => {
   )
 }
 
-const renderRow = (type: string, title: string, firstArg: string, secondArg: string, thirdArg: string) => {
+const renderRow = (type: string, title: string, firstArg: string, secondArg?: string, thirdArg?: string) => {
   return (
     <Row className='tw-text-base' align={'middle'}>
       <Col>
@@ -62,21 +71,12 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg: str
 
 const Index = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const workingTimeInfo: IWorkingInfo = useAppSelector((item) => item.workingTime.workingTimeInfo)
-  console.log(workingTimeInfo, 'working time info')
   const [checkedValues, setCheckedValues] = useState<CheckboxValueType[]>([])
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuater)
   const [saturdayList, setSaturdayList] = useState<SaturdayWorkingConfig[]>([])
-
-  const quarterOptions: { value: string; lastDate: string }[] = [
-    {
-      value: 'Q1',
-      lastDate: workingTimeInfo?.year ? `${workingTimeInfo.year}-03-31` : `${dayjs().get('year')}-03-31`
-    },
-    { value: 'Q2', lastDate: workingTimeInfo?.year ? `${workingTimeInfo.year}-06-30` : `${dayjs().get('year')}-06-30` },
-    { value: 'Q3', lastDate: workingTimeInfo?.year ? `${workingTimeInfo.year}-09-30` : `${dayjs().get('year')}-09-30` },
-    { value: 'Q4', lastDate: workingTimeInfo?.year ? `${workingTimeInfo.year}-12-31` : `${dayjs().get('year')}-12-31` }
-  ]
+  const [saturdayListFilter, setSaturdayListFilter] = useState<string[]>([])
 
   const overtimeOptions: DailyOverTimeSetup[] = workingTimeInfo?.timeWorkSetup?.dailyOverTimeSetups || []
 
@@ -88,18 +88,63 @@ const Index = () => {
     setCheckedValues(checkedValues)
   }
 
-  useEffect(() => {
-    dispatch(getWorkingTimeSettingInfo())
-  }, [])
+  const splitSaturdaysByQuarter = (saturdayList: CheckboxValueType[]) => {
+    const quarters: CheckboxValueType[][] = [[], [], [], []]
+
+    saturdayList.forEach((saturday) => {
+      const date = dayjs(saturday.toString())
+      if (date.year() === dayjs().year()) {
+        const quarter = Math.floor((date.month() + 3) / 3) - 1
+        quarters[quarter].push(saturday)
+      }
+    })
+
+    return quarters
+  }
+
+  const updateQuarter = async () => {
+    const quarters = splitSaturdaysByQuarter(checkedValues)
+    const newTimeWorkQuarterSetup: TimeWorkQuaterSetup[] = []
+    quarters.forEach((quarter, index) => {
+      newTimeWorkQuarterSetup[index] = JSON.parse(
+        JSON.stringify(workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[index])
+      )
+      const saturdayWorkingMapping = workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[
+        index
+      ].saturdayWorkingConfigs.map((item) => {
+        return {
+          saturdayDate: item.saturdayDate,
+          working: quarter.includes(item.saturdayDate) ? true : false
+        }
+      })
+      newTimeWorkQuarterSetup[index].saturdayWorkingConfigs = saturdayWorkingMapping
+    })
+    const payload = JSON.parse(JSON.stringify(workingTimeInfo))
+    payload.timeWorkSetup.timeWorkQuaterSetups = newTimeWorkQuarterSetup
+    await dispatch(updateWorkingTime(payload))
+    notification.success({ message: 'Cập nhật cấu hình thành công' })
+  }
 
   useEffect(() => {
-    if (workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups?.length > 0 && selectedQuarter) {
+    dispatch(getWorkingTimeSettingInfo())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups?.length > 0) {
       const saturdayList =
-        workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups?.find((item) => item.quarter === selectedQuarter)
-          ?.saturdayWorkingConfigs || []
+        workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups.flatMap((item) => item.saturdayWorkingConfigs) || []
       const saturdayDateWorking = saturdayList.filter((option) => option.working).map((item) => item.saturdayDate)
       setSaturdayList(saturdayList)
       setCheckedValues(saturdayDateWorking)
+    }
+  }, [workingTimeInfo])
+
+  useEffect(() => {
+    if (workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups?.length > 0 && selectedQuarter) {
+      const saturdayListFilter =
+        workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups.find((item) => item.quarter === selectedQuarter)
+          ?.saturdayWorkingConfigs || []
+      setSaturdayListFilter(saturdayListFilter.map((item) => item.saturdayDate))
     }
   }, [workingTimeInfo, selectedQuarter])
 
@@ -113,8 +158,7 @@ const Index = () => {
             'double',
             '1. Giờ làm việc hành chính (Thứ 2 - Thứ 6)',
             workingTimeInfo?.timeWorkSetup?.workingTime?.startTime,
-            workingTimeInfo?.timeWorkSetup?.workingTime?.endTime,
-            ''
+            workingTimeInfo?.timeWorkSetup?.workingTime?.endTime
           )}
           <div className='tw-text-base tw-mt-4'>
             <Row align={'middle'} justify={'space-between'}>
@@ -125,15 +169,14 @@ const Index = () => {
                   workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find((item) => item.quarter === selectedQuarter)
                     ?.startTime || '',
                   workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups.find((item) => item.quarter === selectedQuarter)
-                    ?.endTime || '',
-                  ''
+                    ?.endTime || ''
                 )}
               </Col>
               <Col>
                 <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
                   {quarterOptions.map((opt, index) => {
                     return (
-                      <Radio.Button key={index} value={opt.value} disabled={dayjs().isAfter(opt.lastDate)}>
+                      <Radio.Button key={index} value={opt.value}>
                         {convertQuarterName(opt.value)}
                       </Radio.Button>
                     )
@@ -147,7 +190,13 @@ const Index = () => {
                 <div className='tw-flex tw-flex-wrap tw-w-full'>
                   {saturdayList.map((option, index) => {
                     return (
-                      <div key={index} className='tw-mt-2 xs-tw-w-[50%] md:tw-w-[33%] xl:tw-w-[20%]'>
+                      <div
+                        key={index}
+                        className='tw-mt-2 xs-tw-w-[50%] md:tw-w-[33%] xl:tw-w-[20%]'
+                        style={{
+                          display: saturdayListFilter.includes(option.saturdayDate) ? 'block' : 'none'
+                        }}
+                      >
                         <Checkbox value={option.saturdayDate} disabled={dayjs().isAfter(option.saturdayDate)}>
                           {dayjs(option.saturdayDate).format('DD/MM/YYYY')}
                         </Checkbox>
@@ -206,17 +255,13 @@ const Index = () => {
           {renderRow(
             'single',
             '1. Thông báo đi muộn/ về sớm hàng ngày',
-            workingTimeInfo?.policySetup?.reportViolateTime,
-            '',
-            ''
+            workingTimeInfo?.policySetup?.reportViolateTime
           )}
           <div className='tw-mt-4'>
             {renderRow(
               'single',
               '2. Thông báo ngày công của tháng',
-              workingTimeInfo?.policySetup?.reportMonthlyStatisticTime,
-              '',
-              ''
+              workingTimeInfo?.policySetup?.reportMonthlyStatisticTime
             )}
           </div>
         </div>
@@ -229,13 +274,22 @@ const Index = () => {
           {renderRow(
             'single',
             'Số ngày nghỉ phép mặc định của năm',
-            `${workingTimeInfo?.policySetup?.defaultLeaveDay}`,
-            '',
-            ''
+            `${workingTimeInfo?.policySetup?.defaultLeaveDay}`
           )}
           <div className='tw-ml-2'>(ngày)</div>
         </div>
       </section>
+
+      <div className='tw-w-full'>
+        <Space className=' tw-float-right'>
+          <Button type='default' onClick={() => navigate('/')}>
+            Quay lại
+          </Button>
+          <Button type='primary' onClick={updateQuarter}>
+            Lưu cấu hình
+          </Button>
+        </Space>
+      </div>
     </div>
   )
 }
