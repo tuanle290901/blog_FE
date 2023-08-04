@@ -461,7 +461,7 @@ const Department: React.FC = () => {
           onClick={() => onBackPageSize()}
           icon={<IconBackSVG width={11} height={16} fill='' />}
         />
-        <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-3xl'>
+        <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-2xl'>
           {dataRender?.listDataTitle.map((item: any, index) => {
             return (
               <span

@@ -225,7 +225,7 @@ const TypesOfLeave: React.FC = () => {
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <TypesOfLeaveForm open={isOpenModal} data={editingTypesOfLeave} handleClose={handleCloseModal} />
       <div>
-        <h1 className='tw-text-3xl tw-font-semibold'>{t('typesOfLeave.title')}</h1>
+        <h1 className='tw-text-2xl tw-font-semibold'>{t('typesOfLeave.title')}</h1>
       </div>
       <Row gutter={[16, 16]} className='tw-flex tw-my-5 tw-justify-between'>
         <Col xs={24} lg={12}>

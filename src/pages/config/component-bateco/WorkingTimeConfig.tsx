@@ -44,9 +44,9 @@ const renderTitle = (title: string) => {
 
 const renderRow = (type: string, title: string, firstArg: string, secondArg?: string, thirdArg?: string) => {
   return (
-    <Row className='tw-text-base' align={'middle'}>
+    <Row className='tw-text-md' align={'middle'}>
       <Col>
-        <div className='tw-text-base tw-w-[300px]'>{title}</div>
+        <div className='tw-text-md tw-w-[300px]'>{title}</div>
       </Col>
       <Col className='tw-ml-4'>
         <Space>
@@ -70,7 +70,7 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg?: st
   )
 }
 
-const Index = () => {
+const WorkingTimeConfig = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const workingTimeInfo: IWorkingInfo = useAppSelector((item) => item.workingTime.workingTimeInfo)
@@ -175,7 +175,7 @@ const Index = () => {
               workingTimeInfo?.timeWorkSetup?.workingTime?.startTime,
               workingTimeInfo?.timeWorkSetup?.workingTime?.endTime
             )}
-            <div className='tw-text-base tw-mt-4'>
+            <div className='tw-text-md tw-mt-4'>
               <Row align={'middle'} justify={'space-between'}>
                 <Col>
                   {renderRow(
@@ -244,7 +244,7 @@ const Index = () => {
             <div className='tw-mt-4'>
               <Row align={'middle'}>
                 <Col>
-                  <div className='tw-text-base tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
+                  <div className='tw-text-md tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
                 </Col>
 
                 <Col>
@@ -327,8 +327,8 @@ const Index = () => {
         )}
       </section>
 
-      <div className='tw-w-full'>
-        <Space className=' tw-float-right'>
+      <div className='tw-w-full '>
+        <Space className=' tw-float-right tw-mb-[20px]'>
           <Button type='default' onClick={() => navigate('/')}>
             Quay lại
           </Button>
@@ -341,4 +341,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default WorkingTimeConfig
