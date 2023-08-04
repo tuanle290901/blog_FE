@@ -1,23 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { IWorkingTimeConfig } from '~/types/working-time.interface.ts'
-import { IApiResponse } from '~/types/api-response.interface.ts'
-import { IUser } from '~/types/user.interface.ts'
 import HttpService from '~/config/api.ts'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { searchUser, startEditingUser } from '~/stores/features/user/user.slice.ts'
+import { IApiResponse } from '~/types/api-response.interface.ts'
+import { IWorkingInfo, IWorkingTimeConfig } from '~/types/working-time.interface.ts'
 
 export interface IWorkingTimeConfigState {
   listWKTC: IWorkingTimeConfig[]
   currentWorkingTimeConfig?: IWorkingTimeConfig | null
   currentRequestId: string | null
   loading: boolean
+  workingTimeInfo: IWorkingInfo
 }
 const initialState: IWorkingTimeConfigState = {
   listWKTC: [],
   currentWorkingTimeConfig: null,
   currentRequestId: null,
-  loading: false
+  loading: false,
+  workingTimeInfo: {} as IWorkingInfo
 }
 export const createWorkingTime = createAsyncThunk(
   'workingTimeConfig/create',
@@ -62,12 +62,47 @@ export const getAllWorkingTimeSetting = createAsyncThunk('workingTimeConfig/getA
     throw error
   }
 })
+
+export const getWorkingTimeSettingInfo = createAsyncThunk('workingTimeConfig/getByYear', async (_, thunkAPI) => {
+  try {
+    const response = await HttpService.get('/group-working-time-setup/get-by-year', {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+
+export const updateWorkingTime = createAsyncThunk(
+  'workingTimeConfig/updateOne',
+  async (payload: IWorkingInfo, thunkAPI) => {
+    try {
+      const response = await HttpService.put('/group-working-time-setup/update', payload, {
+        signal: thunkAPI.signal
+      })
+      return response.data
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
+    }
+  }
+)
+
 const workingTimeConfigSlice = createSlice({
   name: 'workingTimeConfig',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(getWorkingTimeSettingInfo.fulfilled, (state, action) => {
+        state.workingTimeInfo = action.payload
+      })
       .addCase(getAllWorkingTimeSetting.fulfilled, (state, action) => {
         state.listWKTC = action.payload.map((item) => {
           const result: IWorkingTimeConfig = {
@@ -92,7 +127,6 @@ const workingTimeConfigSlice = createSlice({
           if (state.loading && state.currentRequestId === action.meta.requestId) {
             state.loading = false
             state.currentRequestId = null
-            //   TODO handle error
           }
         }
       )

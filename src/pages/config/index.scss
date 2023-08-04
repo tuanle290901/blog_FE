@@ -3,3 +3,33 @@
     @apply tw-mb-0;
   }
 }
+
+.box-style {
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  border-left: 3px solid #156deb;
+}
+
+.time-box {
+  height: 35px;
+  width: 60px;
+  border-radius: 6px;
+  border: none;
+  background-color: #efefef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.time-circle {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  background-color: #2a79ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  margin-left: 20px;
+}

@@ -1,6 +1,7 @@
 import { IRoutes } from '~/constants/public-routes.tsx'
 import Dashboard from '~/pages/Dashboard'
 import CommonTimeConfig from '~/pages/config/component/CommonTimeConfig.tsx'
+import CommonTimeConfigBateco from '~/pages/config/component-bateco'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
 import TicketDefinationNew from '~/pages/setting/ticket-defination-new'
@@ -94,7 +95,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: 'config',
     path: PRIVATE_PATH.config.prefix,
-    component: CommonTimeConfig,
+    component: CommonTimeConfigBateco,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
