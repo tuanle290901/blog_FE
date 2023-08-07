@@ -1,8 +1,10 @@
 export interface IHoliday {
   id: string | null
+  code: string
   name: string
-  startDate: string
-  endDate: string
+  startAt: string
+  endAt: string
+  type: 'HOLIDAY'
   note?: string
 }
 

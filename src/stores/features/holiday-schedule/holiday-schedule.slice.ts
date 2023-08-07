@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { IHoliday, IHolidaySchedule } from '~/types/HolidaySchedule'
-import { HolidayList } from './fake-data'
+import { IApiResponse } from '~/types/api-response.interface'
+import { IHoliday, IHolidaySchedule } from '~/types/holiday-schedule'
 
 const initialState: IHolidaySchedule = {
   loading: false,
@@ -9,28 +10,49 @@ const initialState: IHolidaySchedule = {
   currentRequestId: null
 }
 
-export const getListHoliday = createAsyncThunk('holidaySchedule/getAll', async (_, thunkAPI) => {
-  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
-  //   signal: thunkAPI.signal
-  // })
-  const response = new Promise<any>((resolve, reject) => {
-    setTimeout(() => {
-      resolve(HolidayList)
-    }, 100)
-  })
-  return await response
+export const getListHoliday = createAsyncThunk('holidaySchedule/filter', async (_, thunkAPI) => {
+  try {
+    const payload = {}
+    const response: IApiResponse<IHoliday[]> = await HttpService.post('/event/filter', payload, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
 })
 
 export const addOneHolidaySchedule = createAsyncThunk('holidaySchedule/create', async (payload: IHoliday, thunkAPI) => {
-  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
-  //   signal: thunkAPI.signal
-  // })
-  const response = new Promise<any>((resolve, reject) => {
-    setTimeout(() => {
-      resolve({ sucess: true, data: 'Thêm mới thành công' })
-    }, 100)
-  })
-  return await response
+  try {
+    const response: IApiResponse<IHoliday> = await HttpService.post('/event/create', payload, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const updateHolidaySchedule = createAsyncThunk(`holidaySchedule/update`, async (payload: IHoliday, thunkAPI) => {
+  try {
+    const response: IApiResponse<IHoliday> = await HttpService.put(`/event/update/${payload.id}`, payload, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const deleteHolidaySchedule = createAsyncThunk(`holidaySchedule/delete`, async (id: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<IHoliday> = await HttpService.delete(`/event/delete/${id}`, {
+      signal: thunkAPI.signal
+    })
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
 })
 
 const holidaySchedule = createSlice({
