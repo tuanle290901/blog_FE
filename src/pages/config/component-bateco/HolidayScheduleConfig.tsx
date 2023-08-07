@@ -194,6 +194,7 @@ const HolidayScheduleConfig = () => {
       const existedDate = holidayList.find((item) => formattedDate >= item.startAt && formattedDate <= item.endAt)
       form.setFieldsValue({
         id: existedDate ? existedDate.id : null,
+        code: existedDate ? existedDate.code : '',
         name: existedDate ? existedDate.name : '',
         date: existedDate ? [dayjs(existedDate.startAt), dayjs(existedDate.endAt)] : [date, date],
         note: existedDate ? existedDate.note : ''
@@ -202,9 +203,22 @@ const HolidayScheduleConfig = () => {
     }
   }
 
-  const onFinish = async ({ id, name, date, note }: { id: string; name: string; date: Dayjs[]; note: string }) => {
+  const onFinish = async ({
+    id,
+    code,
+    name,
+    date,
+    note
+  }: {
+    id: string
+    code: string
+    name: string
+    date: Dayjs[]
+    note: string
+  }) => {
     const payload: IHoliday = {
       id,
+      code,
       name,
       startAt: date[0].format('YYYY-MM-DD'),
       endAt: date[1].format('YYYY-MM-DD'),
@@ -230,9 +244,20 @@ const HolidayScheduleConfig = () => {
   return (
     <div className='tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white holiday-schedule-container'>
       <h1 className='tw-text-2xl tw-font-semibold'>Cấu hình danh sách ngày nghỉ lễ</h1>
-      <Calendar mode='month' cellRender={cellRender} onSelect={onSelectDate} headerRender={headerRender} />
+      <Calendar
+        mode='month'
+        cellRender={cellRender}
+        onSelect={onSelectDate}
+        headerRender={headerRender}
+        disabledDate={(date) => {
+          if (date.endOf('d').valueOf() < dayjs().valueOf()) {
+            return true
+          }
+          return false
+        }}
+      />
 
-      <Modal title='Thêm ngày nghỉ' open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
+      <Modal title='Thông tin ngày nghỉ lễ' open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
         <Form
           form={form}
           name='basic'
@@ -244,6 +269,10 @@ const HolidayScheduleConfig = () => {
           onFinishFailed={onFinishFailed}
           autoComplete='off'
         >
+          <Form.Item label='Mã ngày nghỉ' name='code' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+            <Input placeholder='Nhập mã ngày nghỉ' disabled={form.getFieldValue('id')} />
+          </Form.Item>
+
           <Form.Item label='Tiêu đề' name='name' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
             <Input placeholder='Nhập tiêu đề' />
           </Form.Item>
@@ -274,7 +303,7 @@ const HolidayScheduleConfig = () => {
               )}
 
               <Button type='primary' htmlType='submit'>
-                Thêm ngày nghỉ
+                Lưu thông tin
               </Button>
             </Space>
           </Form.Item>

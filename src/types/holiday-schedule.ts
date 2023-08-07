@@ -1,5 +1,6 @@
 export interface IHoliday {
   id: string | null
+  code: string
   name: string
   startAt: string
   endAt: string
