@@ -1,46 +1,52 @@
-import { IHoliday } from '~/types/HolidaySchedule'
+import { IHoliday } from '~/types/holiday-schedule'
 
 export const HolidayList: IHoliday[] = [
   {
     id: '1',
     name: 'Tết Dương lịch',
-    startDate: '2023-01-01',
-    endDate: '2023-01-02',
+    startAt: '2023-01-01',
+    endAt: '2023-01-02',
+    type: 'HOLIDAY',
     note: ''
   },
   {
     id: '2',
     name: 'Tết Nguyên đán',
-    startDate: '2023-01-21',
-    endDate: '2023-01-27',
+    startAt: '2023-01-21',
+    endAt: '2023-01-27',
+    type: 'HOLIDAY',
     note: ''
   },
   {
     id: '3',
     name: 'Giỗ Tổ Hùng Vương',
-    startDate: '2023-04-29',
-    endDate: '2023-04-29',
+    startAt: '2023-04-29',
+    endAt: '2023-04-29',
+    type: 'HOLIDAY',
     note: ''
   },
   {
     id: '4',
     name: 'Ngày Thống nhất đất nước',
-    startDate: '2023-04-30',
-    endDate: '2023-04-30',
+    startAt: '2023-04-30',
+    endAt: '2023-04-30',
+    type: 'HOLIDAY',
     note: ''
   },
   {
     id: '5',
     name: 'Ngày Quốc tế lao động',
-    startDate: '2023-05-01',
-    endDate: '2023-05-01',
+    startAt: '2023-05-01',
+    endAt: '2023-05-01',
+    type: 'HOLIDAY',
     note: ''
   },
   {
     id: '6',
     name: 'Ngày Quốc khánh',
-    startDate: '2023-09-02',
-    endDate: '2023-09-04',
+    startAt: '2023-09-02',
+    endAt: '2023-09-04',
+    type: 'HOLIDAY',
     note: ''
   }
 ]

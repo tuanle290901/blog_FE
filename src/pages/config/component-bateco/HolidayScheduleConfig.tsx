@@ -21,11 +21,19 @@ import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import type { CellRenderInfo } from 'rc-picker/lib/interface'
 import { useEffect, useState } from 'react'
-import { addOneHolidaySchedule, getListHoliday } from '~/stores/features/holiday-schedule/holiday-schedule.slice'
+import { ExclamationCircleFilled } from '@ant-design/icons'
+import {
+  addOneHolidaySchedule,
+  deleteHolidaySchedule,
+  getListHoliday,
+  updateHolidaySchedule
+} from '~/stores/features/holiday-schedule/holiday-schedule.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { IHoliday } from '~/types/HolidaySchedule'
+import { IHoliday } from '~/types/holiday-schedule'
 import { convertMonthToLocaleVi } from '~/utils/helper'
 import '../index.scss'
+
+const { confirm } = Modal
 
 const { RangePicker } = DatePicker
 const headerRender = ({ value, onChange }: any) => {
@@ -108,16 +116,13 @@ const HolidayScheduleConfig = () => {
   const getListData = (value: Dayjs) => {
     const formattedDate = value.format('YYYY-MM-DD')
     const listData: { type: string; content: string }[] = []
-
     holidayList.forEach((holiday) => {
-      const start = holiday.startDate
-      const end = holiday.endDate
-
+      const start = dayjs(holiday.startAt).format('YYYY-MM-DD')
+      const end = dayjs(holiday.endAt).format('YYYY-MM-DD')
       if (formattedDate >= start && formattedDate <= end) {
         listData.push({ type: 'error', content: holiday.name })
       }
     })
-
     return listData
   }
 
@@ -129,8 +134,40 @@ const HolidayScheduleConfig = () => {
     setIsModalOpen(false)
   }
 
-  const handleRemoveHoliday = () => {
-    console.log(form.getFieldsValue())
+  const handleRemoveHoliday = async () => {
+    const holidayDetail = form.getFieldsValue() as IHoliday
+    if (holidayDetail.id) {
+      showConfirm(holidayDetail)
+    }
+  }
+
+  const showConfirm = (holidayDetail: IHoliday) => {
+    confirm({
+      title: (
+        <div>
+          <span>Bạn có chắc chắn muốn xóa</span> <span className='tw-font-bold'>{holidayDetail.name}</span>
+        </div>
+      ),
+      icon: <ExclamationCircleFilled />,
+      content: (
+        <div>
+          <div>{holidayDetail.name}</div>
+          <div>{holidayDetail.note}</div>
+          <div>{holidayDetail.endAt}</div>
+        </div>
+      ),
+      onOk: async () => {
+        if (holidayDetail.id) {
+          await dispatch(deleteHolidaySchedule(holidayDetail.id))
+          notification.success({ message: 'Xóa ngày nghỉ thành công' })
+          await dispatch(getListHoliday())
+          setIsModalOpen(false)
+        }
+      },
+      onCancel() {
+        // TODO
+      }
+    })
   }
 
   const dateCellRender = (value: Dayjs) => {
@@ -154,11 +191,11 @@ const HolidayScheduleConfig = () => {
   const onSelectDate = (date: Dayjs, { source }: SelectInfo) => {
     if (source === 'date') {
       const formattedDate = date.format('YYYY-MM-DD')
-      const existedDate = holidayList.find((item) => formattedDate >= item.startDate && formattedDate <= item.endDate)
+      const existedDate = holidayList.find((item) => formattedDate >= item.startAt && formattedDate <= item.endAt)
       form.setFieldsValue({
         id: existedDate ? existedDate.id : null,
         name: existedDate ? existedDate.name : '',
-        date: existedDate ? [dayjs(existedDate.startDate), dayjs(existedDate.endDate)] : [date, date],
+        date: existedDate ? [dayjs(existedDate.startAt), dayjs(existedDate.endAt)] : [date, date],
         note: existedDate ? existedDate.note : ''
       })
       setIsModalOpen(true)
@@ -169,13 +206,20 @@ const HolidayScheduleConfig = () => {
     const payload: IHoliday = {
       id,
       name,
-      startDate: date[0].format('YYYY-MM-DD'),
-      endDate: date[1].format('YYYY-MM-DD'),
+      startAt: date[0].format('YYYY-MM-DD'),
+      endAt: date[1].format('YYYY-MM-DD'),
+      type: 'HOLIDAY',
       note
     }
-    await dispatch(addOneHolidaySchedule(payload))
+    if (id) {
+      await dispatch(updateHolidaySchedule(payload))
+      notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
+    } else {
+      await dispatch(addOneHolidaySchedule(payload))
+      notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
+    }
     await dispatch(getListHoliday())
-    notification.success({ message: 'Thêm mới thành công' })
+
     setIsModalOpen(false)
   }
 
