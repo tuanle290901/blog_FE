@@ -111,11 +111,11 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
     if (!REGEX_SPECIAL_CHARS.test(value)) {
       return Promise.reject(t('department.alter-notification.do-not-leave-spaces-special-accents'))
     }
-    if (serverError) {
-      if (serverError.status === HttpStatusCode.Conflict || serverError.message.includes(value)) {
-        return Promise.reject('Mã phòng ban ' + value + ' đã được sử dụng.')
-      }
-    }
+    // if (serverError) {
+    //   if (serverError.status === HttpStatusCode.Conflict || serverError.message.includes(value)) {
+    //     return Promise.reject('Mã phòng ban ' + value + ' đã được sử dụng.')
+    //   }
+    // }
     return Promise.resolve()
   }
 
