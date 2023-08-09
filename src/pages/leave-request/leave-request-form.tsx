@@ -1,72 +1,89 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Col, DatePicker, Form, Input, Modal, Row, Select, TimePicker, notification } from 'antd'
-import React, { useEffect } from 'react'
+import { DatePicker, Form, Input, Modal, Select, notification } from 'antd'
+import dayjs, { Dayjs } from 'dayjs'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { createLeaveRequest, updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
-import { useAppDispatch } from '~/stores/hook'
-import { ILeaveRequest, ILeaveRequestForm } from '~/types/leave-request'
-import dayjs from 'dayjs'
+import { createLeaveRequest, editLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
+import { LeaveTypes } from '~/types/leave-request.interface'
+import { TicketAttribute } from '~/types/setting-ticket-process'
+import { INPUT_TYPE, LEAVE_TYPE_MAP } from '~/utils/Constant'
 
-const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?: ILeaveRequest | null }> = ({
-  open,
-  handleClose,
-  data
-}) => {
+const transformData = (
+  key: string,
+  formValue: { [key: string]: string },
+  attributes: TicketAttribute[] | undefined
+) => {
+  const type = attributes && attributes.find((item) => item.name === key)?.type
+  switch (type) {
+    case INPUT_TYPE.DATETIME: {
+      return dayjs(formValue[key]).format('YYYY-MM-DD HH:mm:ss')
+    }
+    default: {
+      return formValue[key]
+    }
+  }
+}
+
+const LeaveRequestForm: React.FC<{
+  canUpdateForm: boolean
+  open: boolean
+  handleClose: () => void
+  data?: any | null
+}> = ({ canUpdateForm, open, handleClose, data }) => {
   const { t } = useTranslation()
-  const [form] = Form.useForm<ILeaveRequest>()
+  const [form] = Form.useForm()
   const dispatch = useAppDispatch()
+  const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
+  const [selectedTicketTypeId, setSelectedTicketTypeId] = useState<string>('')
+  const selectedTicketType = ticketDifinations.find((ticket) => ticket.id === selectedTicketTypeId)
 
   useEffect(() => {
     if (data) {
-      form.setFieldsValue(data)
-    } else {
-      form.resetFields()
+      setSelectedTicketTypeId(data.ticketDefinitionId)
+      form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
+      const attributesProperties = selectedTicketType?.revisions[0].processNodes['0'].attributes
+      const attributesData = data?.processStatus['0']?.attributes
+
+      attributesProperties?.forEach((item) => {
+        if (item.type === INPUT_TYPE.DATETIME) {
+          form.setFieldValue(item.name, dayjs(attributesData[item.name]))
+        } else {
+          form.setFieldValue(item.name, attributesData[item.name])
+        }
+      })
     }
-  }, [data])
+  }, [data, selectedTicketTypeId])
 
   const handleSubmit = async () => {
-    const formValue = { ...form.getFieldsValue() }
-    const payload: ILeaveRequestForm = {
-      typeOfLeave: formValue?.typeOfLeave,
-      requestMessage: formValue?.requestMessage,
-      AmountTimeLeave: formValue?.AmountTimeLeave,
-      requestDate: dayjs().format('DD/MM/YYYY'),
-      startDate: `${dayjs(formValue?.startDate).format('DD/MM/YYYY')} ${dayjs(formValue?.startTime).format('HH:mm')}`,
-      endDate: `${dayjs(formValue?.endDate).format('DD/MM/YYYY')} ${dayjs(formValue?.endTime).format('HH:mm')}`
-    }
-    if (data) {
-      try {
-        console.log(payload)
-        const response = await dispatch(
-          updateLeaveRequest({
-            ...payload,
-            id: data.id
-          })
-        ).unwrap()
-        form.resetFields()
-        handleClose()
-        notification.success({
-          message: response.message
-        })
-      } catch (error: any) {
-        notification.error({
-          message: error.message
-        })
-      }
-    } else {
-      try {
-        const response = await dispatch(createLeaveRequest(payload)).unwrap()
-        form.resetFields()
-        handleClose()
-        notification.success({
-          message: response.message
-        })
-      } catch (error: any) {
-        notification.error({
-          message: error.message
-        })
-      }
+    const formValue = form.getFieldsValue()
+    const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
+
+    const processNodesAttributes = selectedTicket?.revisions[1]?.processNodes['0']?.attributes
+
+    const transformedFormValue = Object.keys(formValue).reduce((acc, key) => {
+      const transformedValue = transformData(key, formValue, processNodesAttributes)
+      return { ...acc, [key]: transformedValue }
+    }, {})
+
+    const payload: ILeaveRequestForm | ILeaveRequestEditForm = data
+      ? { attrs: transformedFormValue, id: data.id }
+      : { initialAttrs: transformedFormValue, revision: 1, ticketDefinitionId: formValue.typeOfLeave }
+
+    try {
+      const response = await (data
+        ? dispatch(editLeaveRequest(payload as ILeaveRequestEditForm))
+        : dispatch(createLeaveRequest(payload as ILeaveRequestForm))
+      ).unwrap()
+      form.resetFields()
+      handleClose()
+      notification.success({
+        message: response.message
+      })
+    } catch (error: any) {
+      notification.error({
+        message: error.message
+      })
     }
   }
 
@@ -75,10 +92,9 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
     form.resetFields()
   }
 
-  const typeOfLeaveOptions = [
-    { value: 'OM', label: 'Nghỉ ốm' },
-    { value: 'HY', label: 'Nghỉ cưới' }
-  ]
+  const disabledDate = (current: Dayjs, item: any) => {
+    return current && current <= dayjs().endOf('day')
+  }
 
   return (
     <Modal
@@ -94,94 +110,87 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
     >
       <div className='tw-my-4'>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
-          <Form.Item label={t('leaveRequest.typeOfLeave')} name='typeOfLeave'>
+          <Form.Item label='Loại yêu cầu' name='typeOfLeave' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
             <Select
+              disabled={data?.id}
               className='tw-w-full'
               showSearch
-              placeholder={`${t('rootInit.requiredSelect')} ${t('leaveRequest.typeOfLeave')}`}
+              placeholder='Vui lòng chọn Loại yêu cầu'
               optionFilterProp='children'
               filterOption={(input, option) => {
                 return (option?.label + '').toLowerCase().includes(input.toLowerCase())
               }}
               allowClear
               onClear={() => void {}}
-              onChange={() => void {}}
-              options={typeOfLeaveOptions}
+              onChange={(id) => setSelectedTicketTypeId(id)}
+              options={ticketDifinations.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id
+                }
+              })}
             />
           </Form.Item>
-          <div className='tw-mb-3'>
-            <div>{t('leaveRequest.timeLeave')}</div>
-            <Row gutter={[16, 16]} className='tw-items-center tw-mt-3'>
-              <Col xs={4} className='tw-text-[#BFBFBF]'>
-                {t('leaveRequest.from')}
-              </Col>
-              <Col xs={20}>
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={14}>
-                    <Form.Item className='tw-mb-0' name='startDate'>
-                      <DatePicker
-                        format='DD/MM/YYYY'
-                        disabledDate={(date) => {
-                          return date.isAfter(new Date(form.getFieldValue('endDate')))
-                        }}
-                        showToday={false}
-                        className='tw-w-full'
-                        placeholder={t('leaveRequest.selectDate')}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={10}>
-                    <Form.Item className='tw-mb-0' name='startTime'>
-                      <TimePicker
-                        showNow={false}
-                        placeholder={t('leaveRequest.selectHour')}
-                        format='HH:mm'
-                        className='tw-w-full'
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]} className='tw-items-center tw-mt-3'>
-              <Col xs={4} className='tw-text-[#BFBFBF]'>
-                {t('leaveRequest.to')}
-              </Col>
-              <Col xs={20}>
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={14}>
-                    <Form.Item className='tw-mb-0' name='endDate'>
-                      <DatePicker
-                        format='DD/MM/YYYY'
-                        disabledDate={(date) => {
-                          return date.isBefore(new Date(form.getFieldValue('startDate')))
-                        }}
-                        showToday={false}
-                        className='tw-w-full'
-                        placeholder={t('leaveRequest.selectDate')}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={10}>
-                    <Form.Item className='tw-mb-0' name='endTime'>
-                      <TimePicker
-                        // disabledDate={(time) => {
-                        //   return time.isBefore(form.getFieldValue('startTime'))
-                        // }}
-                        showNow={false}
-                        placeholder={t('leaveRequest.selectHour')}
-                        className='tw-w-full'
-                        format='HH:mm'
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </div>
-          <Form.Item label={t('leaveRequest.requestMessage')} name='requestMessage'>
-            <Input.TextArea rows={3} placeholder={t('leaveRequest.requestMessage')} allowClear />
-          </Form.Item>
+
+          {selectedTicketType?.id &&
+            selectedTicketType?.revisions[1]?.processNodes['0']?.attributes?.map((item, index) => {
+              return (
+                <Form.Item
+                  key={index}
+                  label={item.description}
+                  name={item.name}
+                  rules={[{ required: item.required, message: 'Trường bắt buộc' }]}
+                >
+                  {item.type === INPUT_TYPE.TEXT && <Input disabled={!canUpdateForm} placeholder={item.description} />}
+                  {item.type === INPUT_TYPE.SINGLE_SELECT && (
+                    <Select
+                      disabled={!canUpdateForm}
+                      placeholder={item.description}
+                      options={item.options?.map((val: keyof LeaveTypes) => {
+                        return {
+                          label: LEAVE_TYPE_MAP[val],
+                          value: val
+                        }
+                      })}
+                    />
+                  )}
+                  {item.type === INPUT_TYPE.MULTIPLE_SELECT && (
+                    <Select
+                      disabled={!canUpdateForm}
+                      mode='multiple'
+                      placeholder={item.description}
+                      options={item.options?.map((val: keyof LeaveTypes) => {
+                        return {
+                          label: LEAVE_TYPE_MAP[val],
+                          value: val
+                        }
+                      })}
+                    />
+                  )}
+                  {item.type === INPUT_TYPE.DATETIME && (
+                    <DatePicker
+                      disabled={!canUpdateForm}
+                      placeholder={item.description}
+                      className='tw-w-full'
+                      showTime={{ format: 'HH:mm' }}
+                      format='DD/MM/YYYY HH:mm'
+                      disabledDate={(val) => disabledDate(val, item)}
+                      // disabledTime={() => disabledDateTime(item)}
+                    />
+                  )}
+                  {item.type === INPUT_TYPE.BOOLEAN && (
+                    <Select
+                      disabled={!canUpdateForm}
+                      placeholder={item.description}
+                      options={[
+                        { label: 'Có', value: true },
+                        { label: 'Không', value: false }
+                      ]}
+                    />
+                  )}
+                </Form.Item>
+              )
+            })}
         </Form>
       </div>
     </Modal>

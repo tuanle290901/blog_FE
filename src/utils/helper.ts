@@ -1,10 +1,10 @@
-import { notification } from 'antd'
+import { Ticket } from '~/types/setting-ticket-process'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { ROLE } from '~/constants/app.constant.ts'
-import { IGroup } from '~/stores/features/master-data/master-data.slice.ts'
 import { IDepartmentTitle } from '~/types/department.interface'
 import { GroupProfile } from '~/types/user.interface.ts'
+import { TicketStatusEnum } from './Constant'
 dayjs.extend(utc)
 
 export const ACTION_TYPE = {
@@ -123,5 +123,18 @@ export const convertMonthToLocaleVi = (month: string) => {
       return 'Tháng 11'
     case 'dec':
       return 'Tháng 12'
+  }
+}
+
+export const tagColorMapping = (status: string | number) => {
+  switch (status) {
+    case TicketStatusEnum.SUBMITTED:
+      return 'default'
+    case TicketStatusEnum.PROCESSING:
+      return 'processing'
+    case TicketStatusEnum.CONFIRMED:
+      return 'success'
+    case TicketStatusEnum.REJECTED:
+      return 'error'
   }
 }

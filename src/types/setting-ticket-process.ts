@@ -66,11 +66,13 @@ export interface TicketProcessRevision {
   endNodeIndex?: number
   continueTransferStrategy?: string[]
   stopTransferStrategy?: string
-  strategy?: string
+  strategy?: string[]
   createdAt?: string
   createdBy?: string
   processFlow: TicketTransfer[]
-  processNodes: TicketProcessNode[]
+  processNodes: {
+    [id: string]: TicketProcessNode
+  }
 }
 
 export interface TicketDefRevisionCreateReq {
