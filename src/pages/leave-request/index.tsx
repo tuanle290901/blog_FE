@@ -5,12 +5,15 @@ import {
   EditOutlined,
   PlusOutlined,
   ReloadOutlined,
-  CheckSquareFilled,
-  CloseSquareFilled
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleFilled,
+  InfoCircleOutlined
 } from '@ant-design/icons'
 import {
   Button,
   DatePicker,
+  Modal,
   Popconfirm,
   Select,
   Space,
@@ -49,6 +52,7 @@ import { TicketStatusType } from '~/types/leave-request.interface'
 import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { tagColorMapping } from '~/utils/helper'
 
+const { confirm } = Modal
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -81,15 +85,22 @@ const filterUserPayload = {
 
 const LeaveRequest: React.FC = () => {
   const { t } = useTranslation()
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const dispatch = useAppDispatch()
+  const { userInfo } = useUserInfo()
+
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state: any) => state.leaveRequest.listData)
-  const { userInfo } = useUserInfo()
+  const users = useAppSelector((item) => item.user.userList)
+  const editingLeaveRequest = useAppSelector((state: any) => state.leaveRequest.editingLeaveRequest)
+
+  const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const [canUpdateForm, setCanUpdateForm] = useState<boolean>(true)
   const isSystemAdmin = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const isManagerDepartment = userInfo?.groupProfiles.find(
     (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
   )
-  const users = useAppSelector((item) => item.user.userList)
+
   // const meta: IPaging = useAppSelector((state: any) => state.leaveRequest.meta)
   const meta: IPaging = {
     page: 0,
@@ -97,11 +108,6 @@ const LeaveRequest: React.FC = () => {
     total: 12,
     totalPage: 2
   }
-  const editingLeaveRequest = useAppSelector((state: any) => state.leaveRequest.editingLeaveRequest)
-  const filter = useAppSelector((state: any) => state.leaveRequest.filter)
-
-  const dispatch = useAppDispatch()
-  const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
 
   const handleClickDelete = async (record: ILeaveRequest) => {
     try {
@@ -129,7 +135,12 @@ const LeaveRequest: React.FC = () => {
     }
   }
 
-  const handleClickUpdate = (record: ILeaveRequest) => {
+  const handleClickUpdate = (type: string, record: ILeaveRequest) => {
+    if (type === 'view') {
+      setCanUpdateForm(false)
+    } else {
+      setCanUpdateForm(true)
+    }
     setIsOpenModal(true)
     dispatch(startEditing(record.id))
   }
@@ -146,60 +157,57 @@ const LeaveRequest: React.FC = () => {
   const handleCloseModal = async () => {
     setIsOpenModal(false)
     dispatch(cancelEditing())
-    if (filter && JSON.parse(filter) !== '') {
-      setSearchValue({
-        ...JSON.parse(filter)
-      })
-    }
     dispatch(resetValueFilter())
     dispatch(filterLeaveRequest(searchValue))
   }
 
   const onChangeRequest = (type: string, requestItem: string | any) => {
-    switch (type) {
-      case 'onlyAssignToMe': {
-        const status = requestItem.target.checked
-        setSearchValue((prev) => {
-          return {
-            ...prev,
-            onlyAssignToMe: status
-          }
-        })
-        break
-      }
-      case 'requestBy': {
-        setSearchValue((prev) => {
-          return {
-            ...prev,
-            requestedBy: requestItem
-          }
-        })
-        break
-      }
-      case 'requestTime': {
-        setSearchValue((prev) => {
-          return {
-            ...prev,
-            startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
-            endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
-          }
-        })
-        break
-      }
-      case 'requestStatus': {
-        setSearchValue((prev) => {
-          return {
-            ...prev,
-            statuses: requestItem
-          }
-        })
-      }
+    const updateSearchValue = (updateFn: (prev: any) => any) => {
+      setSearchValue((prev) => ({
+        ...prev,
+        ...updateFn(prev)
+      }))
     }
+
+    switch (type) {
+      case 'onlyAssignToMe':
+        updateSearchValue((prev) => ({ onlyAssignToMe: requestItem.target.checked }))
+        break
+
+      case 'requestBy':
+        updateSearchValue((prev) => ({ requestedBy: requestItem }))
+        break
+
+      case 'requestTime':
+        updateSearchValue((prev) => ({
+          startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
+          endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
+        }))
+        break
+
+      case 'requestStatus':
+        updateSearchValue((prev) => ({ statuses: requestItem }))
+        break
+    }
+  }
+
+  const showConfirm = (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
+    confirm({
+      title: status === TicketStatusEnum.FINISHED ? 'Đồng ý' : 'Từ chối',
+      icon: <ExclamationCircleFilled />,
+      content: status === TicketStatusEnum.FINISHED ? 'Bạn có muốn duyệt yêu cầu?' : 'Bạn có muốn từ chối yêu cầu?',
+      onOk() {
+        onUpdateStatus(status, data)
+      },
+      onCancel() {
+        console.log('Cancel')
+      }
+    })
   }
 
   const onUpdateStatus = (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
     const payload: ILeaveRequestUpdateStatusForm = {
-      attrs: data.processStatus['0'].attributes,
+      attrs: data?.processStatus['0']?.attributes,
       nodeId: 1,
       status,
       ticketId: data.id
@@ -284,15 +292,15 @@ const LeaveRequest: React.FC = () => {
                   {status !== TicketStatusEnum.CONFIRMED && status !== TicketStatusEnum.REJECTED && (
                     <>
                       <Tooltip title='Từ chối'>
-                        <CloseSquareFilled
+                        <CloseCircleOutlined
                           className='tw-text-red-600 tw-text-2xl tw-cursor-pointer'
-                          onClick={() => onUpdateStatus(TicketStatusEnum.REJECTED, record)}
+                          onClick={() => showConfirm(TicketStatusEnum.REJECTED, record)}
                         />
                       </Tooltip>
                       <Tooltip title='Đồng ý'>
-                        <CheckSquareFilled
+                        <CheckCircleOutlined
                           className='tw-text-green-600 tw-text-2xl tw-cursor-pointer'
-                          onClick={() => onUpdateStatus(TicketStatusEnum.FINISHED, record)}
+                          onClick={() => showConfirm(TicketStatusEnum.FINISHED, record)}
                         />
                       </Tooltip>
                     </>
@@ -319,8 +327,17 @@ const LeaveRequest: React.FC = () => {
               {record?.status !== TicketStatusEnum.CONFIRMED && (
                 <Button
                   size='small'
-                  onClick={() => handleClickUpdate(record)}
+                  onClick={() => handleClickUpdate('view', record)}
+                  icon={<InfoCircleOutlined className='tw-text-blue-600' />}
+                />
+              )}
+
+              {record?.status !== TicketStatusEnum.CONFIRMED && (
+                <Button
+                  size='small'
+                  onClick={() => handleClickUpdate('update', record)}
                   icon={<EditOutlined className='tw-text-blue-600' />}
+                  disabled={record.createdBy !== userInfo?.userName}
                 />
               )}
 
@@ -331,8 +348,13 @@ const LeaveRequest: React.FC = () => {
                   onConfirm={() => handleClickDelete(record)}
                   okText={t('common.yes')}
                   cancelText={t('common.no')}
+                  disabled={record.createdBy !== userInfo?.userName}
                 >
-                  <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                  <Button
+                    size='small'
+                    icon={<DeleteOutlined className='tw-text-red-600' />}
+                    disabled={record.createdBy !== userInfo?.userName}
+                  />
                 </Popconfirm>
               )}
 
@@ -379,13 +401,19 @@ const LeaveRequest: React.FC = () => {
 
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
-      <LeaveRequestForm open={isOpenModal} data={editingLeaveRequest} handleClose={handleCloseModal} />
+      <LeaveRequestForm
+        open={isOpenModal}
+        data={editingLeaveRequest}
+        handleClose={handleCloseModal}
+        canUpdateForm={canUpdateForm}
+      />
       <div className='tw-flex'>
         <h1 className='tw-text-2xl tw-font-semibold'>{t('leaveRequest.title')}</h1>
       </div>
       <div className='tw-flex tw-justify-between tw-my-5'>
         <Button
           onClick={() => {
+            setCanUpdateForm(true)
             setIsOpenModal(true)
             dispatch(setValueFilter(JSON.stringify(searchValue)))
           }}

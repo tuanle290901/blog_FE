@@ -30,5 +30,5 @@ export interface ILeaveRequestUpdateStatusForm {
   ticketId: string
   nodeId: number
   attrs: { [key: string]: string }
-  status: TicketStatusEnum.CONFIRMED | TicketStatusEnum.REJECTED
+  status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED
 }

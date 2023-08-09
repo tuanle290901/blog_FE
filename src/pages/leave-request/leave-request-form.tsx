@@ -9,14 +9,6 @@ import { LeaveTypes } from '~/types/leave-request.interface'
 import { TicketAttribute } from '~/types/setting-ticket-process'
 import { INPUT_TYPE, LEAVE_TYPE_MAP } from '~/utils/Constant'
 
-const range = (start: number, end: number) => {
-  const result = []
-  for (let i = start; i < end; i++) {
-    result.push(i)
-  }
-  return result
-}
-
 const transformData = (
   key: string,
   formValue: { [key: string]: string },
@@ -33,11 +25,12 @@ const transformData = (
   }
 }
 
-const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?: any | null }> = ({
-  open,
-  handleClose,
-  data
-}) => {
+const LeaveRequestForm: React.FC<{
+  canUpdateForm: boolean
+  open: boolean
+  handleClose: () => void
+  data?: any | null
+}> = ({ canUpdateForm, open, handleClose, data }) => {
   const { t } = useTranslation()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
@@ -49,10 +42,10 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
     if (data) {
       setSelectedTicketTypeId(data.ticketDefinitionId)
       form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
-      const attributes = selectedTicketType?.revisions[0].processNodes['0'].attributes
+      const attributesProperties = selectedTicketType?.revisions[0].processNodes['0'].attributes
       const attributesData = data?.processStatus['0']?.attributes
 
-      attributes?.forEach((item) => {
+      attributesProperties?.forEach((item) => {
         if (item.type === INPUT_TYPE.DATETIME) {
           form.setFieldValue(item.name, dayjs(attributesData[item.name]))
         } else {
@@ -65,45 +58,32 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
   const handleSubmit = async () => {
     const formValue = form.getFieldsValue()
     const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
-    for (const key in formValue) {
-      formValue[key] = transformData(key, formValue, selectedTicket?.revisions[1]?.processNodes['0']?.attributes)
-    }
 
-    if (data) {
-      const payload: ILeaveRequestEditForm = {
-        attrs: formValue,
-        id: data.id
-      }
-      try {
-        const response = await dispatch(editLeaveRequest(payload)).unwrap()
-        form.resetFields()
-        handleClose()
-        notification.success({
-          message: response.message
-        })
-      } catch (error: any) {
-        notification.error({
-          message: error.message
-        })
-      }
-    } else {
-      const payload: ILeaveRequestForm = {
-        initialAttrs: formValue,
-        revision: 1,
-        ticketDefinitionId: formValue.typeOfLeave
-      }
-      try {
-        const response = await dispatch(createLeaveRequest(payload)).unwrap()
-        form.resetFields()
-        handleClose()
-        notification.success({
-          message: response.message
-        })
-      } catch (error: any) {
-        notification.error({
-          message: error.message
-        })
-      }
+    const processNodesAttributes = selectedTicket?.revisions[1]?.processNodes['0']?.attributes
+
+    const transformedFormValue = Object.keys(formValue).reduce((acc, key) => {
+      const transformedValue = transformData(key, formValue, processNodesAttributes)
+      return { ...acc, [key]: transformedValue }
+    }, {})
+
+    const payload: ILeaveRequestForm | ILeaveRequestEditForm = data
+      ? { attrs: transformedFormValue, id: data.id }
+      : { initialAttrs: transformedFormValue, revision: 1, ticketDefinitionId: formValue.typeOfLeave }
+
+    try {
+      const response = await (data
+        ? dispatch(editLeaveRequest(payload as ILeaveRequestEditForm))
+        : dispatch(createLeaveRequest(payload as ILeaveRequestForm))
+      ).unwrap()
+      form.resetFields()
+      handleClose()
+      notification.success({
+        message: response.message
+      })
+    } catch (error: any) {
+      notification.error({
+        message: error.message
+      })
     }
   }
 
@@ -113,37 +93,8 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
   }
 
   const disabledDate = (current: Dayjs, item: any) => {
-    // if (item.name === 'end_time') {
-    //   const startTime = form.getFieldValue('start_time')
-    //   if (startTime) {
-    //     return current && current <= dayjs(startTime).endOf('day')
-    //   }
-    //   return current && current <= dayjs().endOf('day')
-    // }
-
-    // if (item.name === 'start_time') {
-    //   const endTime = form.getFieldValue('end_time')
-    //   if (endTime) {
-    //     return current && current >= dayjs(endTime).endOf('day')
-    //   }
-    //   return current && current <= dayjs().endOf('day')
-    // }
     return current && current <= dayjs().endOf('day')
   }
-
-  // const disabledDateTime = (item: any) => ({
-  //   disabledHours: () => {
-  //     const disabledHours = []
-  //     for (let i = 0; i < 8; i++) {
-  //       disabledHours.push(i)
-  //     }
-  //     for (let i = 18; i < 24; i++) {
-  //       disabledHours.push(i)
-  //     }
-  //     return disabledHours
-  //   },
-  //   disabledMinutes: () => range(30, 60)
-  // })
 
   return (
     <Modal
@@ -190,9 +141,10 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
                   name={item.name}
                   rules={[{ required: item.required, message: 'Trường bắt buộc' }]}
                 >
-                  {item.type === INPUT_TYPE.TEXT && <Input placeholder={item.description} />}
+                  {item.type === INPUT_TYPE.TEXT && <Input disabled={!canUpdateForm} placeholder={item.description} />}
                   {item.type === INPUT_TYPE.SINGLE_SELECT && (
                     <Select
+                      disabled={!canUpdateForm}
                       placeholder={item.description}
                       options={item.options?.map((val: keyof LeaveTypes) => {
                         return {
@@ -204,6 +156,7 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
                   )}
                   {item.type === INPUT_TYPE.MULTIPLE_SELECT && (
                     <Select
+                      disabled={!canUpdateForm}
                       mode='multiple'
                       placeholder={item.description}
                       options={item.options?.map((val: keyof LeaveTypes) => {
@@ -216,6 +169,7 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
                   )}
                   {item.type === INPUT_TYPE.DATETIME && (
                     <DatePicker
+                      disabled={!canUpdateForm}
                       placeholder={item.description}
                       className='tw-w-full'
                       showTime={{ format: 'HH:mm' }}
@@ -226,6 +180,7 @@ const LeaveRequestForm: React.FC<{ open: boolean; handleClose: () => void; data?
                   )}
                   {item.type === INPUT_TYPE.BOOLEAN && (
                     <Select
+                      disabled={!canUpdateForm}
                       placeholder={item.description}
                       options={[
                         { label: 'Có', value: true },
