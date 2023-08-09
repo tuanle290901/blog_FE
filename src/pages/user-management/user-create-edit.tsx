@@ -140,6 +140,10 @@ const UserCreateEdit: React.FC<{
       const birthday = value.birthday ? value.birthday.format('YYYY-MM-DD') : null
       const joinDate = value.joinDate ? value.joinDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
       const formalDate = value.formalDate ? value.formalDate.format('YYYY-MM-DD') : null
+      if (joinDate && formalDate && joinDate > formalDate) {
+        notification.warning({ message: 'Lưu ý: Ngày ký hợp đồng chính thức phải sau ngày gia nhập!' })
+        return
+      }
       const payload: IUser = {
         ...value,
         groupProfiles,
@@ -198,7 +202,7 @@ const UserCreateEdit: React.FC<{
 
   const emailValidator = (rule: RuleObject | any, value: any) => {
     if (!value) {
-      return Promise.resolve()
+      return Promise.reject('Email không được để trống')
     }
     if (!EMAIL_REG.test(value)) {
       return Promise.reject(t('userModal.errorMessage.invalidEmail'))
@@ -217,7 +221,6 @@ const UserCreateEdit: React.FC<{
     if (!REGEX_PHONE_NUMBER.test(value)) {
       return Promise.reject(t('userModal.errorMessage.invalidPhoneNumber'))
     }
-    console.log(serverError)
     if (serverError && serverError.message.includes(value)) {
       return Promise.reject('Số điện thoại ' + value + ' đã được sử dụng.')
     }
@@ -383,6 +386,7 @@ const UserCreateEdit: React.FC<{
                   style={{ marginBottom: 24 }}
                   label={t('userList.email')}
                   name='email'
+                  required
                   rules={[
                     {
                       validator: emailValidator
