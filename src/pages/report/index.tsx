@@ -119,7 +119,7 @@ const Index = () => {
   }
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
-    return current && current < dayjs().startOf('year')
+    return current && (current < dayjs().startOf('year') || current.isAfter(new Date()))
   }
 
   useEffect(() => {
