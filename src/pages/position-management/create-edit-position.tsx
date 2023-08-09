@@ -9,6 +9,7 @@ import { createPosition, updatePosition } from '~/stores/features/position/posit
 import { IUser } from '~/types/user.interface.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { ROLE } from '~/constants/app.constant.ts'
+import { REGEX_TRIM } from '~/constants/regex.constant'
 
 const CreateEditPosition: React.FC<{
   userInfo: IUser | null
@@ -86,12 +87,25 @@ const CreateEditPosition: React.FC<{
             {
               required: true,
               message: t('position.message.positionEmpty')
+            },
+            {
+              pattern: REGEX_TRIM,
+              message: t('rootInit.trim')
             }
           ]}
         >
           <Input disabled={!editAble} placeholder={t('position.message.enterPositionName')} />
         </FormItem>
-        <FormItem name='description' label={t('position.description')}>
+        <FormItem
+          name='description'
+          label={t('position.description')}
+          rules={[
+            {
+              pattern: REGEX_TRIM,
+              message: t('rootInit.trim')
+            }
+          ]}
+        >
           <TextArea disabled={!editAble} placeholder={t('position.message.enterDescription')} />
         </FormItem>
       </Form>
