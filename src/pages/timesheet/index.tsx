@@ -134,13 +134,13 @@ const Timesheet: React.FC = () => {
   const handleSelectThisMonth = () => {
     setSelectedTimeRange('this_month')
     setSelectedStartDate(dayjs().startOf('M'))
-    setSelectedEndDate(dayjs().endOf('M'))
+    setSelectedEndDate(dayjs())
     setSearchValue((prevState) => {
       return {
         ...prevState,
         paging: { ...prevState.paging, page: 0 },
         startDate: dayjs().startOf('M').format('YYYY-MM-DD'),
-        endDate: dayjs().endOf('M').format('YYYY-MM-DD')
+        endDate: dayjs().format('YYYY-MM-DD')
       }
     })
   }
@@ -612,6 +612,9 @@ const Timesheet: React.FC = () => {
                     defaultValue={[dayjs(), dayjs()]}
                     value={[selectedStartDate, selectedEndDate]}
                     allowClear={false}
+                    disabledDate={(date) => {
+                      return date.isAfter(new Date())
+                    }}
                     renderExtraFooter={() => (
                       <div className='timesheet-filter-time__button'>
                         <Button
