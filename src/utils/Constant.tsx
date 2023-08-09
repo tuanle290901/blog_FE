@@ -52,7 +52,8 @@ export enum TicketStatusEnum {
   SUBMITTED = 'SUBMITTED',
   PROCESSING = 'PROCESSING',
   CONFIRMED = 'CONFIRMED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  FINISHED = 'FINISHED'
 }
 
 export const TICKET_STATUS: TicketStatusType = {

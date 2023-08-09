@@ -11,7 +11,7 @@ export interface ILeaveRequest {
   definitionRevision: number
   updatedAt: string
   updatedBy: string
-  processStatus: { [key: string]: string }
+  processStatus: { [key: string]: any }
 }
 
 export interface ILeaveRequestForm {

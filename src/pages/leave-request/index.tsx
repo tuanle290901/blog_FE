@@ -34,11 +34,12 @@ import {
   resetLeaveRequest,
   resetValueFilter,
   setValueFilter,
-  startEditing
+  startEditing,
+  updateLeaveRequest
 } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IPaging } from '~/types/api-response.interface'
-import { ILeaveRequest } from '~/types/leave-request'
+import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
 // import { convertUTCToLocaleDate } from '~/utils/helper'
 import dayjs from 'dayjs'
 import { ROLE } from '~/constants/app.constant'
@@ -196,6 +197,17 @@ const LeaveRequest: React.FC = () => {
     }
   }
 
+  const onUpdateStatus = (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
+    const payload: ILeaveRequestUpdateStatusForm = {
+      attrs: data.processStatus['0'].attributes,
+      nodeId: 1,
+      status,
+      ticketId: data.id
+    }
+    dispatch(updateLeaveRequest(payload))
+    dispatch(filterLeaveRequest(searchValue))
+  }
+
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
@@ -258,23 +270,30 @@ const LeaveRequest: React.FC = () => {
         ellipsis: true
       },
       {
-        key: 'status',
+        key: '',
         title: t('leaveRequest.status'),
         dataIndex: 'status',
         showSorterTooltip: false,
         ellipsis: true,
-        render: (status: keyof TicketStatusType) => {
+        render: (_, record: ILeaveRequest) => {
+          const status: keyof TicketStatusType = record.status
           return (
             <div>
               {isSystemAdmin ? (
                 <Space>
                   {status !== TicketStatusEnum.CONFIRMED && status !== TicketStatusEnum.REJECTED && (
                     <>
-                      <Tooltip title='Đồng ý'>
-                        <CloseSquareFilled className='tw-text-green-600 tw-text-2xl tw-cursor-pointer' />
-                      </Tooltip>
                       <Tooltip title='Từ chối'>
-                        <CheckSquareFilled className='tw-text-red-600 tw-text-2xl tw-cursor-pointer' />
+                        <CloseSquareFilled
+                          className='tw-text-red-600 tw-text-2xl tw-cursor-pointer'
+                          onClick={() => onUpdateStatus(TicketStatusEnum.REJECTED, record)}
+                        />
+                      </Tooltip>
+                      <Tooltip title='Đồng ý'>
+                        <CheckSquareFilled
+                          className='tw-text-green-600 tw-text-2xl tw-cursor-pointer'
+                          onClick={() => onUpdateStatus(TicketStatusEnum.FINISHED, record)}
+                        />
                       </Tooltip>
                     </>
                   )}

@@ -5,7 +5,12 @@ import { END_POINT_API } from '~/config/endpointapi'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface'
-import { ILeaveRequest, ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
+import {
+  ILeaveRequest,
+  ILeaveRequestEditForm,
+  ILeaveRequestForm,
+  ILeaveRequestUpdateStatusForm
+} from '~/types/leave-request'
 import { TicketDefinationResponse } from '~/types/leave-request.interface'
 
 export interface ILeaveRequestState {
@@ -70,7 +75,7 @@ export const createLeaveRequest = createAsyncThunk(
 
 export const updateLeaveRequest = createAsyncThunk(
   'leave-request/update',
-  async (body: ILeaveRequestEditForm, thunkAPI) => {
+  async (body: ILeaveRequestUpdateStatusForm, thunkAPI) => {
     try {
       const response: IApiResponse<ILeaveRequest> = await HttpService.put(
         `${END_POINT_API.LeaveRequest.update()}`,
