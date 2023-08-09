@@ -5,7 +5,8 @@ import { END_POINT_API } from '~/config/endpointapi'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface'
-import { ILeaveRequest, ILeaveRequestForm } from '~/types/leave-request'
+import { ILeaveRequest, ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
+import { TicketDefinationResponse } from '~/types/leave-request.interface'
 
 export interface ILeaveRequestState {
   listData: ILeaveRequest[]
@@ -14,6 +15,19 @@ export interface ILeaveRequestState {
   meta: IPaging
   editingLeaveRequest: ILeaveRequest | null
   filter: string
+  ticketDefinationType: TicketDefinationResponse[]
+}
+
+export interface TicketRequestPayload {
+  startDate?: string
+  endDate?: string
+  page: number
+  size: number
+  sort: ISort[]
+  requestedBy?: string[]
+  statuses?: string[]
+  ticketDef?: string[]
+  onlyAssignToMe?: boolean
 }
 
 const initialState: ILeaveRequestState = {
@@ -22,39 +36,20 @@ const initialState: ILeaveRequestState = {
   currentRequestId: null,
   meta: { page: 0, size: 10, total: 0, totalPage: 0 },
   editingLeaveRequest: null,
-  filter: ''
+  filter: '',
+  ticketDefinationType: []
 }
 
-export const filterLeaveRequest = createAsyncThunk(
-  'leave-request/filter',
-  async (params: { query: string | null; paging: IPaging | null; sorts: ISort[] | null }, thunkAPI) => {
-    try {
-      let body: any = {
-        page: params?.paging?.page,
-        size: params?.paging?.size,
-        sort: params?.sorts
-      }
-      if (!params?.query && !params?.paging && !params?.sorts) {
-        body = {}
-      }
-      if (params.query) {
-        body.criteria = [
-          {
-            field: 'name',
-            operator: 'LIKE_IGNORE_CASE',
-            value: params.query
-          }
-        ]
-      }
-      const response: IApiResponse<[]> = await HttpService.post('/leave-request/filter', body, {
-        signal: thunkAPI.signal
-      })
-      return response
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error)
-    }
+export const filterLeaveRequest = createAsyncThunk('tickets/filter', async (params: TicketRequestPayload, thunkAPI) => {
+  try {
+    const response: any = await HttpService.post('/tickets/filter', params, {
+      signal: thunkAPI.signal
+    })
+    return response
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
   }
-)
+})
 
 export const createLeaveRequest = createAsyncThunk(
   'leave-request/create',
@@ -75,10 +70,31 @@ export const createLeaveRequest = createAsyncThunk(
 
 export const updateLeaveRequest = createAsyncThunk(
   'leave-request/update',
-  async (body: ILeaveRequestForm, thunkAPI) => {
+  async (body: ILeaveRequestEditForm, thunkAPI) => {
     try {
       const response: IApiResponse<ILeaveRequest> = await HttpService.put(
-        `${END_POINT_API.LeaveRequest.update()}/${body.id}`,
+        `${END_POINT_API.LeaveRequest.update()}`,
+        body,
+        {
+          signal: thunkAPI.signal
+        }
+      )
+      return response
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      return error
+    }
+  }
+)
+
+export const editLeaveRequest = createAsyncThunk(
+  'leave-request/edit',
+  async (body: ILeaveRequestEditForm, thunkAPI) => {
+    try {
+      const response: IApiResponse<ILeaveRequest> = await HttpService.put(
+        `${END_POINT_API.LeaveRequest.edit()}`,
         body,
         {
           signal: thunkAPI.signal
@@ -96,8 +112,34 @@ export const updateLeaveRequest = createAsyncThunk(
 
 export const deleteLeaveRequest = createAsyncThunk('leave-request/delete', async (id: string, thunkAPI) => {
   try {
-    const response: IApiResponse<any> = await HttpService.delete(`${END_POINT_API.LeaveRequest.delete()}/${id}`)
+    const response: IApiResponse<any> = await HttpService.delete(
+      `${END_POINT_API.LeaveRequest.delete()}?ticketId=${id}`
+    )
     return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
+  }
+})
+
+export const resetLeaveRequest = createAsyncThunk('leave-request/reset', async (id: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<any> = await HttpService.put(`${END_POINT_API.LeaveRequest.reset()}?ticketId=${id}`)
+    return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
+  }
+})
+
+export const getAllDefinationType = createAsyncThunk('tickets/definitions', async (_, thunkAPI) => {
+  try {
+    const response: IApiResponse<TicketDefinationResponse> = await HttpService.get('tickets/definitions')
+    return response.data
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)
@@ -137,10 +179,13 @@ const leaveRequestSlice = createSlice({
         state.loading = false
       })
       .addCase(filterLeaveRequest.fulfilled, (state, action) => {
-        state.listData = [...action.payload.data]
+        state.listData = [...action.payload.data.content]
         state.meta = {
           ...action?.payload?.meta
         }
+      })
+      .addCase(getAllDefinationType.fulfilled, (state, action) => {
+        state.ticketDefinationType = action.payload
       })
       .addCase(updateLeaveRequest.pending, (state) => {
         state.loading = true

@@ -537,7 +537,7 @@ const UserCreateEdit: React.FC<{
                           </div>
                         </div>
                       ))}
-                      <Form.Item>
+                      {/* <Form.Item>
                         {hasPermissionAddAndChangeRole() && userData?.status !== USER_STATUS.DEACTIVE && (
                           <Button
                             type='dashed'
@@ -548,7 +548,7 @@ const UserCreateEdit: React.FC<{
                             {t('userModal.addRole')}
                           </Button>
                         )}
-                      </Form.Item>
+                      </Form.Item> */}
                     </>
                   )}
                 </Form.List>

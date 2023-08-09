@@ -1,3 +1,5 @@
+import { LeaveTypes, TicketStatusType } from '~/types/leave-request.interface'
+
 export const LOCAL_STORAGE = {
   AUTH_INFO: 'currentAuth',
   ACCESS_TOKEN: 'accessToken'
@@ -31,4 +33,31 @@ export const DEVICE_STATUS = {
   INITIAL: 'INITIAL',
   ACTIVE: 'ACTIVE',
   DEACTIVE: 'DEACTIVE'
+}
+
+export const LEAVE_TYPE_MAP: LeaveTypes = {
+  SICK: 'Nghỉ ốm',
+  COMPENSATORY: 'Nghỉ bù',
+  ANNUAL: 'Nghỉ phép theo năm',
+  UNPAID: 'Nghỉ không lương',
+  MATERNITY: 'Nghỉ thai sản',
+  PATERNITY: 'Nghỉ thai sản cho người thân',
+  WORK_FROM_HOME: 'Làm việc ở nhà',
+  WEDDING: 'Nghỉ cưới',
+  UNEXPECTED: 'Nghỉ đột xuất',
+  COMPASSIONATE: 'Nghỉ phép vì tang gia'
+}
+
+export enum TicketStatusEnum {
+  SUBMITTED = 'SUBMITTED',
+  PROCESSING = 'PROCESSING',
+  CONFIRMED = 'CONFIRMED',
+  REJECTED = 'REJECTED'
+}
+
+export const TICKET_STATUS: TicketStatusType = {
+  SUBMITTED: 'Đã gửi',
+  PROCESSING: 'Đang xử lý',
+  CONFIRMED: 'Đã xác nhận',
+  REJECTED: 'Từ chối'
 }

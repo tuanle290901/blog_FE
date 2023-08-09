@@ -1,2 +1,2 @@
-export const API_URL = 'http://192.168.133.110:8088'
-// export const API_URL = 'https://htime.htsc.vn/api'
+export const API_URL = 'http://192.168.160.74:8081'
+// export const API_URL = 'http://192.168.133.110:8088'

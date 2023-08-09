@@ -1,63 +1,94 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  CheckSquareFilled,
+  CloseSquareFilled
+} from '@ant-design/icons'
 import {
   Button,
-  Col,
-  Input,
+  DatePicker,
   Popconfirm,
-  Row,
+  Select,
   Space,
   Table,
   TableColumnsType,
   TablePaginationConfig,
+  Tag,
+  Tooltip,
   notification
 } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import LeaveRequestForm from '~/pages/leave-request/leave-request-form'
 import {
+  TicketRequestPayload,
   cancelEditing,
   deleteLeaveRequest,
   filterLeaveRequest,
+  getAllDefinationType,
+  resetLeaveRequest,
   resetValueFilter,
   setValueFilter,
   startEditing
 } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { IPaging, ISort } from '~/types/api-response.interface'
+import { IPaging } from '~/types/api-response.interface'
 import { ILeaveRequest } from '~/types/leave-request'
 // import { convertUTCToLocaleDate } from '~/utils/helper'
 import dayjs from 'dayjs'
+import { ROLE } from '~/constants/app.constant'
+import { searchUser } from '~/stores/features/user/user.slice'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { TicketStatusType } from '~/types/leave-request.interface'
+import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
+import { tagColorMapping } from '~/utils/helper'
+
+const { RangePicker } = DatePicker
+const initialPayload: TicketRequestPayload = {
+  startDate: '',
+  endDate: '',
+  page: 0,
+  size: 10,
+  sort: [
+    {
+      field: 'createdAt',
+      direction: 'ASC'
+    }
+  ],
+  requestedBy: [],
+  statuses: [],
+  ticketDef: [],
+  onlyAssignToMe: false
+}
+
+const filterUserPayload = {
+  query: '',
+  paging: {
+    page: 0,
+    size: 10000,
+    total: 0,
+    totalPage: 0
+  },
+  sorts: [],
+  groupCode: null
+}
 
 const LeaveRequest: React.FC = () => {
   const { t } = useTranslation()
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-  // const listData: ILeaveRequest[] = useAppSelector((state: any) => state.leaveRequest.listData)
-  const listData: ILeaveRequest[] = [
-    {
-      id: '64bf80014da3c80a38g4374f',
-      typeOfLeave: 'Nghỉ ốm',
-      startDate: '2023-08-01',
-      endDate: '2023-08-01',
-      requestMessage: '',
-      AmountTimeLeave: 1,
-      requestDate: '2023-08-01',
-      status: 'processing'
-    },
-    {
-      id: '64bf80014da3c80a38as374f',
-      typeOfLeave: 'Nghỉ cưới',
-      startDate: '2023-08-04',
-      endDate: '2023-08-05',
-      requestMessage: '',
-      AmountTimeLeave: 2,
-      requestDate: '2023-08-02',
-      status: 'approve'
-    }
-  ]
-  const timerId = useRef<any>(null)
+  const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
+  const listData: ILeaveRequest[] = useAppSelector((state: any) => state.leaveRequest.listData)
+  const { userInfo } = useUserInfo()
+  const isSystemAdmin = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
+  const isManagerDepartment = userInfo?.groupProfiles.find(
+    (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
+  )
+  const users = useAppSelector((item) => item.user.userList)
   // const meta: IPaging = useAppSelector((state: any) => state.leaveRequest.meta)
   const meta: IPaging = {
     page: 0,
@@ -69,26 +100,7 @@ const LeaveRequest: React.FC = () => {
   const filter = useAppSelector((state: any) => state.leaveRequest.filter)
 
   const dispatch = useAppDispatch()
-  const [searchValue, setSearchValue] = useState<{
-    query: string | ''
-    group?: string | null
-    paging: IPaging
-    sorts: ISort[]
-  }>({
-    query: '',
-    paging: {
-      page: 0,
-      size: 10,
-      total: 0,
-      totalPage: 0
-    },
-    sorts: [
-      {
-        direction: 'DESC',
-        field: 'created_at'
-      }
-    ]
-  })
+  const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
 
   const handleClickDelete = async (record: ILeaveRequest) => {
     try {
@@ -96,13 +108,19 @@ const LeaveRequest: React.FC = () => {
       await notification.success({
         message: response.message
       })
-      dispatch(
-        filterLeaveRequest({
-          paging: searchValue.paging,
-          sorts: searchValue.sorts,
-          query: searchValue.query
-        })
-      )
+    } catch (error: any) {
+      notification.error({
+        message: error.message
+      })
+    }
+  }
+
+  const handleClickReset = async (record: ILeaveRequest) => {
+    try {
+      const response = await dispatch(resetLeaveRequest(record.id)).unwrap()
+      await notification.success({
+        message: response.message
+      })
     } catch (error: any) {
       notification.error({
         message: error.message
@@ -112,69 +130,132 @@ const LeaveRequest: React.FC = () => {
 
   const handleClickUpdate = (record: ILeaveRequest) => {
     setIsOpenModal(true)
-    dispatch(startEditing(record.id as string))
+    dispatch(startEditing(record.id))
   }
 
   const getSortOrder = (filed: string) => {
-    const sort = searchValue.sorts[0]
+    const sort = searchValue.sort[0]
     if (sort && sort.field === filed) {
-      return searchValue.sorts[0].direction === 'ASC' ? 'ascend' : 'descend'
+      return searchValue.sort[0].direction === 'ASC' ? 'ascend' : 'descend'
     } else {
       return null
+    }
+  }
+
+  const handleCloseModal = async () => {
+    setIsOpenModal(false)
+    dispatch(cancelEditing())
+    if (filter && JSON.parse(filter) !== '') {
+      setSearchValue({
+        ...JSON.parse(filter)
+      })
+    }
+    dispatch(resetValueFilter())
+    dispatch(filterLeaveRequest(searchValue))
+  }
+
+  const onChangeRequest = (type: string, requestItem: string | any) => {
+    switch (type) {
+      case 'onlyAssignToMe': {
+        const status = requestItem.target.checked
+        setSearchValue((prev) => {
+          return {
+            ...prev,
+            onlyAssignToMe: status
+          }
+        })
+        break
+      }
+      case 'requestBy': {
+        setSearchValue((prev) => {
+          return {
+            ...prev,
+            requestedBy: requestItem
+          }
+        })
+        break
+      }
+      case 'requestTime': {
+        setSearchValue((prev) => {
+          return {
+            ...prev,
+            startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
+            endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
+          }
+        })
+        break
+      }
+      case 'requestStatus': {
+        setSearchValue((prev) => {
+          return {
+            ...prev,
+            statuses: requestItem
+          }
+        })
+      }
     }
   }
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
-        key: 'typeOfLeave',
-        title: t('leaveRequest.typeOfLeave'),
-        dataIndex: 'typeOfLeave',
-        sorter: true,
+        key: 'ticketDefinitionId',
+        title: 'Yêu cầu',
+        dataIndex: 'ticketDefinitionId',
+        sorter: false,
         showSorterTooltip: false,
-        sortOrder: getSortOrder('typeOfLeave'),
-        ellipsis: true
+        sortOrder: getSortOrder('ticketDefinitionId'),
+        ellipsis: true,
+        render: (item) => {
+          return ticketDifinations.find((ticket) => ticket.id === item)?.name
+        }
       },
       {
-        key: 'startDate',
+        key: 'processStatus',
         title: t('leaveRequest.startDate'),
-        dataIndex: 'startDate',
+        dataIndex: 'processStatus',
         ellipsis: true,
-        render: (startDate) => {
-          return dayjs(startDate).format('DD/MM/YYYY')
+        render: (item) => {
+          const startDate = item['0']?.attributes?.start_time
+          return dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')
         }
       },
       {
-        key: 'endDate',
+        key: 'processStatus',
         title: t('leaveRequest.endDate'),
-        dataIndex: 'endDate',
+        dataIndex: 'processStatus',
         ellipsis: true,
-        render: (endDate) => {
-          return dayjs(endDate).format('DD/MM/YYYY')
+        render: (item) => {
+          const endDate = item['0']?.attributes?.end_time
+          return dayjs(endDate).format('DD/MM/YYYY HH:mm:ss')
         }
       },
       {
-        key: 'requestMessage',
+        key: 'processStatus',
         title: t('leaveRequest.requestMessage'),
-        dataIndex: 'requestMessage',
+        dataIndex: 'processStatus',
         showSorterTooltip: false,
-        ellipsis: true
+        ellipsis: true,
+        render: (item) => {
+          const reason = item['0']?.attributes?.reason || item['0']?.attributes?.description
+          return reason
+        }
       },
       {
-        key: 'AmountTimeLeave',
-        title: t('leaveRequest.AmountTimeLeave'),
-        dataIndex: 'AmountTimeLeave',
-        showSorterTooltip: false,
-        ellipsis: true
-      },
-      {
-        key: 'requestDate',
+        key: 'createdAt',
         title: t('leaveRequest.requestDate'),
-        dataIndex: 'requestDate',
+        dataIndex: 'createdAt',
         ellipsis: true,
         render: (requestDate) => {
-          return dayjs(requestDate).format('DD/MM/YYYY')
+          return dayjs(requestDate).format('DD/MM/YYYY HH:mm:ss')
         }
+      },
+      {
+        key: 'createdBy',
+        title: 'Người yêu cầu',
+        dataIndex: 'createdBy',
+        showSorterTooltip: false,
+        ellipsis: true
       },
       {
         key: 'status',
@@ -182,8 +263,30 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'status',
         showSorterTooltip: false,
         ellipsis: true,
-        render: (status) => {
-          return <div className={status === 'processing' ? 'tw-text-red-500' : 'tw-text-green-500'}>{status}</div>
+        render: (status: keyof TicketStatusType) => {
+          return (
+            <div>
+              {isSystemAdmin ? (
+                <Space>
+                  {status !== TicketStatusEnum.CONFIRMED && status !== TicketStatusEnum.REJECTED && (
+                    <>
+                      <Tooltip title='Đồng ý'>
+                        <CloseSquareFilled className='tw-text-green-600 tw-text-2xl tw-cursor-pointer' />
+                      </Tooltip>
+                      <Tooltip title='Từ chối'>
+                        <CheckSquareFilled className='tw-text-red-600 tw-text-2xl tw-cursor-pointer' />
+                      </Tooltip>
+                    </>
+                  )}
+                  {(status === TicketStatusEnum.CONFIRMED || status === TicketStatusEnum.REJECTED) && (
+                    <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
+                  )}
+                </Space>
+              ) : (
+                <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
+              )}
+            </div>
+          )
         }
       },
       {
@@ -194,20 +297,37 @@ const LeaveRequest: React.FC = () => {
         render: (_, record: ILeaveRequest) => {
           return (
             <Space size='small'>
-              <Button
-                size='small'
-                onClick={() => handleClickUpdate(record)}
-                icon={<EditOutlined className='tw-text-blue-600' />}
-              />
-              <Popconfirm
-                title={t('leaveRequest.confirmDeleteTitle')}
-                description={t('leaveRequest.confirmDelete')}
-                onConfirm={() => handleClickDelete(record)}
-                okText={t('common.yes')}
-                cancelText={t('common.no')}
-              >
-                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-              </Popconfirm>
+              {record?.status !== TicketStatusEnum.CONFIRMED && (
+                <Button
+                  size='small'
+                  onClick={() => handleClickUpdate(record)}
+                  icon={<EditOutlined className='tw-text-blue-600' />}
+                />
+              )}
+
+              {record?.status !== TicketStatusEnum.CONFIRMED && (
+                <Popconfirm
+                  title={t('leaveRequest.confirmDeleteTitle')}
+                  description={t('leaveRequest.confirmDelete')}
+                  onConfirm={() => handleClickDelete(record)}
+                  okText={t('common.yes')}
+                  cancelText={t('common.no')}
+                >
+                  <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                </Popconfirm>
+              )}
+
+              {isSystemAdmin && record?.status === TicketStatusEnum.CONFIRMED && (
+                <Popconfirm
+                  title='Đặt lại yêu cầu'
+                  description='Bạn có chắc chắn muốn đặt lại yêu cầu không?'
+                  onConfirm={() => handleClickReset(record)}
+                  okText={t('common.yes')}
+                  cancelText={t('common.no')}
+                >
+                  <Button size='small' icon={<ReloadOutlined className='tw-text-red-600' />} />
+                </Popconfirm>
+              )}
             </Space>
           )
         }
@@ -216,33 +336,15 @@ const LeaveRequest: React.FC = () => {
     return columns
   }, [handleClickDelete, getSortOrder, handleClickUpdate, t])
 
-  const handleCloseModal = () => {
-    setIsOpenModal(false)
-    dispatch(cancelEditing())
-    if (filter && JSON.parse(filter) !== '') {
-      setSearchValue({
-        ...JSON.parse(filter)
-      })
-    } else {
-      dispatch(
-        filterLeaveRequest({
-          paging: searchValue.paging,
-          sorts: searchValue.sorts,
-          query: searchValue.query
-        })
-      )
+  useEffect(() => {
+    dispatch(getAllDefinationType())
+    if (isSystemAdmin || isManagerDepartment) {
+      dispatch(searchUser(filterUserPayload))
     }
-    dispatch(resetValueFilter())
-  }
+  }, [])
 
   useEffect(() => {
-    const promise = dispatch(
-      filterLeaveRequest({
-        paging: searchValue.paging,
-        sorts: searchValue.sorts,
-        query: searchValue.query
-      })
-    )
+    const promise = dispatch(filterLeaveRequest(searchValue))
     return () => {
       promise.abort()
     }
@@ -253,61 +355,63 @@ const LeaveRequest: React.FC = () => {
     filters: Record<string, FilterValue | null>,
     sorter: SorterResult<ILeaveRequest> | any
   ) => {
-    setSearchValue((prevState) => {
-      const paging: IPaging = {
-        ...prevState.paging,
-        page: Number(pagination.current) - 1,
-        size: pagination.pageSize as number
-      }
-      const sorts: ISort[] = []
-      if (sorter.order) {
-        sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
-      } else {
-        sorts.push({
-          direction: 'DESC',
-          field: 'created_at'
-        })
-      }
-      return { ...prevState, paging, sorts }
-    })
-  }
-
-  const handleSearchValueChange = (value: string) => {
-    if (timerId.current) {
-      clearTimeout(timerId.current)
-    }
-    timerId.current = setTimeout(() => {
-      setSearchValue((prevState) => ({ ...prevState, query: value, paging: { ...prevState.paging, page: 0 } }))
-    }, 500)
+    // TODO
   }
 
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <LeaveRequestForm open={isOpenModal} data={editingLeaveRequest} handleClose={handleCloseModal} />
-      <div>
+      <div className='tw-flex'>
         <h1 className='tw-text-2xl tw-font-semibold'>{t('leaveRequest.title')}</h1>
       </div>
-      <Row gutter={[16, 16]} className='tw-flex tw-my-5 tw-justify-between'>
-        <Col xs={24} lg={12}>
-          <Button
-            onClick={() => {
-              setIsOpenModal(true)
-              dispatch(setValueFilter(JSON.stringify(searchValue)))
-            }}
-            icon={<PlusOutlined />}
-            type='default'
-          >
-            {t('leaveRequest.createNew')}
-          </Button>
-        </Col>
-        <Col xs={24} lg={12} className=' tw-text-right'>
-          <Input.Search
-            className='tw-w-64'
-            placeholder={t('leaveRequest.search')}
-            onChange={(event) => handleSearchValueChange(event.target.value)}
+      <div className='tw-flex tw-justify-between tw-my-5'>
+        <Button
+          onClick={() => {
+            setIsOpenModal(true)
+            dispatch(setValueFilter(JSON.stringify(searchValue)))
+          }}
+          icon={<PlusOutlined />}
+          type='primary'
+        >
+          {t('leaveRequest.createNew')}
+        </Button>
+        <Space>
+          {/* {isSystemAdmin && (
+            <Checkbox onChange={(val) => onChangeRequest('onlyAssignToMe', val)}>Các yêu cầu cần tôi xử lý</Checkbox>
+          )} */}
+
+          {(isSystemAdmin || isManagerDepartment) && (
+            <Select
+              onChange={(val) => onChangeRequest('requestBy', val)}
+              mode='multiple'
+              placeholder='Người yêu cầu'
+              style={{ minWidth: 200 }}
+              options={users.map((user) => {
+                return {
+                  label: user?.fullName || user?.userName,
+                  value: user?.userName
+                }
+              })}
+            />
+          )}
+
+          <RangePicker format={'DD/MM/YYYY'} onChange={(val) => onChangeRequest('requestTime', val)} />
+
+          <Select
+            onChange={(val) => onChangeRequest('requestStatus', val)}
+            mode='multiple'
+            placeholder='Trạng thái yêu cầu'
+            style={{ minWidth: 200 }}
+            options={Object.entries(TICKET_STATUS).map((item) => {
+              return {
+                label: item[1],
+                value: item[0]
+              }
+            })}
           />
-        </Col>
-      </Row>
+        </Space>
+      </div>
+
       <div>
         <Table
           columns={columns}

@@ -1,24 +1,34 @@
+import { TicketStatusEnum } from '~/utils/Constant'
+
 export interface ILeaveRequest {
   id: string
-  typeOfLeave: string
-  startDate: string
-  endDate: string
-  requestMessage: string
-  AmountTimeLeave: number
-  requestDate: string
+  groupCode: string
   status: string
-  startTime?: string
-  endTime?: string
+  ticketCode: string
+  ticketDefinitionId: string
+  createdAt: string
+  createdBy: string
+  definitionRevision: number
+  updatedAt: string
+  updatedBy: string
+  processStatus: { [key: string]: string }
 }
 
 export interface ILeaveRequestForm {
   id?: string
-  typeOfLeave: string
-  startDate: string
-  endDate: string
-  requestMessage: string
-  AmountTimeLeave: number
-  requestDate: string
-  startTime?: string
-  endTime?: string
+  initialAttrs: { [key: string]: string }
+  revision: number
+  ticketDefinitionId: string
+}
+
+export interface ILeaveRequestEditForm {
+  attrs: { [key: string]: string }
+  id: string
+}
+
+export interface ILeaveRequestUpdateStatusForm {
+  ticketId: string
+  nodeId: number
+  attrs: { [key: string]: string }
+  status: TicketStatusEnum.CONFIRMED | TicketStatusEnum.REJECTED
 }

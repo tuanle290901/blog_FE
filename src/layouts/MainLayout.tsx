@@ -131,7 +131,7 @@ const MainLayout: React.FC = () => {
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        'Xin nghỉ phép',
+        'Danh sách yêu cầu',
         'leave-request',
         <img src={menuIconTimeKeeping} alt='' className='menu-image' />
       ),

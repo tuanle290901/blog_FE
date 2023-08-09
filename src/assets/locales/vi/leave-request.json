@@ -1,7 +1,7 @@
 {
   "leaveRequest": {
     "typeOfLeave": "Công nghỉ",
-    "title": "Yêu cầu nghỉ phép",
+    "title": "Danh sách yêu cầu",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
     "from": "Từ",
@@ -14,10 +14,10 @@
     "requestDate": "Ngày yêu cầu",
     "status": "Trạng thái",
     "name": "Tên nghỉ phép",
-    "createNew": "Thêm yêu cầu nghỉ phép",
+    "createNew": "Thêm yêu cầu mới",
     "createdAt": "Ngày tạo",
     "search": "Tìm kiếm...",
-    "confirmDeleteTitle": "Xóa yêu cầu nghỉ phép",
+    "confirmDeleteTitle": "Xóa yêu cầu",
     "confirmDelete": "Bạn có chắc chắn muốn xóa không?"
   }
 }
