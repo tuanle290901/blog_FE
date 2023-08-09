@@ -63,7 +63,7 @@ const Index = () => {
     msg: ''
   })
 
-  const groups = useAppSelector((state: any) => state.masterData.groups)
+  const authState = useAppSelector((state: any) => state?.auth?.userInfo)
 
   const onChangeTime: DatePickerProps['onChange'] = (date) => {
     setTimReport(date)
@@ -80,8 +80,8 @@ const Index = () => {
       const response = (await downloadExcelFile(params)) as any
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
       const fileName =
-        groups && groups.length > 0
-          ? `${groups[groups.length - 1]?.name}_ChamCong_${params.month}${params.year}.xlsx`
+        authState?.groupProfiles?.length > 0
+          ? `${authState?.groupProfiles[0]?.groupCode}_ChamCong_${params.month}${params.year}.xlsx`
           : `ChamCong_${params.month}${params.year}.xlsx`
       saveAs(blob, fileName)
       setIsDownloadFinished({
