@@ -41,7 +41,7 @@ import {
   updateLeaveRequest
 } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { IPaging } from '~/types/api-response.interface'
+import { IPaging, ISort } from '~/types/api-response.interface'
 import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
 // import { convertUTCToLocaleDate } from '~/utils/helper'
 import dayjs from 'dayjs'
@@ -62,7 +62,7 @@ const initialPayload: TicketRequestPayload = {
   sort: [
     {
       field: 'createdAt',
-      direction: 'ASC'
+      direction: 'DESC'
     }
   ],
   requestedBy: [],
@@ -70,7 +70,12 @@ const initialPayload: TicketRequestPayload = {
   ticketDef: [],
   onlyAssignToMe: false
 }
-
+const initialMeta: IPaging = {
+  page: 0,
+  size: 10,
+  total: 12,
+  totalPage: 2
+}
 const filterUserPayload = {
   query: '',
   paging: {
@@ -92,6 +97,7 @@ const LeaveRequest: React.FC = () => {
   const listData: ILeaveRequest[] = useAppSelector((state: any) => state.leaveRequest.listData)
   const users = useAppSelector((item) => item.user.userList)
   const editingLeaveRequest = useAppSelector((state: any) => state.leaveRequest.editingLeaveRequest)
+  const isLoading = useAppSelector((state: any) => state.leaveRequest.loading)
 
   const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
@@ -101,13 +107,7 @@ const LeaveRequest: React.FC = () => {
     (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
   )
 
-  // const meta: IPaging = useAppSelector((state: any) => state.leaveRequest.meta)
-  const meta: IPaging = {
-    page: 0,
-    size: 10,
-    total: 12,
-    totalPage: 2
-  }
+  const meta: IPaging = useAppSelector((state: any) => state.leaveRequest.meta)
 
   const handleClickDelete = async (record: ILeaveRequest) => {
     try {
@@ -233,6 +233,7 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'processStatus',
         title: t('leaveRequest.startDate'),
+        sorter: false,
         dataIndex: 'processStatus',
         ellipsis: true,
         render: (item) => {
@@ -244,7 +245,8 @@ const LeaveRequest: React.FC = () => {
         key: 'processStatus',
         title: t('leaveRequest.endDate'),
         dataIndex: 'processStatus',
-        ellipsis: true,
+        ellipsis: false,
+        sorter: false,
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
           return dayjs(endDate).format('DD/MM/YYYY HH:mm:ss')
@@ -265,6 +267,7 @@ const LeaveRequest: React.FC = () => {
         key: 'createdAt',
         title: t('leaveRequest.requestDate'),
         dataIndex: 'createdAt',
+        sorter: true,
         ellipsis: true,
         render: (requestDate) => {
           return dayjs(requestDate).format('DD/MM/YYYY HH:mm:ss')
@@ -275,7 +278,8 @@ const LeaveRequest: React.FC = () => {
         title: 'Người yêu cầu',
         dataIndex: 'createdBy',
         showSorterTooltip: false,
-        ellipsis: true
+        ellipsis: true,
+        sorter: true
       },
       {
         key: '',
@@ -343,8 +347,8 @@ const LeaveRequest: React.FC = () => {
 
               {record?.status !== TicketStatusEnum.CONFIRMED && (
                 <Popconfirm
-                  title={t('leaveRequest.confirmDeleteTitle')}
-                  description={t('leaveRequest.confirmDelete')}
+                  title='Hủy yêu cầu'
+                  description='Bạn có chắc chắn muốn hủy yêu cầu'
                   onConfirm={() => handleClickDelete(record)}
                   okText={t('common.yes')}
                   cancelText={t('common.no')}
@@ -396,7 +400,24 @@ const LeaveRequest: React.FC = () => {
     filters: Record<string, FilterValue | null>,
     sorter: SorterResult<ILeaveRequest> | any
   ) => {
-    // TODO
+    const sorts: ISort[] = []
+    if (sorter.order) {
+      sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
+    } else {
+      sorts.push({
+        direction: 'DESC',
+        field: 'createdAt'
+      })
+    }
+
+    setSearchValue((prev) => {
+      return {
+        ...prev,
+        page: (pagination.current as number) - 1,
+        size: pagination.pageSize as number,
+        sort: sorts
+      }
+    })
   }
 
   return (
@@ -465,9 +486,10 @@ const LeaveRequest: React.FC = () => {
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+          loading={isLoading}
           pagination={{
             className: 'd-flex justify-content-end align-items-center',
-            current: meta && meta.page + 1,
+            current: meta && meta.page,
             total: meta?.total,
             defaultPageSize: meta?.size,
             pageSize: meta?.size,
@@ -483,11 +505,6 @@ const LeaveRequest: React.FC = () => {
             },
 
             position: ['bottomRight']
-            // onChange: (page: number, pageSize: number) => {
-            //   if (handlePropsChange) {
-            //     handlePropsChange(page, pageSize)
-            //   }
-            // }
           }}
         />
       </div>
