@@ -24,6 +24,10 @@
     "status": "Trạng thái",
     "INITIAL": "Khởi tạo",
     "ACTIVE": "Kích hoạt",
-    "DEACTIVE": "Xóa"
+    "DEACTIVE": "Xóa",
+    "confirmActiveDevice": "Bạn có chắc chắn muốn kích hoạt thiết bị này không?",
+    "confirmActiveDeviceTitle": "Kích hoạt thiết bị",
+    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa thiết bị này không?",
+    "confirmDeleteDeviceTitle": "Xóa thiết bị"
   }
 }

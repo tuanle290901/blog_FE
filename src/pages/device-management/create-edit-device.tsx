@@ -128,6 +128,10 @@ const CreateEditDevice: React.FC<{
               {
                 pattern: REGEX_IP_ADDRESS,
                 message: `${t('device.ipAddress')}`
+              },
+              {
+                required: true,
+                message: `${t('device.enterIpAddress')}`
               }
             ]}
           >
@@ -168,7 +172,7 @@ const CreateEditDevice: React.FC<{
             rules={[
               {
                 required: true,
-                message: `${t('department.pleaseSelectAGroup')}`
+                message: `${t('device.pleaseSelectAGroup')}`
               }
             ]}
           >

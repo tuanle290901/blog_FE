@@ -5,13 +5,14 @@ import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { saveAs } from 'file-saver'
 import { useEffect, useState } from 'react'
-import { getListDepartments } from '~/stores/features/department/department.silce'
+// import { getListDepartments } from '~/stores/features/department/department.silce'
 import { downloadExcelFile } from '~/stores/features/report/report.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType } from '~/types/department.interface'
 import { FormValues } from '../setting/ticket-defination/type/ItemTypes'
 import './style.scss'
 import { convertBlobToString } from '~/utils/helper'
+import { getGroupRootName } from '~/stores/features/master-data/master-data.slice'
 
 const { RangePicker } = DatePicker
 
@@ -31,31 +32,31 @@ const rangePresets: {
 
 const { SHOW_PARENT } = TreeSelect
 
-interface TreeItem {
-  title: string | undefined
-  value: string
-  key: string
-  children?: TreeItem[]
-}
+// interface TreeItem {
+//   title: string | undefined
+//   value: string
+//   key: string
+//   children?: TreeItem[]
+// }
 
-const generateTreeData = (data: DataType[]) => {
-  return data.map((item) => {
-    const { code, name, children } = item
-    const formattedItem: TreeItem = { title: name, value: code, key: code }
+// const generateTreeData = (data: DataType[]) => {
+//   return data.map((item) => {
+//     const { code, name, children } = item
+//     const formattedItem: TreeItem = { title: name, value: code, key: code }
 
-    if (children && children.length > 0) {
-      formattedItem.children = generateTreeData(children)
-    }
+//     if (children && children.length > 0) {
+//       formattedItem.children = generateTreeData(children)
+//     }
 
-    return formattedItem
-  })
-}
+//     return formattedItem
+//   })
+// }
 
 const Index = () => {
   const [reportForm] = Form.useForm()
   const dispatch = useAppDispatch()
-  const departments = useAppSelector((item) => item.department.listData)
-  const [treeData, setTreeData] = useState<any[]>([])
+  // const departments = useAppSelector((item) => item.department.listData)
+  // const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
   const [timeReport, setTimReport] = useState<Dayjs | null>(null)
   const [isDownloadFinished, setIsDownloadFinished] = useState({
@@ -64,6 +65,7 @@ const Index = () => {
   })
 
   const authState = useAppSelector((state: any) => state?.auth?.userInfo)
+  const groupRootNameState = useAppSelector((state: any) => state?.masterData?.groupRootName)
 
   const onChangeTime: DatePickerProps['onChange'] = (date) => {
     setTimReport(date)
@@ -79,10 +81,9 @@ const Index = () => {
     try {
       const response = (await downloadExcelFile(params)) as any
       const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-      const fileName =
-        authState?.groupProfiles?.length > 0
-          ? `${authState?.groupProfiles[0]?.groupCode}_ChamCong_${params.month}${params.year}.xlsx`
-          : `ChamCong_${params.month}${params.year}.xlsx`
+      const fileName = groupRootNameState?.name
+        ? `${groupRootNameState?.name}_ChamCong_${params.month}${params.year}.xlsx`
+        : `ChamCong_${params.month}${params.year}.xlsx`
       saveAs(blob, fileName)
       setIsDownloadFinished({
         status: true,
@@ -103,39 +104,42 @@ const Index = () => {
     console.log(formValue)
   }
 
-  const [value, setValue] = useState<string[]>([])
+  // const [value, setValue] = useState<string[]>([])
 
-  const onChange = (newValue: string[]) => {
-    setValue(newValue)
-  }
+  // const onChange = (newValue: string[]) => {
+  //   setValue(newValue)
+  // }
 
-  const treeProps = {
-    treeData,
-    value,
-    onChange,
-    treeCheckable: true,
-    showCheckedStrategy: SHOW_PARENT,
-    placeholder: 'Phòng ban'
-  }
+  // const treeProps = {
+  //   treeData,
+  //   value,
+  //   onChange,
+  //   treeCheckable: true,
+  //   showCheckedStrategy: SHOW_PARENT,
+  //   placeholder: 'Phòng ban'
+  // }
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
     return current && (current < dayjs().startOf('year') || current.isAfter(new Date()))
   }
 
   useEffect(() => {
-    dispatch(getListDepartments())
+    const promise = dispatch(getGroupRootName())
     setTimReport(dayjs())
     reportForm.setFieldsValue({
       time: dayjs()
     })
+    return () => {
+      promise.abort()
+    }
   }, [])
 
-  useEffect(() => {
-    if (departments.length > 0) {
-      const tempTree = generateTreeData(departments)
-      setTreeData(tempTree)
-    }
-  }, [departments])
+  // useEffect(() => {
+  //   if (departments.length > 0) {
+  //     const tempTree = generateTreeData(departments)
+  //     setTreeData(tempTree)
+  //   }
+  // }, [departments])
 
   return (
     <div className='report-wrapper'>

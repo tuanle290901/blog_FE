@@ -49,6 +49,8 @@
     "addRole": "Thêm vị trí",
     "departmentRole": "Vai trò trong tổ chức",
     "systemRole": "Vai trò trong hệ thống",
+    "remainLeaveHour": "Số giờ nghỉ phép còn lại",
+    "enterRemainLeaveHour": "Ví dụ: 10.25",
     "errorMessage": {
       "fullNameIsEmpty": "Họ và tên không được để trống",
       "groupEmpty": "Tổ chức không được để trống",
@@ -58,7 +60,8 @@
       "avatarEmpty": "Ảnh đại diện không được để trống",
       "invalidEmail": "Email không đúng định dạng",
       "invalidPhoneNumber": "Số điện thoại không đúng định dạng",
-      "passwordIsEmpty": "Mật khẩu không được để trống"
+      "passwordIsEmpty": "Mật khẩu không được để trống",
+      "remainLeaveHourIsEmpty": "Số giờ nghỉ phép còn lại không được để trống"
     }
   }
 }
