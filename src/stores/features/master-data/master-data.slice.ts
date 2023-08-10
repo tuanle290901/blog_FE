@@ -12,6 +12,7 @@ export interface IGroup {
 export interface IGroupState {
   groups: IGroup[]
   listUserTitle: IUserTitle[]
+  groupRootName: any
   loading: boolean
   currentRequestId: string | null
   error: Record<string, any> | null
@@ -19,6 +20,7 @@ export interface IGroupState {
 const initialState: IGroupState = {
   groups: [],
   listUserTitle: [],
+  groupRootName: null,
   loading: false,
   currentRequestId: null,
   error: null
@@ -36,6 +38,21 @@ export const getAllGroup = createAsyncThunk('master-data/getAll', async (_, thun
     throw error
   }
 })
+
+export const getGroupRootName = createAsyncThunk('master-data/getGroupRootName', async (_, thunkAPI) => {
+  try {
+    const response: IApiResponse<IGroup[]> = await HttpService.get('/org/group/group-root-name', {
+      signal: thunkAPI.signal
+    })
+    return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+
 export const getTitle = createAsyncThunk('masterData/getAllTitle', async (_, thunkAPI) => {
   return (await HttpService.post(
     'org/title/filter',
@@ -56,6 +73,9 @@ const masterDataSlice = createSlice({
       })
       .addCase(getTitle.fulfilled, (state, action) => {
         state.listUserTitle = action.payload.data
+      })
+      .addCase(getGroupRootName.fulfilled, (state, action) => {
+        state.groupRootName = action.payload.data
       })
       .addMatcher<PendingAction>(
         (action) => action.type.endsWith('/pending'),

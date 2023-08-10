@@ -8,14 +8,16 @@ import {
   InfoCircleOutlined,
   MinusCircleFilled,
   PlusOutlined,
-  EyeOutlined
+  EyeOutlined,
+  CheckOutlined
 } from '@ant-design/icons'
-import { Button, Input, notification, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import { Button, Input, notification, Popconfirm, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import CreateEditDevice from '~/pages/device-management/create-edit-device.tsx'
 import {
+  activeDevice,
   cancelEditingDevice,
   deleteDevice,
   getListDevice,
@@ -98,6 +100,25 @@ const DeviceList: React.FC = () => {
     }
   }
 
+  const handleActiveDevice = async (record: IDevice) => {
+    if (record?.id) {
+      try {
+        const payload = {
+          id: record?.id,
+          status: 'ACTIVE'
+        }
+        const response = await dispatch(activeDevice(payload)).unwrap()
+        notification.success({
+          message: response.message
+        })
+      } catch (error: any) {
+        notification.error({
+          message: error.message
+        })
+      }
+    }
+  }
+
   const columns = useMemo(() => {
     const columns: TableColumnsType<IDevice> = [
       {
@@ -147,6 +168,16 @@ const DeviceList: React.FC = () => {
                   <MinusCircleFilled className='tw-text-[#f33c3c] tw-mr-1' /> {t(`device.${record?.status}`)}
                 </div>
               )}
+              {/* <Switch
+                checkedChildren={
+                  <div>
+                    <CheckOutlined className='tw-mr-1' />
+                    Kích hoạt
+                  </div>
+                }
+                unCheckedChildren='Hủy kích hoạt'
+                defaultChecked={record?.status === DEVICE_STATUS.ACTIVE}
+              /> */}
             </div>
           )
         }
@@ -165,20 +196,35 @@ const DeviceList: React.FC = () => {
                   onClick={() => handleClickEditDevice(record, ACTION_TYPE.Updated)}
                   icon={<EditOutlined className='tw-text-blue-600' />}
                 />
-                <Button
-                  size='small'
-                  onClick={() => handleClickDeleteUser(record)}
-                  icon={<DeleteOutlined className='tw-text-red-600' />}
-                />
+                <Popconfirm
+                  title={t('device.confirmDeleteDeviceTitle')}
+                  description={t('device.confirmDeleteDevice')}
+                  onConfirm={() => handleClickDeleteUser(record)}
+                  okText={t('common.yes')}
+                  cancelText={t('common.no')}
+                >
+                  <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                </Popconfirm>
               </Space>
             )
           } else {
             return (
-              <Button
-                size='small'
-                onClick={() => handleClickEditDevice(record, ACTION_TYPE.View)}
-                icon={<EyeOutlined className='tw-text-blue-600' />}
-              />
+              <Space size='small'>
+                <Button
+                  size='small'
+                  onClick={() => handleClickEditDevice(record, ACTION_TYPE.View)}
+                  icon={<EyeOutlined className='tw-text-blue-600' />}
+                />
+                <Popconfirm
+                  title={t('device.confirmActiveDeviceTitle')}
+                  description={t('device.confirmActiveDevice')}
+                  onConfirm={() => handleActiveDevice(record)}
+                  okText={t('common.yes')}
+                  cancelText={t('common.no')}
+                >
+                  <Button size='small' icon={<CheckOutlined className='tw-text-green-500' />} />
+                </Popconfirm>
+              </Space>
             )
           }
         }

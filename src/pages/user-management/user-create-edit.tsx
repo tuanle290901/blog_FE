@@ -427,7 +427,7 @@ const UserCreateEdit: React.FC<{
                   userData?.userName ? 'tw-h-[602px]' : 'tw-h-[516px]'
                 }   tw-overflow-auto`}
               >
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate'>
+                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate' required>
                   {userData ? (
                     <DatePicker
                       format='DD/MM/YYYY'
@@ -442,6 +442,7 @@ const UserCreateEdit: React.FC<{
                       defaultValue={userData?.joinDate ? dayjs(userData?.joinDate) : undefined}
                       className='tw-w-full'
                       placeholder={t('userModal.enterDateJoin')}
+                      allowClear={false}
                     />
                   ) : (
                     <DatePicker
@@ -454,6 +455,7 @@ const UserCreateEdit: React.FC<{
                       defaultValue={dayjs()}
                       className='tw-w-full'
                       placeholder={t('userModal.enterDateJoin')}
+                      allowClear={false}
                     />
                   )}
                 </Form.Item>
@@ -484,6 +486,24 @@ const UserCreateEdit: React.FC<{
                     showToday={false}
                     className='tw-w-full'
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
+                  />
+                </Form.Item>
+                <Form.Item
+                  style={{ marginBottom: 24 }}
+                  label={t('userModal.remainLeaveHour')}
+                  name='remainLeaveHour'
+                  required
+                  rules={[
+                    {
+                      required: true,
+                      message: t('userModal.errorMessage.remainLeaveHourIsEmpty')
+                    }
+                  ]}
+                >
+                  <Input
+                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
+                    placeholder={t('userModal.enterRemainLeaveHour')}
+                    type='number'
                   />
                 </Form.Item>
                 <Form.List name='groupProfiles' initialValue={groupProfiles}>
