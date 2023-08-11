@@ -142,22 +142,19 @@ export const deleteDevice = createAsyncThunk('devices/delete', async (id: string
   }
 })
 
-export const activeDevice = createAsyncThunk(
-  'devices/active',
-  async (body: { id: string; status: string }, thunkAPI) => {
-    try {
-      const response: IApiResponse<IDevice> = await HttpService.put(END_POINT_API.Devices.active(), body, {
-        signal: thunkAPI.signal
-      })
-      return response
-    } catch (error: any) {
-      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
-        return thunkAPI.rejectWithValue(error.response.data)
-      }
-      return error
+export const activeDevice = createAsyncThunk('devices/active', async (id: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<IDevice> = await HttpService.put(END_POINT_API.Devices.active(id), {
+      signal: thunkAPI.signal
+    })
+    return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
     }
+    return error
   }
-)
+})
 
 const devicesSlice = createSlice({
   name: 'devices',
