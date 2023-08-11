@@ -103,11 +103,7 @@ const DeviceList: React.FC = () => {
   const handleActiveDevice = async (record: IDevice) => {
     if (record?.id) {
       try {
-        const payload = {
-          id: record?.id,
-          status: 'ACTIVE'
-        }
-        const response = await dispatch(activeDevice(payload)).unwrap()
+        const response = await dispatch(activeDevice(record?.id)).unwrap()
         notification.success({
           message: response.message
         })
