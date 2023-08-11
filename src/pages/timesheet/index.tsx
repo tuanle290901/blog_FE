@@ -11,7 +11,7 @@ import {
   ClockCircleOutlined,
   CalendarOutlined,
   UploadOutlined,
-  MenuOutlined
+  SyncOutlined
 } from '@ant-design/icons'
 import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import {
   exportTimesheet,
   filterTimesheet,
-  getAllGroup,
+  // getAllGroup,
   getEmployeeWorkingTime,
   getUserInGroup,
   updateAttendanceStatistic
@@ -33,6 +33,7 @@ import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-le
 import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
 import TimesheetChart from './component/TimesheetChart'
 import { IEmployeeWorkingTime } from '~/types/timesheet'
+import SyncTimeAttendanceModal from './component/SyncTimeAttendanceModal'
 
 const Timesheet: React.FC = () => {
   const { Search } = Input
@@ -66,6 +67,8 @@ const Timesheet: React.FC = () => {
   const [selectedEndDate, setSelectedEndDate] = useState(dayjs())
   const [mode, setMode] = useState('list')
   const [clickUpdateButton, setClickUpdateButton] = useState(false)
+  const [syncTimeAttendance, setSyncTimeAttendance] = useState(false)
+  const [syncManualSuccess, setSyncManualSuccess] = useState(false)
   const timerId = useRef<any>(null)
   const [query, setQuery] = useState<string>('')
   const [selectedTimeRange, setSelectedTimeRange] = useState('')
@@ -188,8 +191,7 @@ const Timesheet: React.FC = () => {
   }
 
   const findViolate = (data: IViolate[] | null, violateType: string) => {
-    if (!data) return false
-    if (data?.findIndex((item: IViolate) => item?.violateType === violateType) > -1) {
+    if (data && data.find((item: IViolate) => item?.violateType === violateType)) {
       return true
     } else {
       return false
@@ -361,8 +363,8 @@ const Timesheet: React.FC = () => {
           startTime && (
             <div
               className={`tw-flex tw-items-center ${
-                findViolate(record?.reportData?.violate, 'LATE_COME') ||
-                findViolate(record?.reportData?.violate, 'FORGET_TIME_ATTENDANCE')
+                findViolate(record?.reportData?.violates, 'LATE_COME') ||
+                findViolate(record?.reportData?.violates, 'FORGET_TIME_ATTENDANCE')
                   ? 'tw-text-[#E64D29]'
                   : ''
               }`}
@@ -387,7 +389,7 @@ const Timesheet: React.FC = () => {
           endTime && (
             <div
               className={`tw-flex tw-items-center ${
-                findViolate(record?.reportData?.violate, 'EARLY_BACK') ? 'tw-text-[#E64D29]' : ''
+                findViolate(record?.reportData?.violates, 'EARLY_BACK') ? 'tw-text-[#E64D29]' : ''
               }`}
             >
               <ClockCircleOutlined className='tw-text-[12px] tw-text-[#B2C2D8] tw-mr-[5px]' /> {endTime}
@@ -480,7 +482,7 @@ const Timesheet: React.FC = () => {
 
   useEffect(() => {
     dispatch(getEmployeeWorkingTime())
-    const promiseGetAllGroup = dispatch(getAllGroup())
+    // const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
@@ -492,7 +494,7 @@ const Timesheet: React.FC = () => {
       })
     )
     return () => {
-      promiseGetAllGroup.abort()
+      // promiseGetAllGroup.abort()
       promiseFilterTypesOfLeave.abort()
     }
   }, [])
@@ -537,7 +539,7 @@ const Timesheet: React.FC = () => {
     return () => {
       promise.abort()
     }
-  }, [searchValue, clickUpdateButton])
+  }, [searchValue, clickUpdateButton, syncManualSuccess])
 
   // const sheetsData = [
   //   {
@@ -703,7 +705,7 @@ const Timesheet: React.FC = () => {
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search
                     value={query}
-                    placeholder={'Tìm kiếm theo mã chấm công'}
+                    placeholder='Tìm kiếm theo mã chấm công'
                     onChange={(event) => handleSearchValueChange(event.target.value)}
                     className='tw-w-full tw-max-w-[300px]'
                   />
@@ -714,11 +716,26 @@ const Timesheet: React.FC = () => {
               </Row>
             </div>
             {isAllowedAccess && (
-              <div className='tw-text-right tw-mt-[15px]'>
-                <Button icon={<CheckCircleOutlined />} type='primary' onClick={() => handleUpdateAttendanceStatistic()}>
-                  Cập nhật
-                </Button>
-              </div>
+              <Row gutter={[16, 16]} className='tw-justify-end tw-mt-[15px]'>
+                <Col>
+                  <Button
+                    icon={<CheckCircleOutlined />}
+                    type='primary'
+                    onClick={() => handleUpdateAttendanceStatistic()}
+                  >
+                    Cập nhật
+                  </Button>
+                </Col>
+                <Col className='timesheet__sync-button'>
+                  <Button
+                    icon={<SyncOutlined />}
+                    type='primary'
+                    onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
+                  >
+                    {t('timesheet.syncData')}
+                  </Button>
+                </Col>
+              </Row>
             )}
             <div className='timesheet-table'>
               <Table
@@ -764,6 +781,11 @@ const Timesheet: React.FC = () => {
         )} */}
       </Col>
       <TimesheetForm open={isOpenModal} handleClose={handleCloseTimesheetModal} />
+      <SyncTimeAttendanceModal
+        open={syncTimeAttendance}
+        handleClose={() => setSyncTimeAttendance(!syncTimeAttendance)}
+        onSyncSuccess={() => setSyncManualSuccess(!syncManualSuccess)}
+      />
     </Row>
   )
 }

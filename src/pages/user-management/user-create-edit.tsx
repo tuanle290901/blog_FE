@@ -56,6 +56,10 @@ const UserCreateEdit: React.FC<{
     {
       label: t('common.role.manager'),
       value: ROLE.MANAGER
+    },
+    {
+      label: t('common.role.system_admin'),
+      value: ROLE.SYSTEM_ADMIN
     }
   ]
   const groupProfiles: any[] = useMemo(() => {

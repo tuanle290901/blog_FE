@@ -257,6 +257,15 @@
       background: #f5f4f4;
     }
   }
+
+  &__sync-button button {
+    background-color: #52c41a;
+  }
+
+  &__sync-button:hover button {
+    background-color: #52c41a !important;
+    opacity: 0.9;
+  }
 }
 
 .timesheet .ant-picker-calendar-header {

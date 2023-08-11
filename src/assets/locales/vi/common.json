@@ -8,9 +8,9 @@
     "role": {
       "officer": "Nhân viên",
       "subManager": "Quản lí trực tiếp",
-      "manager": "Quản lí",
-      "sub_manager": "Quản lí",
-      "system_admin": "Quản trị hệ thống"
+      "manager": "Quản lí chung",
+      "sub_manager": "Quản lí trực tiếp",
+      "system_admin": "Quản trị viên hệ thống"
     },
     "page": "Trang",
     "nextPage": "Trang sau",

@@ -130,7 +130,7 @@ export const updateDevice = createAsyncThunk('devices/update', async (body: IDev
 
 export const deleteDevice = createAsyncThunk('devices/delete', async (id: string, thunkAPI) => {
   try {
-    const response: IApiResponse<IDevice> = await HttpService.delete(END_POINT_API.Devices.delete(id), {
+    const response: IApiResponse<IDevice> = await HttpService.put(END_POINT_API.Devices.delete(id), {
       signal: thunkAPI.signal
     })
     return response

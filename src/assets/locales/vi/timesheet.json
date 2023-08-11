@@ -27,6 +27,8 @@
     "attendanceDate": "Ngày điểm danh",
     "startTime": "Giờ đến",
     "endTime": "Giờ về",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
     "status": "Trạng thái",
     "note": "Ghi chú",
     "addNewNote": "Thêm ghi chú",
@@ -44,6 +46,11 @@
     "onlyShowViolateDate": "Chỉ hiển thị ngày vi phạm chưa có phép",
     "onlyShowWorkingDay": "Chỉ hiển thị ngày làm việc",
     "bout": "lượt",
-    "noData": "Không có dữ liệu"
+    "noData": "Không có dữ liệu",
+    "syncTimeAttendance": "Đồng bộ dữ liệu chấm công",
+    "syncData": "Đồng bộ dữ liệu",
+    "sync": "Đồng bộ",
+    "syncTimeAttendanceWarning": "Chỉ được chọn khoảng thời gian tối đa 3 ngày",
+    "selectDateWarning": "Ngày kết thúc phải sau ngày bắt đầu"
   }
 }
