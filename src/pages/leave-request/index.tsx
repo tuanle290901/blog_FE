@@ -215,6 +215,15 @@ const LeaveRequest: React.FC = () => {
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
+        key: 'ticketCode',
+        title: 'Mã yêu cầu',
+        dataIndex: 'ticketCode',
+        sorter: false,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('ticketDefinitionId'),
+        ellipsis: true
+      },
+      {
         key: 'ticketDefinitionId',
         title: 'Yêu cầu',
         dataIndex: 'ticketDefinitionId',
