@@ -221,3 +221,12 @@
   background-size: 100% 103%;
   background-image: url('../assets/images/login/backgroundLogin.png');
 }
+
+.ant-table-thead .ant-table-cell {
+  background: #e6f4ff !important;
+  padding: 14px 14px !important;
+}
+
+.ant-table-body .ant-table-cell {
+  padding: 13px 14px !important;
+}
