@@ -64,7 +64,7 @@ const reportSlice = createSlice({
 
 export const downloadExcelFile = async (payload: { month: string; year: string }) => {
   const { month, year } = payload
-  const response = await HttpService.get(`/time-attendance/export-month-statistic?month=${month}&year=${year}`, {
+  const response = await HttpService.get(`/export-time-attendance/export-month-statistic?month=${month}&year=${year}`, {
     responseType: 'blob'
   })
   return response
