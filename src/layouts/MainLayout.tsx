@@ -156,6 +156,13 @@ const MainLayout: React.FC = () => {
       ),
 
       getItemIfAllowed(
+        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
+        'Thống kê',
+        'statistical',
+        <img src={menuIconReport} alt='' className='menu-image' />
+      ),
+
+      getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN],
         'Báo cáo',
         'report',
