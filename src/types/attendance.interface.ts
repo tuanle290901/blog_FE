@@ -14,7 +14,8 @@ export interface IReportData {
   absenceAmount: number
   workingAmount: number
   note: string | null
-  noneWorkingDay: boolean
+  noneWorkingDay?: boolean
+  dateType: string
 }
 
 export interface IViolate {

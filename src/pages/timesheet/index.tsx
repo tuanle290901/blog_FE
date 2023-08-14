@@ -72,7 +72,6 @@ const Timesheet: React.FC = () => {
   const timerId = useRef<any>(null)
   const [query, setQuery] = useState<string>('')
   const [selectedTimeRange, setSelectedTimeRange] = useState('')
-  let confirmAttendanceStatisticList: any[] = []
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
@@ -198,101 +197,23 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const handleUpdateAttendanceStatistic = async () => {
-    const response = await dispatch(updateAttendanceStatistic(confirmAttendanceStatisticList)).unwrap()
-    if (response) {
-      notification.success({
-        message: response?.message
-      })
-    }
-    setClickUpdateButton(!clickUpdateButton)
-    confirmAttendanceStatisticList = []
-  }
-
-  const handleSelectTypesOfLeave = (data: IAttendance, typesOfLeave: string) => {
-    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data.id)
-    let payload = {}
-    if (index > -1) {
-      payload = {
-        date: confirmAttendanceStatisticList[index]?.date,
-        id: confirmAttendanceStatisticList[index]?.id,
-        userId: confirmAttendanceStatisticList[index]?.userId,
-        reportData: {
-          ...confirmAttendanceStatisticList[index]?.reportData,
-          absenceType: typesOfLeave !== undefined ? typesOfLeave : null,
-          absenceAmount:
-            typesOfLeave !== undefined ? 1 - confirmAttendanceStatisticList[index]?.reportData?.workingAmount : 0.0
-        }
-      }
-      confirmAttendanceStatisticList.splice(index, 1)
-    } else {
-      payload = {
-        date: data?.date,
-        id: data?.id,
-        userId: data?.userId,
-        reportData: {
-          ...data?.reportData,
-          absenceType: typesOfLeave !== undefined ? typesOfLeave : null,
-          absenceAmount: typesOfLeave !== undefined ? 1 - data?.reportData?.workingAmount : 0.0
-        }
-      }
-    }
-    confirmAttendanceStatisticList.push(payload)
-  }
-
-  const handleAddNote = (data: IAttendance, newNote: string) => {
-    const index = confirmAttendanceStatisticList.findIndex((item) => item?.id === data?.id)
-    let payload = {}
-    if (index > -1) {
-      payload = {
-        date: confirmAttendanceStatisticList[index]?.date,
-        id: confirmAttendanceStatisticList[index]?.id,
-        userId: confirmAttendanceStatisticList[index]?.userId,
-        reportData: {
-          ...confirmAttendanceStatisticList[index]?.reportData,
-          note: newNote
-        }
-      }
-      confirmAttendanceStatisticList.splice(index, 1)
-    } else {
-      payload = {
-        date: data?.date,
-        id: data?.id,
-        userId: data?.userId,
-        reportData: {
-          ...data?.reportData,
-          note: newNote
-        }
-      }
-    }
-    confirmAttendanceStatisticList.push(payload)
-  }
-
   const renderStatusByWorkingAmount = (workingAmount: number) => {
-    switch (workingAmount) {
-      case 0.0:
-        return (
-          <div className='tw-text-[#E64D29]'>
-            <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>THIẾU CÔNG</span>
-          </div>
-        )
-      case 0.5:
-        return (
-          <div className='tw-text-[#25BD74]'>
-            <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>1/2 CÔNG</span>
-          </div>
-        )
-      case 1:
-        return (
-          <div className='tw-text-[#25BD74]'>
-            <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-            <span>ĐỦ CÔNG</span>
-          </div>
-        )
-      default:
-        return ''
+    if (workingAmount === null) return
+    if (workingAmount < 8) {
+      return (
+        <div className='tw-text-[#E64D29]'>
+          <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
+          <span>THIẾU CÔNG</span>
+        </div>
+      )
+    }
+    if (workingAmount >= 8) {
+      return (
+        <div className='tw-text-[#25BD74]'>
+          <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
+          <span>ĐỦ CÔNG</span>
+        </div>
+      )
     }
   }
 
@@ -346,7 +267,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return reportData?.noneWorkingDay ? '' : renderStatusByWorkingAmount(reportData?.workingAmount)
+        return renderStatusByWorkingAmount(reportData?.workingAmount)
       }
     },
     {
@@ -402,50 +323,32 @@ const Timesheet: React.FC = () => {
       title: t('Số giờ làm'),
       dataIndex: 'workingHour',
       key: 'workingHour',
-      sortOrder: getSortOrder('workingHour'),
       align: 'center',
       width: '120px'
     },
     {
-      title: t('Công nghỉ'),
-      dataIndex: 'reportData',
-      ellipsis: true,
-      width: '170px',
-      render: (reportData, record) => {
-        return reportData?.noneWorkingDay
-          ? ''
-          : !isAllowedAccess
-          ? renderTypesOfLeaveName(reportData?.absenceType)
-          : reportData?.workingAmount < 1 && (
-              <Select
-                onChange={(value) => handleSelectTypesOfLeave(record, value)}
-                defaultValue={reportData?.absenceType}
-                options={typesOfLeaveOptions}
-                className='tw-w-full'
-                showSearch
-                filterOption={(input, option) => (option?.label + '').toLowerCase().includes(input.toLowerCase())}
-                allowClear
-              />
-            )
+      title: t('Số giờ nghỉ'),
+      align: 'center',
+      width: '120px',
+      render: (record) => {
+        return (
+          <span>
+            {record?.reportData?.workingAmount &&
+            record?.workingHour &&
+            record?.reportData?.workingAmount - record?.workingHour > 0
+              ? (record?.reportData?.workingAmount - record?.workingHour).toFixed(2)
+              : 0}
+          </span>
+        )
       }
     },
     {
-      title: t('timesheet.noteFromManager'),
-      dataIndex: '',
-      key: '',
+      title: t('Công nghỉ'),
       ellipsis: true,
-      width: '200px',
+      width: '170px',
       render: (record) => {
-        return record?.reportData?.noneWorkingDay ? (
-          ''
-        ) : !isAllowedAccess ? (
-          record?.reportData?.note
-        ) : (
-          <Input
-            onChange={(e) => handleAddNote(record, e?.target?.value)}
-            defaultValue={record?.reportData?.note || ''}
-            className='tw-w-full'
-          />
+        return (
+          <span>{record?.reportData?.absenceType ? renderTypesOfLeaveName(record?.reportData?.absenceType) : ''}</span>
         )
       }
     }
@@ -601,67 +504,86 @@ const Timesheet: React.FC = () => {
             {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
-                <Col xs={24} lg={8}>
+                <Col xs={24} lg={5}>
                   <div className='tw-font-bold'>
                     {!isAllowedAccess ? 'Xác nhận ngày công của tôi' : 'Xác nhận ngày công'}
                   </div>
                 </Col>
-                <Col xs={24} lg={16} className='tw-text-right'>
-                  <RangePicker
-                    onChange={handleSelectDate}
-                    format='DD/MM/YYYY'
-                    placeholder={[t('timesheet.from'), t('timesheet.to')]}
-                    defaultValue={[dayjs(), dayjs()]}
-                    value={[selectedStartDate, selectedEndDate]}
-                    allowClear={false}
-                    disabledDate={(date) => {
-                      return date.isAfter(new Date())
-                    }}
-                    renderExtraFooter={() => (
-                      <div className='timesheet-filter-time__button'>
-                        <Button
-                          onClick={handleSelectToday}
-                          size='small'
-                          className={selectedTimeRange === 'today' ? 'selected' : ''}
-                        >
-                          {t('timesheet.today')}
-                        </Button>
-                        <Button
-                          onClick={handleSelectThisMonth}
-                          size='small'
-                          className={selectedTimeRange === 'this_month' ? 'selected' : ''}
-                        >
-                          {t('timesheet.thisMonth')}
-                        </Button>
-                        <Button
-                          onClick={handleSelectLastMonth}
-                          size='small'
-                          className={selectedTimeRange === 'last_month' ? 'selected' : ''}
-                        >
-                          {t('timesheet.lastMonth')}
-                        </Button>
-                      </div>
+                <Col xs={24} lg={19}>
+                  <Row gutter={[12, 16]} className='tw-flex tw-justify-end tw-text-right'>
+                    <Col>
+                      <RangePicker
+                        onChange={handleSelectDate}
+                        format='DD/MM/YYYY'
+                        placeholder={[t('timesheet.from'), t('timesheet.to')]}
+                        defaultValue={[dayjs(), dayjs()]}
+                        value={[selectedStartDate, selectedEndDate]}
+                        allowClear={false}
+                        disabledDate={(date) => {
+                          return date.isAfter(new Date())
+                        }}
+                        renderExtraFooter={() => (
+                          <div className='timesheet-filter-time__button'>
+                            <Button
+                              onClick={handleSelectToday}
+                              size='small'
+                              className={selectedTimeRange === 'today' ? 'selected' : ''}
+                            >
+                              {t('timesheet.today')}
+                            </Button>
+                            <Button
+                              onClick={handleSelectThisMonth}
+                              size='small'
+                              className={selectedTimeRange === 'this_month' ? 'selected' : ''}
+                            >
+                              {t('timesheet.thisMonth')}
+                            </Button>
+                            <Button
+                              onClick={handleSelectLastMonth}
+                              size='small'
+                              className={selectedTimeRange === 'last_month' ? 'selected' : ''}
+                            >
+                              {t('timesheet.lastMonth')}
+                            </Button>
+                          </div>
+                        )}
+                      />
+                    </Col>
+                    <Col>
+                      <Button
+                        icon={<UploadOutlined />}
+                        className='timesheet-filter__export'
+                        onClick={() =>
+                          dispatch(
+                            exportTimesheet({
+                              paging: searchValue.paging,
+                              sorts: searchValue.sorts,
+                              query: searchValue.query,
+                              groupCode: searchValue.group,
+                              startDate: searchValue.startDate,
+                              endDate: searchValue.endDate,
+                              userId: searchValue.userId
+                            })
+                          )
+                        }
+                      >
+                        {t('Xuất dữ liệu')}
+                      </Button>
+                    </Col>
+                    {isAllowedAccess && (
+                      <Col>
+                        <div className='timesheet__sync-button'>
+                          <Button
+                            icon={<SyncOutlined />}
+                            type='primary'
+                            onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
+                          >
+                            {t('timesheet.syncData')}
+                          </Button>
+                        </div>
+                      </Col>
                     )}
-                  />
-                  <Button
-                    icon={<UploadOutlined />}
-                    className='timesheet-filter__export'
-                    onClick={() =>
-                      dispatch(
-                        exportTimesheet({
-                          paging: searchValue.paging,
-                          sorts: searchValue.sorts,
-                          query: searchValue.query,
-                          groupCode: searchValue.group,
-                          startDate: searchValue.startDate,
-                          endDate: searchValue.endDate,
-                          userId: searchValue.userId
-                        })
-                      )
-                    }
-                  >
-                    {t('Xuất dữ liệu')}
-                  </Button>
+                  </Row>
                 </Col>
               </Row>
               <Row gutter={[16, 16]} className='tw-mt-[12px]'>
@@ -715,28 +637,6 @@ const Timesheet: React.FC = () => {
                 </Col>
               </Row>
             </div>
-            {isAllowedAccess && (
-              <Row gutter={[16, 16]} className='tw-justify-end tw-mt-[15px]'>
-                <Col>
-                  <Button
-                    icon={<CheckCircleOutlined />}
-                    type='primary'
-                    onClick={() => handleUpdateAttendanceStatistic()}
-                  >
-                    Cập nhật
-                  </Button>
-                </Col>
-                <Col className='timesheet__sync-button'>
-                  <Button
-                    icon={<SyncOutlined />}
-                    type='primary'
-                    onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
-                  >
-                    {t('timesheet.syncData')}
-                  </Button>
-                </Col>
-              </Row>
-            )}
             <div className='timesheet-table'>
               <Table
                 rowKey='id'
@@ -744,7 +644,11 @@ const Timesheet: React.FC = () => {
                 dataSource={timesheetSate.timesheetList}
                 loading={timesheetSate.loading}
                 scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
-                rowClassName={(record: IAttendance) => (record.reportData.noneWorkingDay ? 'dayoff' : '')}
+                rowClassName={(record: IAttendance) =>
+                  record?.reportData?.dateType !== 'WORKING_DATE'
+                    ? record?.reportData?.dateType?.toLocaleLowerCase()
+                    : ''
+                }
                 onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
                 pagination={{
                   className: 'd-flex justify-content-end align-items-center',

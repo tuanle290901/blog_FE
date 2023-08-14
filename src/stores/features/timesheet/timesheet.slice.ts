@@ -258,16 +258,13 @@ export const filterTimesheet = createAsyncThunk(
       }
       if (params.onlyShowWorkingDay) {
         body.criteria[0].children.push({
-          field: 'report_data.is_none_working_day',
-          operator: 'IS',
-          type: 'BOOLEAN',
-          value: false
+          field: 'report_data.date_type',
+          operator: 'LIKE_IGNORE_CASE',
+          value: 'WORKING_DATE'
         })
       }
       if (!params.onlyShowWorkingDay) {
-        const index = body.criteria[0].children.findIndex(
-          (item: any) => item.field === 'report_data.is_none_working_day'
-        )
+        const index = body.criteria[0].children.findIndex((item: any) => item.field === 'report_data.date_type')
         if (index > -1) {
           body.criteria[0].children.splice(index, 1)
         }
@@ -286,7 +283,7 @@ export const filterTimesheet = createAsyncThunk(
 )
 
 export const exportTimesheet = createAsyncThunk(
-  'time-attendance/export-search-attendance',
+  'export-time-attendance/export-search-attendance',
   async (
     params: {
       query: string
@@ -418,32 +415,28 @@ export const exportTimesheet = createAsyncThunk(
       }
       if (params.onlyShowWorkingDay) {
         body.criteria[0].children.push({
-          field: 'report_data.is_none_working_day',
-          operator: 'IS',
-          type: 'BOOLEAN',
-          value: false
+          field: 'report_data.date_type',
+          operator: 'LIKE_IGNORE_CASE',
+          value: 'WORKING_DATE'
         })
       }
       if (!params.onlyShowWorkingDay) {
-        const index = body.criteria[0].children.findIndex(
-          (item: any) => item.field === 'report_data.is_none_working_day'
-        )
+        const index = body.criteria[0].children.findIndex((item: any) => item.field === 'report_data.date_type')
         if (index > -1) {
           body.criteria[0].children.splice(index, 1)
         }
       }
-      const response: any = await HttpService.post('/time-attendance/export-search-attendance', body, {
+      const response: any = await HttpService.post('/export-time-attendance/export-search-attendance', body, {
         responseType: 'blob',
         signal: thunkAPI.signal
       })
       if (response?.size > 0) {
         const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
-        saveAs(
-          blob,
-          `Dữ liệu chấm công từ ngày ${params.startDate || dayjs().format('YYYY-MM-DD')} đến ngày ${
-            params.endDate || dayjs().format('YYYY-MM-DD')
-          }.xlsx`
-        )
+        if (params.startDate === params.endDate || (!params.startDate && !params.endDate)) {
+          saveAs(blob, `Dữ liệu chấm công ngày ${params.startDate || dayjs().format('YYYY-MM-DD')}.xlsx`)
+        } else {
+          saveAs(blob, `Dữ liệu chấm công từ ngày ${params.startDate} đến ngày ${params.endDate}.xlsx`)
+        }
       } else {
         notification.warning({ message: 'Chỉ được chọn khoảng thời gian không quá 31 ngày' })
       }
