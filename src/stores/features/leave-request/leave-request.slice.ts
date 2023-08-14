@@ -117,9 +117,7 @@ export const editLeaveRequest = createAsyncThunk(
 
 export const deleteLeaveRequest = createAsyncThunk('leave-request/delete', async (id: string, thunkAPI) => {
   try {
-    const response: IApiResponse<any> = await HttpService.delete(
-      `${END_POINT_API.LeaveRequest.delete()}?ticketId=${id}`
-    )
+    const response: IApiResponse<any> = await HttpService.put(`${END_POINT_API.LeaveRequest.delete()}?ticketId=${id}`)
     return response
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
@@ -174,26 +172,17 @@ const leaveRequestSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createLeaveRequest.pending, (state) => {
-        state.loading = true
-      })
-      .addCase(createLeaveRequest.fulfilled, (state) => {
-        state.loading = false
-      })
-      .addCase(createLeaveRequest.rejected, (state) => {
-        state.loading = false
-      })
       .addCase(filterLeaveRequest.fulfilled, (state, action) => {
         state.listData = [...action.payload.data.content]
         state.meta = {
-          ...action?.payload?.meta
+          page: action.payload.data.number,
+          size: action.payload.data.size,
+          total: action.payload.data.totalElements,
+          totalPage: action.payload.data.totalPages
         }
       })
       .addCase(getAllDefinationType.fulfilled, (state, action) => {
         state.ticketDefinationType = action.payload
-      })
-      .addCase(updateLeaveRequest.pending, (state) => {
-        state.loading = true
       })
       .addCase(updateLeaveRequest.fulfilled, (state, action) => {
         const dataUpdate = action.payload

@@ -70,12 +70,6 @@ const initialPayload: TicketRequestPayload = {
   ticketDef: [],
   onlyAssignToMe: false
 }
-const initialMeta: IPaging = {
-  page: 0,
-  size: 10,
-  total: 12,
-  totalPage: 2
-}
 const filterUserPayload = {
   query: '',
   paging: {
@@ -112,7 +106,8 @@ const LeaveRequest: React.FC = () => {
   const handleClickDelete = async (record: ILeaveRequest) => {
     try {
       const response = await dispatch(deleteLeaveRequest(record.id as string)).unwrap()
-      await notification.success({
+      await dispatch(filterLeaveRequest(searchValue))
+      notification.success({
         message: response.message
       })
     } catch (error: any) {
@@ -125,7 +120,8 @@ const LeaveRequest: React.FC = () => {
   const handleClickReset = async (record: ILeaveRequest) => {
     try {
       const response = await dispatch(resetLeaveRequest(record.id)).unwrap()
-      await notification.success({
+      await dispatch(filterLeaveRequest(searchValue))
+      notification.success({
         message: response.message
       })
     } catch (error: any) {
@@ -205,19 +201,28 @@ const LeaveRequest: React.FC = () => {
     })
   }
 
-  const onUpdateStatus = (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
+  const onUpdateStatus = async (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
     const payload: ILeaveRequestUpdateStatusForm = {
       attrs: data?.processStatus['0']?.attributes,
       nodeId: 1,
       status,
       ticketId: data.id
     }
-    dispatch(updateLeaveRequest(payload))
-    dispatch(filterLeaveRequest(searchValue))
+    await dispatch(updateLeaveRequest(payload))
+    await dispatch(filterLeaveRequest(searchValue))
   }
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
+      {
+        key: 'ticketCode',
+        title: 'Mã yêu cầu',
+        dataIndex: 'ticketCode',
+        sorter: false,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('ticketDefinitionId'),
+        ellipsis: true
+      },
       {
         key: 'ticketDefinitionId',
         title: 'Yêu cầu',
@@ -293,23 +298,27 @@ const LeaveRequest: React.FC = () => {
             <div>
               {isSystemAdmin ? (
                 <Space>
-                  {status !== TicketStatusEnum.CONFIRMED && status !== TicketStatusEnum.REJECTED && (
-                    <>
-                      <Tooltip title='Từ chối'>
-                        <CloseCircleOutlined
-                          className='tw-text-red-600 tw-text-2xl tw-cursor-pointer'
-                          onClick={() => showConfirm(TicketStatusEnum.REJECTED, record)}
-                        />
-                      </Tooltip>
-                      <Tooltip title='Đồng ý'>
-                        <CheckCircleOutlined
-                          className='tw-text-green-600 tw-text-2xl tw-cursor-pointer'
-                          onClick={() => showConfirm(TicketStatusEnum.FINISHED, record)}
-                        />
-                      </Tooltip>
-                    </>
-                  )}
-                  {(status === TicketStatusEnum.CONFIRMED || status === TicketStatusEnum.REJECTED) && (
+                  {status !== TicketStatusEnum.CONFIRMED &&
+                    status !== TicketStatusEnum.REJECTED &&
+                    status !== TicketStatusEnum.CANCELLED && (
+                      <>
+                        <Tooltip title='Từ chối'>
+                          <CloseCircleOutlined
+                            className='tw-text-red-600 tw-text-2xl tw-cursor-pointer'
+                            onClick={() => showConfirm(TicketStatusEnum.REJECTED, record)}
+                          />
+                        </Tooltip>
+                        <Tooltip title='Đồng ý'>
+                          <CheckCircleOutlined
+                            className='tw-text-green-600 tw-text-2xl tw-cursor-pointer'
+                            onClick={() => showConfirm(TicketStatusEnum.FINISHED, record)}
+                          />
+                        </Tooltip>
+                      </>
+                    )}
+                  {(status === TicketStatusEnum.CONFIRMED ||
+                    status === TicketStatusEnum.REJECTED ||
+                    status === TicketStatusEnum.CANCELLED) && (
                     <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
                   )}
                 </Space>
@@ -328,7 +337,7 @@ const LeaveRequest: React.FC = () => {
         render: (_, record: ILeaveRequest) => {
           return (
             <Space size='small'>
-              {record?.status !== TicketStatusEnum.CONFIRMED && (
+              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
                 <Button
                   size='small'
                   onClick={() => handleClickUpdate('view', record)}
@@ -336,7 +345,7 @@ const LeaveRequest: React.FC = () => {
                 />
               )}
 
-              {record?.status !== TicketStatusEnum.CONFIRMED && (
+              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
                 <Button
                   size='small'
                   onClick={() => handleClickUpdate('update', record)}
@@ -345,7 +354,7 @@ const LeaveRequest: React.FC = () => {
                 />
               )}
 
-              {record?.status !== TicketStatusEnum.CONFIRMED && (
+              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
                 <Popconfirm
                   title='Hủy yêu cầu'
                   description='Bạn có chắc chắn muốn hủy yêu cầu'
@@ -362,17 +371,18 @@ const LeaveRequest: React.FC = () => {
                 </Popconfirm>
               )}
 
-              {isSystemAdmin && record?.status === TicketStatusEnum.CONFIRMED && (
-                <Popconfirm
-                  title='Đặt lại yêu cầu'
-                  description='Bạn có chắc chắn muốn đặt lại yêu cầu không?'
-                  onConfirm={() => handleClickReset(record)}
-                  okText={t('common.yes')}
-                  cancelText={t('common.no')}
-                >
-                  <Button size='small' icon={<ReloadOutlined className='tw-text-red-600' />} />
-                </Popconfirm>
-              )}
+              {isSystemAdmin &&
+                (record?.status === TicketStatusEnum.CONFIRMED || record?.status === TicketStatusEnum.REJECTED) && (
+                  <Popconfirm
+                    title='Đặt lại yêu cầu'
+                    description='Bạn có chắc chắn muốn đặt lại yêu cầu không?'
+                    onConfirm={() => handleClickReset(record)}
+                    okText={t('common.yes')}
+                    cancelText={t('common.no')}
+                  >
+                    <Button size='small' icon={<ReloadOutlined className='tw-text-red-600' />} />
+                  </Popconfirm>
+                )}
             </Space>
           )
         }
@@ -489,7 +499,7 @@ const LeaveRequest: React.FC = () => {
           loading={isLoading}
           pagination={{
             className: 'd-flex justify-content-end align-items-center',
-            current: meta && meta.page,
+            current: meta?.page + 1,
             total: meta?.total,
             defaultPageSize: meta?.size,
             pageSize: meta?.size,
