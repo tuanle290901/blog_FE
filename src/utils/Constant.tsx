@@ -53,12 +53,14 @@ export enum TicketStatusEnum {
   PROCESSING = 'PROCESSING',
   CONFIRMED = 'CONFIRMED',
   REJECTED = 'REJECTED',
-  FINISHED = 'FINISHED'
+  FINISHED = 'FINISHED',
+  CANCELLED = 'CANCELLED'
 }
 
 export const TICKET_STATUS: TicketStatusType = {
   SUBMITTED: 'Đã gửi',
   PROCESSING: 'Đang xử lý',
   CONFIRMED: 'Đã xác nhận',
-  REJECTED: 'Từ chối'
+  REJECTED: 'Từ chối',
+  CANCELLED: 'Đã hủy'
 }

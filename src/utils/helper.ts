@@ -136,5 +136,7 @@ export const tagColorMapping = (status: string | number) => {
       return 'success'
     case TicketStatusEnum.REJECTED:
       return 'error'
+    case TicketStatusEnum.CANCELLED:
+      return 'warning'
   }
 }
