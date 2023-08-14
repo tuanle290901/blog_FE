@@ -166,7 +166,7 @@
     }
     &__export {
       background: #ffbc25;
-      margin: 10px 0 0 15px;
+      margin: 0;
       ~ .ant-btn-default:hover {
         color: #ffbc25 !important;
       }
@@ -251,10 +251,20 @@
     }
   }
 
-  .ant-table-row.dayoff {
+  .ant-table-row.weekend {
     background: #f5f4f4;
     .ant-table-column-sort {
-      background: #f5f4f4;
+      background: transparent;
+    }
+  }
+
+  .ant-table-row.holiday {
+    background: #ffa6004f;
+    .ant-table-column-sort {
+      background: transparent;
+    }
+    &:hover td {
+      background: #ffa60027 !important;
     }
   }
 
