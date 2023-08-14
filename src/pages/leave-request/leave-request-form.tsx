@@ -59,7 +59,7 @@ const LeaveRequestForm: React.FC<{
     const formValue = form.getFieldsValue()
     const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
 
-    const processNodesAttributes = selectedTicket?.revisions[1]?.processNodes['0']?.attributes
+    const processNodesAttributes = selectedTicket?.revisions[0]?.processNodes['0']?.attributes
 
     const transformedFormValue = Object.keys(formValue).reduce((acc, key) => {
       const transformedValue = transformData(key, formValue, processNodesAttributes)
@@ -133,7 +133,7 @@ const LeaveRequestForm: React.FC<{
           </Form.Item>
 
           {selectedTicketType?.id &&
-            selectedTicketType?.revisions[1]?.processNodes['0']?.attributes?.map((item, index) => {
+            selectedTicketType?.revisions[0]?.processNodes['0']?.attributes?.map((item, index) => {
               return (
                 <Form.Item
                   key={index}
