@@ -104,6 +104,27 @@ const getEmployeeWorkingTime = createAsyncThunk('time-attendance/get-employee-wo
   return await response
 })
 
+export const syncTimeAttendanceManual = createAsyncThunk(
+  'time-attendance/sync-time-attendance-manual',
+  async (body: { fromDate: string; toDate: string }, thunkAPI) => {
+    try {
+      const response: any = await HttpService.post(
+        '/internal/attmachine/integration/syn-time-attendance-manual',
+        body,
+        {
+          signal: thunkAPI.signal
+        }
+      )
+      return response
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      return error
+    }
+  }
+)
+
 export const filterTimesheet = createAsyncThunk(
   'time-attendance/filter',
   async (

@@ -9,7 +9,7 @@ export interface IAttendance {
   reportData: IReportData
 }
 export interface IReportData {
-  violate: IViolate[]
+  violates: IViolate[]
   absenceType: string | null
   absenceAmount: number
   workingAmount: number
