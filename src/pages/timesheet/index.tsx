@@ -189,17 +189,17 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const findViolate = (data: IViolate[] | null, violateType: string) => {
-    if (data && data.find((item: IViolate) => item?.violateType === violateType)) {
+  const findViolate = (data: string[] | null, violateType: string) => {
+    if (data && data.includes(violateType)) {
       return true
     } else {
       return false
     }
   }
 
-  const renderStatusByWorkingAmount = (workingAmount: number) => {
-    if (workingAmount === null) return
-    if (workingAmount < 8) {
+  const renderStatusByWorkingAmount = (reportData: IReportData) => {
+    if (reportData?.workingAmount === null) return
+    if (reportData?.workingAmount < 9) {
       return (
         <div className='tw-text-[#E64D29]'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -207,7 +207,7 @@ const Timesheet: React.FC = () => {
         </div>
       )
     }
-    if (workingAmount >= 8) {
+    if (reportData?.workingAmount >= 9 && reportData?.violates?.length < 1) {
       return (
         <div className='tw-text-[#25BD74]'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -267,7 +267,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return renderStatusByWorkingAmount(reportData?.workingAmount)
+        return renderStatusByWorkingAmount(reportData)
       }
     },
     {
