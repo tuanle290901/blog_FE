@@ -43,7 +43,7 @@ const Timesheet: React.FC = () => {
   const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
-  const groupsSate = useAppSelector((state) => state.timesheet.groups)
+  const groupsSate = useAppSelector((state) => state.masterData.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
@@ -343,7 +343,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Công nghỉ'),
+      title: t('Loại công nghỉ'),
       ellipsis: true,
       width: '170px',
       render: (record) => {
