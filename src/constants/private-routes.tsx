@@ -29,6 +29,7 @@ export const PRIVATE_PATH = {
     history: 'user/history/:id'
   },
   timesheet: '/timesheet',
+  dashboard: '/dashboard',
   setting: {
     ticketProcessDefinition: 'ticket-process-definition',
     ticketProcessDefinitionNew: 'ticket-process-definition-new'
@@ -54,9 +55,9 @@ export const PRIVATE_PATH = {
 
 export const PRIVATE_ROUTES: IRoutes[] = [
   {
-    name: '',
-    path: PRIVATE_PATH.home,
-    component: Timesheet,
+    name: 'dashboard',
+    path: PRIVATE_PATH.dashboard,
+    component: Dashboard,
     allowedRoles: []
   },
   {

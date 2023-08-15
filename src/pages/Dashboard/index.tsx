@@ -8,6 +8,7 @@ import IconWaveOrange from '~/assets/images/dashboard/icon_wave_orange.svg'
 import IconWaveBlue from '~/assets/images/dashboard/icon_wave_blue.svg'
 import './style.scss'
 import Rankings from './component/Rankings'
+import ViolateChart from './component/ViolateChart'
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation()
@@ -70,6 +71,7 @@ const Dashboard: React.FC = () => {
         <Col xs={24} xl={16}>
           <div className='dashboard-statistic-chart'>
             <p className='dashboard-statistic-chart__title'>Biểu đồ đi muộn/về sớm theo phòng ban</p>
+            <ViolateChart />
           </div>
         </Col>
       </Row>
