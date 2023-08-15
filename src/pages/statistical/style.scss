@@ -1,0 +1,31 @@
+.box-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 6px;
+}
+
+.border-top-gradient {
+  position: absolute;
+  height: 4px;
+  top: 0;
+  width: 100%;
+}
+
+.border-top-gradient-one {
+  background: linear-gradient(to right, #6e3ec4, #bb69d8);
+}
+
+.border-top-gradient-two {
+  background: linear-gradient(to right, #ef6f62, #f4a66a);
+}
+
+.border-top-gradient-three {
+  background: linear-gradient(to right, #f639c0, #f544c4);
+}

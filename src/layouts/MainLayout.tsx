@@ -11,6 +11,7 @@ import menuIconTimeKeeping from '../assets/images/menu/attendance-confirm.png'
 import menuIconDepartment from '../assets/images/menu/human-resource.png'
 import menuIconReport from '../assets/images/menu/icon-report.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
+import menuIconPlane from '../assets/images/menu/plane.png'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import defaultImg from '~/assets/images/default-img.png'
@@ -131,9 +132,23 @@ const MainLayout: React.FC = () => {
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        'Danh sách yêu cầu',
-        'leave-request',
-        <img src={menuIconTimeKeeping} alt='' className='menu-image' />
+        'Yêu cầu',
+        'request',
+        <img src={menuIconPlane} alt='' className='menu-image' />,
+        [
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+            'Danh sách yêu cầu',
+            'leave-request',
+            null
+          ),
+          getItemIfAllowed(
+            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
+            'Thông tin phép và OT',
+            'statistical',
+            null
+          )
+        ]
       ),
 
       getItemIfAllowed(
@@ -153,13 +168,6 @@ const MainLayout: React.FC = () => {
           getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER], 'Phòng ban', 'department', null),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Chức vụ', 'positions', null)
         ]
-      ),
-
-      getItemIfAllowed(
-        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
-        'Thống kê',
-        'statistical',
-        <img src={menuIconReport} alt='' className='menu-image' />
       ),
 
       getItemIfAllowed(
