@@ -1,0 +1,20 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "exportData": "Export data",
+    "violateAmount": "Number of times coming late, leaving early",
+    "onBussinessAmount": "Number of business days",
+    "LeaveAmount": "Number of leave days",
+    "bout": "times",
+    "day": "day",
+    "month": "Month",
+    "comparedWithPreviousMonth": "Compared to last month",
+    "violateRankTitle": "Coming late, leaving early rank",
+    "rank": "rank",
+    "fullname": "Fullname",
+    "amount": "Amount",
+    "violateChartTitle": "Coming late, leaving early chart -",
+    "lateCome": "Coming late",
+    "backEarly": "Back soon"
+  }
+}

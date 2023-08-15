@@ -1,0 +1,20 @@
+{
+  "dashboard": {
+    "title": "Tổng quan",
+    "exportData": "Xuất dữ liệu",
+    "violateAmount": "Số lần đi muộn, về sớm",
+    "onBussinessAmount": "Số ngày công tác",
+    "LeaveAmount": "Số ngày nghỉ phép",
+    "bout": "lần",
+    "day": "ngày",
+    "month": "Tháng",
+    "comparedWithPreviousMonth": "So với tháng trước",
+    "violateRankTitle": "Bảng xếp hạng đi muộn, về sớm",
+    "rank": "Thứ hạng",
+    "fullname": "Họ tên",
+    "amount": "Số lần",
+    "violateChartTitle": "Biểu đồ đi muộn, về sớm -",
+    "lateCome": "Đến muộn",
+    "backEarly": "Về sớm"
+  }
+}

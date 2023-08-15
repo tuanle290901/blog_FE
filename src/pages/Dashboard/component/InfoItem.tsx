@@ -1,5 +1,6 @@
 import React from 'react'
 import { Col, Row } from 'antd'
+import { useTranslation } from 'react-i18next'
 
 interface Idata {
   title: string
@@ -10,11 +11,12 @@ interface Idata {
 }
 
 const InfoItem: React.FC<Idata> = (data) => {
+  const { t } = useTranslation()
   return (
     <div className='dashboard-info-item'>
       <p className='tw-mb-[30px]'>
         <span className='tw-font-bold'>{data.title}</span>
-        <span className='tw-text-[#BFBFBF] tw-ml-[5px]'>/ Tháng</span>
+        <span className='tw-text-[#BFBFBF] tw-ml-[5px]'>/ {t('dashboard.month')}</span>
       </p>
       <Row gutter={[10, 10]} className='tw-justify-between tw-items-end'>
         <Col xs={24} lg={12}>
@@ -26,7 +28,7 @@ const InfoItem: React.FC<Idata> = (data) => {
               {data.percent > 0 ? `+` : ''}
               {data.percent}%
             </span>
-            <span className='tw-text-[#BFBFBF] tw-ml-[5px]'>(So với tháng trước)</span>
+            <span className='tw-text-[#BFBFBF] tw-ml-[5px]'>({t('dashboard.comparedWithPreviousMonth')})</span>
           </p>
         </Col>
         <Col xs={24} lg={12} className='tw-text-right'>

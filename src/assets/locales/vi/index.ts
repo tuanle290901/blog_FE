@@ -9,6 +9,8 @@ import typesOfLeave from './types-of-leave.json'
 import changePassword from './change-password.json'
 import position from './position.json'
 import leaveRequest from './leave-request.json'
+import dashboard from './dashboard.json'
+
 export const vi = {
   ...common,
   ...initializeVI,
@@ -20,5 +22,6 @@ export const vi = {
   ...typesOfLeave,
   ...changePassword,
   ...position,
-  ...leaveRequest
+  ...leaveRequest,
+  ...dashboard
 }
