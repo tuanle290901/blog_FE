@@ -14,6 +14,7 @@ import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
 import { EMAIL_REG, REGEX_PHONE_NUMBER, REGEX_POSITIVE_NUMBER } from '~/constants/regex.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { VALIDATE_FORM } from '~/utils/Constant'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -341,6 +342,7 @@ const UserCreateEdit: React.FC<{
                   <Input
                     disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterMemberName')}
+                    maxLength={VALIDATE_FORM.MAX_LENGTH_FULLNAME}
                   />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>

@@ -64,3 +64,10 @@ export const TICKET_STATUS: TicketStatusType = {
   REJECTED: 'Từ chối',
   CANCELLED: 'Đã hủy'
 }
+
+export const VALIDATE_FORM = {
+  MAX_LENGTH_INPUT: 256,
+  MAX_LENGTH_TEXTAREA: 2048,
+  MAX_LENGTH_PASSWORD: 20,
+  MAX_LENGTH_FULLNAME: 32
+}

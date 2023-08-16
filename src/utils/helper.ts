@@ -13,12 +13,6 @@ export const ACTION_TYPE = {
   View: 'view'
 }
 
-export const VALIDATE_FORM = {
-  MAX_LENGTH_INPUT: 256,
-  MAX_LENGTH_TEXTAREA: 2048,
-  MAX_LENGTH_PASSWORD: 20
-}
-
 export const convertUTCToLocaleDate = (dateStr: string) => {
   if (!dateStr) return ''
   // const now = new Date()
