@@ -22,8 +22,7 @@ import {
   filterTimesheet,
   // getAllGroup,
   getEmployeeWorkingTime,
-  getUserInGroup,
-  updateAttendanceStatistic
+  getUserInGroup
 } from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
@@ -34,6 +33,8 @@ import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
 import TimesheetChart from './component/TimesheetChart'
 import { IEmployeeWorkingTime } from '~/types/timesheet'
 import SyncTimeAttendanceModal from './component/SyncTimeAttendanceModal'
+import { getAllDefinationType } from '~/stores/features/leave-request/leave-request.slice'
+import { LEAVE_TYPE_MAP } from '~/utils/Constant'
 
 const Timesheet: React.FC = () => {
   const { Search } = Input
@@ -46,10 +47,7 @@ const Timesheet: React.FC = () => {
   const groupsSate = useAppSelector((state) => state.masterData.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
-  const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
-  const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
-    return { value: item?.code, label: item?.name }
-  })
+  const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const userOptions = usersInGroupSate?.map((item) => {
     return { value: item?.id, label: item?.fullName }
   })
@@ -219,8 +217,8 @@ const Timesheet: React.FC = () => {
 
   const renderTypesOfLeaveName = (code: string) => {
     if (!code) return
-    const result = typesOfLeaveSate?.listData?.find((item) => item?.code === code)
-    return result?.name || ''
+    const result = ticketDifinations.find((ticket) => ticket.id === code)
+    return result?.name || LEAVE_TYPE_MAP[code]
   }
 
   const columns: ColumnsType<IAttendance> = [
@@ -321,25 +319,18 @@ const Timesheet: React.FC = () => {
     },
     {
       title: t('Số giờ làm'),
-      dataIndex: 'workingHour',
-      key: 'workingHour',
       align: 'center',
-      width: '120px'
+      width: '120px',
+      render: (record) => {
+        return <span>{record?.reportData?.workingAmount?.toFixed(2)}</span>
+      }
     },
     {
       title: t('Số giờ nghỉ'),
       align: 'center',
       width: '120px',
       render: (record) => {
-        return (
-          <span>
-            {record?.reportData?.workingAmount &&
-            record?.workingHour &&
-            record?.reportData?.workingAmount - record?.workingHour > 0
-              ? (record?.reportData?.workingAmount - record?.workingHour).toFixed(2)
-              : 0}
-          </span>
-        )
+        return <span>{record?.reportData?.absenceAmount?.toFixed(2)}</span>
       }
     },
     {
@@ -385,6 +376,7 @@ const Timesheet: React.FC = () => {
 
   useEffect(() => {
     dispatch(getEmployeeWorkingTime())
+    const promiseGetAllDefinationType = dispatch(getAllDefinationType())
     // const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
@@ -397,7 +389,7 @@ const Timesheet: React.FC = () => {
       })
     )
     return () => {
-      // promiseGetAllGroup.abort()
+      promiseGetAllDefinationType.abort()
       promiseFilterTypesOfLeave.abort()
     }
   }, [])
