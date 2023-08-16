@@ -44,7 +44,7 @@ const CreateEditPosition: React.FC<{
         notification.success({ message: t('position.message.createPositionSuccess') })
       } else {
         await dispatch(updatePosition({ ...value, id: position.id }))
-        notification.success({ message: t('position.message.createPositionSuccess') })
+        notification.success({ message: t('position.message.updatePositionSuccess') })
       }
       finishAndClose(true)
     } catch (e) {

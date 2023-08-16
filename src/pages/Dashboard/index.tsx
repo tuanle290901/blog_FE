@@ -11,16 +11,10 @@ import { useTranslation } from 'react-i18next'
 import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import {
-  exportTimesheet,
-  filterTimesheet,
-  getEmployeeWorkingTime,
-  getUserInGroup
-} from '~/stores/features/timesheet/timesheet.slice'
+import { exportTimesheet, filterTimesheet, getEmployeeWorkingTime } from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
-import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation()
@@ -31,9 +25,7 @@ const Dashboard: React.FC = () => {
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.masterData.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
-  const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
-  const [selectedUser, setSelectedUser] = useState(null)
   const [isAllowedAccess, setIsAllowedAccess] = useState(
     currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? true : false
   )
@@ -137,7 +129,6 @@ const Dashboard: React.FC = () => {
   }
 
   const handleSelectGroup = (value: string) => {
-    setSelectedUser(null)
     setSelectedGroup(value)
   }
 
@@ -146,30 +137,13 @@ const Dashboard: React.FC = () => {
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
-    const promiseFilterTypesOfLeave = dispatch(
-      filterTypesOfLeave({
-        paging: null,
-        sorts: null,
-        query: null
-      })
-    )
-    return () => {
-      promiseFilterTypesOfLeave.abort()
-    }
   }, [])
-  useEffect(() => {
-    const promise = dispatch(getUserInGroup(selectedGroup))
-    setSearchValue((prevState) => {
-      return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
-    })
-    return () => promise.abort()
-  }, [selectedGroup])
 
   useEffect(() => {
     setSearchValue((prevState) => {
-      return { ...prevState, paging: { ...prevState.paging, page: 0 }, userId: selectedUser }
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
-  }, [selectedUser])
+  }, [selectedGroup])
 
   useEffect(() => {
     const promise = dispatch(

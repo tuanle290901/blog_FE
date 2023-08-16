@@ -445,7 +445,7 @@ const UserList: React.FC = () => {
       )}
       <div>
         <h1 className='tw-text-2xl tw-font-semibold'>
-          {t('userList.member')}({userState.meta.total})
+          {t('userList.member')} ({userState.meta.total})
         </h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>

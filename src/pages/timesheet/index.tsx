@@ -102,7 +102,7 @@ const Timesheet: React.FC = () => {
     setSelectedStartDate(dayjs(dataSelected[0]))
     setSelectedEndDate(dayjs(dataSelected[1]))
     if (dayjs(dataSelected[0]).year() !== dayjs(dataSelected[1]).year()) {
-      notification.warning({ message: 'Chỉ được chọn ngày trong cùng một năm' })
+      notification.warning({ message: t('timesheet.message.selectDate') })
       return
     }
     if (dataSelected[0] && dataSelected[1]) {
@@ -199,17 +199,17 @@ const Timesheet: React.FC = () => {
     if (reportData?.workingAmount === null) return
     if (reportData?.workingAmount < 9) {
       return (
-        <div className='tw-text-[#E64D29]'>
+        <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
-          <span>THIẾU CÔNG</span>
+          <span>{t('timesheet.insufficientWorkingHours')}</span>
         </div>
       )
     }
     if (reportData?.workingAmount >= 9 && reportData?.violates?.length < 1) {
       return (
-        <div className='tw-text-[#25BD74]'>
+        <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-          <span>ĐỦ CÔNG</span>
+          <span>{t('timesheet.enoughWorkingHours')}</span>
         </div>
       )
     }
@@ -231,7 +231,7 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('fullName')
     },
     {
-      title: t('Mã chấm công'),
+      title: t('timesheet.attendanceCode'),
       dataIndex: 'userName',
       key: 'userName',
       ellipsis: true,
@@ -260,7 +260,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Trạng thái'),
+      title: t('timesheet.status'),
       dataIndex: 'reportData',
       ellipsis: true,
       width: '120px',
@@ -318,7 +318,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Số giờ làm'),
+      title: t('timesheet.workingAmount'),
       align: 'center',
       width: '120px',
       render: (record) => {
@@ -326,7 +326,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Số giờ nghỉ'),
+      title: t('timesheet.absenceAmount'),
       align: 'center',
       width: '120px',
       render: (record) => {
@@ -334,7 +334,7 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Loại công nghỉ'),
+      title: t('timesheet.absenceType'),
       ellipsis: true,
       width: '170px',
       render: (record) => {
@@ -496,12 +496,12 @@ const Timesheet: React.FC = () => {
             {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
-                <Col xs={24} lg={5}>
-                  <div className='tw-font-bold'>
-                    {!isAllowedAccess ? 'Xác nhận ngày công của tôi' : 'Xác nhận ngày công'}
+                <Col xs={24} lg={10} xl={8}>
+                  <div className='tw-font-bold tw-text-[24px]'>
+                    {!isAllowedAccess ? t('timesheet.titleForUser') : t('timesheet.titleForAdmin')}
                   </div>
                 </Col>
-                <Col xs={24} lg={19}>
+                <Col xs={24} lg={14} xl={16}>
                   <Row gutter={[12, 16]} className='tw-flex tw-justify-end tw-text-right'>
                     <Col>
                       <RangePicker
@@ -559,7 +559,7 @@ const Timesheet: React.FC = () => {
                           )
                         }
                       >
-                        {t('Xuất dữ liệu')}
+                        {t('timesheet.exportData')}
                       </Button>
                     </Col>
                     {isAllowedAccess && (
@@ -619,7 +619,7 @@ const Timesheet: React.FC = () => {
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search
                     value={query}
-                    placeholder='Tìm kiếm theo mã chấm công'
+                    placeholder={t('timesheet.findDataByAttendanceCode')}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
                     className='tw-w-full tw-max-w-[300px]'
                   />
