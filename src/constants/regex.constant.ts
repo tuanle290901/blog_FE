@@ -15,3 +15,4 @@ export const REGEX_SPECIAL_CHARS = /^[a-zA-Z0-9]+$/
 export const REGEX_SPECIAL_TRIM = /^[^\s]+[a-zA-Z0-9]+(\s+[a-zA-Z0-9]+[^\s]+)*$/
 
 export const REGEX_PASSWORD = /^[A-Za-z\d@#$%&]{6,20}$/
+export const REGEX_POSITIVE_NUMBER = /^((?!-).)*$/
