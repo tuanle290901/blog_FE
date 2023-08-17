@@ -126,10 +126,12 @@ export const convertMonthToLocaleVi = (month: string) => {
   }
 }
 
-export const tagColorMapping = (status: string | number) => {
+export const tagColorMapping = (status?: string | number) => {
   switch (status) {
     case TicketStatusEnum.SUBMITTED:
       return 'default'
+    case TicketStatusEnum.FINISHED:
+      return 'success'
     case TicketStatusEnum.PROCESSING:
       return 'processing'
     case TicketStatusEnum.CONFIRMED:
@@ -138,5 +140,12 @@ export const tagColorMapping = (status: string | number) => {
       return 'error'
     case TicketStatusEnum.CANCELLED:
       return 'warning'
+    default:
+      return 'default'
   }
+}
+
+export const roundHoursToDays = (hours: number) => {
+  const days = Math.round(hours / 24)
+  return days
 }

@@ -62,5 +62,6 @@ export const TICKET_STATUS: TicketStatusType = {
   PROCESSING: 'Đang xử lý',
   CONFIRMED: 'Đã xác nhận',
   REJECTED: 'Từ chối',
-  CANCELLED: 'Đã hủy'
+  CANCELLED: 'Đã hủy',
+  FINISHED: 'Hoàn thành'
 }

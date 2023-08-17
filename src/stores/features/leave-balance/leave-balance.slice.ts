@@ -2,14 +2,30 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
-
 export interface ILeaveBalace {
-  totalLeaveBalance: string
-  restLeaveBalance: string
-  usedLeaveBalance: string
-  overtime: string
+  absenceInfoList: AbsenceInfoList[]
+  overTimeInfoList: OverTimeInfoList[]
+  totalAbsenceHours: number
+  totalEarlyBack: number
+  totalLateCome: number
+  totalOverTimeHours: number
+  totalRemainLeaveHours: number
+  totalUsedLeaveHours: number
+  totalViolates: number
+  violateInfoList: ViolateInfoList[]
 }
-
+export interface AbsenceInfoList {
+  key: string
+  value: number
+}
+export interface OverTimeInfoList {
+  key: string
+  value: number
+}
+export interface ViolateInfoList {
+  key: string
+  value: number
+}
 export interface ILeaveBalanceState {
   leaveBalanceData: ILeaveBalace
   loading: boolean
@@ -22,19 +38,12 @@ const initialState: ILeaveBalanceState = {
   currentRequestId: null
 }
 
-const fakeData: ILeaveBalace = {
-  totalLeaveBalance: '12',
-  restLeaveBalance: '10',
-  usedLeaveBalance: '1',
-  overtime: '32'
-}
-
-export const getLeaveBalance = createAsyncThunk('leave-balance/get', async (_, thunkAPI) => {
+export const getLeaveBalance = createAsyncThunk('time-attendance/getLeaveBalance', async (_, thunkAPI) => {
   try {
-    // const response: any = await HttpService.get('leave-balance/get', {
-    //   signal: thunkAPI.signal
-    // })
-    return fakeData
+    const response: any = await HttpService.get('time-attendance/leave-balance', {
+      signal: thunkAPI.signal
+    })
+    return response.data
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
