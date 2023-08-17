@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, notification } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, Tooltip, notification } from 'antd'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
 import {
-  CheckCircleOutlined,
   CheckOutlined,
   CloseOutlined,
   ClockCircleOutlined,
@@ -13,14 +12,13 @@ import {
   UploadOutlined,
   SyncOutlined
 } from '@ant-design/icons'
-import { IAttendance, IPayloadUpdateAttendance, IReportData, IViolate } from '~/types/attendance.interface'
+import { IAttendance, IAbsenceInfo, IReportData } from '~/types/attendance.interface'
 import dayjs from 'dayjs'
 import TimesheetForm from './component/TimesheetForm'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import {
   exportTimesheet,
   filterTimesheet,
-  // getAllGroup,
   getEmployeeWorkingTime,
   getUserInGroup
 } from '~/stores/features/timesheet/timesheet.slice'
@@ -29,8 +27,6 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
 import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
-import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
-import TimesheetChart from './component/TimesheetChart'
 import { IEmployeeWorkingTime } from '~/types/timesheet'
 import SyncTimeAttendanceModal from './component/SyncTimeAttendanceModal'
 import { getAllDefinationType } from '~/stores/features/leave-request/leave-request.slice'
@@ -215,10 +211,53 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const renderTypesOfLeaveName = (code: string) => {
-    if (!code) return
-    const result = ticketDifinations.find((ticket) => ticket.id === code)
-    return result?.name || LEAVE_TYPE_MAP[code]
+  const handleGetAbsenceTypeName = (data: IAbsenceInfo) => {
+    const result = ticketDifinations.find((ticket) => ticket.id === data?.absenceType)
+    return result?.name || LEAVE_TYPE_MAP[data?.absenceType]
+  }
+
+  const renderTypesOfLeaveName = (reportData: IReportData) => {
+    if (reportData?.absenceInfoList?.length <= 0) return
+    else {
+      return (
+        <div>
+          {reportData?.absenceInfoList?.map((item) => (
+            <div key={item?.ticketCode} className='tw-cursor-context-menu'>
+              {handleGetAbsenceTypeName(item)}
+            </div>
+          ))}
+        </div>
+      )
+    }
+  }
+
+  const renderAbsenceInfo = (reportData: IReportData) => {
+    if (reportData?.absenceInfoList?.length <= 0) return
+    else {
+      return (
+        <div>
+          {reportData?.absenceInfoList?.map((item) => (
+            <Tooltip
+              color='#ffbc25'
+              key={item?.ticketCode}
+              title={
+                <div className='tw-text-black tw-text-center'>
+                  <div>{handleGetAbsenceTypeName(item)}</div>
+                  <div>
+                    <span>{t('timesheet.from')}</span>
+                    <span className='tw-font-bold tw-mx-[10px]'>{item?.startDateTimeRegist?.split(' ')[1]}</span>
+                    <span>{t('timesheet.to')}</span>
+                    <span className='tw-font-bold tw-ml-[10px]'>{item?.endDateTimeRegist?.split(' ')[1]}</span>
+                  </div>
+                </div>
+              }
+            >
+              <div className='tw-cursor-context-menu'>{item?.amount?.toFixed(2)}</div>
+            </Tooltip>
+          ))}
+        </div>
+      )
+    }
   }
 
   const columns: ColumnsType<IAttendance> = [
@@ -330,7 +369,7 @@ const Timesheet: React.FC = () => {
       align: 'center',
       width: '120px',
       render: (record) => {
-        return <span>{record?.reportData?.absenceAmount?.toFixed(2)}</span>
+        return renderAbsenceInfo(record?.reportData)
       }
     },
     {
@@ -338,9 +377,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '170px',
       render: (record) => {
-        return (
-          <span>{record?.reportData?.absenceType ? renderTypesOfLeaveName(record?.reportData?.absenceType) : ''}</span>
-        )
+        return renderTypesOfLeaveName(record?.reportData)
       }
     }
   ]

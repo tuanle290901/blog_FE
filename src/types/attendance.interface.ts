@@ -10,17 +10,21 @@ export interface IAttendance {
 }
 export interface IReportData {
   violates: string[]
-  absenceType: string | null
+  absenceType?: string | null
   absenceAmount: number
   workingAmount: number
   note: string | null
   noneWorkingDay?: boolean
   dateType: string
+  absenceInfoList: IAbsenceInfo[]
 }
 
-export interface IViolate {
-  violateType: string
-  confirmed: boolean
+export interface IAbsenceInfo {
+  ticketCode: string
+  amount: number
+  absenceType: string
+  startDateTimeRegist: string
+  endDateTimeRegist: string
 }
 
 export interface IPayloadUpdateAttendance {
