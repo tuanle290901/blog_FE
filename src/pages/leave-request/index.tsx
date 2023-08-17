@@ -501,7 +501,9 @@ const LeaveRequest: React.FC = () => {
       </div>
 
       <Modal
-        title={`Yêu cầu `}
+        title={`Yêu cầu ${selectedTicket?.ticketCode} - ${
+          ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name
+        }`}
         open={isModalAprroveOpen}
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
@@ -509,18 +511,18 @@ const LeaveRequest: React.FC = () => {
         style={{ minWidth: 800 }}
         footer={null}
       >
-        <div className='tw-font-semibold tw-mb-3'>
-          {selectedTicket?.ticketCode} |{' '}
-          {ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name}
-          {selectedTicket?.status && (
-            <>
-              {' '}
-              | {
-                <Tag color={tagColorMapping(selectedTicket?.status)}>{TICKET_STATUS[selectedTicket?.status]}</Tag>
-              }{' '}
-            </>
-          )}
-        </div>
+        {selectedTicket?.status && (
+          <div className='tw-mb-3 tw-text-base tw-font-semibold'>
+            Trạng thái yêu cầu:{' '}
+            <Tag
+              style={{ lineHeight: 2.5, minWidth: 80, textAlign: 'center' }}
+              color={tagColorMapping(selectedTicket?.status)}
+            >
+              {TICKET_STATUS[selectedTicket?.status]}
+            </Tag>
+          </div>
+        )}
+
         <div className='feature-container'>
           <Row>
             <Col span={24}>
