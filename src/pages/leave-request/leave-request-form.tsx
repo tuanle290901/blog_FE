@@ -1,4 +1,5 @@
 import { DatePicker, Form, Input, Modal, Select, notification } from 'antd'
+import TextArea from 'antd/es/input/TextArea'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -141,7 +142,9 @@ const LeaveRequestForm: React.FC<{
                   name={item.name}
                   rules={[{ required: item.required, message: 'Trường bắt buộc' }]}
                 >
-                  {item.type === INPUT_TYPE.TEXT && <Input disabled={!canUpdateForm} placeholder={item.description} />}
+                  {item.type === INPUT_TYPE.TEXT && (
+                    <TextArea disabled={!canUpdateForm} placeholder={item.description} />
+                  )}
                   {item.type === INPUT_TYPE.SINGLE_SELECT && (
                     <Select
                       disabled={!canUpdateForm}
