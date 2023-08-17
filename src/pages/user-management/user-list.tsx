@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, notification, Popconfirm, Select, Table, TablePaginationConfig, Tooltip } from 'antd'
+import { Button, Input, notification, Popconfirm, Select, Table, TablePaginationConfig, Tooltip, Row, Col } from 'antd'
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -178,6 +178,7 @@ const UserList: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('fullName'),
+      width: '200px',
       render: (text, record) => {
         return (
           <div className='tw-relative'>
@@ -199,6 +200,7 @@ const UserList: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('userName'),
+      width: '150px',
       ellipsis: true
     },
     {
@@ -210,7 +212,7 @@ const UserList: React.FC = () => {
       showSorterTooltip: false,
       width: '150px',
       align: 'center',
-      render: (text, record) => {
+      render: (text) => {
         if (text) {
           const date = dayjs(text).format('DD/MM/YYYY')
           return date
@@ -234,9 +236,10 @@ const UserList: React.FC = () => {
       title: t('userList.department'),
       dataIndex: 'groupProfiles',
       key: 'groupProfiles',
+      width: '250px',
       render: (text, record) => {
         return record.groupProfiles
-          .map((item, index) => {
+          .map((item) => {
             return `${item.groupName} (${t(`common.role.${item.role.toLowerCase()}`)})`
           })
           .join(',')
@@ -259,6 +262,7 @@ const UserList: React.FC = () => {
       sorter: true,
       showSorterTooltip: false,
       sortOrder: getSortOrder('email'),
+      width: '200px',
       ellipsis: true
     },
     {
@@ -449,46 +453,56 @@ const UserList: React.FC = () => {
         </h1>
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
-      <div className='tw-flex tw-gap-4 tw-mt-4'>
-        <div className='tw-gap-4 tw-flex'>
-          {permissionAddUser && (
-            <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
-              {t('userList.addMember')}
-            </Button>
-          )}
-          {permissionImportUser && (
-            <>
-              {' '}
-              <Button icon={<DownloadOutlined />} onClick={() => fileSelect?.current?.click()}>
-                Import thành viên
-              </Button>
-              <input
-                ref={fileSelect}
-                className='tw-hidden'
-                type='file'
-                accept='.xlxs,.xls'
-                onChange={(event) => handleFileChange(event.target.files)}
-              />
-            </>
-          )}
-        </div>
+      <Row gutter={[16, 16]} className='tw-mt-4'>
+        <Col xs={24} lg={12}>
+          <Row gutter={[16, 16]}>
+            {permissionAddUser && (
+              <Col>
+                <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
+                  {t('userList.addMember')}
+                </Button>
+              </Col>
+            )}
+            {permissionImportUser && (
+              <Col>
+                {' '}
+                <Button icon={<DownloadOutlined />} onClick={() => fileSelect?.current?.click()}>
+                  Import thành viên
+                </Button>
+                <input
+                  ref={fileSelect}
+                  className='tw-hidden'
+                  type='file'
+                  accept='.xlxs,.xls'
+                  onChange={(event) => handleFileChange(event.target.files)}
+                />
+              </Col>
+            )}
+          </Row>
+        </Col>
 
-        <div className='tw-flex tw-gap-4 tw-justify-end tw-flex-1'>
-          <Select
-            onChange={handleDepartmentChange}
-            defaultValue={'all'}
-            options={groupOptions}
-            value={searchValue.group}
-            className='tw-w-64'
-          ></Select>
-          <Search
-            value={query}
-            placeholder={'Tìm kiếm thành viên'}
-            onChange={(event) => handleSearchValueChange(event.target.value)}
-            className='tw-w-64'
-          />
-        </div>
-      </div>
+        <Col xs={24} lg={12}>
+          <Row gutter={[16, 16]} className='tw-flex tw-justify-end'>
+            <Col>
+              <Select
+                onChange={handleDepartmentChange}
+                defaultValue={'all'}
+                options={groupOptions}
+                value={searchValue.group}
+                className='tw-w-full tw-mw-64'
+              />
+            </Col>
+            <Col>
+              <Search
+                value={query}
+                placeholder={'Tìm kiếm thành viên'}
+                onChange={(event) => handleSearchValueChange(event.target.value)}
+                className='tw-w-full tw-mw-64'
+              />
+            </Col>
+          </Row>
+        </Col>
+      </Row>
       <div className='tw-mt-6'>
         <Table
           rowKey='id'

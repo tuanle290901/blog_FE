@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, DatePicker, Form, Input, message, Modal, notification, Radio, Select, Upload } from 'antd'
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, DatePicker, Form, Input, message, Modal, notification, Radio, Select, Upload, Row, Col } from 'antd'
+import { MinusCircleOutlined } from '@ant-design/icons'
 import { RuleObject } from 'antd/lib/form'
 import { useTranslation } from 'react-i18next'
 import { RcFile } from 'antd/es/upload'
@@ -28,6 +28,7 @@ const UserCreateEdit: React.FC<{
   const [avatarBase64, setAvatarBase64] = useState<string>('')
   const [avtError, setAvtError] = useState(false)
   const [serverError, setServerError] = useState<any>(null)
+  const [remainLeaveHour, setRemainLeaveHour] = useState<number>(userData?.createWithRemainLeaveHours || 0)
   const [form] = Form.useForm<
     Omit<IUser, 'birthday' | 'joinDate' | 'formalDate'> & { birthday: Dayjs; joinDate: Dayjs; formalDate: Dayjs }
   >()
@@ -156,7 +157,8 @@ const UserCreateEdit: React.FC<{
         formalDate,
         joinDate,
         email: value.email || null,
-        phoneNumber: value.phoneNumber || null
+        phoneNumber: value.phoneNumber || null,
+        createWithRemainLeaveHours: Number(value?.createWithRemainLeaveHours) || 0
       }
       try {
         setLoading(true)
@@ -271,7 +273,7 @@ const UserCreateEdit: React.FC<{
       width={1000}
       centered
     >
-      <div className=' tw-min-w-[800px] tw-overflow-auto'>
+      <div>
         <div className='tw-flex tw-items-center tw-gap-4'>
           <Upload name='avatar' accept='image/png, image/jpeg' showUploadList={false} beforeUpload={beforeUpload}>
             <div ref={uploadRef}>
@@ -302,15 +304,15 @@ const UserCreateEdit: React.FC<{
               {/*<Button onClick={() => setAvatarBase64('')}>{t('userModal.deleteAvatar')}</Button>*/}
             </div>
             <div className='tw-mt-1'>
-              <p className='tw-text-yellow-600 tw-w-2/3'>{t('userModal.avatarAccept')}</p>
+              <p className='tw-text-yellow-600'>{t('userModal.avatarAccept')}</p>
               {avtError && <p className='tw-text-red-600'>{t('userModal.errorMessage.avatarEmpty')}</p>}
             </div>
           </div>
         </div>
         <div className='tw-border-[#eee] tw-border tw-border-solid tw-my-2' />
         <Form form={form} layout='vertical'>
-          <div className='tw-flex tw-gap-4'>
-            <div className='tw-w-1/2'>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={12}>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.commonInfo')}</h3>
               <div className='tw-p-4 tw-bg-[#FAFAFA]'>
                 {userData?.userName && (
@@ -425,8 +427,8 @@ const UserCreateEdit: React.FC<{
                 {/*  </Form.Item>*/}
                 {/*)}*/}
               </div>
-            </div>
-            <div className='tw-w-1/2'>
+            </Col>
+            <Col xs={24} lg={12}>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
               <div
                 className={`tw-p-4 tw-bg-[#FAFAFA] ${
@@ -485,10 +487,19 @@ const UserCreateEdit: React.FC<{
                 </Form.Item>
                 <Form.Item
                   style={{ marginBottom: 24 }}
-                  label={t('userModal.remainLeaveHour')}
-                  name='remainLeaveHour'
+                  label={
+                    <>
+                      <span>{t('userModal.remainLeaveHour')}</span>
+                      {remainLeaveHour > 0 && (
+                        <span className='tw-text-orange-600 tw-ml-1'>
+                          ({(remainLeaveHour / 8).toFixed(2)} {t('timesheet.day')})
+                        </span>
+                      )}
+                    </>
+                  }
+                  name='createWithRemainLeaveHours'
                   required
-                  initialValue={userData?.remainLeaveHour || 0}
+                  initialValue={userData?.createWithRemainLeaveHours || 0}
                   rules={[
                     {
                       required: true,
@@ -505,6 +516,7 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterRemainLeaveHour')}
                     type='number'
                     min={0}
+                    onChange={(e) => setRemainLeaveHour(Number(e?.target?.value))}
                   />
                 </Form.Item>
                 <Form.List name='groupProfiles' initialValue={groupProfiles}>
@@ -578,8 +590,8 @@ const UserCreateEdit: React.FC<{
                   )}
                 </Form.List>
               </div>
-            </div>
-          </div>
+            </Col>
+          </Row>
         </Form>
       </div>
     </Modal>
