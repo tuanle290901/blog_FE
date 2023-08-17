@@ -22,8 +22,7 @@ import {
   filterTimesheet,
   // getAllGroup,
   getEmployeeWorkingTime,
-  getUserInGroup,
-  updateAttendanceStatistic
+  getUserInGroup
 } from '~/stores/features/timesheet/timesheet.slice'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
@@ -34,6 +33,8 @@ import TimesheetChartForAdmin from './component/TimesheetChartForAdmin'
 import TimesheetChart from './component/TimesheetChart'
 import { IEmployeeWorkingTime } from '~/types/timesheet'
 import SyncTimeAttendanceModal from './component/SyncTimeAttendanceModal'
+import { getAllDefinationType } from '~/stores/features/leave-request/leave-request.slice'
+import { LEAVE_TYPE_MAP } from '~/utils/Constant'
 
 const Timesheet: React.FC = () => {
   const { Search } = Input
@@ -46,10 +47,7 @@ const Timesheet: React.FC = () => {
   const groupsSate = useAppSelector((state) => state.masterData.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
-  const typesOfLeaveSate = useAppSelector((state) => state.typesOfLeave)
-  const typesOfLeaveOptions = typesOfLeaveSate?.listData?.map((item) => {
-    return { value: item?.code, label: item?.name }
-  })
+  const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const userOptions = usersInGroupSate?.map((item) => {
     return { value: item?.id, label: item?.fullName }
   })
@@ -104,7 +102,7 @@ const Timesheet: React.FC = () => {
     setSelectedStartDate(dayjs(dataSelected[0]))
     setSelectedEndDate(dayjs(dataSelected[1]))
     if (dayjs(dataSelected[0]).year() !== dayjs(dataSelected[1]).year()) {
-      notification.warning({ message: 'Chỉ được chọn ngày trong cùng một năm' })
+      notification.warning({ message: t('timesheet.message.selectDate') })
       return
     }
     if (dataSelected[0] && dataSelected[1]) {
@@ -189,29 +187,29 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const findViolate = (data: IViolate[] | null, violateType: string) => {
-    if (data && data.find((item: IViolate) => item?.violateType === violateType)) {
+  const findViolate = (data: string[] | null, violateType: string) => {
+    if (data && data.includes(violateType)) {
       return true
     } else {
       return false
     }
   }
 
-  const renderStatusByWorkingAmount = (workingAmount: number) => {
-    if (workingAmount === null) return
-    if (workingAmount < 8) {
+  const renderStatusByWorkingAmount = (reportData: IReportData) => {
+    if (reportData?.workingAmount === null) return
+    if (reportData?.workingAmount < 9) {
       return (
-        <div className='tw-text-[#E64D29]'>
+        <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
-          <span>THIẾU CÔNG</span>
+          <span>{t('timesheet.insufficientWorkingHours')}</span>
         </div>
       )
     }
-    if (workingAmount >= 8) {
+    if (reportData?.workingAmount >= 9 && reportData?.violates?.length < 1) {
       return (
-        <div className='tw-text-[#25BD74]'>
+        <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
-          <span>ĐỦ CÔNG</span>
+          <span>{t('timesheet.enoughWorkingHours')}</span>
         </div>
       )
     }
@@ -219,8 +217,8 @@ const Timesheet: React.FC = () => {
 
   const renderTypesOfLeaveName = (code: string) => {
     if (!code) return
-    const result = typesOfLeaveSate?.listData?.find((item) => item?.code === code)
-    return result?.name || ''
+    const result = ticketDifinations.find((ticket) => ticket.id === code)
+    return result?.name || LEAVE_TYPE_MAP[code]
   }
 
   const columns: ColumnsType<IAttendance> = [
@@ -233,7 +231,7 @@ const Timesheet: React.FC = () => {
       sortOrder: getSortOrder('fullName')
     },
     {
-      title: t('Mã chấm công'),
+      title: t('timesheet.attendanceCode'),
       dataIndex: 'userName',
       key: 'userName',
       ellipsis: true,
@@ -262,12 +260,12 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Trạng thái'),
+      title: t('timesheet.status'),
       dataIndex: 'reportData',
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return renderStatusByWorkingAmount(reportData?.workingAmount)
+        return renderStatusByWorkingAmount(reportData)
       }
     },
     {
@@ -320,30 +318,23 @@ const Timesheet: React.FC = () => {
       }
     },
     {
-      title: t('Số giờ làm'),
-      dataIndex: 'workingHour',
-      key: 'workingHour',
-      align: 'center',
-      width: '120px'
-    },
-    {
-      title: t('Số giờ nghỉ'),
+      title: t('timesheet.workingAmount'),
       align: 'center',
       width: '120px',
       render: (record) => {
-        return (
-          <span>
-            {record?.reportData?.workingAmount &&
-            record?.workingHour &&
-            record?.reportData?.workingAmount - record?.workingHour > 0
-              ? (record?.reportData?.workingAmount - record?.workingHour).toFixed(2)
-              : 0}
-          </span>
-        )
+        return <span>{record?.reportData?.workingAmount?.toFixed(2)}</span>
       }
     },
     {
-      title: t('Loại công nghỉ'),
+      title: t('timesheet.absenceAmount'),
+      align: 'center',
+      width: '120px',
+      render: (record) => {
+        return <span>{record?.reportData?.absenceAmount?.toFixed(2)}</span>
+      }
+    },
+    {
+      title: t('timesheet.absenceType'),
       ellipsis: true,
       width: '170px',
       render: (record) => {
@@ -385,6 +376,7 @@ const Timesheet: React.FC = () => {
 
   useEffect(() => {
     dispatch(getEmployeeWorkingTime())
+    const promiseGetAllDefinationType = dispatch(getAllDefinationType())
     // const promiseGetAllGroup = dispatch(getAllGroup())
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
@@ -397,7 +389,7 @@ const Timesheet: React.FC = () => {
       })
     )
     return () => {
-      // promiseGetAllGroup.abort()
+      promiseGetAllDefinationType.abort()
       promiseFilterTypesOfLeave.abort()
     }
   }, [])
@@ -504,12 +496,12 @@ const Timesheet: React.FC = () => {
             {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
-                <Col xs={24} lg={5}>
-                  <div className='tw-font-bold'>
-                    {!isAllowedAccess ? 'Xác nhận ngày công của tôi' : 'Xác nhận ngày công'}
+                <Col xs={24} lg={10} xl={8}>
+                  <div className='tw-font-bold tw-text-[24px]'>
+                    {!isAllowedAccess ? t('timesheet.titleForUser') : t('timesheet.titleForAdmin')}
                   </div>
                 </Col>
-                <Col xs={24} lg={19}>
+                <Col xs={24} lg={14} xl={16}>
                   <Row gutter={[12, 16]} className='tw-flex tw-justify-end tw-text-right'>
                     <Col>
                       <RangePicker
@@ -567,7 +559,7 @@ const Timesheet: React.FC = () => {
                           )
                         }
                       >
-                        {t('Xuất dữ liệu')}
+                        {t('timesheet.exportData')}
                       </Button>
                     </Col>
                     {isAllowedAccess && (
@@ -627,7 +619,7 @@ const Timesheet: React.FC = () => {
                 <Col xs={24} lg={14} xl={16} className='tw-text-right'>
                   <Search
                     value={query}
-                    placeholder='Tìm kiếm theo mã chấm công'
+                    placeholder={t('timesheet.findDataByAttendanceCode')}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
                     className='tw-w-full tw-max-w-[300px]'
                   />

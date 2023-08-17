@@ -65,3 +65,10 @@ export const TICKET_STATUS: TicketStatusType = {
   CANCELLED: 'Đã hủy',
   FINISHED: 'Hoàn thành'
 }
+
+export const VALIDATE_FORM = {
+  MAX_LENGTH_INPUT: 256,
+  MAX_LENGTH_TEXTAREA: 2048,
+  MAX_LENGTH_PASSWORD: 20,
+  MAX_LENGTH_FULLNAME: 32
+}

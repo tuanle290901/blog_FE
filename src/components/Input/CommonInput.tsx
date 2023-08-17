@@ -1,6 +1,6 @@
 import { Input } from 'antd'
 import React, { ClipboardEvent, KeyboardEvent, ReactNode } from 'react'
-import { VALIDATE_FORM } from '~/utils/helper'
+import { VALIDATE_FORM } from '~/utils/Constant'
 
 interface ICommonInput {
   id?: string

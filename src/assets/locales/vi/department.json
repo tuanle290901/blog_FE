@@ -10,7 +10,7 @@
     "publishDate": "Ngày thành lập",
     "actions": "Hành động",
     "departmentAdd": "Thêm mới phòng ban",
-    "add": "Thêm mới",
+    "add": "Thêm phòng ban",
     "departmentUpdate": "Cập nhật thông tin phòng ban {{name}}",
     "pleaseEnterSearch": "Mời nhập thông tin tìm kiếm",
     "please-insert-input": "Mời nhập thông tin ",

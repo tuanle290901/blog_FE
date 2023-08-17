@@ -247,12 +247,12 @@ const Department: React.FC = () => {
         dataIndex: 'name',
         key: 'name',
         width: '250px',
-        render: (value: string, record: DataType) => {
+        render: (value: string) => {
           return (
             <span
-              onClick={() => {
-                setUseSelect(record)
-              }}
+            // onClick={() => {
+            //   setUseSelect(record)
+            // }}
             >
               {value}
             </span>
@@ -542,6 +542,11 @@ const Department: React.FC = () => {
           className='pointer'
           scroll={{ y: 'calc(100vh - 360px)' }}
           rowKey={(record: DataType) => record.code}
+          onRow={(record) => {
+            return {
+              onClick: () => setUseSelect(record)
+            }
+          }}
         />
       </Row>
     </div>

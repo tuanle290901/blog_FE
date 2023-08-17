@@ -11,9 +11,10 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { EDIT_TYPE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import { createUser, updateUser } from '~/stores/features/user/user.slice.ts'
-import { EMAIL_REG, REGEX_PHONE_NUMBER } from '~/constants/regex.constant.ts'
+import { EMAIL_REG, REGEX_PHONE_NUMBER, REGEX_POSITIVE_NUMBER } from '~/constants/regex.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
+import { VALIDATE_FORM } from '~/utils/Constant'
 
 const UserCreateEdit: React.FC<{
   open: boolean
@@ -341,6 +342,7 @@ const UserCreateEdit: React.FC<{
                   <Input
                     disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterMemberName')}
+                    maxLength={VALIDATE_FORM.MAX_LENGTH_FULLNAME}
                   />
                 </Form.Item>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
@@ -463,17 +465,6 @@ const UserCreateEdit: React.FC<{
                     />
                   )}
                 </Form.Item>
-                {/*<Form.Item style={{ marginBottom: 24 }} label={t('userList.probationDate')} name='probationDate'>*/}
-                {/*  <DatePicker*/}
-                {/*    format='DD/MM/YYYY'*/}
-                {/*    disabledDate={(date) => {*/}
-                {/*      return date.isAfter(new Date())*/}
-                {/*    }}*/}
-                {/*    showToday={false}*/}
-                {/*    className='tw-w-full'*/}
-                {/*    placeholder={t('userModal.enterProbationDate')}*/}
-                {/*  />*/}
-                {/*</Form.Item>*/}
                 <Form.Item
                   style={{ marginBottom: 24 }}
                   label={t('userList.officialContractSigningDate')}
@@ -497,10 +488,15 @@ const UserCreateEdit: React.FC<{
                   label={t('userModal.remainLeaveHour')}
                   name='remainLeaveHour'
                   required
+                  initialValue={userData?.remainLeaveHour || 0}
                   rules={[
                     {
                       required: true,
                       message: t('userModal.errorMessage.remainLeaveHourIsEmpty')
+                    },
+                    {
+                      pattern: REGEX_POSITIVE_NUMBER,
+                      message: t('Số giờ nghỉ phép còn lại phải lớn hơn 0')
                     }
                   ]}
                 >
@@ -508,6 +504,7 @@ const UserCreateEdit: React.FC<{
                     disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterRemainLeaveHour')}
                     type='number'
+                    min={0}
                   />
                 </Form.Item>
                 <Form.List name='groupProfiles' initialValue={groupProfiles}>

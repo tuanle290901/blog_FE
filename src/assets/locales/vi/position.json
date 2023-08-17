@@ -13,10 +13,10 @@
       "createPositionSuccess": "Tạo mới chức vụ thành công",
       "updatePositionSuccess": "Cập nhật chức vụ thành công",
       "deleteSuccess": "Xóa chức vụ thành công",
-      "positionEmpty": "Trường chức vụ không được để trống",
+      "positionEmpty": "Chức vụ không được để trống",
       "enterPositionName": "Nhập tên chức vụ",
       "enterDescription": "Nhập mô tả cho chức vụ",
-      "warnDelete": "Bạn có muốn xóa chức vụ"
+      "warnDelete": "Bạn có muốn xóa chức vụ không?"
     }
   }
 }

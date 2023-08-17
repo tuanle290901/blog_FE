@@ -212,7 +212,7 @@ const PositionList: React.FC = () => {
       />
       <div>
         <h1 className='tw-text-2xl tw-font-semibold'>
-          {t('position.position')}({positionState.meta.total})
+          {t('position.position')} ({positionState.meta.total})
         </h1>
         <h5 className='tw-text-sm'>{t('position.list')}</h5>
       </div>

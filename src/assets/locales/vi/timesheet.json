@@ -51,6 +51,19 @@
     "syncData": "Đồng bộ dữ liệu",
     "sync": "Đồng bộ",
     "syncTimeAttendanceWarning": "Chỉ được chọn khoảng thời gian tối đa 3 ngày",
-    "selectDateWarning": "Ngày kết thúc phải sau ngày bắt đầu"
+    "selectDateWarning": "Ngày kết thúc phải sau ngày bắt đầu",
+    "message": {
+      "selectDate": "Chỉ được chọn ngày trong cùng một năm"
+    },
+    "enoughWorkingHours": "đủ công",
+    "insufficientWorkingHours": "thiếu công",
+    "attendanceCode": "Mã chấm công",
+    "findDataByAttendanceCode": "Tìm kiếm theo mã chấm công",
+    "workingAmount": "Số giờ làm",
+    "absenceAmount": "Số giờ nghỉ",
+    "absenceType": "Loại công nghỉ",
+    "titleForUser": "Xác nhận ngày công của tôi",
+    "titleForAdmin": "Xác nhận ngày công",
+    "exportData": "Xuất dữ liệu"
   }
 }
