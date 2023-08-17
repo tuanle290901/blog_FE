@@ -1,20 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleFilled,
-  InfoCircleOutlined
-} from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   Button,
+  Col,
   DatePicker,
   Modal,
   Popconfirm,
+  Row,
   Select,
   Space,
   Table,
@@ -25,8 +18,11 @@ import {
   notification
 } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import dayjs from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import iconApprove from '~/assets/images/approved.png'
+import { ROLE } from '~/constants/app.constant'
 import LeaveRequestForm from '~/pages/leave-request/leave-request-form'
 import {
   TicketRequestPayload,
@@ -40,18 +36,14 @@ import {
   startEditing,
   updateLeaveRequest
 } from '~/stores/features/leave-request/leave-request.slice'
+import { searchUser } from '~/stores/features/user/user.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
-// import { convertUTCToLocaleDate } from '~/utils/helper'
-import dayjs from 'dayjs'
-import { ROLE } from '~/constants/app.constant'
-import { searchUser } from '~/stores/features/user/user.slice'
-import { useUserInfo } from '~/stores/hooks/useUserProfile'
-import { TicketStatusType } from '~/types/leave-request.interface'
 import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { tagColorMapping } from '~/utils/helper'
-
+import './style.scss'
 const { confirm } = Modal
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
@@ -88,20 +80,22 @@ const LeaveRequest: React.FC = () => {
   const { userInfo } = useUserInfo()
 
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
-  const listData: ILeaveRequest[] = useAppSelector((state: any) => state.leaveRequest.listData)
+  const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
   const users = useAppSelector((item) => item.user.userList)
-  const editingLeaveRequest = useAppSelector((state: any) => state.leaveRequest.editingLeaveRequest)
-  const isLoading = useAppSelector((state: any) => state.leaveRequest.loading)
+  const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
+  const isLoading = useAppSelector((state) => state.leaveRequest.loading)
 
   const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const [canUpdateForm, setCanUpdateForm] = useState<boolean>(true)
+  const [isModalAprroveOpen, setIsModalApproveOpen] = useState<boolean>(false)
+  const [selectedTicket, setSelectedTicket] = useState<ILeaveRequest>()
   const isSystemAdmin = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const isManagerDepartment = userInfo?.groupProfiles.find(
     (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
   )
 
-  const meta: IPaging = useAppSelector((state: any) => state.leaveRequest.meta)
+  const meta: IPaging = useAppSelector((state) => state.leaveRequest.meta)
 
   const handleClickDelete = async (record: ILeaveRequest) => {
     try {
@@ -157,6 +151,19 @@ const LeaveRequest: React.FC = () => {
     dispatch(filterLeaveRequest(searchValue))
   }
 
+  const handleModalAprroveOk = () => {
+    setIsModalApproveOpen(false)
+  }
+
+  const handleModalAprroveCancel = () => {
+    setIsModalApproveOpen(false)
+  }
+
+  const onOpenModalApprove = (record: ILeaveRequest) => {
+    setIsModalApproveOpen(true)
+    setSelectedTicket(record)
+  }
+
   const onChangeRequest = (type: string, requestItem: string | any) => {
     const updateSearchValue = (updateFn: (prev: any) => any) => {
       setSearchValue((prev) => ({
@@ -167,15 +174,15 @@ const LeaveRequest: React.FC = () => {
 
     switch (type) {
       case 'onlyAssignToMe':
-        updateSearchValue((prev) => ({ onlyAssignToMe: requestItem.target.checked }))
+        updateSearchValue(() => ({ onlyAssignToMe: requestItem.target.checked }))
         break
 
       case 'requestBy':
-        updateSearchValue((prev) => ({ requestedBy: requestItem }))
+        updateSearchValue(() => ({ requestedBy: requestItem }))
         break
 
       case 'requestTime':
-        updateSearchValue((prev) => ({
+        updateSearchValue(() => ({
           startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
           endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
         }))
@@ -287,44 +294,15 @@ const LeaveRequest: React.FC = () => {
         sorter: true
       },
       {
-        key: '',
+        key: 'status',
         title: t('leaveRequest.status'),
         dataIndex: 'status',
         showSorterTooltip: false,
         ellipsis: true,
-        render: (_, record: ILeaveRequest) => {
-          const status: keyof TicketStatusType = record.status
+        render: (status) => {
           return (
             <div>
-              {isSystemAdmin ? (
-                <Space>
-                  {status !== TicketStatusEnum.CONFIRMED &&
-                    status !== TicketStatusEnum.REJECTED &&
-                    status !== TicketStatusEnum.CANCELLED && (
-                      <>
-                        <Tooltip title='Từ chối'>
-                          <CloseCircleOutlined
-                            className='tw-text-red-600 tw-text-2xl tw-cursor-pointer'
-                            onClick={() => showConfirm(TicketStatusEnum.REJECTED, record)}
-                          />
-                        </Tooltip>
-                        <Tooltip title='Đồng ý'>
-                          <CheckCircleOutlined
-                            className='tw-text-green-600 tw-text-2xl tw-cursor-pointer'
-                            onClick={() => showConfirm(TicketStatusEnum.FINISHED, record)}
-                          />
-                        </Tooltip>
-                      </>
-                    )}
-                  {(status === TicketStatusEnum.CONFIRMED ||
-                    status === TicketStatusEnum.REJECTED ||
-                    status === TicketStatusEnum.CANCELLED) && (
-                    <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
-                  )}
-                </Space>
-              ) : (
-                <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
-              )}
+              <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
             </div>
           )
         }
@@ -338,37 +316,44 @@ const LeaveRequest: React.FC = () => {
           return (
             <Space size='small'>
               {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Button
-                  size='small'
-                  onClick={() => handleClickUpdate('view', record)}
-                  icon={<InfoCircleOutlined className='tw-text-blue-600' />}
-                />
+                <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
+                  <img
+                    alt=''
+                    src={iconApprove}
+                    className='tw-cursor-pointer'
+                    onClick={() => onOpenModalApprove(record)}
+                  />
+                </Tooltip>
               )}
 
               {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Button
-                  size='small'
-                  onClick={() => handleClickUpdate('update', record)}
-                  icon={<EditOutlined className='tw-text-blue-600' />}
-                  disabled={record.createdBy !== userInfo?.userName}
-                />
-              )}
-
-              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Popconfirm
-                  title='Hủy yêu cầu'
-                  description='Bạn có chắc chắn muốn hủy yêu cầu'
-                  onConfirm={() => handleClickDelete(record)}
-                  okText={t('common.yes')}
-                  cancelText={t('common.no')}
-                  disabled={record.createdBy !== userInfo?.userName}
-                >
+                <Tooltip title='Cập nhật thông tin' className='tw-flex tw-items-center'>
                   <Button
                     size='small'
-                    icon={<DeleteOutlined className='tw-text-red-600' />}
+                    onClick={() => handleClickUpdate('update', record)}
+                    icon={<EditOutlined className='tw-text-blue-600' />}
                     disabled={record.createdBy !== userInfo?.userName}
                   />
-                </Popconfirm>
+                </Tooltip>
+              )}
+
+              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
+                <Tooltip title='Hủy yêu cầu'>
+                  <Popconfirm
+                    title='Hủy yêu cầu'
+                    description='Bạn có chắc chắn muốn hủy yêu cầu'
+                    onConfirm={() => handleClickDelete(record)}
+                    okText={t('common.yes')}
+                    cancelText={t('common.no')}
+                    disabled={record.createdBy !== userInfo?.userName}
+                  >
+                    <Button
+                      size='small'
+                      icon={<DeleteOutlined className='tw-text-red-600' />}
+                      disabled={record.createdBy !== userInfo?.userName}
+                    />
+                  </Popconfirm>
+                </Tooltip>
               )}
 
               {isSystemAdmin &&
@@ -454,10 +439,6 @@ const LeaveRequest: React.FC = () => {
           {t('leaveRequest.createNew')}
         </Button>
         <Space>
-          {/* {isSystemAdmin && (
-            <Checkbox onChange={(val) => onChangeRequest('onlyAssignToMe', val)}>Các yêu cầu cần tôi xử lý</Checkbox>
-          )} */}
-
           {(isSystemAdmin || isManagerDepartment) && (
             <Select
               onChange={(val) => onChangeRequest('requestBy', val)}
@@ -518,6 +499,86 @@ const LeaveRequest: React.FC = () => {
           }}
         />
       </div>
+
+      <Modal
+        title={`Yêu cầu `}
+        open={isModalAprroveOpen}
+        onOk={handleModalAprroveOk}
+        onCancel={handleModalAprroveCancel}
+        width='40%'
+        style={{ minWidth: 800 }}
+        footer={null}
+      >
+        <div className='tw-font-semibold tw-mb-3'>
+          {selectedTicket?.ticketCode} |{' '}
+          {ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name}
+          {selectedTicket?.status && (
+            <>
+              {' '}
+              | {
+                <Tag color={tagColorMapping(selectedTicket?.status)}>{TICKET_STATUS[selectedTicket?.status]}</Tag>
+              }{' '}
+            </>
+          )}
+        </div>
+        <div className='feature-container'>
+          <Row>
+            <Col span={24}>
+              <Row gutter={[0, 16]}>
+                <Col span={12} className='tw-flex'>
+                  <div style={{ minWidth: 150 }}>Thời gian bắt đầu:</div>
+                  <div className='tw-font-medium'>
+                    {dayjs(selectedTicket?.processStatus['0']?.attributes?.start_time).format('DD/MM/YYYY HH:mm:ss')}
+                  </div>
+                </Col>
+
+                <Col span={12} className='tw-flex'>
+                  <div style={{ minWidth: 150 }}>Thời gian kết thúc:</div>
+                  <div className='tw-font-medium'>
+                    {dayjs(selectedTicket?.processStatus['0']?.attributes?.end_time).format('DD/MM/YYYY HH:mm:ss')}
+                  </div>
+                </Col>
+
+                <Col span={12} className='tw-flex'>
+                  <div style={{ minWidth: 150 }}>Ngày yêu cầu:</div>
+                  <div className='tw-font-medium'>{dayjs(selectedTicket?.createdAt).format('DD/MM/YYYY HH:mm:ss')}</div>
+                </Col>
+
+                <Col span={12} className='tw-flex'>
+                  <div style={{ minWidth: 150 }}>Người yêu cầu:</div>
+                  <div className='tw-font-medium'>{selectedTicket?.createdBy}</div>
+                </Col>
+
+                <Col span={24} className='tw-flex'>
+                  <div style={{ minWidth: 150 }}>Ghi chú:</div>
+                  <div className='tw-font-medium tw-text-ellipsis'>
+                    {selectedTicket?.processStatus['0']?.attributes?.reason && (
+                      <div>{selectedTicket?.processStatus['0']?.attributes?.reason}</div>
+                    )}
+
+                    {selectedTicket?.processStatus['0']?.attributes?.reason && (
+                      <div>{selectedTicket?.processStatus['0']?.attributes?.description}</div>
+                    )}
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </div>
+
+        <div className='feature-container tw-mt-4'>
+          <Row>
+            <Col span={24} className='tw-mt-6'>
+              <div className='tw-flex tw-justify-center tw-items-center'>
+                <Space>
+                  <Button>Từ chối</Button>
+                  <Button className='tw-bg-green-600 tw-text-white'>Duyệt</Button>
+                </Space>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </Modal>
     </div>
   )
 }
