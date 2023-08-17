@@ -19,7 +19,7 @@ export interface IUser {
   userName: string
   editType: EDIT_TYPE
   status: USER_STATUS
-  remainLeaveHour?: number
+  createWithRemainLeaveHours: number
 }
 export interface GroupProfile {
   title: string
