@@ -123,15 +123,15 @@ export const convertMonthToLocaleVi = (month: string) => {
 export const tagColorMapping = (status?: string | number) => {
   switch (status) {
     case TicketStatusEnum.SUBMITTED:
-      return 'default'
-    case TicketStatusEnum.FINISHED:
-      return 'success'
-    case TicketStatusEnum.PROCESSING:
       return 'processing'
+    case TicketStatusEnum.FINISHED:
+      return '#16a34a'
+    case TicketStatusEnum.PROCESSING:
+      return '#108ee9'
     case TicketStatusEnum.CONFIRMED:
-      return 'success'
+      return '#16a34a'
     case TicketStatusEnum.REJECTED:
-      return 'error'
+      return 'red'
     case TicketStatusEnum.CANCELLED:
       return 'warning'
     default:

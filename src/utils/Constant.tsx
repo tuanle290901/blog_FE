@@ -54,7 +54,8 @@ export enum TicketStatusEnum {
   CONFIRMED = 'CONFIRMED',
   REJECTED = 'REJECTED',
   FINISHED = 'FINISHED',
-  CANCELLED = 'CANCELLED'
+  CANCELLED = 'CANCELLED',
+  PENDING = 'PENDING'
 }
 
 export const TICKET_STATUS: TicketStatusType = {
@@ -63,7 +64,8 @@ export const TICKET_STATUS: TicketStatusType = {
   CONFIRMED: 'Đã xác nhận',
   REJECTED: 'Từ chối',
   CANCELLED: 'Đã hủy',
-  FINISHED: 'Hoàn thành'
+  FINISHED: 'Hoàn thành',
+  PENDING: 'Đợi xử lý'
 }
 
 export const VALIDATE_FORM = {

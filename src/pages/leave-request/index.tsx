@@ -217,6 +217,7 @@ const LeaveRequest: React.FC = () => {
     }
     await dispatch(updateLeaveRequest(payload))
     await dispatch(filterLeaveRequest(searchValue))
+    setIsModalApproveOpen(false)
   }
 
   const columns = useMemo(() => {
@@ -302,7 +303,9 @@ const LeaveRequest: React.FC = () => {
         render: (status) => {
           return (
             <div>
-              <Tag color={tagColorMapping(status)}>{TICKET_STATUS[status]}</Tag>
+              <Tag style={{ minWidth: 80, textAlign: 'center' }} color={tagColorMapping(status)}>
+                {TICKET_STATUS[status]}
+              </Tag>
             </div>
           )
         }
@@ -415,6 +418,8 @@ const LeaveRequest: React.FC = () => {
     })
   }
 
+  console.log(selectedTicket)
+
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <LeaveRequestForm
@@ -501,7 +506,9 @@ const LeaveRequest: React.FC = () => {
       </div>
 
       <Modal
-        title={`Yêu cầu `}
+        title={`Yêu cầu ${selectedTicket?.ticketCode} - ${
+          ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name
+        }`}
         open={isModalAprroveOpen}
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
@@ -509,22 +516,26 @@ const LeaveRequest: React.FC = () => {
         style={{ minWidth: 800 }}
         footer={null}
       >
-        <div className='tw-font-semibold tw-mb-3'>
-          {selectedTicket?.ticketCode} |{' '}
-          {ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name}
-          {selectedTicket?.status && (
-            <>
-              {' '}
-              | {
-                <Tag color={tagColorMapping(selectedTicket?.status)}>{TICKET_STATUS[selectedTicket?.status]}</Tag>
-              }{' '}
-            </>
-          )}
-        </div>
+        {selectedTicket?.status && (
+          <div className='tw-mb-3 tw-text-base tw-font-semibold'>
+            Trạng thái yêu cầu:{' '}
+            <Tag
+              style={{ lineHeight: 2.5, minWidth: 80, textAlign: 'center' }}
+              color={tagColorMapping(selectedTicket?.status)}
+            >
+              {TICKET_STATUS[selectedTicket?.status]}
+            </Tag>
+          </div>
+        )}
+
         <div className='feature-container'>
           <Row>
             <Col span={24}>
               <Row gutter={[0, 16]}>
+                <Col span={24} className='tw-flex'>
+                  <div className='tw-font-semibold'>Yêu cầu đăng ký</div>
+                </Col>
+
                 <Col span={12} className='tw-flex'>
                   <div style={{ minWidth: 150 }}>Thời gian bắt đầu:</div>
                   <div className='tw-font-medium'>
@@ -566,18 +577,67 @@ const LeaveRequest: React.FC = () => {
           </Row>
         </div>
 
-        <div className='feature-container tw-mt-4'>
-          <Row>
-            <Col span={24} className='tw-mt-6'>
-              <div className='tw-flex tw-justify-center tw-items-center'>
-                <Space>
-                  <Button>Từ chối</Button>
-                  <Button className='tw-bg-green-600 tw-text-white'>Duyệt</Button>
-                </Space>
-              </div>
-            </Col>
-          </Row>
-        </div>
+        {selectedTicket?.ticketDefinitionId !== 'TD_BUSINESS_TRIP' && (
+          <div className='feature-container tw-mt-4'>
+            <Row>
+              <Col span={24}>
+                <Row gutter={[0, 16]}>
+                  <Col span={24} className='tw-flex'>
+                    <div className='tw-font-semibold'>Phê duyệt yêu cầu</div>
+                  </Col>
+
+                  <Col span={12} className='tw-flex'>
+                    <div style={{ minWidth: 150 }}>Người duyệt:</div>
+                    <div className='tw-font-medium'>{selectedTicket?.processStatus['1']?.executors[0]}</div>
+                  </Col>
+                </Row>
+              </Col>
+              {isSystemAdmin &&
+                selectedTicket &&
+                selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
+                  <Col span={24} className='tw-mt-6'>
+                    <div className='tw-flex tw-justify-center tw-items-center'>
+                      <Space>
+                        <Button
+                          danger
+                          className='tw-min-w-[100px]'
+                          onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
+                        >
+                          Từ chối
+                        </Button>
+                        <Button
+                          type='primary'
+                          className='tw-min-w-[100px] tw-text-white'
+                          onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
+                        >
+                          Duyệt
+                        </Button>
+                      </Space>
+                    </div>
+                  </Col>
+                )}
+            </Row>
+          </div>
+        )}
+
+        {selectedTicket?.ticketDefinitionId === 'TD_BUSINESS_TRIP' && (
+          <div className='feature-container tw-mt-4'>
+            <Row>
+              <Col span={24}>
+                <Row gutter={[0, 16]}>
+                  <Col span={24} className='tw-flex'>
+                    <div className='tw-font-semibold'>Phê duyệt yêu cầu</div>
+                  </Col>
+
+                  <Col span={12} className='tw-flex'>
+                    <div style={{ minWidth: 150 }}>Người duyệt:</div>
+                    <div className='tw-font-medium'>{selectedTicket?.processStatus['1']?.executors[0]}</div>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </div>
+        )}
       </Modal>
     </div>
   )
