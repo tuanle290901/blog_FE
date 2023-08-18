@@ -270,7 +270,7 @@ const UserCreateEdit: React.FC<{
       }
       maskClosable={false}
       forceRender
-      width={1000}
+      width={1100}
       centered
     >
       <div>
@@ -406,7 +406,7 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterEmail')}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.address')} name='address'>
+                <Form.Item style={{ marginBottom: '10px' }} label={t('userList.address')} name='address'>
                   <Input
                     disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
                     placeholder={t('userModal.enterAddress')}
@@ -430,11 +430,7 @@ const UserCreateEdit: React.FC<{
             </Col>
             <Col xs={24} lg={12}>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
-              <div
-                className={`tw-p-4 tw-bg-[#FAFAFA] ${
-                  userData?.userName ? 'tw-h-[602px]' : 'tw-h-[516px]'
-                }   tw-overflow-auto`}
-              >
+              <div className={`tw-p-4 tw-bg-[#FAFAFA] ${userData?.userName ? 'tw-h-[602px]' : 'tw-h-[502px]'}`}>
                 <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate' required>
                   {userData ? (
                     <DatePicker
@@ -485,40 +481,48 @@ const UserCreateEdit: React.FC<{
                     placeholder={t('userModal.enterOfficialContractSigningDate')}
                   />
                 </Form.Item>
-                <Form.Item
-                  style={{ marginBottom: 24 }}
-                  label={
-                    <>
+                {hasPermissionAddAndChangeRole() && userData?.status !== USER_STATUS.DEACTIVE && (
+                  <>
+                    <div className='form-item__label required'>
                       <span>{t('userModal.remainLeaveHour')}</span>
                       {remainLeaveHour > 0 && (
                         <span className='tw-text-orange-600 tw-ml-1'>
                           ({(remainLeaveHour / 8).toFixed(2)} {t('timesheet.day')})
                         </span>
                       )}
-                    </>
-                  }
-                  name='createWithRemainLeaveHours'
-                  required
-                  initialValue={userData?.createWithRemainLeaveHours || 0}
-                  rules={[
-                    {
-                      required: true,
-                      message: t('userModal.errorMessage.remainLeaveHourIsEmpty')
-                    },
-                    {
-                      pattern: REGEX_POSITIVE_NUMBER,
-                      message: t('Số giờ nghỉ phép còn lại phải lớn hơn 0')
-                    }
-                  ]}
-                >
-                  <Input
-                    disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
-                    placeholder={t('userModal.enterRemainLeaveHour')}
-                    type='number'
-                    min={0}
-                    onChange={(e) => setRemainLeaveHour(Number(e?.target?.value))}
-                  />
-                </Form.Item>
+                    </div>
+                    <div className='tw-text-yellow-600 tw-ml-[10px] tw-mb-[10px] tw-text-[13px]'>
+                      <p>- Bắt buộc nhập khi tạo mới thành viên.</p>
+                      <p>
+                        - Việc cập nhật lại sẽ không có tác dụng nếu thành viên đó đã từng được phê duyệt yêu cầu nghỉ
+                        phép trong hệ thống.
+                      </p>
+                    </div>
+                    <Form.Item
+                      style={{ marginBottom: 24 }}
+                      name='createWithRemainLeaveHours'
+                      required
+                      initialValue={userData?.createWithRemainLeaveHours || 0}
+                      rules={[
+                        {
+                          required: true,
+                          message: t('userModal.errorMessage.remainLeaveHourIsEmpty')
+                        },
+                        {
+                          pattern: REGEX_POSITIVE_NUMBER,
+                          message: t('Số giờ nghỉ phép còn lại phải lớn hơn 0')
+                        }
+                      ]}
+                    >
+                      <Input
+                        placeholder={t('userModal.enterRemainLeaveHour')}
+                        type='number'
+                        min={0}
+                        onChange={(e) => setRemainLeaveHour(Number(e?.target?.value))}
+                      />
+                    </Form.Item>
+                  </>
+                )}
                 <Form.List name='groupProfiles' initialValue={groupProfiles}>
                   {(fields = groupProfiles, { add, remove }) => (
                     <>
@@ -532,7 +536,7 @@ const UserCreateEdit: React.FC<{
                           )}
                           <Form.Item
                             {...restField}
-                            style={{ marginBottom: 8 }}
+                            style={{ marginBottom: 24 }}
                             label={t('userList.department')}
                             name={[name, 'groupCode']}
                             required
@@ -560,7 +564,6 @@ const UserCreateEdit: React.FC<{
                             </Form.Item>
                             <Form.Item
                               {...restField}
-                              style={{ marginBottom: 24 }}
                               label={t('userModal.systemRole')}
                               name={[name, 'role']}
                               rules={[{ required: true, message: t('userModal.errorMessage.roleEmpty') }]}

@@ -240,3 +240,13 @@
 .ant-table-column-sorter-down.active svg {
   color: #fff;
 }
+
+.form-item__label.required::before {
+  display: inline-block;
+  margin-inline-end: 4px;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: '*';
+}
