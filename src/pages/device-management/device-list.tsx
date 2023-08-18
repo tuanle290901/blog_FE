@@ -11,7 +11,17 @@ import {
   EyeOutlined,
   CheckOutlined
 } from '@ant-design/icons'
-import { Button, Input, notification, Popconfirm, Space, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import {
+  Button,
+  Input,
+  notification,
+  Popconfirm,
+  Space,
+  Table,
+  TableColumnsType,
+  TablePaginationConfig,
+  Tooltip
+} from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -117,25 +127,29 @@ const DeviceList: React.FC = () => {
         title: t('device.name'),
         dataIndex: 'name',
         sortOrder: getSortOrder('name'),
-        ellipsis: true
+        ellipsis: true,
+        width: '200px'
       },
       {
         key: 'ipAddress',
         title: t('device.ipAddress'),
         dataIndex: 'ipAddress',
-        ellipsis: true
+        ellipsis: true,
+        width: '140px'
       },
       {
         key: 'port',
         title: t('device.port'),
         dataIndex: 'port',
-        ellipsis: true
+        ellipsis: true,
+        width: '130px'
       },
       {
         key: 'groupName',
         title: t('device.groupName'),
         dataIndex: 'groupName',
-        ellipsis: true
+        ellipsis: true,
+        width: '250px'
       },
       {
         key: 'status',
@@ -163,16 +177,6 @@ const DeviceList: React.FC = () => {
                   <MinusCircleFilled className='tw-text-[#f33c3c] tw-mr-1' /> {t(`device.${record?.status}`)}
                 </div>
               )}
-              {/* <Switch
-                checkedChildren={
-                  <div>
-                    <CheckOutlined className='tw-mr-1' />
-                    Kích hoạt
-                  </div>
-                }
-                unCheckedChildren='Hủy kích hoạt'
-                defaultChecked={record?.status === DEVICE_STATUS.ACTIVE}
-              /> */}
             </div>
           )
         }
@@ -186,39 +190,47 @@ const DeviceList: React.FC = () => {
           if (record?.status !== DEVICE_STATUS.DEACTIVE) {
             return (
               <Space size='small'>
-                <Button
-                  size='small'
-                  onClick={() => handleClickEditDevice(record, ACTION_TYPE.Updated)}
-                  icon={<EditOutlined className='tw-text-blue-600' />}
-                />
-                <Popconfirm
-                  title={t('device.confirmDeleteDeviceTitle')}
-                  description={t('device.confirmDeleteDevice')}
-                  onConfirm={() => handleClickDeleteUser(record)}
-                  okText={t('common.yes')}
-                  cancelText={t('common.no')}
-                >
-                  <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-                </Popconfirm>
+                <Tooltip title={t('device.updateDevice')} placement='left'>
+                  <Button
+                    size='small'
+                    onClick={() => handleClickEditDevice(record, ACTION_TYPE.Updated)}
+                    icon={<EditOutlined className='tw-text-blue-600' />}
+                  />
+                </Tooltip>
+                <Tooltip title={t('device.confirmDeleteDeviceTitle')} placement='left'>
+                  <Popconfirm
+                    title={t('device.confirmDeleteDeviceTitle')}
+                    description={t('device.confirmDeleteDevice')}
+                    onConfirm={() => handleClickDeleteUser(record)}
+                    okText={t('common.yes')}
+                    cancelText={t('common.no')}
+                  >
+                    <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                  </Popconfirm>
+                </Tooltip>
               </Space>
             )
           } else {
             return (
               <Space size='small'>
-                <Button
-                  size='small'
-                  onClick={() => handleClickEditDevice(record, ACTION_TYPE.View)}
-                  icon={<EyeOutlined className='tw-text-blue-600' />}
-                />
-                <Popconfirm
-                  title={t('device.confirmActiveDeviceTitle')}
-                  description={t('device.confirmActiveDevice')}
-                  onConfirm={() => handleActiveDevice(record)}
-                  okText={t('common.yes')}
-                  cancelText={t('common.no')}
-                >
-                  <Button size='small' icon={<CheckOutlined className='tw-text-green-500' />} />
-                </Popconfirm>
+                <Tooltip title={t('device.viewDevice')} placement='left'>
+                  <Button
+                    size='small'
+                    onClick={() => handleClickEditDevice(record, ACTION_TYPE.View)}
+                    icon={<EyeOutlined className='tw-text-blue-600' />}
+                  />
+                </Tooltip>
+                <Tooltip title={t('device.confirmActiveDeviceTitle')} placement='left'>
+                  <Popconfirm
+                    title={t('device.confirmActiveDeviceTitle')}
+                    description={t('device.confirmActiveDevice')}
+                    onConfirm={() => handleActiveDevice(record)}
+                    okText={t('common.yes')}
+                    cancelText={t('common.no')}
+                  >
+                    <Button size='small' icon={<CheckOutlined className='tw-text-green-500' />} />
+                  </Popconfirm>
+                </Tooltip>
               </Space>
             )
           }
@@ -279,11 +291,6 @@ const DeviceList: React.FC = () => {
       const sorts: ISort[] = []
       if (sorter.order) {
         sorts.push({ field: sorter.field as string, direction: sorter.order === 'ascend' ? 'ASC' : 'DESC' })
-      } else {
-        sorts.push({
-          direction: 'DESC',
-          field: 'created_at'
-        })
       }
       return { ...prevState, paging, sorts }
     })
@@ -308,11 +315,11 @@ const DeviceList: React.FC = () => {
       />
       <div>
         <h1 className='tw-text-2xl tw-font-semibold'>
-          {t('device.deviceListTitle')}({meta.total})
+          {t('device.deviceListTitle')} ({meta.total})
         </h1>
         <h5 className='tw-text-sm'>{t('device.deviceListSubTitle')}</h5>
       </div>
-      <div className='tw-flex tw-my-3 tw-justify-between '>
+      <div className='tw-flex tw-my-3 tw-justify-between tw-flex-wrap tw-gap-4'>
         <Button
           onClick={() => {
             setIsOpenModal({
@@ -328,7 +335,7 @@ const DeviceList: React.FC = () => {
         </Button>
         <Input.Search
           className='tw-w-64'
-          placeholder='Tìm kiếm thiết bị'
+          placeholder={t('device.searchDeviceByKeyword')}
           onChange={(event) => handleSearchValueChange(event.target.value)}
         />
       </div>

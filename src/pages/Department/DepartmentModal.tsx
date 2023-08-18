@@ -7,10 +7,8 @@ import { createDepartment, getListDepartments, updateDepartment } from '~/stores
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
-
 import dayjs from 'dayjs'
 import { RuleObject } from 'antd/lib/form'
-import { HttpStatusCode } from 'axios'
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data, dataParent } = props
@@ -129,9 +127,13 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       okText={`${t('common.save')}`}
       cancelText={`${t('common.cancel')}`}
       title={
-        typeModel === ACTION_TYPE.Created
-          ? `${t('department.departmentAdd')}`
-          : `${t('department.departmentUpdate', { name: data && data.name })}`
+        typeModel === ACTION_TYPE.Created ? (
+          `${t('department.departmentAdd')}`
+        ) : (
+          <span>
+            {t('department.departmentUpdate')}:<span className='tw-italic tw-ml-2'>{data?.name}</span>
+          </span>
+        )
       }
       maskClosable={false}
     >

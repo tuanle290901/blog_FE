@@ -88,7 +88,13 @@ const CreateEditDevice: React.FC<{
   return (
     <Modal
       open={open}
-      title={t('device.addDevice')}
+      title={
+        deviceData?.id
+          ? typeAction === ACTION_TYPE.Updated
+            ? t('device.updateDevice')
+            : t('device.viewDevice')
+          : t('device.addDevice')
+      }
       onCancel={onCancel}
       onOk={form.submit}
       okText={t('common.save')}
