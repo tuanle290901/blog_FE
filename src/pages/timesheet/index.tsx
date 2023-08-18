@@ -191,9 +191,9 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const renderStatusByWorkingAmount = (reportData: IReportData) => {
-    if (reportData?.workingAmount === null) return
-    if (reportData?.workingAmount < 8) {
+  const renderStatusByPayrollAmount = (reportData: IReportData) => {
+    if (reportData?.payrollAmount === null) return
+    if (reportData?.payrollAmount < 8) {
       return (
         <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -201,7 +201,7 @@ const Timesheet: React.FC = () => {
         </div>
       )
     }
-    if (reportData?.workingAmount >= 8 && reportData?.violates?.length < 1) {
+    if (reportData?.payrollAmount >= 8 && reportData?.violates?.length < 1) {
       return (
         <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -304,7 +304,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return renderStatusByWorkingAmount(reportData)
+        return renderStatusByPayrollAmount(reportData)
       }
     },
     {
@@ -359,9 +359,17 @@ const Timesheet: React.FC = () => {
     {
       title: t('timesheet.workingAmount'),
       align: 'center',
-      width: '120px',
+      width: '150px',
       render: (record) => {
         return <span>{record?.reportData?.workingAmount?.toFixed(2)}</span>
+      }
+    },
+    {
+      title: t('timesheet.payrollAmount'),
+      align: 'center',
+      width: '150px',
+      render: (record) => {
+        return <span>{record?.reportData?.payrollAmount?.toFixed(2)}</span>
       }
     },
     {
