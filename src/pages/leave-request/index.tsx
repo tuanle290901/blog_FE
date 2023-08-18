@@ -44,6 +44,7 @@ import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-requ
 import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { tagColorMapping } from '~/utils/helper'
 import './style.scss'
+import TextArea from 'antd/es/input/TextArea'
 const { confirm } = Modal
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
@@ -381,9 +382,7 @@ const LeaveRequest: React.FC = () => {
 
   useEffect(() => {
     dispatch(getAllDefinationType())
-    if (isSystemAdmin || isManagerDepartment) {
-      dispatch(searchUser(filterUserPayload))
-    }
+    dispatch(searchUser(filterUserPayload))
   }, [])
 
   useEffect(() => {
@@ -621,22 +620,99 @@ const LeaveRequest: React.FC = () => {
         )}
 
         {selectedTicket?.ticketDefinitionId === 'TD_BUSINESS_TRIP' && (
-          <div className='feature-container tw-mt-4'>
-            <Row>
-              <Col span={24}>
-                <Row gutter={[0, 16]}>
-                  <Col span={24} className='tw-flex'>
-                    <div className='tw-font-semibold'>Phê duyệt yêu cầu</div>
-                  </Col>
+          <>
+            <div className='feature-container tw-mt-4'>
+              <Row>
+                <Col span={24}>
+                  <Row gutter={[0, 16]}>
+                    <Col span={24} className='tw-flex'>
+                      <div className='tw-font-semibold'>Duyệt đăng ký</div>
+                    </Col>
 
-                  <Col span={12} className='tw-flex'>
-                    <div style={{ minWidth: 150 }}>Người duyệt:</div>
-                    <div className='tw-font-medium'>{selectedTicket?.processStatus['1']?.executors[0]}</div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </div>
+                    <Col span={24} className='tw-flex'>
+                      <Row className='tw-w-full' align={'middle'}>
+                        <Col span={8}>Ý kiến:</Col>
+                        <Col span={16}>
+                          <TextArea className='tw-w-full' placeholder={'Ý kiến'} />
+                        </Col>
+                      </Row>
+                    </Col>
+
+                    {isSystemAdmin &&
+                      selectedTicket &&
+                      selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
+                        <Col span={24} className='tw-mt-6'>
+                          <div className='tw-flex tw-justify-center tw-items-center'>
+                            <Space>
+                              <Button
+                                danger
+                                className='tw-min-w-[100px]'
+                                onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
+                              >
+                                Từ chối
+                              </Button>
+                              <Button
+                                type='primary'
+                                className='tw-min-w-[100px] tw-text-white'
+                                onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
+                              >
+                                Duyệt
+                              </Button>
+                            </Space>
+                          </div>
+                        </Col>
+                      )}
+                  </Row>
+                </Col>
+              </Row>
+            </div>
+
+            <div className='feature-container tw-mt-4'>
+              <Row>
+                <Col span={24}>
+                  <Row gutter={[0, 16]}>
+                    <Col span={24} className='tw-flex'>
+                      <div className='tw-font-semibold'>Giải trình</div>
+                    </Col>
+
+                    <Col span={24} className='tw-flex'>
+                      <Row className='tw-w-full' align={'middle'}>
+                        <Col span={8}>Ý kiến:</Col>
+                        <Col span={16}>
+                          <TextArea className='tw-w-full' placeholder={'Ý kiến'} />
+                        </Col>
+                      </Row>
+                    </Col>
+
+                    {isSystemAdmin &&
+                      selectedTicket &&
+                      selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
+                        <Col span={24} className='tw-mt-6'>
+                          <div className='tw-flex tw-justify-center tw-items-center'>
+                            <Space>
+                              <Button
+                                danger
+                                className='tw-min-w-[100px]'
+                                onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
+                              >
+                                Từ chối
+                              </Button>
+                              <Button
+                                type='primary'
+                                className='tw-min-w-[100px] tw-text-white'
+                                onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
+                              >
+                                Duyệt
+                              </Button>
+                            </Space>
+                          </div>
+                        </Col>
+                      )}
+                  </Row>
+                </Col>
+              </Row>
+            </div>
+          </>
         )}
       </Modal>
     </div>

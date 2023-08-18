@@ -48,8 +48,8 @@ const Index = () => {
                   <Progress
                     type='circle'
                     percent={
-                      (leaveBalanceInfo?.totalAbsenceHours /
-                        (leaveBalanceInfo?.totalUsedLeaveHours + leaveBalanceInfo?.totalAbsenceHours)) *
+                      (leaveBalanceInfo?.totalRemainLeaveHours /
+                        (leaveBalanceInfo?.totalRemainLeaveHours + leaveBalanceInfo?.totalUsedLeaveHours)) *
                       100
                     }
                     strokeColor={{
@@ -60,8 +60,8 @@ const Index = () => {
                     strokeLinecap='round'
                     status={'normal'}
                     format={() =>
-                      `${Number(leaveBalanceInfo?.totalAbsenceHours)?.toFixed(1)}/${Number(
-                        (leaveBalanceInfo?.totalUsedLeaveHours + leaveBalanceInfo?.totalAbsenceHours)?.toFixed(1)
+                      `${Number(leaveBalanceInfo?.totalRemainLeaveHours)?.toFixed(1)}/${Number(
+                        (leaveBalanceInfo?.totalRemainLeaveHours + leaveBalanceInfo?.totalUsedLeaveHours)?.toFixed(1)
                       )}`
                     }
                   />
@@ -111,7 +111,7 @@ const Index = () => {
               <Col xs={24} xl={12} xxl={8}>
                 {renderRow(
                   'Số giờ nghỉ phép còn lại',
-                  Number((leaveBalanceInfo?.totalAbsenceHours ?? 0).toFixed(1)),
+                  Number((leaveBalanceInfo?.totalRemainLeaveHours ?? 0).toFixed(1)),
                   'giờ'
                 )}
                 {renderRow(
@@ -134,6 +134,8 @@ const Index = () => {
                 {renderRow('Ca 1 (17h - 22h):', 0, 'giờ', 'child')}
                 {renderRow('Ca 2 (22h - 06h):', 0, 'giờ', 'child')}
                 {renderRow('Ca 3 (06h - 08h):', 0, 'giờ', 'child')}
+                {renderRow('Ngày nghỉ:', 0, 'giờ', 'child')}
+                {renderRow('Ngày lễ:', 0, 'giờ', 'child')}
               </Col>
             </Row>
           </>
