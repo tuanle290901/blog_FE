@@ -7,7 +7,7 @@ import {
   EyeOutlined,
   PlusOutlined,
   UndoOutlined,
-  SyncOutlined
+  LockOutlined
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
@@ -302,7 +302,7 @@ const UserList: React.FC = () => {
                           okText={t('common.confirm')}
                           cancelText={t('common.cancel')}
                         >
-                          <Button size='small' icon={<SyncOutlined className='tw-text-blue-600' />} />
+                          <Button size='small' icon={<LockOutlined className='tw-text-blue-600' />} />
                         </Popconfirm>
                       </Tooltip>
                     </>

@@ -2,7 +2,7 @@
 import { DatePicker, Form, Input, Modal, notification } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_SPECIAL_CHARS, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
+import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_SPECIAL_CHARS, REGEX_ONLYTEXT } from '~/constants/regex.constant'
 import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
@@ -160,12 +160,12 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
               message: `${t('department.please-insert-input')} ${t('department.name')}`
             },
             {
-              pattern: REGEX_SPECIAL_TRIM,
+              pattern: REGEX_ONLYTEXT,
               message: `${t('department.alter-notification.do-not-leave-spaces-special-accents')}`
             }
           ]}
         >
-          <Input placeholder={`${t('department.please-insert-input')}`} />
+          <Input placeholder={`${t('department.please-insert-input')}`} min={10} />
         </Form.Item>
         <Form.Item
           name='contactEmail'
