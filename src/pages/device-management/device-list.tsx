@@ -60,12 +60,7 @@ const DeviceList: React.FC = () => {
       total: 0,
       totalPage: 0
     },
-    sorts: [
-      {
-        direction: 'DESC',
-        field: 'created_at'
-      }
-    ]
+    sorts: []
   })
 
   const handleClickEditDevice = (record: IDevice, typeAction: string) => {
@@ -147,6 +142,10 @@ const DeviceList: React.FC = () => {
         title: t('device.status'),
         dataIndex: 'status',
         ellipsis: true,
+        sorter: true,
+        sortOrder: getSortOrder('status'),
+        showSorterTooltip: false,
+        width: '160px',
         render: (_, record) => {
           return (
             <div className='tw-flex tw-justify-left tw-items-left'>
