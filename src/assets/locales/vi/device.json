@@ -6,6 +6,7 @@
     "action": "Hành động",
     "addDevice": "Thêm thiết bị",
     "updateDevice": "Cập nhật thông tin thiết bị",
+    "viewDevice": "Xem thông tin thiết bị",
     "deviceListTitle": "Danh sách thiết bị chấm công",
     "deviceListSubTitle": "Quản lí các thiết bị chấm công có trong hệ thống",
     "enterDeviceCode": "Nhập mã thiết bị",
@@ -28,6 +29,7 @@
     "confirmActiveDevice": "Bạn có chắc chắn muốn kích hoạt thiết bị này không?",
     "confirmActiveDeviceTitle": "Kích hoạt thiết bị",
     "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa thiết bị này không?",
-    "confirmDeleteDeviceTitle": "Xóa thiết bị"
+    "confirmDeleteDeviceTitle": "Xóa thiết bị",
+    "searchDeviceByKeyword": "Tìm kiếm thiết bị"
   }
 }

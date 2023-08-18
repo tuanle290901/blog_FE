@@ -32,12 +32,12 @@ export const getListDevice = createAsyncThunk(
     try {
       const defaultSorts = [
         {
-          direction: 'DESC',
-          field: 'created_at'
-        },
-        {
           direction: 'ASC',
           field: 'status'
+        },
+        {
+          direction: 'DESC',
+          field: 'created_at'
         }
       ]
       const body: any = {
