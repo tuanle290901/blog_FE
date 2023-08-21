@@ -3,9 +3,11 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   Button,
+  Col,
   DatePicker,
   Modal,
   Popconfirm,
+  Row,
   Select,
   Space,
   Table,
@@ -26,6 +28,7 @@ import { getListDepartments } from '~/stores/features/department/department.silc
 import {
   TicketRequestPayload,
   cancelEditing,
+  countLeaveRequest,
   deleteLeaveRequest,
   filterLeaveRequest,
   getAllDefinationType,
@@ -82,6 +85,7 @@ const LeaveRequest: React.FC = () => {
   const users = useAppSelector((item) => item.user.userList)
   const departments = useAppSelector((item) => item.department.listData)
   const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
+  const countLeaveRequestSate = useAppSelector((state) => state.leaveRequest.countLeaveRequest)
   const isLoading = useAppSelector((state) => state.leaveRequest.loading)
   const [isApprovedSuccess, setIsApprovedSuccess] = useState<boolean>(false)
 
@@ -366,6 +370,7 @@ const LeaveRequest: React.FC = () => {
     dispatch(getAllDefinationType())
     dispatch(searchUser(filterUserPayload))
     dispatch(getListDepartments())
+    dispatch(countLeaveRequest())
   }, [])
 
   useEffect(() => {
@@ -398,6 +403,13 @@ const LeaveRequest: React.FC = () => {
         sort: sorts
       }
     })
+  }
+
+  const getPercentage = (amount: number) => {
+    const percent =
+      (amount / (countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted)) *
+      100
+    return percent?.toFixed(0) || 0
   }
 
   return (
@@ -454,6 +466,39 @@ const LeaveRequest: React.FC = () => {
             })}
           />
         </Space>
+      </div>
+      <Row gutter={[16, 16]} className='leave-request-count'>
+        <Col xs={24} lg={8} className='leave-request-count-title'>
+          Số yêu cầu trong tháng
+          <span>
+            {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
+          </span>
+        </Col>
+        <Col xs={24} lg={16} className='leave-request-count-detail'>
+          <div className='leave-request-count-detail__item'>
+            Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+          </div>
+          <div className='leave-request-count-detail__item leave-request-count-detail__item--rejected'>
+            Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+          </div>
+          <div className='leave-request-count-detail__item leave-request-count-detail__item--submitted'>
+            Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+          </div>
+        </Col>
+      </Row>
+      <div className='leave-request-percent'>
+        <div
+          className='leave-request-percent__item'
+          style={{ width: `${getPercentage(countLeaveRequestSate.approved)}%` }}
+        ></div>
+        <div
+          style={{ width: `${getPercentage(countLeaveRequestSate.rejected)}%` }}
+          className='leave-request-percent__item tw-bg-[#cf1322]'
+        ></div>
+        <div
+          style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
+          className='leave-request-percent__item tw-bg-[#1677ff]'
+        ></div>
       </div>
 
       <div>
