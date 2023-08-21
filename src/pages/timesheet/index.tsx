@@ -44,21 +44,9 @@ const Timesheet: React.FC = () => {
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
-  const userOptions = usersInGroupSate?.map((item) => {
-    return {
-      value: item?.id,
-      label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
-    }
-  })
-  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
-    const options = groupsSate.map((item) => {
-      return { value: item?.code, label: item?.name }
-    })
-    return [{ value: 'ALL', label: t('userList.allGroup') }, ...options]
-  }, [groupsSate])
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
-  const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
+  const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(true)
   // const [selectedUser, setSelectedUser] = useState(
   //   currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
   // )
@@ -78,6 +66,22 @@ const Timesheet: React.FC = () => {
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
+  const userOptions = usersInGroupSate?.map((item) => {
+    return {
+      value: item?.id,
+      label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
+    }
+  })
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    const options = groupsSate.map((item) => {
+      return { value: item?.code, label: item?.name }
+    })
+    if (isAllowedAccess) {
+      return [{ value: 'ALL', label: t('userList.allGroup') }, ...options]
+    } else {
+      return [...options]
+    }
+  }, [groupsSate])
 
   const [searchValue, setSearchValue] = useState<{
     query: string
@@ -202,7 +206,7 @@ const Timesheet: React.FC = () => {
 
   const renderStatusByPayrollAmount = (reportData: IReportData) => {
     if (reportData?.payrollAmount === null) return
-    if (reportData?.payrollAmount < 8) {
+    if (reportData?.payrollAmount < 8 || reportData?.violates?.length > 0) {
       return (
         <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -210,7 +214,7 @@ const Timesheet: React.FC = () => {
         </div>
       )
     }
-    if (reportData?.payrollAmount >= 8 && reportData?.violates?.length < 1) {
+    if (reportData?.payrollAmount >= 8) {
       return (
         <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -609,7 +613,8 @@ const Timesheet: React.FC = () => {
                               groupCode: searchValue.group,
                               startDate: searchValue.startDate,
                               endDate: searchValue.endDate,
-                              userId: searchValue.userId
+                              userId: searchValue.userId,
+                              onlyShowWorkingDay: searchValue.onlyShowWorkingDay
                             })
                           )
                         }
