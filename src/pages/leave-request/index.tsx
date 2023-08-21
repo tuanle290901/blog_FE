@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   Button,
-  Col,
   DatePicker,
   Modal,
   Popconfirm,
-  Row,
   Select,
   Space,
   Table,
@@ -24,6 +22,7 @@ import { useTranslation } from 'react-i18next'
 import iconApprove from '~/assets/images/approved.png'
 import { ROLE } from '~/constants/app.constant'
 import LeaveRequestForm from '~/pages/leave-request/leave-request-form'
+import { getListDepartments } from '~/stores/features/department/department.silce'
 import {
   TicketRequestPayload,
   cancelEditing,
@@ -33,19 +32,17 @@ import {
   resetLeaveRequest,
   resetValueFilter,
   setValueFilter,
-  startEditing,
-  updateLeaveRequest
+  startEditing
 } from '~/stores/features/leave-request/leave-request.slice'
 import { searchUser } from '~/stores/features/user/user.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
-import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
+import { ILeaveRequest } from '~/types/leave-request'
 import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { tagColorMapping } from '~/utils/helper'
+import ModalApprove from './ModalApprove'
 import './style.scss'
-import TextArea from 'antd/es/input/TextArea'
-const { confirm } = Modal
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -83,13 +80,15 @@ const LeaveRequest: React.FC = () => {
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
   const users = useAppSelector((item) => item.user.userList)
+  const departments = useAppSelector((item) => item.department.listData)
   const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
   const isLoading = useAppSelector((state) => state.leaveRequest.loading)
+  const [isApprovedSuccess, setIsApprovedSuccess] = useState<boolean>(false)
 
   const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const [canUpdateForm, setCanUpdateForm] = useState<boolean>(true)
-  const [isModalAprroveOpen, setIsModalApproveOpen] = useState<boolean>(false)
+  const [isOpenModalApprove, setIsOpenModalApprove] = useState<boolean>(false)
   const [selectedTicket, setSelectedTicket] = useState<ILeaveRequest>()
   const isSystemAdmin = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const isManagerDepartment = userInfo?.groupProfiles.find(
@@ -153,16 +152,16 @@ const LeaveRequest: React.FC = () => {
   }
 
   const handleModalAprroveOk = () => {
-    setIsModalApproveOpen(false)
+    setIsOpenModalApprove(false)
   }
 
   const handleModalAprroveCancel = () => {
-    setIsModalApproveOpen(false)
+    setIsOpenModalApprove(false)
   }
 
   const onOpenModalApprove = (record: ILeaveRequest) => {
-    setIsModalApproveOpen(true)
     setSelectedTicket(record)
+    setIsOpenModalApprove(true)
   }
 
   const onChangeRequest = (type: string, requestItem: string | any) => {
@@ -190,36 +189,21 @@ const LeaveRequest: React.FC = () => {
         break
 
       case 'requestStatus':
-        updateSearchValue((prev) => ({ statuses: requestItem }))
+        updateSearchValue(() => ({ statuses: requestItem }))
         break
     }
   }
 
-  const showConfirm = (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
-    confirm({
-      title: status === TicketStatusEnum.FINISHED ? 'Đồng ý' : 'Từ chối',
-      icon: <ExclamationCircleFilled />,
-      content: status === TicketStatusEnum.FINISHED ? 'Bạn có muốn duyệt yêu cầu?' : 'Bạn có muốn từ chối yêu cầu?',
-      onOk() {
-        onUpdateStatus(status, data)
-      },
-      onCancel() {
-        console.log('Cancel')
-      }
-    })
+  const setApproveStatus = (isApprove: boolean) => {
+    setIsApprovedSuccess(isApprove)
   }
 
-  const onUpdateStatus = async (status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED, data: ILeaveRequest) => {
-    const payload: ILeaveRequestUpdateStatusForm = {
-      attrs: data?.processStatus['0']?.attributes,
-      nodeId: 1,
-      status,
-      ticketId: data.id
+  useEffect(() => {
+    if (isApprovedSuccess) {
+      setIsOpenModalApprove(false)
+      dispatch(filterLeaveRequest(searchValue))
     }
-    await dispatch(updateLeaveRequest(payload))
-    await dispatch(filterLeaveRequest(searchValue))
-    setIsModalApproveOpen(false)
-  }
+  }, [isApprovedSuccess])
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
@@ -319,16 +303,14 @@ const LeaveRequest: React.FC = () => {
         render: (_, record: ILeaveRequest) => {
           return (
             <Space size='small'>
-              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
-                  <img
-                    alt=''
-                    src={iconApprove}
-                    className='tw-cursor-pointer'
-                    onClick={() => onOpenModalApprove(record)}
-                  />
-                </Tooltip>
-              )}
+              <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
+                <img
+                  alt=''
+                  src={iconApprove}
+                  className='tw-cursor-pointer'
+                  onClick={() => onOpenModalApprove(record)}
+                />
+              </Tooltip>
 
               {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
                 <Tooltip title='Cập nhật thông tin' className='tw-flex tw-items-center'>
@@ -383,6 +365,7 @@ const LeaveRequest: React.FC = () => {
   useEffect(() => {
     dispatch(getAllDefinationType())
     dispatch(searchUser(filterUserPayload))
+    dispatch(getListDepartments())
   }, [])
 
   useEffect(() => {
@@ -416,8 +399,6 @@ const LeaveRequest: React.FC = () => {
       }
     })
   }
-
-  console.log(selectedTicket)
 
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
@@ -508,211 +489,19 @@ const LeaveRequest: React.FC = () => {
         title={`Yêu cầu ${selectedTicket?.ticketCode} - ${
           ticketDifinations.find((ticket) => ticket.id === selectedTicket?.ticketDefinitionId)?.name
         }`}
-        open={isModalAprroveOpen}
+        open={isOpenModalApprove}
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
-        width='40%'
+        width='60%'
         style={{ minWidth: 800 }}
         footer={null}
       >
-        {selectedTicket?.status && (
-          <div className='tw-mb-3 tw-text-base tw-font-semibold'>
-            Trạng thái yêu cầu:{' '}
-            <Tag
-              style={{ lineHeight: 2.5, minWidth: 80, textAlign: 'center' }}
-              color={tagColorMapping(selectedTicket?.status)}
-            >
-              {TICKET_STATUS[selectedTicket?.status]}
-            </Tag>
-          </div>
-        )}
-
-        <div className='feature-container'>
-          <Row>
-            <Col span={24}>
-              <Row gutter={[0, 16]}>
-                <Col span={24} className='tw-flex'>
-                  <div className='tw-font-semibold'>Yêu cầu đăng ký</div>
-                </Col>
-
-                <Col span={12} className='tw-flex'>
-                  <div style={{ minWidth: 150 }}>Thời gian bắt đầu:</div>
-                  <div className='tw-font-medium'>
-                    {dayjs(selectedTicket?.processStatus['0']?.attributes?.start_time).format('DD/MM/YYYY HH:mm:ss')}
-                  </div>
-                </Col>
-
-                <Col span={12} className='tw-flex'>
-                  <div style={{ minWidth: 150 }}>Thời gian kết thúc:</div>
-                  <div className='tw-font-medium'>
-                    {dayjs(selectedTicket?.processStatus['0']?.attributes?.end_time).format('DD/MM/YYYY HH:mm:ss')}
-                  </div>
-                </Col>
-
-                <Col span={12} className='tw-flex'>
-                  <div style={{ minWidth: 150 }}>Ngày yêu cầu:</div>
-                  <div className='tw-font-medium'>{dayjs(selectedTicket?.createdAt).format('DD/MM/YYYY HH:mm:ss')}</div>
-                </Col>
-
-                <Col span={12} className='tw-flex'>
-                  <div style={{ minWidth: 150 }}>Người yêu cầu:</div>
-                  <div className='tw-font-medium'>{selectedTicket?.createdBy}</div>
-                </Col>
-
-                <Col span={24} className='tw-flex'>
-                  <div style={{ minWidth: 150 }}>Ghi chú:</div>
-                  <div className='tw-font-medium tw-text-ellipsis'>
-                    {selectedTicket?.processStatus['0']?.attributes?.reason && (
-                      <div>{selectedTicket?.processStatus['0']?.attributes?.reason}</div>
-                    )}
-
-                    {selectedTicket?.processStatus['0']?.attributes?.reason && (
-                      <div>{selectedTicket?.processStatus['0']?.attributes?.description}</div>
-                    )}
-                  </div>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </div>
-
-        {selectedTicket?.ticketDefinitionId !== 'TD_BUSINESS_TRIP' && (
-          <div className='feature-container tw-mt-4'>
-            <Row>
-              <Col span={24}>
-                <Row gutter={[0, 16]}>
-                  <Col span={24} className='tw-flex'>
-                    <div className='tw-font-semibold'>Phê duyệt yêu cầu</div>
-                  </Col>
-
-                  <Col span={12} className='tw-flex'>
-                    <div style={{ minWidth: 150 }}>Người duyệt:</div>
-                    <div className='tw-font-medium'>{selectedTicket?.processStatus['1']?.executors[0]}</div>
-                  </Col>
-                </Row>
-              </Col>
-              {isSystemAdmin &&
-                selectedTicket &&
-                selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
-                  <Col span={24} className='tw-mt-6'>
-                    <div className='tw-flex tw-justify-center tw-items-center'>
-                      <Space>
-                        <Button
-                          danger
-                          className='tw-min-w-[100px]'
-                          onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
-                        >
-                          Từ chối
-                        </Button>
-                        <Button
-                          type='primary'
-                          className='tw-min-w-[100px] tw-text-white'
-                          onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
-                        >
-                          Duyệt
-                        </Button>
-                      </Space>
-                    </div>
-                  </Col>
-                )}
-            </Row>
-          </div>
-        )}
-
-        {selectedTicket?.ticketDefinitionId === 'TD_BUSINESS_TRIP' && (
-          <>
-            <div className='feature-container tw-mt-4'>
-              <Row>
-                <Col span={24}>
-                  <Row gutter={[0, 16]}>
-                    <Col span={24} className='tw-flex'>
-                      <div className='tw-font-semibold'>Duyệt đăng ký</div>
-                    </Col>
-
-                    <Col span={24} className='tw-flex'>
-                      <Row className='tw-w-full' align={'middle'}>
-                        <Col span={8}>Ý kiến:</Col>
-                        <Col span={16}>
-                          <TextArea className='tw-w-full' placeholder={'Ý kiến'} />
-                        </Col>
-                      </Row>
-                    </Col>
-
-                    {isSystemAdmin &&
-                      selectedTicket &&
-                      selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
-                        <Col span={24} className='tw-mt-6'>
-                          <div className='tw-flex tw-justify-center tw-items-center'>
-                            <Space>
-                              <Button
-                                danger
-                                className='tw-min-w-[100px]'
-                                onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
-                              >
-                                Từ chối
-                              </Button>
-                              <Button
-                                type='primary'
-                                className='tw-min-w-[100px] tw-text-white'
-                                onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
-                              >
-                                Duyệt
-                              </Button>
-                            </Space>
-                          </div>
-                        </Col>
-                      )}
-                  </Row>
-                </Col>
-              </Row>
-            </div>
-
-            <div className='feature-container tw-mt-4'>
-              <Row>
-                <Col span={24}>
-                  <Row gutter={[0, 16]}>
-                    <Col span={24} className='tw-flex'>
-                      <div className='tw-font-semibold'>Giải trình</div>
-                    </Col>
-
-                    <Col span={24} className='tw-flex'>
-                      <Row className='tw-w-full' align={'middle'}>
-                        <Col span={8}>Ý kiến:</Col>
-                        <Col span={16}>
-                          <TextArea className='tw-w-full' placeholder={'Ý kiến'} />
-                        </Col>
-                      </Row>
-                    </Col>
-
-                    {isSystemAdmin &&
-                      selectedTicket &&
-                      selectedTicket?.processStatus['1']?.status !== TicketStatusEnum.FINISHED && (
-                        <Col span={24} className='tw-mt-6'>
-                          <div className='tw-flex tw-justify-center tw-items-center'>
-                            <Space>
-                              <Button
-                                danger
-                                className='tw-min-w-[100px]'
-                                onClick={() => showConfirm(TicketStatusEnum.REJECTED, selectedTicket)}
-                              >
-                                Từ chối
-                              </Button>
-                              <Button
-                                type='primary'
-                                className='tw-min-w-[100px] tw-text-white'
-                                onClick={() => showConfirm(TicketStatusEnum.FINISHED, selectedTicket)}
-                              >
-                                Duyệt
-                              </Button>
-                            </Space>
-                          </div>
-                        </Col>
-                      )}
-                  </Row>
-                </Col>
-              </Row>
-            </div>
-          </>
+        {selectedTicket && (
+          <ModalApprove
+            departments={departments}
+            ticket={selectedTicket}
+            onUpdateSuccess={(value) => setApproveStatus(value)}
+          />
         )}
       </Modal>
     </div>
