@@ -16,7 +16,8 @@ const CreateEditDevice: React.FC<{
   handleClose: () => void
   deviceData?: IDevice | null
   typeAction?: string
-}> = ({ open, handleClose, deviceData, typeAction }) => {
+  onCreateOrUpdateSuccess: () => void
+}> = ({ open, handleClose, deviceData, typeAction, onCreateOrUpdateSuccess }) => {
   const { t } = useTranslation()
   const [form] = Form.useForm<IDevice>()
   const dispatch = useAppDispatch()
@@ -57,6 +58,7 @@ const CreateEditDevice: React.FC<{
         notification.success({
           message: response.message
         })
+        onCreateOrUpdateSuccess()
       } catch (error: any) {
         notification.error({
           message: error.message
@@ -70,6 +72,7 @@ const CreateEditDevice: React.FC<{
         notification.success({
           message: response.message
         })
+        onCreateOrUpdateSuccess()
       } catch (error: any) {
         notification.error({
           message: error.message

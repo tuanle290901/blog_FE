@@ -73,6 +73,8 @@ const DeviceList: React.FC = () => {
     sorts: []
   })
 
+  const [createOrUpdateStatus, setCreateOrUpdateStatus] = useState(false)
+
   const handleClickEditDevice = (record: IDevice, typeAction: string) => {
     setIsOpenModal({
       openModel: !isOpenModal.openModel,
@@ -90,13 +92,24 @@ const DeviceList: React.FC = () => {
     }
   }
 
-  const handleClickDeleteUser = async (record: IDevice) => {
+  const handleClickDeleteDevice = async (record: IDevice) => {
     if (record?.id) {
       try {
         const response = await dispatch(deleteDevice(record?.id)).unwrap()
         notification.success({
           message: response.message
         })
+        const promise = dispatch(
+          getListDevice({
+            paging: searchValue.paging,
+            sorts: searchValue.sorts,
+            query: searchValue.query,
+            groupCode: searchValue.group
+          })
+        )
+        return () => {
+          promise.abort()
+        }
       } catch (error: any) {
         notification.error({
           message: error.message
@@ -201,7 +214,7 @@ const DeviceList: React.FC = () => {
                   <Popconfirm
                     title={t('device.confirmDeleteDeviceTitle')}
                     description={t('device.confirmDeleteDevice')}
-                    onConfirm={() => handleClickDeleteUser(record)}
+                    onConfirm={() => handleClickDeleteDevice(record)}
                     okText={t('common.yes')}
                     cancelText={t('common.no')}
                   >
@@ -238,7 +251,7 @@ const DeviceList: React.FC = () => {
       }
     ]
     return columns
-  }, [handleClickDeleteUser, getSortOrder, handleClickEditDevice, t])
+  }, [handleClickDeleteDevice, getSortOrder, handleClickEditDevice, t])
 
   const handleCloseModal = () => {
     setIsOpenModal({
@@ -275,7 +288,7 @@ const DeviceList: React.FC = () => {
     return () => {
       promise.abort()
     }
-  }, [searchValue, dispatch])
+  }, [searchValue, dispatch, createOrUpdateStatus])
 
   const handleTableChange = (
     pagination: TablePaginationConfig,
@@ -312,6 +325,7 @@ const DeviceList: React.FC = () => {
         deviceData={editingDevice}
         handleClose={handleCloseModal}
         typeAction={isOpenModal.typeAction}
+        onCreateOrUpdateSuccess={() => setCreateOrUpdateStatus(!createOrUpdateStatus)}
       />
       <div>
         <h1 className='tw-text-2xl tw-font-semibold'>
