@@ -7,9 +7,9 @@ import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import logo from '../assets/images/logo.png'
-import menuIconTimeKeeping from '../assets/images/menu/attendance-confirm.png'
-import menuIconDepartment from '../assets/images/menu/human-resource.png'
-import menuIconReport from '../assets/images/menu/icon-report.png'
+import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
+import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
+import menuIconReport from '../assets/images/menu/icon_report.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconRequest from '../assets/images/menu/icon_request.png'
 import menuIconDashboard from '../assets/images/menu/icon_home.png'
@@ -126,7 +126,7 @@ const MainLayout: React.FC = () => {
     return [
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        'Dashboard',
+        'Tổng quan',
         'dashboard',
         <img src={menuIconDashboard} alt='' className='menu-image' />
       ),
@@ -165,7 +165,7 @@ const MainLayout: React.FC = () => {
           Nhân sự
         </Tooltip>,
         'manageFunction',
-        <img src={menuIconDepartment} alt='' className='menu-image' />,
+        <img src={menuIconEmployee} alt='' className='menu-image' />,
         [
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
