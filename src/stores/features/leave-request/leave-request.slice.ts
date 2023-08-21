@@ -21,6 +21,7 @@ export interface ILeaveRequestState {
   editingLeaveRequest: ILeaveRequest | null
   filter: string
   ticketDefinationType: TicketDefinationResponse[]
+  nodeId: number
 }
 
 export interface TicketRequestPayload {
@@ -42,7 +43,8 @@ const initialState: ILeaveRequestState = {
   meta: { page: 0, size: 10, total: 0, totalPage: 0 },
   editingLeaveRequest: null,
   filter: '',
-  ticketDefinationType: []
+  ticketDefinationType: [],
+  nodeId: 0
 }
 
 export const filterLeaveRequest = createAsyncThunk('tickets/filter', async (params: TicketRequestPayload, thunkAPI) => {
@@ -155,6 +157,9 @@ const leaveRequestSlice = createSlice({
   name: 'leaveRequest',
   initialState,
   reducers: {
+    setNodeIdState: (state, action) => {
+      state.nodeId = action.payload.nodeId
+    },
     startEditing: (state, action: PayloadAction<string>) => {
       const id = action.payload
       const foundUpdate = state.listData.find((data) => data.id === id)
@@ -215,5 +220,6 @@ export const departmentSelectors = {
   selectListData: (state: ILeaveRequestState) => state.listData,
   selectLeaveRequestLoading: (state: ILeaveRequestState) => state.loading
 }
-export const { startEditing, cancelEditing, setValueFilter, resetValueFilter } = leaveRequestSlice.actions
+export const { startEditing, cancelEditing, setValueFilter, resetValueFilter, setNodeIdState } =
+  leaveRequestSlice.actions
 export default leaveRequestSlice.reducer

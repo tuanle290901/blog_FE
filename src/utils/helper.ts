@@ -2,7 +2,7 @@ import { Ticket } from '~/types/setting-ticket-process'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { ROLE } from '~/constants/app.constant.ts'
-import { IDepartmentTitle } from '~/types/department.interface'
+import { DataType, IDepartment, IDepartmentTitle } from '~/types/department.interface'
 import { GroupProfile } from '~/types/user.interface.ts'
 import { TicketStatusEnum } from './Constant'
 dayjs.extend(utc)
@@ -139,7 +139,19 @@ export const tagColorMapping = (status?: string | number) => {
   }
 }
 
-export const roundHoursToDays = (hours: number) => {
-  const days = Math.round(hours / 24)
-  return days
+export const mappingDepartmentByCode = (departments: DataType[], code?: string) => {
+  const department = departments.find((item) => item.code === code)
+
+  if (department) {
+    return department.name
+  }
+
+  for (const item of departments) {
+    const child = item.children?.find((child) => child.code === code)
+    if (child) {
+      return child.name
+    }
+  }
+
+  return null
 }

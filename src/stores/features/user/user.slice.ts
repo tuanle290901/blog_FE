@@ -218,6 +218,14 @@ export const importUser = createAsyncThunk('users/importUser', async (payload: F
     throw error
   }
 })
+
+export const getImportTemplate = async () => {
+  const response = await HttpService.get(`system-user/import-template`, {
+    responseType: 'blob'
+  })
+  return response
+}
+
 const userSlice = createSlice({
   name: 'users',
   initialState,

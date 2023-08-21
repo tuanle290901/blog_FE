@@ -1,4 +1,4 @@
-import { DatePicker, Form, Input, Modal, Select, notification } from 'antd'
+import { AutoComplete, DatePicker, Form, Modal, Select, notification } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useState } from 'react'
@@ -143,7 +143,9 @@ const LeaveRequestForm: React.FC<{
                   rules={[{ required: item.required, message: 'Trường bắt buộc' }]}
                 >
                   {item.type === INPUT_TYPE.TEXT && (
-                    <TextArea disabled={!canUpdateForm} placeholder={item.description} />
+                    <AutoComplete className='tw-w-full' options={item?.suggestion?.map((value) => ({ value }))}>
+                      <TextArea disabled={!canUpdateForm} placeholder={item.description} />
+                    </AutoComplete>
                   )}
                   {item.type === INPUT_TYPE.SINGLE_SELECT && (
                     <Select

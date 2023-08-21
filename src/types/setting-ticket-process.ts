@@ -48,6 +48,7 @@ export interface TicketAttribute {
   description?: string
   suggestion?: any[]
   options?: any[]
+  value?: any
 }
 
 export interface TicketTransfer {
@@ -57,7 +58,14 @@ export interface TicketTransfer {
 
 export interface TicketProcessNode {
   groupCode: string
+  groupCodes: string[]
   attributes: TicketAttribute[]
+  name?: string
+  histories?: { executorId: string; createdAt: string }[]
+  status?: string
+  value?: string
+  executors?: string
+  createdAt?: string
 }
 
 export interface TicketProcessRevision {

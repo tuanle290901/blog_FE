@@ -1,8 +1,23 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, notification, Popconfirm, Select, Table, TablePaginationConfig, Tooltip, Row, Col } from 'antd'
 import {
-  DeleteOutlined,
+  Button,
+  Input,
+  notification,
+  Popconfirm,
+  Select,
+  Table,
+  TablePaginationConfig,
+  Tooltip,
+  Row,
+  Col,
+  Space,
+  Dropdown,
+  MenuProps
+} from 'antd'
+import {
   DownloadOutlined,
+  DeleteOutlined,
+  DownOutlined,
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
@@ -18,6 +33,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import {
   cancelEditingUser,
   deleteUser,
+  getImportTemplate,
   importUser,
   restoreUser,
   searchUser,
@@ -32,6 +48,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 import { COMMON_ERROR_CODE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
+import { saveAs } from 'file-saver'
 
 const { Search } = Input
 
@@ -437,6 +454,46 @@ const UserList: React.FC = () => {
       fileSelect.current.value = ''
     }
   }
+
+  const onDownloadImportTemplate = async () => {
+    try {
+      const response = (await getImportTemplate()) as any
+      const blob = new Blob([response], { type: 'application/vnd.ms-excel' })
+      const fileName = `import-user-template.xlsx`
+      saveAs(blob, fileName)
+    } catch (error: any) {
+      // TODO
+    }
+  }
+
+  const items: MenuProps['items'] = [
+    {
+      label: (
+        <>
+          <div className='tw-cursor-pointer' onClick={() => fileSelect?.current?.click()}>
+            Import thành viên
+          </div>
+          <input
+            ref={fileSelect}
+            className='tw-hidden'
+            type='file'
+            accept='.xlxs,.xls'
+            onChange={(event) => handleFileChange(event.target.files)}
+          />
+        </>
+      ),
+      key: '0'
+    },
+    {
+      label: (
+        <div className='tw-cursor-pointer' onClick={onDownloadImportTemplate}>
+          Tải file import mẫu
+        </div>
+      ),
+      key: '1'
+    }
+  ]
+
   return (
     <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
       {(isOpenUserModal || !!userState.editingUser) && (
@@ -465,17 +522,18 @@ const UserList: React.FC = () => {
             )}
             {permissionImportUser && (
               <Col>
-                {' '}
-                <Button icon={<DownloadOutlined />} onClick={() => fileSelect?.current?.click()}>
-                  Import thành viên
-                </Button>
-                <input
-                  ref={fileSelect}
-                  className='tw-hidden'
-                  type='file'
-                  accept='.xlxs,.xls'
-                  onChange={(event) => handleFileChange(event.target.files)}
-                />
+                <Dropdown menu={{ items }}>
+                  <div onClick={(e) => e.preventDefault()}>
+                    <Button>
+                      <div className='tw-flex tw-items-center'>
+                        <span>Import thành viên</span>
+                        <span className='tw-ml-1'>
+                          <DownOutlined style={{ fontSize: 13 }} />
+                        </span>
+                      </div>
+                    </Button>
+                  </div>
+                </Dropdown>
               </Col>
             )}
           </Row>
