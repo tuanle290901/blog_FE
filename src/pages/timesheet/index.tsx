@@ -46,7 +46,7 @@ const Timesheet: React.FC = () => {
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
-  const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
+  const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(true)
   // const [selectedUser, setSelectedUser] = useState(
   //   currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
   // )
@@ -613,7 +613,8 @@ const Timesheet: React.FC = () => {
                               groupCode: searchValue.group,
                               startDate: searchValue.startDate,
                               endDate: searchValue.endDate,
-                              userId: searchValue.userId
+                              userId: searchValue.userId,
+                              onlyShowWorkingDay: searchValue.onlyShowWorkingDay
                             })
                           )
                         }
