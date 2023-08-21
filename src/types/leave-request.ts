@@ -32,3 +32,9 @@ export interface ILeaveRequestUpdateStatusForm {
   attrs: { [key: string]: string }
   status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED
 }
+
+export interface ICountLeaveRequest {
+  approved: number
+  rejected: number
+  submitted: number
+}
