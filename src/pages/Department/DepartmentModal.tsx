@@ -2,15 +2,13 @@
 import { DatePicker, Form, Input, Modal, notification } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_SPECIAL_CHARS, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
+import { REGEX_EMAIL, REGEX_PHONE_NUMBER, REGEX_SPECIAL_CHARS, REGEX_ONLYTEXT } from '~/constants/regex.constant'
 import { createDepartment, getListDepartments, updateDepartment } from '~/stores/features/department/department.silce'
 import { useAppDispatch } from '~/stores/hook'
 import { IDepartment, IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
-
 import dayjs from 'dayjs'
 import { RuleObject } from 'antd/lib/form'
-import { HttpStatusCode } from 'axios'
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data, dataParent } = props
@@ -129,9 +127,13 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
       okText={`${t('common.save')}`}
       cancelText={`${t('common.cancel')}`}
       title={
-        typeModel === ACTION_TYPE.Created
-          ? `${t('department.departmentAdd')}`
-          : `${t('department.departmentUpdate', { name: data && data.name })}`
+        typeModel === ACTION_TYPE.Created ? (
+          `${t('department.departmentAdd')}`
+        ) : (
+          <span>
+            {t('department.departmentUpdate')}:<span className='tw-italic tw-ml-2'>{data?.name}</span>
+          </span>
+        )
       }
       maskClosable={false}
     >
@@ -160,12 +162,12 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
               message: `${t('department.please-insert-input')} ${t('department.name')}`
             },
             {
-              pattern: REGEX_SPECIAL_TRIM,
+              pattern: REGEX_ONLYTEXT,
               message: `${t('department.alter-notification.do-not-leave-spaces-special-accents')}`
             }
           ]}
         >
-          <Input placeholder={`${t('department.please-insert-input')}`} />
+          <Input placeholder={`${t('department.please-insert-input')}`} min={10} />
         </Form.Item>
         <Form.Item
           name='contactEmail'

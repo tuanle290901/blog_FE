@@ -11,7 +11,7 @@ import menuIconTimeKeeping from '../assets/images/menu/attendance-confirm.png'
 import menuIconDepartment from '../assets/images/menu/human-resource.png'
 import menuIconReport from '../assets/images/menu/icon-report.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
-import menuIconPlane from '../assets/images/menu/plane.png'
+import menuIconRequest from '../assets/images/menu/icon_request.png'
 import menuIconDashboard from '../assets/images/menu/icon_home.png'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -142,7 +142,7 @@ const MainLayout: React.FC = () => {
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
         'Yêu cầu',
         'request',
-        <img src={menuIconPlane} alt='' className='menu-image' />,
+        <img src={menuIconRequest} alt='' className='menu-image' />,
         [
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],

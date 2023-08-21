@@ -30,10 +30,20 @@ export const getListDevice = createAsyncThunk(
   'devices/getAll',
   async (params: { query: string; groupCode?: string | null; paging: IPaging; sorts: ISort[] }, thunkAPI) => {
     try {
+      const defaultSorts = [
+        {
+          direction: 'ASC',
+          field: 'status'
+        },
+        {
+          direction: 'DESC',
+          field: 'created_at'
+        }
+      ]
       const body: any = {
         page: params.paging.page,
         size: params.paging.size,
-        sort: params.sorts
+        sort: params.sorts?.length > 0 ? params.sorts : defaultSorts
       }
       if (params.query && params.groupCode) {
         body.criteria = [

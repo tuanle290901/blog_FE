@@ -13,6 +13,7 @@ export interface IReportData {
   absenceType?: string | null
   absenceAmount: number
   workingAmount: number
+  payrollAmount: number
   note: string | null
   noneWorkingDay?: boolean
   dateType: string

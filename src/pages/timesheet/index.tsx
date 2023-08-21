@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, Tooltip, notification } from 'antd'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
@@ -45,8 +45,17 @@ const Timesheet: React.FC = () => {
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const userOptions = usersInGroupSate?.map((item) => {
-    return { value: item?.id, label: item?.fullName }
+    return {
+      value: item?.id,
+      label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
+    }
   })
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    const options = groupsSate.map((item) => {
+      return { value: item?.code, label: item?.name }
+    })
+    return [{ value: 'ALL', label: t('userList.allGroup') }, ...options]
+  }, [groupsSate])
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
@@ -191,9 +200,9 @@ const Timesheet: React.FC = () => {
     }
   }
 
-  const renderStatusByWorkingAmount = (reportData: IReportData) => {
-    if (reportData?.workingAmount === null) return
-    if (reportData?.workingAmount < 9) {
+  const renderStatusByPayrollAmount = (reportData: IReportData) => {
+    if (reportData?.payrollAmount === null) return
+    if (reportData?.payrollAmount < 8) {
       return (
         <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -201,7 +210,7 @@ const Timesheet: React.FC = () => {
         </div>
       )
     }
-    if (reportData?.workingAmount >= 9 && reportData?.violates?.length < 1) {
+    if (reportData?.payrollAmount >= 8 && reportData?.violates?.length < 1) {
       return (
         <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -304,7 +313,7 @@ const Timesheet: React.FC = () => {
       ellipsis: true,
       width: '120px',
       render: (reportData) => {
-        return renderStatusByWorkingAmount(reportData)
+        return renderStatusByPayrollAmount(reportData)
       }
     },
     {
@@ -359,9 +368,17 @@ const Timesheet: React.FC = () => {
     {
       title: t('timesheet.workingAmount'),
       align: 'center',
-      width: '120px',
+      width: '150px',
       render: (record) => {
         return <span>{record?.reportData?.workingAmount?.toFixed(2)}</span>
+      }
+    },
+    {
+      title: t('timesheet.payrollAmount'),
+      align: 'center',
+      width: '150px',
+      render: (record) => {
+        return <span>{record?.reportData?.payrollAmount?.toFixed(2)}</span>
       }
     },
     {
@@ -534,8 +551,9 @@ const Timesheet: React.FC = () => {
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
                 <Col xs={24} lg={10} xl={8}>
-                  <div className='tw-font-bold tw-text-[24px]'>
-                    {!isAllowedAccess ? t('timesheet.titleForUser') : t('timesheet.titleForAdmin')}
+                  <div className='tw-text-[24px]'>
+                    {!isAllowedAccess ? t('timesheet.titleForUser') : t('timesheet.titleForAdmin')} (
+                    {timesheetSate?.meta?.total})
                   </div>
                 </Col>
                 <Col xs={24} lg={14} xl={16}>
@@ -627,14 +645,8 @@ const Timesheet: React.FC = () => {
                     // onClear={() => setSelectedGroup(userGroup)}
                     onChange={(value) => handleSelectGroup(value)}
                     defaultValue={userGroup}
-                  >
-                    {groupsSate?.length > 0 &&
-                      groupsSate?.map((i) => (
-                        <Option key={i?.code} label={i?.name} value={i?.code}>
-                          {i?.name}
-                        </Option>
-                      ))}
-                  </Select>
+                    options={groupOptions}
+                  />
                 </Col>
                 <Col xs={24} lg={5} xl={4}>
                   <Select
