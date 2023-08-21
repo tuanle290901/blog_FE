@@ -44,18 +44,6 @@ const Timesheet: React.FC = () => {
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
-  const userOptions = usersInGroupSate?.map((item) => {
-    return {
-      value: item?.id,
-      label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
-    }
-  })
-  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
-    const options = groupsSate.map((item) => {
-      return { value: item?.code, label: item?.name }
-    })
-    return [{ value: 'ALL', label: t('userList.allGroup') }, ...options]
-  }, [groupsSate])
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(false)
@@ -78,6 +66,22 @@ const Timesheet: React.FC = () => {
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
+  const userOptions = usersInGroupSate?.map((item) => {
+    return {
+      value: item?.id,
+      label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
+    }
+  })
+  const groupOptions = useMemo<{ value: string | null; label: string }[]>(() => {
+    const options = groupsSate.map((item) => {
+      return { value: item?.code, label: item?.name }
+    })
+    if (isAllowedAccess) {
+      return [{ value: 'ALL', label: t('userList.allGroup') }, ...options]
+    } else {
+      return [...options]
+    }
+  }, [groupsSate])
 
   const [searchValue, setSearchValue] = useState<{
     query: string
