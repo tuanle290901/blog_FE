@@ -45,7 +45,7 @@ export const LEAVE_TYPE_MAP: LeaveTypes = {
   WORK_FROM_HOME: 'Làm việc ở nhà',
   WEDDING: 'Nghỉ cưới',
   UNEXPECTED: 'Nghỉ đột xuất',
-  COMPASSIONATE: 'Nghỉ phép vì tang gia'
+  OTHER: 'Lý do khác'
 }
 
 export enum TicketStatusEnum {
