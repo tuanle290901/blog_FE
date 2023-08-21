@@ -206,7 +206,7 @@ const Timesheet: React.FC = () => {
 
   const renderStatusByPayrollAmount = (reportData: IReportData) => {
     if (reportData?.payrollAmount === null) return
-    if (reportData?.payrollAmount < 8) {
+    if (reportData?.payrollAmount < 8 || reportData?.violates?.length > 0) {
       return (
         <div className='tw-text-[#E64D29] tw-uppercase'>
           <CloseOutlined className='tw-text-[10px] tw-mr-[5px]' />
@@ -214,7 +214,7 @@ const Timesheet: React.FC = () => {
         </div>
       )
     }
-    if (reportData?.payrollAmount >= 8 && reportData?.violates?.length < 1) {
+    if (reportData?.payrollAmount >= 8) {
       return (
         <div className='tw-text-[#25BD74] tw-uppercase'>
           <CheckOutlined className='tw-text-[10px] tw-mr-[5px]' />
