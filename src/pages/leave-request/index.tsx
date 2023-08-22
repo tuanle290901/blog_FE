@@ -39,8 +39,8 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { ILeaveRequest } from '~/types/leave-request'
-import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
-import { tagColorMapping } from '~/utils/helper'
+import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/Constant'
+import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
 const { RangePicker } = DatePicker
@@ -280,6 +280,17 @@ const LeaveRequest: React.FC = () => {
         sorter: true
       },
       {
+        key: 'groupCode',
+        title: 'Phòng ban',
+        dataIndex: 'groupCode',
+        showSorterTooltip: false,
+        ellipsis: true,
+        sorter: true,
+        render: (departmentCode) => {
+          return mappingDepartmentByCode(departments, departmentCode)
+        }
+      },
+      {
         key: 'status',
         title: t('leaveRequest.status'),
         dataIndex: 'status',
@@ -446,7 +457,7 @@ const LeaveRequest: React.FC = () => {
             mode='multiple'
             placeholder='Trạng thái yêu cầu'
             style={{ minWidth: 200 }}
-            options={Object.entries(TICKET_STATUS).map((item) => {
+            options={Object.entries(TICKET_STATUS_FILTER).map((item) => {
               return {
                 label: item[1],
                 value: item[0]

@@ -147,7 +147,7 @@ const MainLayout: React.FC = () => {
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
             'Danh sách yêu cầu',
-            'leave-request',
+            'request',
             null
           ),
           getItemIfAllowed(

@@ -68,6 +68,13 @@ export const TICKET_STATUS: TicketStatusType = {
   PENDING: 'Đợi xử lý'
 }
 
+export const TICKET_STATUS_FILTER = {
+  SUBMITTED: 'Đã gửi',
+  PROCESSING: 'Đang xử lý',
+  CONFIRMED: 'Đã xác nhận',
+  REJECTED: 'Từ chối'
+}
+
 export const VALIDATE_FORM = {
   MAX_LENGTH_INPUT: 256,
   MAX_LENGTH_TEXTAREA: 2048,
