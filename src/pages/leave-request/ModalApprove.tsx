@@ -32,25 +32,30 @@ const ModalApprove = (props: {
   const ticketDefinition = listOfDefinition.find((item) => item.id === ticket.ticketDefinitionId)
   const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revisions[0]?.processNodes || [])
 
+  const sortedProcessNodes = Object.entries(ticketProcessNodes)
+    .map(([key, value]) => ({ key: parseInt(key), value }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ value }) => value)
+
   const processsSteps = Object.values(ticket.processStatus)
-  const mappedSteps: TicketProcessNode[] = processsSteps.map((step: any) => {
-    const matchingNode = ticketProcessNodes.find((node) => node.groupCodes[0] === step.groupCodes[0])
+  const sortedProcessSteps = Object.entries(processsSteps)
+    .map(([key, value]) => ({ key: parseInt(key), value }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ value }) => value)
+
+  const mappedSteps: TicketProcessNode[] = sortedProcessSteps.map((step: any, index) => {
+    const matchingNode = sortedProcessNodes[index]
+    const attributes = step.attributes || {}
+    const attributesWithValues =
+      matchingNode?.attributes?.map((item) => ({
+        ...item,
+        value: attributes[item.name] || null
+      })) || []
+
     return {
       ...step,
-      name: matchingNode ? matchingNode.name : '',
-      attributes: matchingNode
-        ? matchingNode?.attributes?.map((item) => {
-            const attributes = step.attributes || {}
-            let value = null
-            if (Object.prototype.hasOwnProperty.call(attributes, item.name)) {
-              value = attributes[item.name]
-            }
-            return {
-              ...item,
-              value
-            }
-          })
-        : {}
+      name: matchingNode?.name || '',
+      attributes: attributesWithValues
     }
   })
   const filteredSteps = mappedSteps.filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
