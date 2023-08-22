@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
 
 import { Button, Col, Form, Input, Row } from 'antd'
-import logo from '~/assets/images/logo.png'
+import logo from '~/assets/images/logo_blue.png'
 
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LOCAL_STORAGE } from '~/utils/Constant'
@@ -76,9 +76,8 @@ const Index: React.FC = () => {
     <div className='login-container tw-pt-[15%]'>
       <Row className='login-logo-container tw-h-[12%]' align='middle'>
         <Col xs={24} md={{ span: 16, offset: 4 }}>
-          <div className='tw-flex tw-items-center'>
-            <img src={logo} alt='logo' />
-            <span className='tw-text-2xl tw-font-bold tw-text-sky-500 tw-ml-[10px]'>EMS</span>
+          <div className='tw-flex tw-justify-center'>
+            <img src={logo} alt='logo' className='tw-w-full' />
           </div>
         </Col>
       </Row>
