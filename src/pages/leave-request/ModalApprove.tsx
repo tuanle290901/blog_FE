@@ -9,6 +9,7 @@ import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { DataType } from '~/types/department.interface'
 import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
 import { TicketAttribute, TicketProcessNode } from '~/types/setting-ticket-process'
+import { GroupProfile } from '~/types/user.interface'
 import { INPUT_TYPE, LEAVE_TYPE_MAP, TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 const { confirm } = Modal
@@ -19,7 +20,7 @@ export enum PROCESS_GROUPCODE {
 
 const ModalApprove = (props: {
   ticket: ILeaveRequest
-  isSystemAdmin: boolean
+  isSystemAdmin: GroupProfile | undefined
   departments: DataType[]
   onUpdateSuccess: (isSuccess: boolean) => void
 }) => {
