@@ -16,6 +16,7 @@ import { TicketDefinationResponse } from '~/types/leave-request.interface'
 
 export interface ILeaveRequestState {
   listData: ILeaveRequest[]
+  ticketItemSelected: ILeaveRequest
   loading: boolean
   currentRequestId: string | null
   meta: IPaging
@@ -40,6 +41,7 @@ export interface TicketRequestPayload {
 
 const initialState: ILeaveRequestState = {
   listData: [],
+  ticketItemSelected: {} as ILeaveRequest,
   loading: false,
   currentRequestId: null,
   meta: { page: 0, size: 10, total: 0, totalPage: 0 },
@@ -64,6 +66,15 @@ export const filterLeaveRequest = createAsyncThunk('tickets/filter', async (para
     return thunkAPI.rejectWithValue(error)
   }
 })
+
+export const getTicketDetail = async (code: string) => {
+  try {
+    const response = await HttpService.get(`/tickets?code=${code}`)
+    return response.data
+  } catch (error) {
+    throw new Error('error occur with get ticket detail')
+  }
+}
 
 export const createLeaveRequest = createAsyncThunk(
   'leave-request/create',

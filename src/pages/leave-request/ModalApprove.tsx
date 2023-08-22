@@ -28,7 +28,7 @@ const ModalApprove = (props: {
   const listOfDefinition = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const ticketDefinition = listOfDefinition.find((item) => item.id === ticket.ticketDefinitionId)
   const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revisions[0]?.processNodes || [])
-  console.log(ticketProcessNodes, 'aaaaaaa')
+
   const processsSteps = Object.values(ticket.processStatus)
   const mappedSteps: TicketProcessNode[] = processsSteps.map((step: any) => {
     const matchingNode = ticketProcessNodes.find((node) => node.groupCodes[0] === step.groupCodes[0])

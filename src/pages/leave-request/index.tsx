@@ -32,6 +32,7 @@ import {
   deleteLeaveRequest,
   filterLeaveRequest,
   getAllDefinationType,
+  getTicketDetail,
   resetLeaveRequest,
   resetValueFilter,
   setValueFilter,
@@ -46,6 +47,7 @@ import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/C
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
+import { useParams, useSearchParams } from 'react-router-dom'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -79,9 +81,11 @@ const LeaveRequest: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { userInfo } = useUserInfo()
+  const [queryParameters] = useSearchParams()
 
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
+  const ticketItemSelected: ILeaveRequest = useAppSelector((state) => state.leaveRequest.ticketItemSelected)
   const users = useAppSelector((item) => item.user.userList)
   const departments = useAppSelector((item) => item.department.listData)
   const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
@@ -208,6 +212,21 @@ const LeaveRequest: React.FC = () => {
       dispatch(filterLeaveRequest(searchValue))
     }
   }, [isApprovedSuccess])
+
+  useEffect(() => {
+    if (queryParameters.get('code')) {
+      const getDetail = async () => {
+        const ticketSelected = await getTicketDetail(queryParameters.get('code') ?? '')
+        if (ticketSelected) {
+          setSelectedTicket(ticketSelected)
+          setIsOpenModalApprove(true)
+        }
+      }
+      getDetail()
+    }
+  }, [queryParameters])
+
+  useEffect
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
