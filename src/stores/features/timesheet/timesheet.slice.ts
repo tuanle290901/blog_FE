@@ -132,7 +132,7 @@ export const filterTimesheet = createAsyncThunk(
       query: string
       onlyShowWorkingDay?: boolean | null
       groupCode?: string | null
-      userId?: string | null
+      userName?: string | null
       startDate?: string | null
       endDate?: string | null
       paging: IPaging
@@ -176,15 +176,15 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (!params.query && params.userId) {
+      if (!params.query && params.userName) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
             children: [
               {
-                field: 'user_id',
+                field: 'user_name',
                 operator: 'IS',
-                value: params.userId
+                value: params.userName
               },
               {
                 field: 'date',
@@ -196,7 +196,7 @@ export const filterTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (!params.query && params.userId && params.groupCode) {
+      if (!params.query && params.userName && params.groupCode) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
@@ -207,9 +207,9 @@ export const filterTimesheet = createAsyncThunk(
                 value: params.groupCode
               },
               {
-                field: 'user_id',
+                field: 'user_name',
                 operator: 'IS',
-                value: params.userId
+                value: params.userName
               },
               {
                 field: 'date',
@@ -289,7 +289,7 @@ export const exportTimesheet = createAsyncThunk(
       query: string
       onlyShowWorkingDay?: boolean | null
       groupCode?: string | null
-      userId?: string | null
+      userName?: string | null
       startDate?: string | null
       endDate?: string | null
       paging: IPaging
@@ -333,15 +333,15 @@ export const exportTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (!params.query && params.userId) {
+      if (!params.query && params.userName) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
             children: [
               {
-                field: 'user_id',
+                field: 'user_name',
                 operator: 'IS',
-                value: params.userId
+                value: params.userName
               },
               {
                 field: 'date',
@@ -353,7 +353,7 @@ export const exportTimesheet = createAsyncThunk(
           }
         ]
       }
-      if (!params.query && params.userId && params.groupCode) {
+      if (!params.query && params.userName && params.groupCode) {
         body.criteria = [
           {
             operator: 'AND_MULTIPLES',
@@ -364,9 +364,9 @@ export const exportTimesheet = createAsyncThunk(
                 value: params.groupCode
               },
               {
-                field: 'user_id',
+                field: 'user_name',
                 operator: 'IS',
-                value: params.userId
+                value: params.userName
               },
               {
                 field: 'date',
