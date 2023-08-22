@@ -18,7 +18,7 @@ import {
   notification
 } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import iconApprove from '~/assets/images/approved.png'
@@ -47,7 +47,7 @@ import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/C
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -85,14 +85,15 @@ const LeaveRequest: React.FC = () => {
 
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
-  const ticketItemSelected: ILeaveRequest = useAppSelector((state) => state.leaveRequest.ticketItemSelected)
   const users = useAppSelector((item) => item.user.userList)
   const departments = useAppSelector((item) => item.department.listData)
   const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
   const countLeaveRequestSate = useAppSelector((state) => state.leaveRequest.countLeaveRequest)
   const isLoading = useAppSelector((state) => state.leaveRequest.loading)
-  const [isApprovedSuccess, setIsApprovedSuccess] = useState<boolean>(false)
 
+  const [dateFilter, setDateFilter] = useState<[Dayjs, Dayjs]>([dayjs().startOf('month'), dayjs()])
+  const [statusFilter, setStatusFilter] = useState<string[]>([])
+  const [isApprovedSuccess, setIsApprovedSuccess] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
   const [canUpdateForm, setCanUpdateForm] = useState<boolean>(true)
@@ -190,6 +191,7 @@ const LeaveRequest: React.FC = () => {
         break
 
       case 'requestTime':
+        setDateFilter(requestItem)
         updateSearchValue(() => ({
           startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
           endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
@@ -197,6 +199,7 @@ const LeaveRequest: React.FC = () => {
         break
 
       case 'requestStatus':
+        setStatusFilter(requestItem)
         updateSearchValue(() => ({ statuses: requestItem }))
         break
     }
@@ -442,6 +445,19 @@ const LeaveRequest: React.FC = () => {
     return percent?.toFixed(0) || 0
   }
 
+  const onFasFilter = (status: TicketStatusEnum.SUBMITTED | TicketStatusEnum.REJECTED | TicketStatusEnum.CONFIRMED) => {
+    setDateFilter([dayjs().startOf('month'), dayjs()])
+    setStatusFilter([status])
+    setSearchValue((prev) => {
+      return {
+        ...prev,
+        startDate: dayjs.utc().startOf('month').format(),
+        endDate: dayjs.utc().format(),
+        statuses: [status]
+      }
+    })
+  }
+
   return (
     <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
       <LeaveRequestForm
@@ -481,9 +497,14 @@ const LeaveRequest: React.FC = () => {
             />
           )}
 
-          <RangePicker format={'DD/MM/YYYY'} onChange={(val) => onChangeRequest('requestTime', val)} />
+          <RangePicker
+            value={dateFilter}
+            format={'DD/MM/YYYY'}
+            onChange={(val) => onChangeRequest('requestTime', val)}
+          />
 
           <Select
+            value={statusFilter}
             onChange={(val) => onChangeRequest('requestStatus', val)}
             mode='multiple'
             placeholder='Trạng thái yêu cầu'
@@ -497,39 +518,50 @@ const LeaveRequest: React.FC = () => {
           />
         </Space>
       </div>
-      <Row gutter={[16, 16]} className='leave-request-count'>
-        <Col xs={24} lg={8} className='leave-request-count-title'>
-          Số yêu cầu trong tháng
-          <span>
-            {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
-          </span>
-        </Col>
-        <Col xs={24} lg={16} className='leave-request-count-detail'>
-          <div className='leave-request-count-detail__item'>
-            Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+      {isSystemAdmin && (
+        <>
+          <Row gutter={[16, 16]} className='leave-request-count'>
+            <Col xs={24} lg={8} className='leave-request-count-title'>
+              Số yêu cầu trong tháng
+              <span>
+                {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
+              </span>
+            </Col>
+            <Col xs={24} lg={16} className='leave-request-count-detail'>
+              <div className='leave-request-count-detail__item' onClick={() => onFasFilter(TicketStatusEnum.CONFIRMED)}>
+                Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+              </div>
+              <div
+                className='leave-request-count-detail__item leave-request-count-detail__item--rejected'
+                onClick={() => onFasFilter(TicketStatusEnum.REJECTED)}
+              >
+                Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+              </div>
+              <div
+                className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
+                onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}
+              >
+                Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+              </div>
+            </Col>
+          </Row>
+
+          <div className='leave-request-percent'>
+            <div
+              className='leave-request-percent__item'
+              style={{ width: `${getPercentage(countLeaveRequestSate.approved)}%` }}
+            ></div>
+            <div
+              style={{ width: `${getPercentage(countLeaveRequestSate.rejected)}%` }}
+              className='leave-request-percent__item tw-bg-[#cf1322]'
+            ></div>
+            <div
+              style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
+              className='leave-request-percent__item tw-bg-[#1677ff]'
+            ></div>
           </div>
-          <div className='leave-request-count-detail__item leave-request-count-detail__item--rejected'>
-            Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
-          </div>
-          <div className='leave-request-count-detail__item leave-request-count-detail__item--submitted'>
-            Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
-          </div>
-        </Col>
-      </Row>
-      <div className='leave-request-percent'>
-        <div
-          className='leave-request-percent__item'
-          style={{ width: `${getPercentage(countLeaveRequestSate.approved)}%` }}
-        ></div>
-        <div
-          style={{ width: `${getPercentage(countLeaveRequestSate.rejected)}%` }}
-          className='leave-request-percent__item tw-bg-[#cf1322]'
-        ></div>
-        <div
-          style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
-          className='leave-request-percent__item tw-bg-[#1677ff]'
-        ></div>
-      </div>
+        </>
+      )}
 
       <div>
         <Table
@@ -573,6 +605,7 @@ const LeaveRequest: React.FC = () => {
       >
         {selectedTicket && (
           <ModalApprove
+            isSystemAdmin={isSystemAdmin}
             departments={departments}
             ticket={selectedTicket}
             onUpdateSuccess={(value) => setApproveStatus(value)}

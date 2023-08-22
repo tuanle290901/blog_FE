@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { memo, useEffect, useState } from 'react'
 import { updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { DataType } from '~/types/department.interface'
 import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
 import { TicketAttribute, TicketProcessNode } from '~/types/setting-ticket-process'
@@ -18,36 +19,43 @@ export enum PROCESS_GROUPCODE {
 
 const ModalApprove = (props: {
   ticket: ILeaveRequest
+  isSystemAdmin: boolean
   departments: DataType[]
   onUpdateSuccess: (isSuccess: boolean) => void
 }) => {
-  const { ticket, departments, onUpdateSuccess } = props
+  const { ticket, departments, isSystemAdmin, onUpdateSuccess } = props
   const [fieldValues, setFieldValues] = useState<any>({})
   const dispatch = useAppDispatch()
+  const { userInfo } = useUserInfo()
 
   const listOfDefinition = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const ticketDefinition = listOfDefinition.find((item) => item.id === ticket.ticketDefinitionId)
   const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revisions[0]?.processNodes || [])
 
+  const sortedProcessNodes = Object.entries(ticketProcessNodes)
+    .map(([key, value]) => ({ key: parseInt(key), value }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ value }) => value)
+
   const processsSteps = Object.values(ticket.processStatus)
-  const mappedSteps: TicketProcessNode[] = processsSteps.map((step: any) => {
-    const matchingNode = ticketProcessNodes.find((node) => node.groupCodes[0] === step.groupCodes[0])
+  const sortedProcessSteps = Object.entries(processsSteps)
+    .map(([key, value]) => ({ key: parseInt(key), value }))
+    .sort((a, b) => a.key - b.key)
+    .map(({ value }) => value)
+
+  const mappedSteps: TicketProcessNode[] = sortedProcessSteps.map((step: any, index) => {
+    const matchingNode = sortedProcessNodes[index]
+    const attributes = step.attributes || {}
+    const attributesWithValues =
+      matchingNode?.attributes?.map((item) => ({
+        ...item,
+        value: attributes[item.name] || null
+      })) || []
+
     return {
       ...step,
-      name: matchingNode ? matchingNode.name : '',
-      attributes: matchingNode
-        ? matchingNode?.attributes?.map((item) => {
-            const attributes = step.attributes || {}
-            let value = null
-            if (Object.prototype.hasOwnProperty.call(attributes, item.name)) {
-              value = attributes[item.name]
-            }
-            return {
-              ...item,
-              value
-            }
-          })
-        : {}
+      name: matchingNode?.name || '',
+      attributes: attributesWithValues
     }
   })
   const filteredSteps = mappedSteps.filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
@@ -179,39 +187,56 @@ const ModalApprove = (props: {
                               return (
                                 <>
                                   <Col span={24} className='tw-flex tw-items-center' key={index}>
-                                    <div className='tw-min-w-[200px]'>{item.description}:</div>
-                                    {item.type === INPUT_TYPE.TEXT && (
-                                      <AutoComplete
-                                        className='tw-w-full'
-                                        value={fieldValues[item.name] || ''}
-                                        onChange={(data) => {
-                                          const newValue = {
-                                            ...fieldValues,
-                                            [item.name]: data
-                                          }
-                                          setFieldValues(newValue)
-                                        }}
-                                        options={item?.suggestion?.map((value) => ({ value }))}
-                                      >
-                                        <TextArea placeholder={item.description} />
-                                      </AutoComplete>
+                                    {(isSystemAdmin ||
+                                      userInfo.userName === (step?.executors && step.executors[0])) && (
+                                      <>
+                                        <div className='tw-min-w-[200px]'>{item.description}:</div>
+                                        {item.type === INPUT_TYPE.TEXT && (
+                                          <AutoComplete
+                                            className='tw-w-full'
+                                            value={fieldValues[item.name] || ''}
+                                            onChange={(data) => {
+                                              const newValue = {
+                                                ...fieldValues,
+                                                [item.name]: data
+                                              }
+                                              setFieldValues(newValue)
+                                            }}
+                                            options={item?.suggestion?.map((value) => ({ value }))}
+                                          >
+                                            <TextArea placeholder={item.description} />
+                                          </AutoComplete>
+                                        )}
+
+                                        {item.type === INPUT_TYPE.DATETIME && (
+                                          <DatePicker
+                                            value={fieldValues[item.name] ? dayjs(fieldValues[item.name]) : null}
+                                            onChange={(date) => {
+                                              const newValue = {
+                                                ...fieldValues,
+                                                [item.name]: date
+                                              }
+                                              setFieldValues(newValue)
+                                            }}
+                                            placeholder={item.description}
+                                            className='tw-w-full'
+                                            showTime={{ format: 'HH:mm' }}
+                                            format='DD/MM/YYYY HH:mm'
+                                          />
+                                        )}
+                                      </>
                                     )}
 
-                                    {item.type === INPUT_TYPE.DATETIME && (
-                                      <DatePicker
-                                        value={fieldValues[item.name] ? dayjs(fieldValues[item.name]) : null}
-                                        onChange={(date) => {
-                                          const newValue = {
-                                            ...fieldValues,
-                                            [item.name]: date
-                                          }
-                                          setFieldValues(newValue)
-                                        }}
-                                        placeholder={item.description}
-                                        className='tw-w-full'
-                                        showTime={{ format: 'HH:mm' }}
-                                        format='DD/MM/YYYY HH:mm'
-                                      />
+                                    {!isSystemAdmin && userInfo.userName !== (step?.executors && step.executors[0]) && (
+                                      <div>
+                                        <span className='tw-mr-3'>Trạng thái:</span>
+                                        <Tag
+                                          style={{ minWidth: 80, textAlign: 'center' }}
+                                          color={tagColorMapping(TicketStatusEnum.PROCESSING)}
+                                        >
+                                          {TICKET_STATUS[TicketStatusEnum.PROCESSING]}
+                                        </Tag>
+                                      </div>
                                     )}
                                   </Col>
                                 </>
@@ -219,51 +244,35 @@ const ModalApprove = (props: {
                             }
                           })}
 
-                        {(step.status === TicketStatusEnum.PENDING || step.status === TicketStatusEnum.PROCESSING) && (
-                          <Col span={24} className='tw-flex tw-justify-center'>
-                            <Space>
-                              <Button danger onClick={() => onReject(mainIndex)}>
-                                Từ chối
-                              </Button>
-                              <Button type='primary' onClick={() => onApprove(mainIndex)}>
-                                Đồng ý
-                              </Button>
-                            </Space>
+                        {(step.status === TicketStatusEnum.PENDING || step.status === TicketStatusEnum.PROCESSING) &&
+                          (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
+                            <Col span={24} className='tw-flex tw-justify-center'>
+                              <Space>
+                                <Button danger onClick={() => onReject(mainIndex)}>
+                                  Từ chối
+                                </Button>
+                                <Button type='primary' onClick={() => onApprove(mainIndex)}>
+                                  Đồng ý
+                                </Button>
+                              </Space>
+                            </Col>
+                          )}
+
+                        {step?.status !== TicketStatusEnum.PENDING && step.histories && step?.histories?.length > 0 && (
+                          <Col span={24} className='tw-flex tw-justify-end '>
+                            <div>
+                              <span className='tw-mr-2'>bởi</span>
+                              <span className='tw-text-sky-700 tw-italic'>
+                                {step?.histories[step?.histories?.length - 1].executorId} -
+                                {mappingDepartmentByCode(departments, ticket.groupCode)} (
+                                {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
+                                  'DD/MM/YYYY HH:mm:ss'
+                                )}
+                                )
+                              </span>
+                            </div>
                           </Col>
                         )}
-
-                        {step.groupCodes[0] === PROCESS_GROUPCODE.START &&
-                          step.histories &&
-                          step?.histories?.length > 0 && (
-                            <Col span={24} className='tw-flex tw-justify-end '>
-                              <div>
-                                <span className='tw-mr-2'>bởi</span>
-                                <span className='tw-text-sky-700 tw-italic'>
-                                  {step?.histories[step?.histories?.length - 1].executorId} -
-                                  {mappingDepartmentByCode(departments, ticket.groupCode)} (
-                                  {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
-                                    'DD/MM/YYYY HH:mm:ss'
-                                  )}
-                                  )
-                                </span>
-                              </div>
-                            </Col>
-                          )}
-
-                        {step.executors &&
-                          step.executors.length > 0 &&
-                          step.groupCodes &&
-                          step.groupCodes.length > 0 &&
-                          step.groupCodes[0] !== PROCESS_GROUPCODE.START && (
-                            <Col span={24} className='tw-flex tw-justify-end '>
-                              <div>
-                                <span className='tw-mr-2'>bởi</span>
-                                <span className='tw-text-sky-700 tw-italic'>
-                                  {step.executors[0]} - {mappingDepartmentByCode(departments, step.groupCodes[0])}
-                                </span>
-                              </div>
-                            </Col>
-                          )}
                       </Row>
                     </div>
                   )}

@@ -4,6 +4,23 @@ import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { getLeaveBalance } from '~/stores/features/leave-balance/leave-balance.slice'
 
+const mappingOvertimeKey = (key: string) => {
+  switch (key) {
+    case 'ShiftOne':
+      return 'Ca 1 (17h - 22h):'
+    case 'ShiftTwo':
+      return 'Ca 2 (22h - 06h):'
+    case 'ShiftThree':
+      return 'Ca 3 (06h - 08h):'
+    case 'Weekend':
+      return 'Ngày nghỉ:'
+    case 'Holiday':
+      return 'Ngày lễ:'
+    default:
+      return ''
+  }
+}
+
 const renderRow = (title: string, firstArg: string | number, secondArg: string, level?: 'parent' | 'child') => {
   return (
     <Row className='tw-text-md tw-mt-3' align={'middle'}>
@@ -23,7 +40,6 @@ const renderRow = (title: string, firstArg: string | number, secondArg: string, 
 const Index = () => {
   const dispatch = useAppDispatch()
   const leaveBalanceInfo = useAppSelector((item) => item.leaveBalacnce.leaveBalanceData)
-  console.log(leaveBalanceInfo)
 
   useEffect(() => {
     dispatch(getLeaveBalance())
@@ -131,11 +147,9 @@ const Index = () => {
                   Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)),
                   'giờ'
                 )}
-                {renderRow('Ca 1 (17h - 22h):', 0, 'giờ', 'child')}
-                {renderRow('Ca 2 (22h - 06h):', 0, 'giờ', 'child')}
-                {renderRow('Ca 3 (06h - 08h):', 0, 'giờ', 'child')}
-                {renderRow('Ngày nghỉ:', 0, 'giờ', 'child')}
-                {renderRow('Ngày lễ:', 0, 'giờ', 'child')}
+                {leaveBalanceInfo?.overTimeInfoList?.map((item, index) => {
+                  return <div key={index}>{renderRow(mappingOvertimeKey(item.key), item.value, 'giờ', 'child')}</div>
+                })}
               </Col>
             </Row>
           </>
