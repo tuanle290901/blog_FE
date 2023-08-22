@@ -43,15 +43,17 @@
           transform: translate(-50%, -50%);
         }
 
-        &--rejected::before {
-          background-color: #cf1322;
-          content: '';
-        }
-
-        &--submitted {
+        &--rejected {
           border: none;
           margin: 0;
           padding: 0;
+          &::before {
+            background-color: #cf1322;
+            content: '';
+          }
+        }
+
+        &--submitted {
           &::before {
             background-color: #1677ff;
             content: '';
