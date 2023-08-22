@@ -147,12 +147,12 @@ const MainLayout: React.FC = () => {
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
             'Danh sách yêu cầu',
-            'leave-request',
+            'request',
             null
           ),
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
-            'Thông tin vi phạm và phép',
+            'Vi phạm và phép',
             'statistical',
             null
           )
@@ -260,9 +260,12 @@ const MainLayout: React.FC = () => {
 
         <div className='menu-bottom'>
           <div className='bottom-main-text'>Employee Management System</div>
-          <div>
+          <div className='tw-flex tw-items-center'>
             <span className='bottom-extra-text tw-mr-2'>Powered by</span>
-            <span className='bottom-main-text tw-font-bold'>HTSC</span>
+            <span className='bottom-main-text tw-font-bold tw-flex tw-items-center'>
+              <img src={logo} alt='' className='tw-h-[20px] tw-mr-1' />
+              HTSC
+            </span>
           </div>
         </div>
       </Sider>

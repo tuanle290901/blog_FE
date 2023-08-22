@@ -32,6 +32,7 @@ import {
   deleteLeaveRequest,
   filterLeaveRequest,
   getAllDefinationType,
+  getTicketDetail,
   resetLeaveRequest,
   resetValueFilter,
   setValueFilter,
@@ -42,10 +43,11 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { ILeaveRequest } from '~/types/leave-request'
-import { TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
-import { tagColorMapping } from '~/utils/helper'
+import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/Constant'
+import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
+import { useParams, useSearchParams } from 'react-router-dom'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -79,9 +81,11 @@ const LeaveRequest: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { userInfo } = useUserInfo()
+  const [queryParameters] = useSearchParams()
 
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
+  const ticketItemSelected: ILeaveRequest = useAppSelector((state) => state.leaveRequest.ticketItemSelected)
   const users = useAppSelector((item) => item.user.userList)
   const departments = useAppSelector((item) => item.department.listData)
   const editingLeaveRequest = useAppSelector((state) => state.leaveRequest.editingLeaveRequest)
@@ -209,6 +213,21 @@ const LeaveRequest: React.FC = () => {
     }
   }, [isApprovedSuccess])
 
+  useEffect(() => {
+    if (queryParameters.get('code')) {
+      const getDetail = async () => {
+        const ticketSelected = await getTicketDetail(queryParameters.get('code') ?? '')
+        if (ticketSelected) {
+          setSelectedTicket(ticketSelected)
+          setIsOpenModalApprove(true)
+        }
+      }
+      getDetail()
+    }
+  }, [queryParameters])
+
+  useEffect
+
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
@@ -282,6 +301,17 @@ const LeaveRequest: React.FC = () => {
         showSorterTooltip: false,
         ellipsis: true,
         sorter: true
+      },
+      {
+        key: 'groupCode',
+        title: 'Phòng ban',
+        dataIndex: 'groupCode',
+        showSorterTooltip: false,
+        ellipsis: true,
+        sorter: true,
+        render: (departmentCode) => {
+          return mappingDepartmentByCode(departments, departmentCode)
+        }
       },
       {
         key: 'status',
@@ -458,7 +488,7 @@ const LeaveRequest: React.FC = () => {
             mode='multiple'
             placeholder='Trạng thái yêu cầu'
             style={{ minWidth: 200 }}
-            options={Object.entries(TICKET_STATUS).map((item) => {
+            options={Object.entries(TICKET_STATUS_FILTER).map((item) => {
               return {
                 label: item[1],
                 value: item[0]

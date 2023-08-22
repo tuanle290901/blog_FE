@@ -15,6 +15,7 @@ export interface AuthStateInterface {
   success: boolean
   switchGroup: any
   currentRequestId: string | null
+  historyUrl: string | null
 }
 
 const initialState: AuthStateInterface = {
@@ -24,7 +25,8 @@ const initialState: AuthStateInterface = {
   error: null,
   success: false, // for monitoring the registration process.
   switchGroup: {},
-  currentRequestId: null
+  currentRequestId: null,
+  historyUrl: null
 }
 const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
@@ -59,6 +61,13 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setHistoryUrl: (state, action) => {
+      const startIndex = action.payload.indexOf('request')
+      if (startIndex !== -1) {
+        const historyUrl = action.payload.substring(startIndex)
+        state.historyUrl = historyUrl
+      }
+    },
     setAccessToken: (state, action) => {
       state.accessToken = action.payload.accessToken
     },
@@ -113,5 +122,5 @@ const authSlice = createSlice({
 })
 
 export { login, fetchUserInfo, switchGroup }
-export const { logout, setAccessToken, setUserInfo } = authSlice.actions
+export const { logout, setAccessToken, setUserInfo, setHistoryUrl } = authSlice.actions
 export default authSlice.reducer

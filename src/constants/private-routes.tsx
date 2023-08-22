@@ -49,7 +49,7 @@ export const PRIVATE_PATH = {
   position: '/positions',
   typesOfleave: '/types-of-leave',
   report: 'report',
-  leaveRequest: '/leave-request',
+  leaveRequest: '/request',
   statistical: 'statistical'
 }
 
