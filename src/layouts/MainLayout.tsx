@@ -240,11 +240,9 @@ const MainLayout: React.FC = () => {
         <div className='menu-top'>
           <div className='logo-vertical tw-flex tw-flex-col tw-items-center tw-justify-center'>
             <img src={logo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
-            {!collapsed && (
-              <span className='logo-title-container tw-cursor-pointer' onClick={() => navigate('timesheet')}>
-                <span className='logo-title tw-ml-[5px] tw-font-extrabold tw-text-lg logo-text-color'>EMS</span>
-              </span>
-            )}
+            {/* {!collapsed && (
+              <span className='logo-title-container tw-cursor-pointer' onClick={() => navigate('timesheet')}></span>
+            )} */}
           </div>
           <Menu
             style={{ backgroundColor: 'transparent' }}
