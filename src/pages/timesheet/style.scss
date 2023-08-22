@@ -239,6 +239,9 @@
     position: relative;
     &__checkbox {
       margin-bottom: 10px;
+      &--nodata {
+        margin-top: 10px;
+      }
     }
   }
 
@@ -294,10 +297,16 @@
 }
 
 @media (min-width: 992px) {
-  .timesheet-table__checkbox {
-    position: absolute;
-    bottom: 23px;
-    left: 0;
-    margin-bottom: 0;
+  .timesheet-table {
+    &__checkbox {
+      position: absolute;
+      bottom: 23px;
+      left: 0;
+      margin-bottom: 0;
+    }
+    &__checkbox--nodata {
+      bottom: -30px;
+      margin-top: 0;
+    }
   }
 }

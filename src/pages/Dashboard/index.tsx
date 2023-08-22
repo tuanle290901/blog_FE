@@ -36,7 +36,7 @@ const Dashboard: React.FC = () => {
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
-    userId?: string | null
+    userName?: string | null
     startDate?: string | null
     endDate?: string | null
     paging: IPaging
@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
         groupCode: searchValue.group,
         startDate: searchValue.startDate,
         endDate: searchValue.endDate,
-        userId: searchValue.userId,
+        userName: searchValue.userName,
         onlyShowWorkingDay: false
       })
     )
@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
                       groupCode: searchValue.group,
                       startDate: searchValue.startDate,
                       endDate: searchValue.endDate,
-                      userId: searchValue.userId
+                      userName: searchValue.userName
                     })
                   )
                 }
