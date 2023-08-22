@@ -26,7 +26,7 @@ import { IPaging, ISort } from '~/types/api-response.interface'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { LocalStorage } from '~/utils/local-storage'
 import { IUser } from '~/types/user.interface'
-import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
+// import { filterTypesOfLeave } from '~/stores/features/types-of-leave/types-of-leave.slice'
 import { IEmployeeWorkingTime } from '~/types/timesheet'
 import SyncTimeAttendanceModal from './component/SyncTimeAttendanceModal'
 import { getAllDefinationType } from '~/stores/features/leave-request/leave-request.slice'
@@ -36,7 +36,6 @@ const Timesheet: React.FC = () => {
   const { Search } = Input
   const dispatch = useAppDispatch()
   const { RangePicker } = DatePicker
-  const { Option } = Select
   const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
   const userGroup = currentAuth?.groupProfiles[0]?.groupCode
@@ -47,10 +46,10 @@ const Timesheet: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState(userGroup)
   const [onlyShowWorkingDay, setOnlyShowWorkingDay] = useState(true)
-  // const [selectedUser, setSelectedUser] = useState(
-  //   currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? usersInGroupSate[0]?.id : null
-  // )
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(
+    currentAuth?.groupProfiles[0]?.role === 'OFFICER' ? currentAuth?.userName : null
+  )
+  // const [selectedUser, setSelectedUser] = useState(null)
   const [isAllowedAccess, setIsAllowedAccess] = useState(
     currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? true : false
   )
@@ -68,7 +67,7 @@ const Timesheet: React.FC = () => {
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
   const userOptions = usersInGroupSate?.map((item) => {
     return {
-      value: item?.id,
+      value: item?.userName,
       label: `${item?.fullName ? item?.fullName : ''} (${item?.userName ? item?.userName : ''})`
     }
   })
@@ -86,7 +85,7 @@ const Timesheet: React.FC = () => {
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
-    userId?: string | null
+    userName?: string | null
     startDate?: string | null
     endDate?: string | null
     paging: IPaging
@@ -439,16 +438,16 @@ const Timesheet: React.FC = () => {
     setSearchValue((prevState) => {
       return { ...prevState, paging: { ...prevState.paging, page: 0 }, group: selectedGroup }
     })
-    const promiseFilterTypesOfLeave = dispatch(
-      filterTypesOfLeave({
-        paging: null,
-        sorts: null,
-        query: null
-      })
-    )
+    // const promiseFilterTypesOfLeave = dispatch(
+    //   filterTypesOfLeave({
+    //     paging: null,
+    //     sorts: null,
+    //     query: null
+    //   })
+    // )
     return () => {
       promiseGetAllDefinationType.abort()
-      promiseFilterTypesOfLeave.abort()
+      // promiseFilterTypesOfLeave.abort()
     }
   }, [])
 
@@ -466,7 +465,7 @@ const Timesheet: React.FC = () => {
 
   useEffect(() => {
     setSearchValue((prevState) => {
-      return { ...prevState, paging: { ...prevState.paging, page: 0 }, userId: selectedUser }
+      return { ...prevState, paging: { ...prevState.paging, page: 0 }, userName: selectedUser }
     })
   }, [selectedUser])
 
@@ -485,7 +484,7 @@ const Timesheet: React.FC = () => {
         groupCode: searchValue.group,
         startDate: searchValue.startDate,
         endDate: searchValue.endDate,
-        userId: searchValue.userId,
+        userName: searchValue.userName,
         onlyShowWorkingDay: searchValue.onlyShowWorkingDay
       })
     )
@@ -493,25 +492,6 @@ const Timesheet: React.FC = () => {
       promise.abort()
     }
   }, [searchValue, clickUpdateButton, syncManualSuccess])
-
-  // const sheetsData = [
-  //   {
-  //     sheetName: 'Sheet1',
-  //     headers: ['1', '23'],
-  //     data: [
-  //       ['John', 25],
-  //       ['Jane', 30]
-  //     ]
-  //   },
-  //   {
-  //     sheetName: 'Sheet2',
-  //     headers: ['City', 'Population'],
-  //     data: [
-  //       ['New York', 8500000],
-  //       ['London', 8900000]
-  //     ]
-  //   }
-  // ]
 
   return (
     <Row className='timesheet tw-p-2'>
@@ -613,7 +593,7 @@ const Timesheet: React.FC = () => {
                               groupCode: searchValue.group,
                               startDate: searchValue.startDate,
                               endDate: searchValue.endDate,
-                              userId: searchValue.userId,
+                              userName: searchValue.userName,
                               onlyShowWorkingDay: searchValue.onlyShowWorkingDay
                             })
                           )
@@ -717,7 +697,9 @@ const Timesheet: React.FC = () => {
                 }}
               />
               <Checkbox
-                className='timesheet-table__checkbox'
+                className={`timesheet-table__checkbox ${
+                  timesheetSate?.meta?.total < 1 && 'timesheet-table__checkbox--nodata'
+                }`}
                 onChange={() => setOnlyShowWorkingDay(!onlyShowWorkingDay)}
                 defaultChecked={onlyShowWorkingDay}
               >
