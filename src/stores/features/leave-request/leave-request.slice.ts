@@ -6,6 +6,7 @@ import { COMMON_ERROR_CODE } from '~/constants/app.constant'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface'
 import {
+  ICountLeaveRequest,
   ILeaveRequest,
   ILeaveRequestEditForm,
   ILeaveRequestForm,
@@ -22,6 +23,7 @@ export interface ILeaveRequestState {
   filter: string
   ticketDefinationType: TicketDefinationResponse[]
   nodeId: number
+  countLeaveRequest: ICountLeaveRequest
 }
 
 export interface TicketRequestPayload {
@@ -44,7 +46,12 @@ const initialState: ILeaveRequestState = {
   editingLeaveRequest: null,
   filter: '',
   ticketDefinationType: [],
-  nodeId: 0
+  nodeId: 0,
+  countLeaveRequest: {
+    approved: 0,
+    rejected: 0,
+    submitted: 0
+  }
 }
 
 export const filterLeaveRequest = createAsyncThunk('tickets/filter', async (params: TicketRequestPayload, thunkAPI) => {
@@ -153,6 +160,18 @@ export const getAllDefinationType = createAsyncThunk('tickets/definitions', asyn
   }
 })
 
+export const countLeaveRequest = createAsyncThunk('tickets/count', async (_, thunkAPI) => {
+  try {
+    const response: IApiResponse<any> = await HttpService.get('tickets/count')
+    return response.data
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    return error
+  }
+})
+
 const leaveRequestSlice = createSlice({
   name: 'leaveRequest',
   initialState,
@@ -188,6 +207,9 @@ const leaveRequestSlice = createSlice({
       })
       .addCase(getAllDefinationType.fulfilled, (state, action) => {
         state.ticketDefinationType = action.payload
+      })
+      .addCase(countLeaveRequest.fulfilled, (state, action) => {
+        state.countLeaveRequest = action.payload
       })
       .addCase(updateLeaveRequest.fulfilled, (state, action) => {
         const dataUpdate = action.payload
