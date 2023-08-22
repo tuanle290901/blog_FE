@@ -153,7 +153,7 @@ const MainLayout: React.FC = () => {
           ),
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
-            'Vi phạm và phép',
+            'Thống kê dữ liệu tháng',
             'statistical',
             null
           )
