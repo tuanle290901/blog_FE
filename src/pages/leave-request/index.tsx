@@ -459,7 +459,7 @@ const LeaveRequest: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100%-48px)] tw-m-3 tw-p-5 tw-bg-white'>
       <LeaveRequestForm
         open={isOpenModal}
         data={editingLeaveRequest}
@@ -490,7 +490,7 @@ const LeaveRequest: React.FC = () => {
               style={{ minWidth: 200 }}
               options={users.map((user) => {
                 return {
-                  label: user?.fullName || user?.userName,
+                  label: user?.fullName + ' (' + user?.userName + ')',
                   value: user?.userName
                 }
               })}
@@ -528,6 +528,12 @@ const LeaveRequest: React.FC = () => {
               </span>
             </Col>
             <Col xs={24} lg={16} className='leave-request-count-detail'>
+              <div
+                className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
+                onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}
+              >
+                Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+              </div>
               <div className='leave-request-count-detail__item' onClick={() => onFasFilter(TicketStatusEnum.CONFIRMED)}>
                 Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
               </div>
@@ -537,16 +543,14 @@ const LeaveRequest: React.FC = () => {
               >
                 Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
               </div>
-              <div
-                className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
-                onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}
-              >
-                Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
-              </div>
             </Col>
           </Row>
 
           <div className='leave-request-percent'>
+            <div
+              style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
+              className='leave-request-percent__item tw-bg-[#1677ff]'
+            ></div>
             <div
               className='leave-request-percent__item'
               style={{ width: `${getPercentage(countLeaveRequestSate.approved)}%` }}
@@ -554,10 +558,6 @@ const LeaveRequest: React.FC = () => {
             <div
               style={{ width: `${getPercentage(countLeaveRequestSate.rejected)}%` }}
               className='leave-request-percent__item tw-bg-[#cf1322]'
-            ></div>
-            <div
-              style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
-              className='leave-request-percent__item tw-bg-[#1677ff]'
             ></div>
           </div>
         </>

@@ -25,7 +25,7 @@ const renderRow = (title: string, firstArg: string | number, secondArg: string, 
   return (
     <Row className='tw-text-md tw-mt-3' align={'middle'}>
       <Col>
-        <div className={`tw-text-md tw-w-[250px] ${level === 'child' ? 'tw-indent-[50px]' : 'tw-font-semibold'}`}>
+        <div className={`tw-text-md tw-w-[220px] ${level === 'child' ? 'tw-indent-[50px]' : 'tw-font-semibold'}`}>
           {title}
         </div>
       </Col>
@@ -48,7 +48,7 @@ const Index = () => {
   return (
     <div className='statistical-wrapper'>
       <div className='statistical-container'>
-        <div className='report-title tw-text-lg tw-font-semibold'>Thông tin vi phạm và phép</div>
+        <div className='report-title tw-text-lg tw-font-semibold'>Thống kê thông tin dữ liệu trong tháng</div>
         <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
           Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
         </div>
@@ -57,7 +57,25 @@ const Index = () => {
           <>
             {' '}
             <Row className='tw-mt-3' gutter={[32, 16]}>
-              <Col xs={24} lg={8}>
+              <Col xs={24} lg={6}>
+                <div className='box-container'>
+                  <div className='border-top-gradient border-top-gradient-two' />
+                  <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ công tác</div>
+                  <Progress
+                    type='circle'
+                    percent={Number(leaveBalanceInfo?.totalOverTimeHours) ? 100 : 0}
+                    strokeColor={{
+                      '0%': '#ef6f62',
+                      '100%': '#f4a66a'
+                    }}
+                    strokeWidth={10}
+                    strokeLinecap='round'
+                    status={'normal'}
+                    format={() => `${Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1))} giờ `}
+                  />
+                </div>
+              </Col>
+              <Col xs={24} lg={6}>
                 <div className='box-container'>
                   <div className='border-top-gradient border-top-gradient-one' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ nghỉ phép còn lại</div>
@@ -83,7 +101,7 @@ const Index = () => {
                   />
                 </div>
               </Col>
-              <Col xs={24} lg={8}>
+              <Col xs={24} lg={6}>
                 <div className='box-container'>
                   <div className='border-top-gradient border-top-gradient-four' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số lần đi muộn/ về sớm</div>
@@ -101,7 +119,7 @@ const Index = () => {
                   />
                 </div>
               </Col>
-              <Col xs={24} lg={8}>
+              <Col xs={24} lg={6}>
                 <div className='box-container'>
                   <div className='border-top-gradient border-top-gradient-three' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ làm thêm trong tháng</div>
@@ -121,32 +139,31 @@ const Index = () => {
               </Col>
             </Row>
             <div className='tw-mt-[30px] report-description tw-text-md tw-italic tw-text-sky-700'>
-              Thông tin chi tiết
+              Thông tin chi tiết trong tháng
             </div>
             <Row align={'top'} gutter={[32, 16]}>
-              <Col xs={24} xl={12} xxl={8}>
+              <Col xs={24} xl={12} xxl={6}>
+                {renderRow('Số giờ công tác', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)), 'giờ')}
+              </Col>
+              <Col xs={24} xl={12} xxl={6}>
                 {renderRow(
                   'Số giờ nghỉ phép còn lại',
                   Number((leaveBalanceInfo?.totalRemainLeaveHours ?? 0).toFixed(1)),
                   'giờ'
                 )}
                 {renderRow(
-                  'Số giờ nghỉ phép đã dùng trong tháng',
+                  'Số giờ nghỉ phép đã dùng',
                   Number((leaveBalanceInfo?.totalUsedLeaveHours ?? 0).toFixed(1)),
                   'giờ'
                 )}
               </Col>
-              <Col xs={24} xl={12} xxl={8}>
-                {renderRow('Số lần đi muộn/ về sớm trong tháng', leaveBalanceInfo?.totalViolates, 'lần')}
+              <Col xs={24} xl={12} xxl={6}>
+                {renderRow('Số lần đi muộn/ về sớm', leaveBalanceInfo?.totalViolates, 'lần')}
                 {renderRow('Đi muộn:', leaveBalanceInfo?.totalLateCome, 'lần', 'child')}
                 {renderRow('Về sớm:', leaveBalanceInfo?.totalEarlyBack, 'lần', 'child')}
               </Col>
-              <Col xs={24} xl={12} xxl={8}>
-                {renderRow(
-                  'Số giờ làm thêm trong tháng',
-                  Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)),
-                  'giờ'
-                )}
+              <Col xs={24} xl={12} xxl={6}>
+                {renderRow('Số giờ làm thêm', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)), 'giờ')}
                 {leaveBalanceInfo?.overTimeInfoList?.map((item, index) => {
                   return <div key={index}>{renderRow(mappingOvertimeKey(item.key), item.value, 'giờ', 'child')}</div>
                 })}
