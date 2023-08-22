@@ -7,6 +7,7 @@ import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import logo from '../assets/images/logo.png'
+import logoHtsc from '../assets/images/logo-htsc.png'
 import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
 import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
 import menuIconReport from '../assets/images/menu/icon_group.png'
@@ -265,7 +266,7 @@ const MainLayout: React.FC = () => {
           <div className='tw-flex tw-items-center'>
             <span className='bottom-extra-text tw-mr-2'>Powered by</span>
             <span className='bottom-main-text tw-font-bold tw-flex tw-items-center'>
-              <img src={logo} alt='' className='tw-h-[20px] tw-mr-1' />
+              <img src={logoHtsc} alt='' className='tw-h-[20px] tw-mr-1' />
               HTSC
             </span>
           </div>
