@@ -459,7 +459,7 @@ const LeaveRequest: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100%-48px)] tw-m-3 tw-p-5 tw-bg-white'>
       <LeaveRequestForm
         open={isOpenModal}
         data={editingLeaveRequest}
