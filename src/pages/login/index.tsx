@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { LoginPayload } from '~/types/login-payload.ts'
 
 import { Button, Col, Form, Input, Row } from 'antd'
-import iconHand from '~/assets/images/login/icon-hand.png'
 import logo from '~/assets/images/logo.png'
 
 import { useNavigate } from 'react-router-dom'
@@ -19,6 +18,7 @@ const Index: React.FC = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const loginState = useAppSelector((state) => state.auth)
+  const historyUrl = useAppSelector((state) => state.auth.historyUrl)
 
   const onKeyDown = (event: any) => {
     if (event.key === ' ') event.preventDefault()
@@ -42,9 +42,10 @@ const Index: React.FC = () => {
   useEffect(() => {
     if (loginState?.userInfo?.userName) {
       LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
-      navigate('/timesheet')
+      const from = historyUrl || '/timesheet'
+      navigate(`../../${from}`, { replace: true })
     }
-  }, [loginState.userInfo, navigate])
+  }, [loginState.userInfo, navigate, historyUrl])
 
   useEffect(() => {
     const handleStorageChange = (event: any) => {
