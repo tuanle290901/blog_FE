@@ -7,7 +7,6 @@ import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import logo from '../assets/images/logo.png'
-import emsLogo from '../assets/images/ems-logo.png'
 import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
 import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
 import menuIconReport from '../assets/images/menu/icon_group.png'
@@ -240,6 +239,8 @@ const MainLayout: React.FC = () => {
       >
         <div className='menu-top'>
           <div className='logo-vertical tw-flex tw-flex-col tw-items-center tw-justify-center'>
+            <img src={logo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
+            {/*
             <img src={emsLogo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
             {/* {!collapsed && (
               <span className='logo-title-container tw-cursor-pointer' onClick={() => navigate('timesheet')}>

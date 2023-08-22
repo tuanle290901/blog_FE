@@ -619,9 +619,9 @@ const Timesheet: React.FC = () => {
                 </Col>
               </Row>
               <Row gutter={[16, 16]} className='tw-mt-[12px]'>
-                <Col xs={24} lg={5} xl={4}>
+                <Col xs={24} lg={6} xl={4}>
                   <Select
-                    className='tw-w-full'
+                    className='tw-w-full tw-max-w-[380px]'
                     showSearch
                     placeholder={`${t('rootInit.requiredSelect')} ${t('rootInit.group')}`}
                     optionFilterProp='children'
@@ -633,9 +633,9 @@ const Timesheet: React.FC = () => {
                     options={groupOptions}
                   />
                 </Col>
-                <Col xs={24} lg={5} xl={4}>
+                <Col xs={24} lg={9} xl={10}>
                   <Select
-                    className='tw-w-full'
+                    className='tw-w-full tw-max-w-[380px]'
                     showSearch
                     placeholder={`${t('rootInit.requiredSelect')} ${t('timesheet.employee')}`}
                     optionFilterProp='children'
@@ -650,7 +650,7 @@ const Timesheet: React.FC = () => {
                     options={userOptions}
                   />
                 </Col>
-                <Col xs={24} lg={14} xl={16} className='tw-text-right'>
+                <Col xs={24} lg={9} xl={10} className='tw-text-right'>
                   <Search
                     value={query}
                     placeholder={t('timesheet.findDataByAttendanceCode')}

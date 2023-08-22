@@ -100,7 +100,14 @@ const ChangePassword: React.FC<IChangePassword> = (props) => {
   }
 
   return (
-    <Modal open={showModal} forceRender footer={null} closable={false} maskClosable={false}>
+    <Modal
+      title={t('changePassword.title')}
+      open={showModal}
+      forceRender
+      footer={null}
+      closable={false}
+      maskClosable={false}
+    >
       <Form form={form} layout='vertical' onFinish={onSave} className='tw-my-[15px]'>
         <Form.Item
           label={<div className='tw-font-semibold'>{t('changePassword.oldPassword')}</div>}
