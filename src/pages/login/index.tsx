@@ -6,7 +6,7 @@ import { LoginPayload } from '~/types/login-payload.ts'
 import { Button, Col, Form, Input, Row } from 'antd'
 import logo from '~/assets/images/logo.png'
 
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { LOCAL_STORAGE } from '~/utils/Constant'
 import { LocalStorage } from '~/utils/local-storage'
 
@@ -19,6 +19,8 @@ const Index: React.FC = () => {
   const { t } = useTranslation()
   const loginState = useAppSelector((state) => state.auth)
   const historyUrl = useAppSelector((state) => state.auth.historyUrl)
+  const location = useLocation()
+  console.log(location.state, 'location 1')
 
   const onKeyDown = (event: any) => {
     if (event.key === ' ') event.preventDefault()
@@ -42,8 +44,15 @@ const Index: React.FC = () => {
   useEffect(() => {
     if (loginState?.userInfo?.userName) {
       LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
-      const from = historyUrl || '/timesheet'
-      navigate(`../../${from}`, { replace: true })
+      const hrefSource = location.state
+      if (hrefSource) {
+        const path = hrefSource.split('/')[3]
+        const indexOfPath = hrefSource.indexOf(path)
+        const url = hrefSource.substring(indexOfPath)
+        navigate(`../../${url}`, { replace: true })
+      } else {
+        navigate(`/timesheet`, { replace: true })
+      }
     }
   }, [loginState.userInfo, navigate, historyUrl])
 
