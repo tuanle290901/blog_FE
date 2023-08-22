@@ -490,7 +490,7 @@ const LeaveRequest: React.FC = () => {
               style={{ minWidth: 200 }}
               options={users.map((user) => {
                 return {
-                  label: user?.fullName || user?.userName,
+                  label: user?.fullName + ' (' + user?.userName + ')',
                   value: user?.userName
                 }
               })}
