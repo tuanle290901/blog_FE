@@ -547,15 +547,15 @@ const UserList: React.FC = () => {
                 defaultValue={'all'}
                 options={groupOptions}
                 value={searchValue.group}
-                className='tw-w-full tw-mw-64'
+                className='tw-w-full tw-min-w-[200px]'
               />
             </Col>
             <Col>
               <Search
                 value={query}
-                placeholder={'Tìm kiếm thành viên'}
+                placeholder={t('userList.searchMember')}
                 onChange={(event) => handleSearchValueChange(event.target.value)}
-                className='tw-w-full tw-mw-64'
+                className='tw-w-full tw-max-w-[350px] tw-min-w-[280px]'
               />
             </Col>
           </Row>
