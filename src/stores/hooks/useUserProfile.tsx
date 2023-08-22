@@ -11,7 +11,7 @@ const KEY = LOCAL_STORAGE.AUTH_INFO
 
 export const useUserInfo = () => {
   const [local, setLocal] = useLocalStorage(KEY, initialState)
-  const userInfo = useAppSelector((state) => state.auth.userInfo)
+  const userInfo = useAppSelector((state) => state.auth.userInfo) as IUser
   const dispatch = useAppDispatch()
 
   useEffect(() => {

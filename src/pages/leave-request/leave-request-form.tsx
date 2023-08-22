@@ -97,6 +97,12 @@ const LeaveRequestForm: React.FC<{
     return current && current <= dayjs().startOf('month')
   }
 
+  useEffect(() => {
+    if (!open) {
+      setSelectedTicketTypeId('')
+    }
+  }, [open])
+
   return (
     <Modal
       open={open}
