@@ -235,14 +235,12 @@ const LeaveRequest: React.FC = () => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
         key: 'ticketCode',
-        width: 120,
         title: 'Mã yêu cầu',
         dataIndex: 'ticketCode',
         sorter: false,
         showSorterTooltip: false,
         sortOrder: getSortOrder('ticketDefinitionId'),
         ellipsis: true
-        // fixed: 'left'
       },
       {
         key: 'ticketDefinitionId',
@@ -346,19 +344,21 @@ const LeaveRequest: React.FC = () => {
       {
         key: '',
         title: t('device.action'),
-        width: '120px',
-        align: 'center',
-        // fixed: 'right',
+        width: 160,
+        align: 'left',
         render: (_, record: ILeaveRequest) => {
           return (
-            <Space size='small'>
+            <div className='tw-flex tw-justify-between'>
               <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
-                <img
+                {/* <img
                   alt=''
                   src={iconApprove}
                   className='tw-cursor-pointer'
                   onClick={() => onOpenModalApprove(record)}
-                />
+                /> */}
+                <div onClick={() => onOpenModalApprove(record)} className='tw-text-blue-600 tw-cursor-pointer'>
+                  Phê duyệt
+                </div>
               </Tooltip>
 
               {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
@@ -403,7 +403,7 @@ const LeaveRequest: React.FC = () => {
                     <Button size='small' icon={<ReloadOutlined className='tw-text-red-600' />} />
                   </Popconfirm>
                 )}
-            </Space>
+            </div>
           )
         }
       }
@@ -534,7 +534,7 @@ const LeaveRequest: React.FC = () => {
         <>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} lg={8} className='leave-request-count-title'>
-              Số yêu cầu trong tháng
+              Số yêu cầu trong tháng {dayjs().format('MM/YYYY')}
               <span>
                 {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
               </span>
@@ -544,16 +544,22 @@ const LeaveRequest: React.FC = () => {
                 className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
                 onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}
               >
-                Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.SUBMITTED) ? 'active' : ''}>
+                  Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+                </span>
               </div>
               <div className='leave-request-count-detail__item' onClick={() => onFasFilter(TicketStatusEnum.CONFIRMED)}>
-                Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.CONFIRMED) ? 'active' : ''}>
+                  Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+                </span>
               </div>
               <div
                 className='leave-request-count-detail__item leave-request-count-detail__item--rejected'
                 onClick={() => onFasFilter(TicketStatusEnum.REJECTED)}
               >
-                Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.REJECTED) ? 'active' : ''}>
+                  Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+                </span>
               </div>
             </Col>
           </Row>
