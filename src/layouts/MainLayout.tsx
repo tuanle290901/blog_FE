@@ -227,18 +227,46 @@ const MainLayout: React.FC = () => {
     }
 
     return [
-      getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Menu', 'menu', null, [
-        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Tổng quan', 'dashboard'),
-        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Xác nhận ngày công', 'timesheet'),
-        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Yêu cầu', 'requestGroup', null, [
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách yêu cầu', 'request'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thống kê dữ liệu tháng', 'statistical')
-        ]),
-        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Nhân sự', 'userGroup', null, [
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thành viên', 'users'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Phòng ban', 'department'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Chức vụ', 'positions')
-        ]),
+      getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER], 'Tổng quan', 'dashboard'),
+      getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER], 'Menu', 'menu', null, [
+        getItemIfAllowed(
+          [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          'Xác nhận ngày công',
+          'timesheet'
+        ),
+        getItemIfAllowed(
+          [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          'Yêu cầu',
+          'requestGroup',
+          null,
+          [
+            getItemIfAllowed(
+              [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+              'Danh sách yêu cầu',
+              'request'
+            ),
+            getItemIfAllowed(
+              [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+              'Thống kê dữ liệu tháng',
+              'statistical'
+            )
+          ]
+        ),
+        getItemIfAllowed(
+          [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          'Nhân sự',
+          'userGroup',
+          null,
+          [
+            getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER], 'Thành viên', 'users'),
+            getItemIfAllowed(
+              [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+              'Phòng ban',
+              'department'
+            ),
+            getItemIfAllowed([ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER], 'Chức vụ', 'positions')
+          ]
+        ),
         getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Báo cáo', 'report'),
         getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time', null, [
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
