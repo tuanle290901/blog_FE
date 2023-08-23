@@ -91,7 +91,7 @@ const LeaveRequest: React.FC = () => {
   const countLeaveRequestSate = useAppSelector((state) => state.leaveRequest.countLeaveRequest)
   const isLoading = useAppSelector((state) => state.leaveRequest.loading)
 
-  const [dateFilter, setDateFilter] = useState<[Dayjs, Dayjs]>([dayjs().startOf('month'), dayjs()])
+  const [dateFilter, setDateFilter] = useState<Dayjs>(dayjs().startOf('month'))
   const [statusFilter, setStatusFilter] = useState<string[]>([])
   const [isApprovedSuccess, setIsApprovedSuccess] = useState<boolean>(false)
   const [searchValue, setSearchValue] = useState<TicketRequestPayload>(initialPayload)
@@ -193,8 +193,18 @@ const LeaveRequest: React.FC = () => {
       case 'requestTime':
         setDateFilter(requestItem)
         updateSearchValue(() => ({
-          startDate: requestItem ? dayjs.utc(requestItem[0]).format() : '',
-          endDate: requestItem ? dayjs.utc(requestItem[1]).format() : ''
+          startDate: requestItem
+            ? dayjs
+                .utc(dayjs().month(dayjs(requestItem).month()))
+                .startOf('month')
+                .format()
+            : '',
+          endDate: requestItem
+            ? dayjs
+                .utc(dayjs().month(dayjs(requestItem).month()))
+                .endOf('month')
+                .format()
+            : ''
         }))
         break
 
@@ -229,8 +239,6 @@ const LeaveRequest: React.FC = () => {
     }
   }, [queryParameters])
 
-  useEffect
-
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
@@ -244,8 +252,7 @@ const LeaveRequest: React.FC = () => {
       },
       {
         key: 'ticketDefinitionId',
-        title: 'Yêu cầu',
-        width: 160,
+        title: 'Loại yêu cầu',
         dataIndex: 'ticketDefinitionId',
         sorter: false,
         showSorterTooltip: false,
@@ -415,8 +422,11 @@ const LeaveRequest: React.FC = () => {
     dispatch(getAllDefinationType())
     dispatch(searchUser(filterUserPayload))
     dispatch(getListDepartments())
-    dispatch(countLeaveRequest())
   }, [])
+
+  useEffect(() => {
+    isSystemAdmin && dispatch(countLeaveRequest(dateFilter))
+  }, [dateFilter])
 
   useEffect(() => {
     const promise = dispatch(filterLeaveRequest(searchValue))
@@ -458,13 +468,13 @@ const LeaveRequest: React.FC = () => {
   }
 
   const onFasFilter = (status: TicketStatusEnum.SUBMITTED | TicketStatusEnum.REJECTED | TicketStatusEnum.CONFIRMED) => {
-    setDateFilter([dayjs().startOf('month'), dayjs()])
+    // setDateFilter(dayjs().startOf('month'))
     setStatusFilter([status])
     setSearchValue((prev) => {
       return {
         ...prev,
-        startDate: dayjs.utc().startOf('month').format(),
-        endDate: dayjs.utc().format(),
+        // startDate: dayjs.utc().startOf('month').format(),
+        // endDate: dayjs.utc().format(),
         statuses: [status]
       }
     })
@@ -509,10 +519,15 @@ const LeaveRequest: React.FC = () => {
             />
           )}
 
-          <RangePicker
+          <DatePicker
+            picker='month'
+            allowClear={false}
             value={dateFilter}
-            format={'DD/MM/YYYY'}
+            format={'MM/YYYY'}
             onChange={(val) => onChangeRequest('requestTime', val)}
+            disabledDate={(date) => {
+              return date.isAfter(new Date())
+            }}
           />
 
           <Select
@@ -534,7 +549,7 @@ const LeaveRequest: React.FC = () => {
         <>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} lg={8} className='leave-request-count-title'>
-              Số yêu cầu trong tháng {dayjs().format('MM/YYYY')}
+              Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
               <span>
                 {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
               </span>
