@@ -169,7 +169,7 @@ const Index = () => {
                   <TreeSelect {...treeProps} />
                 </Form.Item>
               </Col> */}
-              <Col span={12} offset={6}>
+              <Col xs={24} lg={{ span: 12, offset: 6 }}>
                 <Form.Item
                   label='Thời gian báo cáo'
                   name='time'
@@ -194,7 +194,7 @@ const Index = () => {
                 </Form.Item>
               </Col>
 
-              <Col span={12} offset={6}>
+              <Col xs={24} lg={{ span: 12, offset: 6 }}>
                 <Form.Item>
                   <Button className='login-button tw-w-1/10 tw-float-right' type='primary' htmlType='submit'>
                     Tải xuống

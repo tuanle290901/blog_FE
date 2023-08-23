@@ -241,15 +241,15 @@ const LeaveRequest: React.FC = () => {
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
-      // {
-      //   key: 'ticketCode',
-      //   title: 'Mã yêu cầu',
-      //   dataIndex: 'ticketCode',
-      //   sorter: false,
-      //   showSorterTooltip: false,
-      //   sortOrder: getSortOrder('ticketDefinitionId'),
-      //   ellipsis: true
-      // },
+      {
+        key: 'ticketCode',
+        title: 'Mã yêu cầu',
+        dataIndex: 'ticketCode',
+        sorter: false,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('ticketDefinitionId'),
+        ellipsis: true
+      },
       {
         key: 'ticketDefinitionId',
         title: 'Loại yêu cầu',
@@ -258,18 +258,18 @@ const LeaveRequest: React.FC = () => {
         showSorterTooltip: false,
         sortOrder: getSortOrder('ticketDefinitionId'),
         ellipsis: true,
-        width: '150px',
         render: (item) => {
           return ticketDifinations.find((ticket) => ticket.id === item)?.name
         }
+        // fixed: 'left'
       },
       {
         key: 'processStatus',
         title: t('leaveRequest.startDate'),
+        width: 160,
         sorter: false,
         dataIndex: 'processStatus',
         ellipsis: true,
-        width: '170px',
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
           return dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')
@@ -278,10 +278,10 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'processStatus',
         title: t('leaveRequest.endDate'),
+        width: 160,
         dataIndex: 'processStatus',
         ellipsis: false,
         sorter: false,
-        width: '170px',
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
           return dayjs(endDate).format('DD/MM/YYYY HH:mm:ss')
@@ -290,10 +290,10 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'processStatus',
         title: t('leaveRequest.requestMessage'),
+        width: 200,
         dataIndex: 'processStatus',
         showSorterTooltip: false,
         ellipsis: true,
-        width: '200px',
         render: (item) => {
           const reason = item['0']?.attributes?.reason || item['0']?.attributes?.description
           return reason
@@ -302,10 +302,10 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'createdAt',
         title: t('leaveRequest.requestDate'),
+        width: 160,
         dataIndex: 'createdAt',
         sorter: true,
         ellipsis: true,
-        width: '170px',
         render: (requestDate) => {
           return dayjs(requestDate).format('DD/MM/YYYY HH:mm:ss')
         }
@@ -313,20 +313,20 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'createdBy',
         title: 'Người yêu cầu',
+        width: 150,
         dataIndex: 'createdBy',
         showSorterTooltip: false,
         ellipsis: true,
-        width: '150px',
         sorter: true
       },
       {
         key: 'groupCode',
         title: 'Phòng ban',
+        width: 120,
         dataIndex: 'groupCode',
         showSorterTooltip: false,
         ellipsis: true,
         sorter: true,
-        width: '150px',
         render: (departmentCode) => {
           return mappingDepartmentByCode(departments, departmentCode)
         }
@@ -334,10 +334,10 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'status',
         title: t('leaveRequest.status'),
+        width: 120,
         dataIndex: 'status',
         showSorterTooltip: false,
         ellipsis: true,
-        width: '100px',
         render: (status) => {
           return (
             <div>
@@ -351,7 +351,7 @@ const LeaveRequest: React.FC = () => {
       {
         key: '',
         title: t('device.action'),
-        width: '160px',
+        width: 160,
         align: 'left',
         render: (_, record: ILeaveRequest) => {
           return (
@@ -425,8 +425,10 @@ const LeaveRequest: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    isSystemAdmin && dispatch(countLeaveRequest(dateFilter))
-  }, [dateFilter])
+    if (isSystemAdmin) {
+      dispatch(countLeaveRequest(dateFilter))
+    }
+  }, [dateFilter, isSystemAdmin])
 
   useEffect(() => {
     const promise = dispatch(filterLeaveRequest(searchValue))
@@ -491,7 +493,7 @@ const LeaveRequest: React.FC = () => {
       <div className='tw-flex'>
         <h1 className='tw-text-2xl tw-font-semibold'>{t('leaveRequest.title')}</h1>
       </div>
-      <div className='tw-flex tw-justify-between tw-my-5'>
+      <div className='tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-gap-[10px] tw-my-5'>
         <Button
           onClick={() => {
             setCanUpdateForm(true)
@@ -503,7 +505,7 @@ const LeaveRequest: React.FC = () => {
         >
           {t('leaveRequest.createNew')}
         </Button>
-        <Space>
+        <div className='tw-flex tw-flex-col md:tw-flex-row tw-gap-[10px] tw-justify-between'>
           {(isSystemAdmin || isManagerDepartment) && (
             <Select
               onChange={(val) => onChangeRequest('requestBy', val)}
@@ -543,11 +545,11 @@ const LeaveRequest: React.FC = () => {
               }
             })}
           />
-        </Space>
+        </div>
       </div>
       {isSystemAdmin && (
         <>
-          <Row gutter={[16, 16]} className='leave-request-count'>
+          <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} lg={8} className='leave-request-count-title'>
               Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
               <span>
@@ -579,7 +581,7 @@ const LeaveRequest: React.FC = () => {
             </Col>
           </Row>
 
-          <div className='leave-request-percent'>
+          <div className='leave-request-percent tw-hidden md:tw-flex'>
             <div
               style={{ width: `${getPercentage(countLeaveRequestSate.submitted)}%` }}
               className='leave-request-percent__item tw-bg-[#1677ff]'
@@ -598,6 +600,14 @@ const LeaveRequest: React.FC = () => {
 
       <div>
         <Table
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                setIsOpenModalApprove(true)
+                setSelectedTicket(record)
+              }
+            }
+          }}
           columns={columns}
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
@@ -633,7 +643,7 @@ const LeaveRequest: React.FC = () => {
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
         width='60%'
-        style={{ minWidth: 800 }}
+        style={{ minWidth: 350 }}
         footer={null}
       >
         {selectedTicket && (

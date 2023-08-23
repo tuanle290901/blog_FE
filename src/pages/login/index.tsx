@@ -20,7 +20,6 @@ const Index: React.FC = () => {
   const loginState = useAppSelector((state) => state.auth)
   const historyUrl = useAppSelector((state) => state.auth.historyUrl)
   const location = useLocation()
-  console.log(location.state, 'location 1')
 
   const onKeyDown = (event: any) => {
     if (event.key === ' ') event.preventDefault()
@@ -46,9 +45,12 @@ const Index: React.FC = () => {
       LocalStorage.setObject(LOCAL_STORAGE.AUTH_INFO, loginState.userInfo)
       const hrefSource = location.state
       if (hrefSource) {
+        let url = ''
         const path = hrefSource.split('/')[3]
         const indexOfPath = hrefSource.indexOf(path)
-        const url = hrefSource.substring(indexOfPath)
+        if (indexOfPath && indexOfPath !== -1) {
+          url = hrefSource.substring(indexOfPath)
+        }
         navigate(`../../${url}`, { replace: true })
       } else {
         navigate(`/timesheet`, { replace: true })

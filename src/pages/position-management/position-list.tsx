@@ -227,7 +227,7 @@ const PositionList: React.FC = () => {
           <Search
             placeholder={t('position.search')}
             onChange={(event) => handleSearchValueChange(event.target.value)}
-            className='tw-w-64'
+            className='tw-w-64 tw-hidden md:tw-flex'
           />
         </div>
       </div>
