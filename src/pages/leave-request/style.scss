@@ -28,7 +28,7 @@
         margin-right: 30px;
         padding-right: 12px;
         border-right: 1px solid #d9d9d9;
-        span {
+        span span {
           font-weight: bold;
         }
         &::before {
@@ -42,6 +42,14 @@
           left: -12px;
           transform: translate(-50%, -50%);
         }
+        span.active {
+          padding: 1px 5px;
+          border-radius: 5px;
+          border: 1px solid #b7eb8f;
+          margin-left: 4px;
+          color: #389e0d;
+          background: #f6ffed;
+        }
 
         &--rejected {
           border: none;
@@ -51,12 +59,22 @@
             background-color: #cf1322;
             content: '';
           }
+          span.active {
+            color: #cf1322;
+            background: #fff1f0;
+            border-color: #ffa39e;
+          }
         }
 
         &--submitted {
           &::before {
             background-color: #1677ff;
             content: '';
+          }
+          span.active {
+            color: #1677ff;
+            background: #e6f4ff;
+            border-color: #91caff;
           }
         }
       }

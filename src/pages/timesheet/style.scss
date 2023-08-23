@@ -245,13 +245,6 @@
     }
   }
 
-  .ant-table-thead {
-    th {
-      text-align: center !important;
-      // text-transform: uppercase;
-    }
-  }
-
   .ant-table-row.weekend {
     background: #f5f4f4;
     .ant-table-column-sort {
@@ -276,10 +269,6 @@
   &__sync-button:hover button {
     background-color: #52c41a !important;
     opacity: 0.9;
-  }
-
-  .ant-table-cell {
-    vertical-align: middle;
   }
 }
 
