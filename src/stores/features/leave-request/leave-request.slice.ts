@@ -13,7 +13,7 @@ import {
   ILeaveRequestUpdateStatusForm
 } from '~/types/leave-request'
 import { TicketDefinationResponse } from '~/types/leave-request.interface'
-
+import dayjs, { Dayjs } from 'dayjs'
 export interface ILeaveRequestState {
   listData: ILeaveRequest[]
   ticketItemSelected: ILeaveRequest
@@ -171,9 +171,11 @@ export const getAllDefinationType = createAsyncThunk('tickets/definitions', asyn
   }
 })
 
-export const countLeaveRequest = createAsyncThunk('tickets/count', async (_, thunkAPI) => {
+export const countLeaveRequest = createAsyncThunk('tickets/count', async (dateFilter: Dayjs, thunkAPI) => {
   try {
-    const response: IApiResponse<any> = await HttpService.get('tickets/count')
+    const response: IApiResponse<any> = await HttpService.get(
+      `tickets/count?yyyyMM=${dayjs(dateFilter).format('YYYYMM')}`
+    )
     return response.data
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
