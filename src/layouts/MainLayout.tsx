@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { InfoCircleOutlined, LoginOutlined, LockOutlined } from '@ant-design/icons'
+import { DoubleRightOutlined, LoginOutlined, LockOutlined, DoubleLeftOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import logo from '../assets/images/logo.png'
 import logoHtsc from '../assets/images/logo-htsc.png'
+import logoIcon from '../assets/images/logo-ems-icon.png'
 import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
 import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
 import menuIconReport from '../assets/images/menu/icon_group.png'
@@ -56,6 +57,7 @@ const MainLayout: React.FC = () => {
   const [sideBarMenuKey, setSideBarMenuKey] = useState('')
   const [selectedKeyStatus, setSelectedKeyStatus] = useState<string>(`${params.pathname}`.split('/')[1])
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false)
+  const [currentMobileItem, setCurrentMobileItem] = useState('')
 
   const handleLogout = () => {
     dispatch(logout())
@@ -202,10 +204,61 @@ const MainLayout: React.FC = () => {
     ]
   }, [userInfo])
 
+  const menuMobileItems: MenuItem[] = useMemo(() => {
+    const getItemIfAllowed = (
+      roles: ROLE[],
+      title: React.ReactNode,
+      key: React.Key,
+      icon?: React.ReactNode,
+      subMenu?: MenuItem[],
+      group?: any
+    ) => {
+      const hasRole = hasPermission(roles, userInfo?.groupProfiles)
+      if (hasRole) return getItem(title, key, icon, subMenu, group)
+      const isHrManager = userInfo?.groupProfiles.find(
+        (item) => item.groupCode === ROLE.HR && (item.role === ROLE.MANAGER || item.role === ROLE.SUB_MANAGER)
+      )
+      if (key === 'report') {
+        if (isHrManager) {
+          return getItem(title, key, icon, subMenu, group)
+        }
+      }
+      return null
+    }
+
+    return [
+      getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Menu', 'menu', null, [
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Tổng quan', 'dashboard'),
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Xác nhận ngày công', 'timesheet'),
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Yêu cầu', 'requestGroup', null, [
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Danh sách yêu cầu', 'request'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thống kê dữ liệu tháng', 'statistical')
+        ]),
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Nhân sự', 'userGroup', null, [
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thành viên', 'users'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Phòng ban', 'department'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Chức vụ', 'positions')
+        ]),
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Báo cáo', 'report'),
+        getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time', null, [
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices')
+        ])
+      ])
+    ]
+  }, [userInfo])
+
   const handleMenuClick = (menu: MenuItem) => {
     if (menu?.key) {
       navigate(menu.key.toString())
     }
+  }
+
+  const onMobileMenuClick: MenuProps['onClick'] = (e) => {
+    if (e?.key) {
+      navigate(e.key.toString())
+    }
+    setCurrentMobileItem(e.key)
   }
 
   useEffect(() => {
@@ -236,18 +289,21 @@ const MainLayout: React.FC = () => {
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
         width={250}
-        className='sidebar-custom'
+        className='sidebar-custom tw-hidden xl:tw-block'
       >
         <div className='menu-top'>
           <div className='logo-vertical tw-flex tw-flex-col tw-items-center tw-justify-center'>
-            <img src={logo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
-            {/*
-            <img src={emsLogo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
-            {/* {!collapsed && (
-              <span className='logo-title-container tw-cursor-pointer' onClick={() => navigate('timesheet')}>
-                <span className='logo-title tw-ml-[5px] tw-font-extrabold tw-text-lg logo-text-color'>EMS</span>
-              </span>
-            )} */}
+            {!collapsed && (
+              <img src={logo} alt='' className='logo-image tw-cursor-pointer' onClick={() => navigate('timesheet')} />
+            )}
+            {collapsed && (
+              <img
+                src={logoIcon}
+                alt=''
+                className='logo-image tw-cursor-pointer'
+                onClick={() => navigate('timesheet')}
+              />
+            )}
           </div>
           <Menu
             style={{ backgroundColor: 'transparent' }}
@@ -262,19 +318,36 @@ const MainLayout: React.FC = () => {
         </div>
 
         <div className='menu-bottom'>
-          <div className='bottom-main-text'>Employee Management System</div>
-          <div className='tw-flex tw-items-center'>
-            <span className='bottom-extra-text tw-mr-2'>Powered by</span>
-            <span className='bottom-main-text tw-font-bold tw-flex tw-items-center'>
-              <img src={logoHtsc} alt='' className='tw-h-[20px] tw-mr-1' />
-              HTSC
-            </span>
+          {!collapsed && (
+            <>
+              <div className='bottom-main-text'>Employee Management System</div>
+              <div className='tw-flex tw-items-center'>
+                <span className='bottom-extra-text tw-mr-2'>Powered by</span>
+
+                <span className='bottom-main-text tw-font-bold tw-flex tw-items-center'>
+                  <img src={logoHtsc} alt='' className='tw-h-[20px] tw-mr-1' />
+                  HTSC
+                </span>
+              </div>
+            </>
+          )}
+
+          <div onClick={() => setCollapsed(!collapsed)}>
+            {collapsed && <DoubleRightOutlined className='tw-text-white tw-cursor-pointer' />}
+            {!collapsed && <DoubleLeftOutlined className='tw-text-white tw-cursor-pointer' />}
           </div>
         </div>
       </Sider>
       <Layout>
         <Header className='header-container'>
-          <div className='header-container__left'></div>
+          <div className='header-container__left tw-block lg:tw-hidden'>
+            <Menu
+              onClick={onMobileMenuClick}
+              selectedKeys={[currentMobileItem]}
+              mode='horizontal'
+              items={menuMobileItems}
+            />
+          </div>
           <div className='header-container__right'>
             <Dropdown
               menu={{
@@ -283,9 +356,6 @@ const MainLayout: React.FC = () => {
               placement='bottom'
             >
               <div className='space-custom'>
-                {/* <Badge count={1}>
-                  <BellOutlined className='bell-icon-custom' />
-                </Badge> */}
                 <Space className='tw-cursor-pointer tw-ml-[15px]'>
                   <Avatar
                     size='large'

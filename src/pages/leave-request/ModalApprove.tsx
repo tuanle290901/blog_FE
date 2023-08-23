@@ -176,8 +176,8 @@ const ModalApprove = (props: {
                               step.status === TicketStatusEnum.REJECTED
                             ) {
                               return (
-                                <Col span={12} className='tw-flex' key={index}>
-                                  <div className='tw-min-w-[200px]'>{item.description}:</div>
+                                <Col xs={24} lg={12} className='tw-flex' key={index}>
+                                  <div className='lg:tw-min-w-[200px]'>{item.description}:</div>
                                   <div className='tw-font-medium tw-ml-[4px]'>{mappingValueByType(item)}</div>
                                 </Col>
                               )
@@ -191,7 +191,7 @@ const ModalApprove = (props: {
                                     {(isSystemAdmin ||
                                       userInfo.userName === (step?.executors && step.executors[0])) && (
                                       <>
-                                        <div className='tw-min-w-[200px]'>{item.description}:</div>
+                                        <div className='lg:tw-min-w-[200px]'>{item.description}:</div>
                                         {item.type === INPUT_TYPE.TEXT && (
                                           <AutoComplete
                                             className='tw-w-full'

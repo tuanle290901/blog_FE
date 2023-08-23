@@ -477,8 +477,8 @@ const Department: React.FC = () => {
           })}
         </h1>
       </Row>
-      <Row className='tw-w-100 tw-flex tw-justify-start tw-my-[20px]'>
-        <Col span={12}>
+      <Row className='tw-w-100 tw-flex tw-justify-start tw-my-[20px]' gutter={[16, 16]}>
+        <Col xs={24} md={12}>
           <CommonButton
             loading={false}
             classNameProps={`btn-add ${
@@ -503,11 +503,12 @@ const Department: React.FC = () => {
             title={`${t('department.add')}`}
           />
         </Col>
-        <Col span={12} className='tw-flex tw-justify-end'>
+        <Col xs={24} md={12} className='tw-flex tw-justify-end'>
           <Input.Search
+            className='tw-w-full'
             placeholder={`${t('department.pleaseEnterSearch')}`}
             onChange={(value) => onSearch(value)}
-            style={{ width: '30%' }}
+            style={{ maxWidth: 400 }}
             value={valueSearch}
           />
         </Col>

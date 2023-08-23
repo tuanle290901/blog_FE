@@ -44,7 +44,7 @@ const renderTitle = (title: string) => {
 
 const renderRow = (type: string, title: string, firstArg: string, secondArg?: string, thirdArg?: string) => {
   return (
-    <Row className='tw-text-md' align={'middle'}>
+    <Row className='tw-text-md' align={'middle'} gutter={[16, 16]}>
       <Col>
         <div className='tw-text-md tw-w-[300px]'>{title}</div>
       </Col>
@@ -176,7 +176,7 @@ const WorkingTimeConfig = () => {
               workingTimeInfo?.timeWorkSetup?.workingTime?.endTime
             )}
             <div className='tw-text-md tw-mt-4'>
-              <Row align={'middle'} justify={'space-between'}>
+              <Row align={'middle'} justify={'space-between'} gutter={[16, 16]}>
                 <Col>
                   {renderRow(
                     'double',
@@ -244,7 +244,7 @@ const WorkingTimeConfig = () => {
             <div className='tw-mt-4'>
               <Row align={'middle'}>
                 <Col>
-                  <div className='tw-text-md tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
+                  <div className='tw-text-md tw-mb-2 tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
                 </Col>
 
                 <Col>
