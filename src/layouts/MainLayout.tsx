@@ -141,26 +141,26 @@ const MainLayout: React.FC = () => {
         <img src={menuIconTimeKeeping} alt='' className='menu-image' />
       ),
 
-      getItemIfAllowed(
-        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        'Yêu cầu',
-        'request',
-        <img src={menuIconRequest} alt='' className='menu-image' />,
-        [
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-            'Danh sách yêu cầu',
-            'request',
-            null
-          ),
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
-            'Thống kê dữ liệu tháng',
-            'statistical',
-            null
-          )
-        ]
-      ),
+      // getItemIfAllowed(
+      //   [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+      //   'Yêu cầu',
+      //   'request',
+      //   <img src={menuIconRequest} alt='' className='menu-image' />,
+      //   [
+      //     getItemIfAllowed(
+      //       [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+      //       'Danh sách yêu cầu',
+      //       'request',
+      //       null
+      //     ),
+      //     getItemIfAllowed(
+      //       [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.MANAGER, ROLE.OFFICER],
+      //       'Thống kê dữ liệu tháng',
+      //       'statistical',
+      //       null
+      //     )
+      //   ]
+      // ),
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
@@ -235,24 +235,24 @@ const MainLayout: React.FC = () => {
         'menu',
         null,
         [
-          getItemIfAllowed(
-            [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-            'Yêu cầu',
-            'requestGroup',
-            null,
-            [
-              getItemIfAllowed(
-                [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-                'Danh sách yêu cầu',
-                'request'
-              ),
-              getItemIfAllowed(
-                [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-                'Thống kê dữ liệu tháng',
-                'statistical'
-              )
-            ]
-          ),
+          // getItemIfAllowed(
+          //   [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          //   'Yêu cầu',
+          //   'requestGroup',
+          //   null,
+          //   [
+          //     getItemIfAllowed(
+          //       [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          //       'Danh sách yêu cầu',
+          //       'request'
+          //     ),
+          //     getItemIfAllowed(
+          //       [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+          //       'Thống kê dữ liệu tháng',
+          //       'statistical'
+          //     )
+          //   ]
+          // ),
           getItemIfAllowed(
             [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
             'Nhân sự',
