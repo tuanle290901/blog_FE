@@ -119,9 +119,18 @@ const ModalApprove = (props: {
       status,
       ticketId
     }
-    await dispatch(updateLeaveRequest(payload))
-    notification.success({ message: 'Thao tác thành công' })
-    onUpdateSuccess(true)
+
+    try {
+      const response = await dispatch(updateLeaveRequest(payload)).unwrap()
+      onUpdateSuccess(true)
+      notification.success({
+        message: response.message
+      })
+    } catch (error: any) {
+      notification.error({
+        message: error.message
+      })
+    }
   }
 
   const onApprove = (nodeId: number) => {
@@ -159,6 +168,7 @@ const ModalApprove = (props: {
           {filteredSteps &&
             filteredSteps.length > 0 &&
             filteredSteps.map((step, mainIndex) => {
+              console.log(step, 'step')
               return (
                 <>
                   {step.status && (
@@ -265,7 +275,11 @@ const ModalApprove = (props: {
                               <span className='tw-mr-2'>bởi</span>
                               <span className='tw-text-sky-700 tw-italic'>
                                 {step?.histories[step?.histories?.length - 1].executorId} -
-                                {mappingDepartmentByCode(departments, ticket.groupCode)} (
+                                {mappingDepartmentByCode(
+                                  departments,
+                                  step.groupCodes[0] !== PROCESS_GROUPCODE.START ? step.groupCodes[0] : ticket.groupCode
+                                )}{' '}
+                                (
                                 {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
                                   'DD/MM/YYYY HH:mm:ss'
                                 )}

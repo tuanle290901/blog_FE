@@ -127,12 +127,12 @@ const MainLayout: React.FC = () => {
     }
 
     return [
-      getItemIfAllowed(
-        [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
-        'Tổng quan',
-        'dashboard',
-        <img src={menuIconDashboard} alt='' className='menu-image' />
-      ),
+      // getItemIfAllowed(
+      //   [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
+      //   'Tổng quan',
+      //   'dashboard',
+      //   <img src={menuIconDashboard} alt='' className='menu-image' />
+      // ),
 
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
