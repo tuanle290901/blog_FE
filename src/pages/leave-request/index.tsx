@@ -425,8 +425,10 @@ const LeaveRequest: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    isSystemAdmin && dispatch(countLeaveRequest(dateFilter))
-  }, [dateFilter])
+    if (isSystemAdmin) {
+      dispatch(countLeaveRequest(dateFilter))
+    }
+  }, [dateFilter, isSystemAdmin])
 
   useEffect(() => {
     const promise = dispatch(filterLeaveRequest(searchValue))
