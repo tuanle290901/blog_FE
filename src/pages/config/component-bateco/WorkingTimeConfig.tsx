@@ -48,7 +48,7 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg?: st
       <Col>
         <div className='tw-text-md tw-w-[300px]'>{title}</div>
       </Col>
-      <Col className='tw-ml-4'>
+      <Col>
         <Space>
           <div className='time-box'>{firstArg}</div>
           {type === 'double' && (
