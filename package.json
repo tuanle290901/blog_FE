@@ -11,7 +11,8 @@
     "lint:fix": "eslint --fix --ext ts,tsx src/",
     "prettier": "prettier --check \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
     "prettier:fix": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "host": "vite --host --open"
   },
   "lint-staged": {
     "*.tsx|*.ts": [
