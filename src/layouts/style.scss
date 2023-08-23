@@ -250,3 +250,13 @@
   line-height: 1;
   content: '*';
 }
+
+.ant-table-thead {
+  th {
+    text-align: center !important;
+  }
+}
+
+.ant-table-cell {
+  vertical-align: middle;
+}

@@ -127,9 +127,9 @@ export const tagColorMapping = (status?: string | number) => {
     case TicketStatusEnum.FINISHED:
       return '#16a34a'
     case TicketStatusEnum.PROCESSING:
-      return '#108ee9'
+      return 'orange'
     case TicketStatusEnum.CONFIRMED:
-      return '#16a34a'
+      return 'green'
     case TicketStatusEnum.REJECTED:
       return 'red'
     case TicketStatusEnum.CANCELLED:

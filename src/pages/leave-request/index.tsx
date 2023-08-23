@@ -233,15 +233,15 @@ const LeaveRequest: React.FC = () => {
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
-      {
-        key: 'ticketCode',
-        title: 'Mã yêu cầu',
-        dataIndex: 'ticketCode',
-        sorter: false,
-        showSorterTooltip: false,
-        sortOrder: getSortOrder('ticketDefinitionId'),
-        ellipsis: true
-      },
+      // {
+      //   key: 'ticketCode',
+      //   title: 'Mã yêu cầu',
+      //   dataIndex: 'ticketCode',
+      //   sorter: false,
+      //   showSorterTooltip: false,
+      //   sortOrder: getSortOrder('ticketDefinitionId'),
+      //   ellipsis: true
+      // },
       {
         key: 'ticketDefinitionId',
         title: 'Yêu cầu',
@@ -250,6 +250,7 @@ const LeaveRequest: React.FC = () => {
         showSorterTooltip: false,
         sortOrder: getSortOrder('ticketDefinitionId'),
         ellipsis: true,
+        width: '150px',
         render: (item) => {
           return ticketDifinations.find((ticket) => ticket.id === item)?.name
         }
@@ -260,6 +261,7 @@ const LeaveRequest: React.FC = () => {
         sorter: false,
         dataIndex: 'processStatus',
         ellipsis: true,
+        width: '170px',
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
           return dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')
@@ -271,6 +273,7 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'processStatus',
         ellipsis: false,
         sorter: false,
+        width: '170px',
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
           return dayjs(endDate).format('DD/MM/YYYY HH:mm:ss')
@@ -282,6 +285,7 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'processStatus',
         showSorterTooltip: false,
         ellipsis: true,
+        width: '200px',
         render: (item) => {
           const reason = item['0']?.attributes?.reason || item['0']?.attributes?.description
           return reason
@@ -293,6 +297,7 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'createdAt',
         sorter: true,
         ellipsis: true,
+        width: '170px',
         render: (requestDate) => {
           return dayjs(requestDate).format('DD/MM/YYYY HH:mm:ss')
         }
@@ -303,6 +308,7 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'createdBy',
         showSorterTooltip: false,
         ellipsis: true,
+        width: '150px',
         sorter: true
       },
       {
@@ -312,6 +318,7 @@ const LeaveRequest: React.FC = () => {
         showSorterTooltip: false,
         ellipsis: true,
         sorter: true,
+        width: '150px',
         render: (departmentCode) => {
           return mappingDepartmentByCode(departments, departmentCode)
         }
@@ -322,6 +329,7 @@ const LeaveRequest: React.FC = () => {
         dataIndex: 'status',
         showSorterTooltip: false,
         ellipsis: true,
+        width: '100px',
         render: (status) => {
           return (
             <div>
@@ -335,18 +343,21 @@ const LeaveRequest: React.FC = () => {
       {
         key: '',
         title: t('device.action'),
-        width: '120px',
-        align: 'center',
+        width: '160px',
+        align: 'left',
         render: (_, record: ILeaveRequest) => {
           return (
-            <Space size='small'>
+            <div className='tw-flex tw-justify-between'>
               <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
-                <img
+                {/* <img
                   alt=''
                   src={iconApprove}
                   className='tw-cursor-pointer'
                   onClick={() => onOpenModalApprove(record)}
-                />
+                /> */}
+                <div onClick={() => onOpenModalApprove(record)} className='tw-text-blue-600 tw-cursor-pointer'>
+                  Phê duyệt
+                </div>
               </Tooltip>
 
               {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
@@ -391,7 +402,7 @@ const LeaveRequest: React.FC = () => {
                     <Button size='small' icon={<ReloadOutlined className='tw-text-red-600' />} />
                   </Popconfirm>
                 )}
-            </Space>
+            </div>
           )
         }
       }
@@ -522,7 +533,7 @@ const LeaveRequest: React.FC = () => {
         <>
           <Row gutter={[16, 16]} className='leave-request-count'>
             <Col xs={24} lg={8} className='leave-request-count-title'>
-              Số yêu cầu trong tháng
+              Số yêu cầu trong tháng {dayjs().format('MM/YYYY')}
               <span>
                 {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
               </span>
@@ -532,16 +543,22 @@ const LeaveRequest: React.FC = () => {
                 className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
                 onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}
               >
-                Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.SUBMITTED) ? 'active' : ''}>
+                  Đang chờ: <span>{countLeaveRequestSate.submitted}</span>
+                </span>
               </div>
               <div className='leave-request-count-detail__item' onClick={() => onFasFilter(TicketStatusEnum.CONFIRMED)}>
-                Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.CONFIRMED) ? 'active' : ''}>
+                  Đã phê duyệt: <span>{countLeaveRequestSate.approved}</span>
+                </span>
               </div>
               <div
                 className='leave-request-count-detail__item leave-request-count-detail__item--rejected'
                 onClick={() => onFasFilter(TicketStatusEnum.REJECTED)}
               >
-                Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+                <span className={statusFilter?.includes(TicketStatusEnum.REJECTED) ? 'active' : ''}>
+                  Đã từ chối: <span>{countLeaveRequestSate.rejected}</span>
+                </span>
               </div>
             </Col>
           </Row>
