@@ -86,8 +86,6 @@ const CreateEditDevice: React.FC<{
     form.resetFields()
   }
 
-  console.log(typeAction)
-
   return (
     <Modal
       open={open}

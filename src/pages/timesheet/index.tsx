@@ -655,7 +655,7 @@ const Timesheet: React.FC = () => {
                     value={query}
                     placeholder={t('timesheet.findDataByAttendanceCode')}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
-                    className='tw-w-full tw-max-w-[300px]'
+                    className='tw-w-full tw-max-w-[360px]'
                   />
                   {/* <Button icon={<MenuOutlined />} type='default'>
                     Lọc

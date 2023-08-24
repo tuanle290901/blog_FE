@@ -469,23 +469,6 @@ const UserList: React.FC = () => {
   const items: MenuProps['items'] = [
     {
       label: (
-        <>
-          <div className='tw-cursor-pointer' onClick={() => fileSelect?.current?.click()}>
-            Import thành viên
-          </div>
-          <input
-            ref={fileSelect}
-            className='tw-hidden'
-            type='file'
-            accept='.xlxs,.xls'
-            onChange={(event) => handleFileChange(event.target.files)}
-          />
-        </>
-      ),
-      key: '0'
-    },
-    {
-      label: (
         <div className='tw-cursor-pointer' onClick={onDownloadImportTemplate}>
           Tải file import mẫu
         </div>
@@ -511,56 +494,50 @@ const UserList: React.FC = () => {
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <Row gutter={[16, 16]} className='tw-mt-4'>
-        <Col xs={24} lg={12}>
-          <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
+          <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
             {permissionAddUser && (
-              <Col>
-                <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
-                  {t('userList.addMember')}
-                </Button>
-              </Col>
+              <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
+                {t('userList.addMember')}
+              </Button>
             )}
-            {permissionImportUser && (
-              <Col>
-                <Dropdown menu={{ items }}>
-                  <div onClick={(e) => e.preventDefault()}>
-                    <Button>
-                      <div className='tw-flex tw-items-center'>
-                        <span>Import thành viên</span>
-                        <span className='tw-ml-1'>
-                          <DownOutlined style={{ fontSize: 13 }} />
-                        </span>
-                      </div>
-                    </Button>
-                  </div>
-                </Dropdown>
-              </Col>
-            )}
-          </Row>
-        </Col>
 
-        <Col xs={24} lg={12}>
-          <Row gutter={[16, 16]} className='tw-flex tw-justify-end'>
-            <Col>
-              <Select
-                onChange={handleDepartmentChange}
-                defaultValue={'all'}
-                options={groupOptions}
-                value={searchValue.group}
-                className='tw-w-full tw-min-w-[200px]'
-              />
-            </Col>
-            <Col>
-              <Search
-                value={query}
-                placeholder={t('userList.searchMember')}
-                onChange={(event) => handleSearchValueChange(event.target.value)}
-                className='tw-w-full tw-max-w-[350px] tw-min-w-[280px]'
-              />
-            </Col>
-          </Row>
+            {permissionImportUser && (
+              <Dropdown.Button menu={{ items }} onClick={() => fileSelect?.current?.click()}>
+                <>
+                  <span className='tw-cursor-pointer'>Import thành viên</span>
+                  <input
+                    ref={fileSelect}
+                    className='tw-hidden'
+                    type='file'
+                    accept='.xlxs,.xls'
+                    onChange={(event) => handleFileChange(event.target.files)}
+                  />
+                </>
+              </Dropdown.Button>
+            )}
+          </div>
+        </Col>
+        <Col xs={24} md={12}>
+          <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
+            <Select
+              onChange={handleDepartmentChange}
+              defaultValue={'all'}
+              options={groupOptions}
+              value={searchValue.group}
+              className='tw-w-full lg:tw-w-[200px]'
+            />
+
+            <Search
+              value={query}
+              placeholder={t('userList.searchMember')}
+              onChange={(event) => handleSearchValueChange(event.target.value)}
+              className='tw-w-full lg:tw-w-[280px]'
+            />
+          </div>
         </Col>
       </Row>
+
       <div className='tw-mt-6'>
         <Table
           rowKey='id'

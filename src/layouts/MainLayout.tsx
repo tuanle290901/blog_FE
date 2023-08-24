@@ -144,7 +144,7 @@ const MainLayout: React.FC = () => {
       getItemIfAllowed(
         [ROLE.SYSTEM_ADMIN, ROLE.SUB_MANAGER, ROLE.OFFICER, ROLE.MANAGER],
         'Yêu cầu',
-        'request',
+        'requestGroup',
         <img src={menuIconRequest} alt='' className='menu-image' />,
         [
           getItemIfAllowed(
@@ -277,8 +277,9 @@ const MainLayout: React.FC = () => {
             ]
           ),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Báo cáo', 'report'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time', null, [
-            getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết lập', 'setting', null, [
+            getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time'),
+            // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
             getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices')
           ])
         ]
