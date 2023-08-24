@@ -270,6 +270,10 @@
     background-color: #52c41a !important;
     opacity: 0.9;
   }
+
+  .ant-table-cell {
+    vertical-align: middle;
+  }
 }
 
 .timesheet .ant-picker-calendar-header {
