@@ -4,11 +4,12 @@
 import { Form, Input, Modal, Select, notification } from 'antd'
 import React, { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT, REGEX_SPECIAL_TRIM } from '~/constants/regex.constant'
+import { REGEX_IP_ADDRESS, REGEX_NUMBER_AND_SPACE, REGEX_PORT, REGEX_ONLYTEXT } from '~/constants/regex.constant'
 import { createDevice, updateDevice } from '~/stores/features/device/device.slice'
 import { IGroup } from '~/stores/features/master-data/master-data.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IDevice, IDeviceForm } from '~/types/device.interface.ts'
+import { VALIDATE_FORM } from '~/utils/Constant'
 import { ACTION_TYPE } from '~/utils/helper'
 
 const CreateEditDevice: React.FC<{
@@ -121,12 +122,16 @@ const CreateEditDevice: React.FC<{
                 message: t('device.enterName')
               },
               {
-                pattern: REGEX_SPECIAL_TRIM,
+                pattern: REGEX_ONLYTEXT,
                 message: `${t('device.do-not-leave-spaces-special-accents')}`
               }
             ]}
           >
-            <Input placeholder={t('device.enterName')} disabled={typeAction === ACTION_TYPE.View ? true : false} />
+            <Input
+              placeholder={t('device.enterName')}
+              maxLength={VALIDATE_FORM.MAX_LENGTH_INPUT}
+              disabled={typeAction === ACTION_TYPE.View ? true : false}
+            />
           </Form.Item>
           <Form.Item
             style={{ marginBottom: 8 }}
