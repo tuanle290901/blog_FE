@@ -9,7 +9,6 @@ import {
   Popconfirm,
   Row,
   Select,
-  Space,
   Table,
   TableColumnsType,
   TablePaginationConfig,
@@ -21,7 +20,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import iconApprove from '~/assets/images/approved.png'
+import { useSearchParams } from 'react-router-dom'
 import { ROLE } from '~/constants/app.constant'
 import LeaveRequestForm from '~/pages/leave-request/leave-request-form'
 import { getListDepartments } from '~/stores/features/department/department.silce'
@@ -47,7 +46,7 @@ import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/C
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
-import { useSearchParams } from 'react-router-dom'
+import { uniqueId } from 'lodash'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -363,7 +362,10 @@ const LeaveRequest: React.FC = () => {
                   className='tw-cursor-pointer'
                   onClick={() => onOpenModalApprove(record)}
                 /> */}
-                <div onClick={() => onOpenModalApprove(record)} className='tw-text-blue-600 tw-cursor-pointer'>
+                <div
+                  onClick={() => onOpenModalApprove(record)}
+                  className='tw-text-blue-600 tw-cursor-pointer tw-underline'
+                >
                   Phê duyệt
                 </div>
               </Tooltip>
@@ -602,7 +604,7 @@ const LeaveRequest: React.FC = () => {
         <Table
           onRow={(record) => {
             return {
-              onClick: () => {
+              onDoubleClick: () => {
                 setIsOpenModalApprove(true)
                 setSelectedTicket(record)
               }

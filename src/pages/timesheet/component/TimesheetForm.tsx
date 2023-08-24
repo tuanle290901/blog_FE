@@ -18,7 +18,6 @@ const TimesheetForm: React.FC<{ open: boolean; handleClose: () => void }> = ({ o
       type: formValue?.type || '',
       reason: formValue?.reason || ''
     }
-    console.log('payload', payload)
     void message.success('Success')
     // handleClose()
   }

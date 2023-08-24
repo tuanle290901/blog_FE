@@ -86,7 +86,6 @@ const Initialize: React.FC = () => {
           type: data?.type,
           publishDate: data?.publishDate
         }
-        console.log('initData', initData)
         // const resData = await RootInitializationService.initAdmin(initData)
         // const resData: any = []
         // if (resData?.data?.accessToken) {

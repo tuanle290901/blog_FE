@@ -168,7 +168,6 @@ const ModalApprove = (props: {
           {filteredSteps &&
             filteredSteps.length > 0 &&
             filteredSteps.map((step, mainIndex) => {
-              console.log(step, 'step')
               return (
                 <>
                   {step.status && (

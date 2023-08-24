@@ -28,7 +28,6 @@ HttpService.interceptors.request.use((config: any) => {
 })
 HttpService.interceptors.response.use(
   (response) => {
-    console.log(response)
     return response.data
   },
   (error) => {

@@ -36,15 +36,16 @@ export const DEVICE_STATUS = {
 }
 
 export const LEAVE_TYPE_MAP: LeaveTypes = {
-  SICK: 'Nghỉ ốm',
+  SICK: 'Nghỉ ốm (Có bảo hiểm)',
   COMPENSATORY: 'Nghỉ bù',
   ANNUAL: 'Nghỉ phép theo năm',
   UNPAID: 'Nghỉ không lương',
-  MATERNITY: 'Nghỉ thai sản',
-  PATERNITY: 'Nghỉ thai sản cho người thân',
+  MATERNITY: 'Nghỉ thai sản (Có bảo hiểm)',
+  PATERNITY: 'Nghỉ thai sản cho người thân (Có bảo hiểm)',
   WORK_FROM_HOME: 'Làm việc ở nhà',
-  WEDDING: 'Nghỉ cưới',
+  WEDDING: 'Nghỉ cưới (Có bảo hiểm)',
   UNEXPECTED: 'Nghỉ đột xuất',
+  COMPASSIONATE: 'Nghỉ hiếu',
   OTHER: 'Lý do khác'
 }
 
