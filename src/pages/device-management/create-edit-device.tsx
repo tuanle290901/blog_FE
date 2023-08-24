@@ -136,7 +136,7 @@ const CreateEditDevice: React.FC<{
             rules={[
               {
                 pattern: REGEX_IP_ADDRESS,
-                message: `${t('device.ipAddress')}`
+                message: `${t('device.enterIpAddressWarning')}`
               },
               {
                 required: true,
