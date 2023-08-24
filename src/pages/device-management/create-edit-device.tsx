@@ -120,11 +120,12 @@ const CreateEditDevice: React.FC<{
               {
                 required: true,
                 message: t('device.enterName')
-              },
-              {
-                pattern: REGEX_ONLYTEXT,
-                message: `${t('device.do-not-leave-spaces-special-accents')}`
               }
+              // ,
+              // {
+              //   pattern: REGEX_ONLYTEXT,
+              //   message: `${t('device.do-not-leave-spaces-special-accents')}`
+              // }
             ]}
           >
             <Input
