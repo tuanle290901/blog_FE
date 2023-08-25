@@ -44,13 +44,14 @@
     "enterDateJoin": "Chọn ngày gia nhập",
     "enterProbationDate": "Chọn ngày kí hợp đồng thử việc",
     "enterOfficialContractSigningDate": "Chọn ngày kí hợp đồng chính thức",
+    "signingDateWarning": "Lưu ý: Ngày ký hợp đồng chính thức phải sau ngày gia nhập!",
     "avatarAccept": "Lưu ý: Ảnh đại diện sẽ dùng để chấm công, nên phải là ảnh khuôn mặt được chụp trực diện, rõ mặt (có thể đeo kính cận hoặc không)",
     "enterPassword": "Nhập mật khẩu",
     "addRole": "Thêm vị trí",
     "departmentRole": "Vai trò trong tổ chức",
     "systemRole": "Vai trò trong hệ thống",
-    "remainLeaveHour": "Số giờ nghỉ phép còn lại",
-    "enterRemainLeaveHour": "Ví dụ: 10.25",
+    "remainLeaveMinute": "Số phút nghỉ phép còn lại",
+    "enterRemainLeaveMinute": "Ví dụ: 10.25",
     "errorMessage": {
       "fullNameIsEmpty": "Họ và tên không được để trống",
       "groupEmpty": "Tổ chức không được để trống",
@@ -61,7 +62,8 @@
       "invalidEmail": "Email không đúng định dạng",
       "invalidPhoneNumber": "Số điện thoại không đúng định dạng",
       "passwordIsEmpty": "Mật khẩu không được để trống",
-      "remainLeaveHourIsEmpty": "Số giờ nghỉ phép còn lại không được để trống"
+      "remainLeaveMinuteIsEmpty": "Số phút nghỉ phép còn lại không được để trống",
+      "remainLeaveMinuteIsPositive": "Số phút nghỉ phép còn lại phải lớn hơn 0"
     }
   }
 }

@@ -257,6 +257,10 @@
   }
 }
 
+.ant-table-cell {
+  vertical-align: middle;
+}
+
 @media (max-width: 768px) {
   .ant-picker-panels {
     flex-direction: column;
