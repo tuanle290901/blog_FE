@@ -38,7 +38,8 @@ const Timesheet: React.FC = () => {
   const { RangePicker } = DatePicker
   const { t } = useTranslation()
   const currentAuth: IUser | null = LocalStorage.getObject('currentAuth')
-  const userGroup = currentAuth?.groupProfiles[0]?.groupCode
+  const userGroup =
+    currentAuth?.groupProfiles[0]?.role === 'SYSTEM_ADMIN' ? 'ALL' : currentAuth?.groupProfiles[0]?.groupCode
   const groupsSate = useAppSelector((state) => state.masterData.groups)
   const timesheetSate = useAppSelector((state) => state.timesheet)
   const usersInGroupSate = useAppSelector((state) => state.timesheet.userInGroup)
@@ -279,7 +280,8 @@ const Timesheet: React.FC = () => {
       key: 'fullName',
       ellipsis: true,
       width: '160px',
-      sortOrder: getSortOrder('fullName')
+      sortOrder: getSortOrder('fullName'),
+      fixed: 'left'
     },
     {
       title: t('timesheet.attendanceCode'),

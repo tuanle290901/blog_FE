@@ -141,6 +141,7 @@ const DeviceList: React.FC = () => {
         dataIndex: 'name',
         sortOrder: getSortOrder('name'),
         ellipsis: true,
+        fixed: true,
         width: '200px'
       },
       {

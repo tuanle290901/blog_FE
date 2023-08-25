@@ -247,6 +247,7 @@ const Department: React.FC = () => {
         dataIndex: 'name',
         key: 'name',
         width: '250px',
+        // fixed: true,
         render: (value: string) => {
           return (
             <span
