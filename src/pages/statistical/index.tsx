@@ -67,7 +67,7 @@ const Index = () => {
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ công tác</div>
                   <Progress
                     type='circle'
-                    percent={Number(leaveBalanceInfo?.totalOverTimeHours) ? 100 : 0}
+                    percent={Number(leaveBalanceInfo?.totalBusiness) ? 100 : 0}
                     strokeColor={{
                       '0%': '#ef6f62',
                       '100%': '#f4a66a'
@@ -75,7 +75,7 @@ const Index = () => {
                     strokeWidth={10}
                     strokeLinecap='round'
                     status={'normal'}
-                    format={() => `${Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1))} giờ `}
+                    format={() => `${Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(1))} giờ `}
                   />
                 </div>
               </Col>
@@ -147,7 +147,7 @@ const Index = () => {
             </div>
             <Row align={'top'} gutter={[32, 16]}>
               <Col xs={24} xl={12} xxl={6}>
-                {renderRow('Số giờ công tác', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)), 'giờ')}
+                {renderRow('Số giờ công tác', Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(1)), 'giờ')}
               </Col>
               <Col xs={24} xl={12} xxl={6}>
                 {renderRow(

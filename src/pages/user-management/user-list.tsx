@@ -469,6 +469,14 @@ const UserList: React.FC = () => {
   const items: MenuProps['items'] = [
     {
       label: (
+        <div className='tw-cursor-pointer' onClick={() => fileSelect?.current?.click()}>
+          Import thành viên
+        </div>
+      ),
+      key: '1'
+    },
+    {
+      label: (
         <div className='tw-cursor-pointer' onClick={onDownloadImportTemplate}>
           Tải file import mẫu
         </div>
@@ -496,16 +504,16 @@ const UserList: React.FC = () => {
       <Row gutter={[16, 16]} className='tw-mt-4'>
         <Col xs={24} md={12}>
           <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
-            {permissionAddUser && (
+            {/* {permissionAddUser && (
               <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
                 {t('userList.addMember')}
               </Button>
-            )}
+            )} */}
 
             {permissionImportUser && (
-              <Dropdown.Button menu={{ items }} onClick={() => fileSelect?.current?.click()}>
+              <Dropdown.Button type='primary' menu={{ items }} onClick={openModalCreateUser}>
                 <>
-                  <span className='tw-cursor-pointer'>Import thành viên</span>
+                  <span className='tw-cursor-pointer'> {t('userList.addMember')}</span>
                   <input
                     ref={fileSelect}
                     className='tw-hidden'

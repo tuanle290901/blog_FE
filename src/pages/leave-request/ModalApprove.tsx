@@ -15,7 +15,8 @@ import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 const { confirm } = Modal
 export enum PROCESS_GROUPCODE {
   START = '__START__',
-  END = '__END__'
+  END = '__END__',
+  REQUESTER = '__REQUESTER__'
 }
 
 const ModalApprove = (props: {
@@ -276,7 +277,10 @@ const ModalApprove = (props: {
                                 {step?.histories[step?.histories?.length - 1].executorId} -
                                 {mappingDepartmentByCode(
                                   departments,
-                                  step.groupCodes[0] !== PROCESS_GROUPCODE.START ? step.groupCodes[0] : ticket.groupCode
+                                  step.groupCodes[0] !== PROCESS_GROUPCODE.START &&
+                                    step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER
+                                    ? step.groupCodes[0]
+                                    : ticket.groupCode
                                 )}{' '}
                                 (
                                 {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
