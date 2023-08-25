@@ -73,7 +73,8 @@ export const TICKET_STATUS_FILTER = {
   SUBMITTED: 'Đã gửi',
   PROCESSING: 'Đang xử lý',
   CONFIRMED: 'Đã xác nhận',
-  REJECTED: 'Từ chối'
+  REJECTED: 'Từ chối',
+  CANCELLED: 'Đã hủy'
 }
 
 export const VALIDATE_FORM = {

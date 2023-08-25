@@ -13,6 +13,7 @@ export interface ILeaveBalace {
   totalUsedLeaveHours: number
   totalViolates: number
   violateInfoList: ViolateInfoList[]
+  totalBusiness?: number
 }
 export interface AbsenceInfoList {
   key: string

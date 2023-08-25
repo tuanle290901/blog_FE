@@ -243,6 +243,7 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'ticketCode',
         title: 'Mã yêu cầu',
+        width: 120,
         dataIndex: 'ticketCode',
         sorter: false,
         showSorterTooltip: false,
@@ -252,6 +253,7 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'ticketDefinitionId',
         title: 'Loại yêu cầu',
+        width: 150,
         dataIndex: 'ticketDefinitionId',
         sorter: false,
         showSorterTooltip: false,
@@ -354,51 +356,53 @@ const LeaveRequest: React.FC = () => {
         align: 'left',
         render: (_, record: ILeaveRequest) => {
           return (
-            <div className='tw-flex tw-justify-between'>
+            <div className='tw-flex tw-justify-center tw-gap-[8px]'>
               <Tooltip title='Xem thông tin phê duyệt' className='tw-flex tw-items-center'>
-                {/* <img
-                  alt=''
-                  src={iconApprove}
-                  className='tw-cursor-pointer'
-                  onClick={() => onOpenModalApprove(record)}
-                /> */}
                 <div
                   onClick={() => onOpenModalApprove(record)}
                   className='tw-text-blue-600 tw-cursor-pointer tw-underline'
                 >
-                  Phê duyệt
+                  {record.status === TicketStatusEnum.SUBMITTED || record.status === TicketStatusEnum.PROCESSING
+                    ? 'Phê duyệt'
+                    : record.status === TicketStatusEnum.CONFIRMED || record.status === TicketStatusEnum.REJECTED
+                    ? 'Xem phê duyệt'
+                    : ''}
                 </div>
               </Tooltip>
 
-              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Tooltip title='Cập nhật thông tin' className='tw-flex tw-items-center'>
-                  <Button
-                    size='small'
-                    onClick={() => handleClickUpdate('update', record)}
-                    icon={<EditOutlined className='tw-text-blue-600' />}
-                    disabled={record.createdBy !== userInfo?.userName}
-                  />
-                </Tooltip>
-              )}
-
-              {record?.status !== TicketStatusEnum.CONFIRMED && record?.status !== TicketStatusEnum.REJECTED && (
-                <Tooltip title='Hủy yêu cầu'>
-                  <Popconfirm
-                    title='Hủy yêu cầu'
-                    description='Bạn có chắc chắn muốn hủy yêu cầu'
-                    onConfirm={() => handleClickDelete(record)}
-                    okText={t('common.yes')}
-                    cancelText={t('common.no')}
-                    disabled={record.createdBy !== userInfo?.userName}
-                  >
+              {record?.status !== TicketStatusEnum.CANCELLED &&
+                record?.status !== TicketStatusEnum.CONFIRMED &&
+                record?.status !== TicketStatusEnum.REJECTED && (
+                  <Tooltip title='Cập nhật thông tin' className='tw-flex tw-items-center tw-justify-center'>
                     <Button
                       size='small'
-                      icon={<DeleteOutlined className='tw-text-red-600' />}
+                      onClick={() => handleClickUpdate('update', record)}
+                      icon={<EditOutlined className='tw-text-blue-600' />}
                       disabled={record.createdBy !== userInfo?.userName}
                     />
-                  </Popconfirm>
-                </Tooltip>
-              )}
+                  </Tooltip>
+                )}
+
+              {record?.status !== TicketStatusEnum.CANCELLED &&
+                record?.status !== TicketStatusEnum.CONFIRMED &&
+                record?.status !== TicketStatusEnum.REJECTED && (
+                  <Tooltip title='Hủy yêu cầu'>
+                    <Popconfirm
+                      title='Hủy yêu cầu'
+                      description='Bạn có chắc chắn muốn hủy yêu cầu'
+                      onConfirm={() => handleClickDelete(record)}
+                      okText={t('common.yes')}
+                      cancelText={t('common.no')}
+                      disabled={record.createdBy !== userInfo?.userName}
+                    >
+                      <Button
+                        size='small'
+                        icon={<DeleteOutlined className='tw-text-red-600' />}
+                        disabled={record.createdBy !== userInfo?.userName}
+                      />
+                    </Popconfirm>
+                  </Tooltip>
+                )}
 
               {isSystemAdmin &&
                 (record?.status === TicketStatusEnum.CONFIRMED || record?.status === TicketStatusEnum.REJECTED) && (
@@ -602,14 +606,14 @@ const LeaveRequest: React.FC = () => {
 
       <div>
         <Table
-          onRow={(record) => {
-            return {
-              onDoubleClick: () => {
-                setIsOpenModalApprove(true)
-                setSelectedTicket(record)
-              }
-            }
-          }}
+          // onRow={(record) => {
+          //   return {
+          //     onDoubleClick: () => {
+          //       setIsOpenModalApprove(true)
+          //       setSelectedTicket(record)
+          //     }
+          //   }
+          // }}
           columns={columns}
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
