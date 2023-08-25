@@ -477,42 +477,40 @@ const Department: React.FC = () => {
           })}
         </h1>
       </Row>
-      <Row className='tw-w-100 tw-flex tw-justify-start tw-my-[20px]' gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <CommonButton
-            loading={false}
-            classNameProps={`btn-add ${
-              dataRender.listDataTitle &&
-              hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === false
-                ? 'tw-hidden'
-                : 'tw-block'
-            }`}
-            typeProps={{
-              type: 'primary',
-              size: 'middle'
-            }}
-            onClick={() => {
-              setShowModal({
-                openModal: !showModal.openModal,
-                type: ACTION_TYPE.Created,
-                data: null,
-                dataParent: dataRender.listDataTitle
-              })
-            }}
-            icon={<PlusOutlined className='tw-text-600' />}
-            title={`${t('department.add')}`}
-          />
-        </Col>
-        <Col xs={24} md={12} className='tw-flex tw-justify-end'>
+      <div className='tw-flex tw-flex-col md:tw-flex-row tw-my-[20px] tw-justify-between tw-flex-wrap tw-gap-4'>
+        <CommonButton
+          loading={false}
+          classNameProps={`btn-add ${
+            dataRender.listDataTitle &&
+            hasPermissionAndGroup([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles, dataRender.listDataTitle) === false
+              ? 'tw-hidden'
+              : 'tw-block'
+          }`}
+          typeProps={{
+            type: 'primary',
+            size: 'middle'
+          }}
+          onClick={() => {
+            setShowModal({
+              openModal: !showModal.openModal,
+              type: ACTION_TYPE.Created,
+              data: null,
+              dataParent: dataRender.listDataTitle
+            })
+          }}
+          icon={<PlusOutlined className='tw-text-600' />}
+          title={`${t('department.add')}`}
+        />
+        <div>
           <Input.Search
             className='tw-w-full'
             placeholder={`${t('department.pleaseEnterSearch')}`}
             onChange={(value) => onSearch(value)}
-            style={{ maxWidth: 400 }}
+            style={{ minWidth: 280 }}
             value={valueSearch}
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
       {showModal.type !== ACTION_TYPE.View ? (
         <DepartmentModal
           onClose={() => onCancelModel()}
