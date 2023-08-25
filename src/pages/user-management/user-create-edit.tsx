@@ -28,7 +28,7 @@ const UserCreateEdit: React.FC<{
   const [avatarBase64, setAvatarBase64] = useState<string>('')
   const [avtError, setAvtError] = useState(false)
   const [serverError, setServerError] = useState<any>(null)
-  const [remainLeaveHour, setRemainLeaveHour] = useState<number>(userData?.createWithRemainLeaveHours || 0)
+  const [remainLeaveMinute, setRemainLeaveMinute] = useState<number>(userData?.createWithRemainLeaveMinutes || 0)
   const [form] = Form.useForm<
     Omit<IUser, 'birthday' | 'joinDate' | 'formalDate'> & { birthday: Dayjs; joinDate: Dayjs; formalDate: Dayjs }
   >()
@@ -147,7 +147,7 @@ const UserCreateEdit: React.FC<{
       const joinDate = value.joinDate ? value.joinDate.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
       const formalDate = value.formalDate ? value.formalDate.format('YYYY-MM-DD') : null
       if (joinDate && formalDate && joinDate > formalDate) {
-        notification.warning({ message: 'Lưu ý: Ngày ký hợp đồng chính thức phải sau ngày gia nhập!' })
+        notification.warning({ message: t('userModal.signingDateWarning') })
         return
       }
       const payload: IUser = {
@@ -158,7 +158,7 @@ const UserCreateEdit: React.FC<{
         joinDate,
         email: value.email || null,
         phoneNumber: value.phoneNumber || null,
-        createWithRemainLeaveHours: Number(value?.createWithRemainLeaveHours) || 0
+        createWithRemainLeaveMinutes: Number(value?.createWithRemainLeaveMinutes) || 0
       }
       try {
         setLoading(true)
@@ -484,10 +484,12 @@ const UserCreateEdit: React.FC<{
                 {hasPermissionAddAndChangeRole() && userData?.status !== USER_STATUS.DEACTIVE && (
                   <>
                     <div className='form-item__label required'>
-                      <span>{t('userModal.remainLeaveHour')}</span>
-                      {remainLeaveHour > 0 && (
+                      <span>{t('userModal.remainLeaveMinute')}</span>
+                      {remainLeaveMinute > 0 && (
                         <span className='tw-text-orange-600 tw-ml-1'>
-                          ({(remainLeaveHour / 8).toFixed(2)} {t('timesheet.day')})
+                          ({(remainLeaveMinute / 60)?.toFixed(2)} {t('timesheet.hour')}
+                          <span className='tw-italic tw-mx-2'>hoặc</span>
+                          {(remainLeaveMinute / (8 * 60))?.toFixed(2)} {t('timesheet.day')} )
                         </span>
                       )}
                     </div>
@@ -500,25 +502,25 @@ const UserCreateEdit: React.FC<{
                     </div>
                     <Form.Item
                       style={{ marginBottom: 24 }}
-                      name='createWithRemainLeaveHours'
+                      name='createWithRemainLeaveMinutes'
                       required
-                      initialValue={userData?.createWithRemainLeaveHours || 0}
+                      initialValue={userData?.createWithRemainLeaveMinutes || 0}
                       rules={[
                         {
                           required: true,
-                          message: t('userModal.errorMessage.remainLeaveHourIsEmpty')
+                          message: t('userModal.errorMessage.remainLeaveMinuteIsEmpty')
                         },
                         {
                           pattern: REGEX_POSITIVE_NUMBER,
-                          message: t('Số giờ nghỉ phép còn lại phải lớn hơn 0')
+                          message: t('userModal.errorMessage.remainLeaveMinuteIsPositive')
                         }
                       ]}
                     >
                       <Input
-                        placeholder={t('userModal.enterRemainLeaveHour')}
+                        placeholder={t('userModal.enterRemainLeaveMinute')}
                         type='number'
                         min={0}
-                        onChange={(e) => setRemainLeaveHour(Number(e?.target?.value))}
+                        onChange={(e) => setRemainLeaveMinute(Number(e?.target?.value))}
                       />
                     </Form.Item>
                   </>
