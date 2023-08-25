@@ -256,3 +256,9 @@
     text-align: center !important;
   }
 }
+
+@media (max-width: 768px) {
+  .ant-picker-panels {
+    flex-direction: column;
+  }
+}

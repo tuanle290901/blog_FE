@@ -196,6 +196,7 @@ const UserList: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('fullName'),
       width: '200px',
+      fixed: 'left',
       render: (text, record) => {
         return (
           <div className='tw-relative'>
