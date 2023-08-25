@@ -25,7 +25,11 @@ const renderRow = (title: string, firstArg: string | number, secondArg: string, 
   return (
     <Row className='tw-text-md tw-mt-3' align={'middle'}>
       <Col>
-        <div className={`tw-text-md tw-w-[220px] ${level === 'child' ? 'tw-indent-[50px]' : 'tw-font-semibold'}`}>
+        <div
+          className={`tw-text-md tw-w-[180px] md:tw-w-[220px] ${
+            level === 'child' ? 'tw-indent-[50px]' : 'tw-font-semibold'
+          }`}
+        >
           {title}
         </div>
       </Col>

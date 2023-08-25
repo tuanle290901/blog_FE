@@ -69,7 +69,6 @@ const Index = () => {
   }, [])
 
   const onElementClick = useCallback((event: any, element: any) => {
-    console.log(element)
     setSelectedNode(element)
   }, [])
 
