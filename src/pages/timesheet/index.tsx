@@ -541,7 +541,7 @@ const Timesheet: React.FC = () => {
                   </div>
                 </Col>
                 <Col xs={24} lg={14} xl={16}>
-                  <Row gutter={[12, 16]} className='tw-flex tw-justify-end tw-text-right'>
+                  <Row gutter={[12, 16]} className='tw-flex lg:tw-justify-end'>
                     <Col>
                       <RangePicker
                         onChange={handleSelectDate}
@@ -619,7 +619,7 @@ const Timesheet: React.FC = () => {
                 </Col>
               </Row>
               <Row gutter={[16, 16]} className='tw-mt-[12px]'>
-                <Col xs={24} lg={6} xl={4}>
+                <Col xs={24} lg={8} xl={4}>
                   <Select
                     className='tw-w-full tw-max-w-[380px]'
                     showSearch
@@ -633,7 +633,7 @@ const Timesheet: React.FC = () => {
                     options={groupOptions}
                   />
                 </Col>
-                <Col xs={24} lg={9} xl={10}>
+                <Col xs={24} lg={8} xl={10}>
                   <Select
                     className='tw-w-full tw-max-w-[380px]'
                     showSearch
@@ -650,12 +650,12 @@ const Timesheet: React.FC = () => {
                     options={userOptions}
                   />
                 </Col>
-                <Col xs={24} lg={9} xl={10} className='tw-text-right'>
+                <Col xs={24} lg={8} xl={10} className='lg:tw-text-right'>
                   <Search
                     value={query}
                     placeholder={t('timesheet.findDataByAttendanceCode')}
                     onChange={(event) => handleSearchValueChange(event.target.value)}
-                    className='tw-w-full tw-max-w-[360px]'
+                    className='tw-w-full tw-max-w-[380px]'
                   />
                   {/* <Button icon={<MenuOutlined />} type='default'>
                     Lọc
