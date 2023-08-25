@@ -216,18 +216,18 @@ const PositionList: React.FC = () => {
         </h1>
         <h5 className='tw-text-sm'>{t('position.list')}</h5>
       </div>
-      <div className='tw-flex tw-justify-between tw-gap-4 tw-mt-4'>
+      <div className='tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-gap-4 tw-mt-4'>
         {hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
           <Button onClick={() => setIsOpenUserModal(true)} type='primary' icon={<PlusOutlined />}>
             {t('position.createPosition')}
           </Button>
         )}
 
-        <div className='tw-flex tw-gap-4 tw-flex-1 tw-justify-end'>
+        <div className='tw-flex tw-gap-4 tw-justify-end'>
           <Search
+            style={{ minWidth: 280 }}
             placeholder={t('position.search')}
             onChange={(event) => handleSearchValueChange(event.target.value)}
-            className='tw-w-64 tw-hidden md:tw-flex'
           />
         </div>
       </div>

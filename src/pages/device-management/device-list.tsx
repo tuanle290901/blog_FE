@@ -141,6 +141,7 @@ const DeviceList: React.FC = () => {
         dataIndex: 'name',
         sortOrder: getSortOrder('name'),
         ellipsis: true,
+        fixed: true,
         width: '200px'
       },
       {
@@ -333,7 +334,7 @@ const DeviceList: React.FC = () => {
         </h1>
         <h5 className='tw-text-sm'>{t('device.deviceListSubTitle')}</h5>
       </div>
-      <div className='tw-flex tw-my-3 tw-justify-between tw-flex-wrap tw-gap-4'>
+      <div className='tw-flex tw-flex-col md:tw-flex-row tw-my-3 tw-justify-between tw-flex-wrap tw-gap-4'>
         <Button
           onClick={() => {
             setIsOpenModal({
@@ -347,11 +348,13 @@ const DeviceList: React.FC = () => {
         >
           {t('device.addDevice')}
         </Button>
-        <Input.Search
-          className='tw-w-64'
-          placeholder={t('device.searchDeviceByKeyword')}
-          onChange={(event) => handleSearchValueChange(event.target.value)}
-        />
+        <div>
+          <Input.Search
+            style={{ minWidth: '280px' }}
+            placeholder={t('device.searchDeviceByKeyword')}
+            onChange={(event) => handleSearchValueChange(event.target.value)}
+          />
+        </div>
       </div>
       <div>
         <Table

@@ -1,0 +1,12 @@
+.user-table {
+  &__img {
+    width: 35px !important;
+    height: 35px !important;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  td.ant-table-cell {
+    padding: 7px 14px !important;
+  }
+}

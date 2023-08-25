@@ -10,7 +10,7 @@ import {
   Tooltip,
   Row,
   Col,
-  Space,
+  Image,
   Dropdown,
   MenuProps
 } from 'antd'
@@ -49,6 +49,7 @@ import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
 import { COMMON_ERROR_CODE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import { hasPermission } from '~/utils/helper.ts'
 import { saveAs } from 'file-saver'
+import './style.scss'
 
 const { Search } = Input
 
@@ -196,15 +197,16 @@ const UserList: React.FC = () => {
       showSorterTooltip: false,
       sortOrder: getSortOrder('fullName'),
       width: '200px',
+      fixed: 'left',
       render: (text, record) => {
         return (
-          <div className='tw-relative'>
-            <img
-              className='tw-w-8 tw-h-8 tw-absolute -tw-top-1 tw-left-0 tw-rounded-full'
+          <div className='tw-flex tw-items-center'>
+            <Image
+              className='user-table__img'
               alt='avatar'
               src={record.avatarBase64 ? `data:image/png;base64,${record.avatarBase64}` : defaultImg}
             />
-            <span className='tw-pl-10'>{text}</span>
+            <span className='tw-ml-2'>{text}</span>
           </div>
         )
       },
@@ -289,7 +291,7 @@ const UserList: React.FC = () => {
       width: '120px',
       render: (_, record) => {
         return (
-          <div className='tw-absolute tw-left-0 tw-w-full'>
+          <div className='tw-absolute tw-left-0 tw-bottom-[12px] tw-w-full'>
             <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
               {record.status !== USER_STATUS.DEACTIVE && (
                 <>
@@ -546,7 +548,7 @@ const UserList: React.FC = () => {
         </Col>
       </Row>
 
-      <div className='tw-mt-6'>
+      <div className='tw-mt-6 user-table'>
         <Table
           rowKey='id'
           columns={columns}
