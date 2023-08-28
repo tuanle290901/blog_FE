@@ -524,7 +524,7 @@ const UserList: React.FC = () => {
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <Row gutter={[16, 16]} className='tw-mt-4'>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={6}>
           <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
             {/* {permissionAddUser && (
               <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
@@ -548,7 +548,7 @@ const UserList: React.FC = () => {
             )}
           </div>
         </Col>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={18}>
           <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
             <Select
               onChange={handleDepartmentChange}
