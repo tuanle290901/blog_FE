@@ -3,6 +3,7 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   Button,
+  Checkbox,
   Col,
   DatePicker,
   Modal,
@@ -265,7 +266,7 @@ const LeaveRequest: React.FC = () => {
         // fixed: 'left'
       },
       {
-        key: 'processStatus',
+        key: 'startDate',
         title: t('leaveRequest.startDate'),
         width: 160,
         sorter: false,
@@ -277,7 +278,7 @@ const LeaveRequest: React.FC = () => {
         }
       },
       {
-        key: 'processStatus',
+        key: 'endDate',
         title: t('leaveRequest.endDate'),
         width: 160,
         dataIndex: 'processStatus',
@@ -289,7 +290,7 @@ const LeaveRequest: React.FC = () => {
         }
       },
       {
-        key: 'processStatus',
+        key: 'description',
         title: t('leaveRequest.requestMessage'),
         width: 200,
         dataIndex: 'processStatus',
@@ -350,7 +351,7 @@ const LeaveRequest: React.FC = () => {
         }
       },
       {
-        key: '',
+        key: 'action',
         title: t('device.action'),
         width: 160,
         align: 'left',
@@ -423,6 +424,12 @@ const LeaveRequest: React.FC = () => {
     ]
     return columns
   }, [handleClickDelete, getSortOrder, handleClickUpdate, t])
+
+  const [visibleColumns, setVisibleColumns] = useState(columns.map((col: any) => col.key))
+
+  const onChangeColumnVisibility = (selectedColumns: any[]) => {
+    setVisibleColumns(selectedColumns)
+  }
 
   useEffect(() => {
     dispatch(getAllDefinationType())
@@ -605,16 +612,24 @@ const LeaveRequest: React.FC = () => {
       )}
 
       <div>
+        {/* <div style={{ marginBottom: 16 }}>
+          <span>Show Columns:</span>
+          <Select
+            mode='multiple'
+            style={{ width: '100%' }}
+            placeholder='Select columns'
+            value={visibleColumns}
+            onChange={onChangeColumnVisibility}
+            options={columns.map((col: any) => {
+              return {
+                label: col.title,
+                value: col.key
+              }
+            })}
+          />
+        </div> */}
         <Table
-          // onRow={(record) => {
-          //   return {
-          //     onDoubleClick: () => {
-          //       setIsOpenModalApprove(true)
-          //       setSelectedTicket(record)
-          //     }
-          //   }
-          // }}
-          columns={columns}
+          columns={columns.filter((col: any) => visibleColumns.includes(col.key))}
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
