@@ -87,9 +87,9 @@ export const updateWorkingTime = createAsyncThunk(
       return response.data
     } catch (error: any) {
       if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
-        return thunkAPI.rejectWithValue(error.response.data)
+        throw error.response.data
       }
-      throw error
+      throw error.response.data
     }
   }
 )

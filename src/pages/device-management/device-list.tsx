@@ -186,6 +186,10 @@ const DeviceList: React.FC = () => {
                 <div>
                   <CheckCircleFilled className='tw-text-[#389E0D] tw-mr-1' /> {t(`device.${record?.status}`)}
                 </div>
+              ) : record?.status === DEVICE_STATUS.NOT_GOOD ? (
+                <div>
+                  <MinusCircleFilled className='tw-text-[#a79c3e] tw-mr-1' /> Không ổn định
+                </div>
               ) : (
                 <div>
                   <MinusCircleFilled className='tw-text-[#f33c3c] tw-mr-1' /> {t(`device.${record?.status}`)}

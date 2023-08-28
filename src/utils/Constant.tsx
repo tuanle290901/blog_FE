@@ -32,7 +32,8 @@ export const ROlE_STORAGE = {
 export const DEVICE_STATUS = {
   INITIAL: 'INITIAL',
   ACTIVE: 'ACTIVE',
-  DEACTIVE: 'DEACTIVE'
+  DEACTIVE: 'DEACTIVE',
+  NOT_GOOD: 'NOT_GOOD'
 }
 
 export const LEAVE_TYPE_MAP: LeaveTypes = {

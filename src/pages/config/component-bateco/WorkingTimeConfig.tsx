@@ -111,26 +111,35 @@ const WorkingTimeConfig = () => {
   }
 
   const updateQuarter = async () => {
-    const quarters = splitSaturdaysByQuarter(checkedValues)
-    const newTimeWorkQuarterSetup: TimeWorkQuaterSetup[] = []
-    quarters.forEach((quarter, index) => {
-      newTimeWorkQuarterSetup[index] = JSON.parse(
-        JSON.stringify(workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[index])
-      )
-      const saturdayWorkingMapping = workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[
-        index
-      ].saturdayWorkingConfigs.map((item) => {
-        return {
-          saturdayDate: item.saturdayDate,
-          working: quarter.includes(item.saturdayDate) ? true : false
-        }
+    try {
+      const quarters = splitSaturdaysByQuarter(checkedValues)
+      const newTimeWorkQuarterSetup: TimeWorkQuaterSetup[] = []
+      quarters.forEach((quarter, index) => {
+        newTimeWorkQuarterSetup[index] = JSON.parse(
+          JSON.stringify(workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[index])
+        )
+        const saturdayWorkingMapping = workingTimeInfo.timeWorkSetup.timeWorkQuaterSetups[
+          index
+        ].saturdayWorkingConfigs.map((item) => {
+          return {
+            saturdayDate: item.saturdayDate,
+            working: quarter.includes(item.saturdayDate) ? true : false
+          }
+        })
+        newTimeWorkQuarterSetup[index].saturdayWorkingConfigs = saturdayWorkingMapping
       })
-      newTimeWorkQuarterSetup[index].saturdayWorkingConfigs = saturdayWorkingMapping
-    })
-    const payload = JSON.parse(JSON.stringify(workingTimeInfo))
-    payload.timeWorkSetup.timeWorkQuaterSetups = newTimeWorkQuarterSetup
-    await dispatch(updateWorkingTime(payload))
-    notification.success({ message: 'Cập nhật cấu hình thành công' })
+      const payload = JSON.parse(JSON.stringify(workingTimeInfo))
+      payload.timeWorkSetup.timeWorkQuaterSetups = newTimeWorkQuarterSetup
+      const response: any = await dispatch(updateWorkingTime(payload))
+      if (response.type.includes('/rejected')) {
+        notification.error({ message: response.error.message })
+      } else if (response.type.includes('/fulfilled')) {
+        notification.success({ message: 'Thao tác thành công' })
+      }
+    } catch (err: any) {
+      notification.error({ message: err.message })
+    }
+    dispatch(getWorkingTimeSettingInfo())
   }
 
   useEffect(() => {
