@@ -32,5 +32,6 @@ export enum EDIT_TYPE {
 }
 export enum USER_STATUS {
   ACTIVE = 'ACTIVE',
-  DEACTIVE = 'DEACTIVE'
+  DEACTIVE = 'DEACTIVE',
+  INITIAL = 'INITIAL'
 }
