@@ -158,10 +158,18 @@ const HolidayScheduleConfig = () => {
       ),
       onOk: async () => {
         if (holidayDetail.id) {
-          await dispatch(deleteHolidaySchedule(holidayDetail.id))
-          notification.success({ message: 'Xóa ngày nghỉ thành công' })
-          await dispatch(getListHoliday())
-          setIsModalOpen(false)
+          try {
+            const response: any = await dispatch(deleteHolidaySchedule(holidayDetail.id)).unwrap()
+            await dispatch(getListHoliday())
+            setIsModalOpen(false)
+            notification.success({
+              message: response.message
+            })
+          } catch (error: any) {
+            notification.error({
+              message: error.response.data.message
+            })
+          }
         }
       },
       onCancel() {
@@ -216,25 +224,29 @@ const HolidayScheduleConfig = () => {
     date: Dayjs[]
     note: string
   }) => {
-    const payload: IHoliday = {
-      id,
-      code,
-      name,
-      startAt: date[0].format('YYYY-MM-DD'),
-      endAt: date[1].format('YYYY-MM-DD'),
-      type: 'HOLIDAY',
-      note
-    }
-    if (id) {
-      await dispatch(updateHolidaySchedule(payload))
-      notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
-    } else {
-      await dispatch(addOneHolidaySchedule(payload))
-      notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
-    }
-    await dispatch(getListHoliday())
+    try {
+      const payload: IHoliday = {
+        id,
+        code,
+        name,
+        startAt: date[0].format('YYYY-MM-DD'),
+        endAt: date[1].format('YYYY-MM-DD'),
+        type: 'HOLIDAY',
+        note
+      }
+      if (id) {
+        await dispatch(updateHolidaySchedule(payload))
+        notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
+      } else {
+        await dispatch(addOneHolidaySchedule(payload))
+        notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
+      }
+      await dispatch(getListHoliday())
 
-    setIsModalOpen(false)
+      setIsModalOpen(false)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const onFinishFailed = () => {
