@@ -18,7 +18,7 @@ const transformData = (
   const type = attributes && attributes.find((item) => item.name === key)?.type
   switch (type) {
     case INPUT_TYPE.DATETIME: {
-      return dayjs(formValue[key]).format('YYYY-MM-DD HH:mm:ss')
+      return dayjs(formValue[key]).format('YYYY-MM-DD HH:mm:00')
     }
     default: {
       return formValue[key]
