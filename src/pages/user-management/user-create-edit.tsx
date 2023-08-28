@@ -488,7 +488,7 @@ const UserCreateEdit: React.FC<{
                       {remainLeaveMinute > 0 && (
                         <span className='tw-text-orange-600 tw-ml-1'>
                           ({(remainLeaveMinute / 60)?.toFixed(2)} {t('timesheet.hour')}
-                          <span className='tw-italic tw-mx-2'>hoặc</span>
+                          <span className='tw-italic tw-mx-2'>=</span>
                           {(remainLeaveMinute / (8 * 60))?.toFixed(2)} {t('timesheet.day')} )
                         </span>
                       )}
