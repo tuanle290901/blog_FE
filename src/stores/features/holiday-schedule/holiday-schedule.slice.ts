@@ -27,7 +27,7 @@ export const addOneHolidaySchedule = createAsyncThunk('holidaySchedule/create', 
     const response: IApiResponse<IHoliday> = await HttpService.post('/event/create', payload, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -38,7 +38,7 @@ export const updateHolidaySchedule = createAsyncThunk(`holidaySchedule/update`, 
     const response: IApiResponse<IHoliday> = await HttpService.put(`/event/update/${payload.id}`, payload, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -49,7 +49,7 @@ export const deleteHolidaySchedule = createAsyncThunk(`holidaySchedule/delete`, 
     const response: IApiResponse<IHoliday> = await HttpService.delete(`/event/delete/${id}`, {
       signal: thunkAPI.signal
     })
-    return response.data
+    return response
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }

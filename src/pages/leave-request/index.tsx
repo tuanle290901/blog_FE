@@ -3,7 +3,6 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import {
   Button,
-  Checkbox,
   Col,
   DatePicker,
   Modal,
@@ -47,7 +46,6 @@ import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/C
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
-import { uniqueId } from 'lodash'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: '',
@@ -103,6 +101,7 @@ const LeaveRequest: React.FC = () => {
   const isManagerDepartment = userInfo?.groupProfiles.find(
     (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
   )
+  const isCreateRequestSuccess = useAppSelector((item: any) => item.leaveRequest.createRequestSuccess)
 
   const meta: IPaging = useAppSelector((state) => state.leaveRequest.meta)
 
@@ -238,6 +237,12 @@ const LeaveRequest: React.FC = () => {
       getDetail()
     }
   }, [queryParameters])
+
+  useEffect(() => {
+    if (isCreateRequestSuccess) {
+      dispatch(countLeaveRequest(dateFilter))
+    }
+  }, [isCreateRequestSuccess])
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
