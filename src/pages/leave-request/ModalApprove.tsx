@@ -203,7 +203,10 @@ const ModalApprove = (props: {
                                     {(isSystemAdmin ||
                                       userInfo.userName === (step?.executors && step.executors[0])) && (
                                       <>
-                                        <div className='lg:tw-min-w-[200px]'>{item.description}:</div>
+                                        <div className='lg:tw-min-w-[200px]'>
+                                          <span className='tw-text-red-600'>* </span>
+                                          {item.description}:
+                                        </div>
                                         {item.type === INPUT_TYPE.TEXT && (
                                           <AutoComplete
                                             className='tw-w-full'
@@ -240,17 +243,19 @@ const ModalApprove = (props: {
                                       </>
                                     )}
 
-                                    {!isSystemAdmin && userInfo.userName !== (step?.executors && step.executors[0]) && (
-                                      <div>
-                                        <span className='tw-mr-3'>Trạng thái:</span>
-                                        <Tag
-                                          style={{ minWidth: 80, textAlign: 'center' }}
-                                          color={tagColorMapping(TicketStatusEnum.PROCESSING)}
-                                        >
-                                          {TICKET_STATUS[TicketStatusEnum.PROCESSING]}
-                                        </Tag>
-                                      </div>
-                                    )}
+                                    {index === 0 &&
+                                      !isSystemAdmin &&
+                                      userInfo.userName !== (step?.executors && step.executors[0]) && (
+                                        <div>
+                                          <span className='tw-mr-3'>Trạng thái:</span>
+                                          <Tag
+                                            style={{ minWidth: 80, textAlign: 'center' }}
+                                            color={tagColorMapping(TicketStatusEnum.PROCESSING)}
+                                          >
+                                            {TICKET_STATUS[TicketStatusEnum.PROCESSING]}
+                                          </Tag>
+                                        </div>
+                                      )}
                                   </Col>
                                 </>
                               )
