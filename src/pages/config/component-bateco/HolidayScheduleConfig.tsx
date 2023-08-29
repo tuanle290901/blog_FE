@@ -274,7 +274,7 @@ const HolidayScheduleConfig = () => {
         onSelect={onSelectDate}
         headerRender={headerRender}
         disabledDate={(date) => {
-          if (date.endOf('month').valueOf() < dayjs().valueOf()) {
+          if (date.endOf('day').valueOf() < dayjs().valueOf()) {
             return true
           }
           return false
