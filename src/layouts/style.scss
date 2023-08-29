@@ -11,6 +11,14 @@
     .header-container__right {
       margin-left: auto;
     }
+
+    .header-right__username {
+      white-space: nowrap;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: bold;
+    }
   }
 
   .content-container {
