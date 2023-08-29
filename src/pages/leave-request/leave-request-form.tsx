@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
 import { LeaveTypes } from '~/types/leave-request.interface'
 import { TicketAttribute } from '~/types/setting-ticket-process'
-import { INPUT_TYPE, LEAVE_TYPE_MAP } from '~/utils/Constant'
+import { INPUT_TYPE, LEAVE_TYPE_MAP, TicketStatusEnum } from '~/utils/Constant'
 
 const transformData = (
   key: string,
@@ -115,6 +115,7 @@ const LeaveRequestForm: React.FC<{
       title={t('leaveRequest.createNew')}
       onCancel={onCancel}
       onOk={form.submit}
+      okButtonProps={{ disabled: data?.status === TicketStatusEnum.PROCESSING }}
       okText={t('common.save')}
       cancelText={t('common.cancel')}
       maskClosable={false}
