@@ -146,6 +146,10 @@ const ModalApprove = (props: {
     showConfirm(TicketStatusEnum.REJECTED, fieldValues, ticket.id, nodeId)
   }
 
+  const isAnyRequiredFieldEmpty = (step: TicketProcessNode) => {
+    return step.attributes.some((item) => item?.required && !fieldValues[item.name])
+  }
+
   useEffect(() => {
     if (ticket) {
       setFieldValues({})
@@ -204,7 +208,7 @@ const ModalApprove = (props: {
                                       userInfo.userName === (step?.executors && step.executors[0])) && (
                                       <>
                                         <div className='lg:tw-min-w-[200px]'>
-                                          <span className='tw-text-red-600'>* </span>
+                                          {item?.required && <span className='tw-text-red-600'>* </span>}
                                           {item.description}:
                                         </div>
                                         {item.type === INPUT_TYPE.TEXT && (
@@ -257,12 +261,35 @@ const ModalApprove = (props: {
                                         </div>
                                       )}
                                   </Col>
+                                  {index === step?.attributes?.length - 1 &&
+                                    (step.status === TicketStatusEnum.PENDING ||
+                                      step.status === TicketStatusEnum.PROCESSING) &&
+                                    (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
+                                      <Col span={24} className='tw-flex tw-justify-center'>
+                                        <Space>
+                                          <Button
+                                            danger
+                                            onClick={() => onReject(mainIndex)}
+                                            disabled={isAnyRequiredFieldEmpty(step)}
+                                          >
+                                            Từ chối
+                                          </Button>
+                                          <Button
+                                            type='primary'
+                                            onClick={() => onApprove(mainIndex)}
+                                            disabled={isAnyRequiredFieldEmpty(step)}
+                                          >
+                                            Đồng ý
+                                          </Button>
+                                        </Space>
+                                      </Col>
+                                    )}
                                 </>
                               )
                             }
                           })}
 
-                        {(step.status === TicketStatusEnum.PENDING || step.status === TicketStatusEnum.PROCESSING) &&
+                        {/* {(step.status === TicketStatusEnum.PENDING || step.status === TicketStatusEnum.PROCESSING) &&
                           (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
                             <Col span={24} className='tw-flex tw-justify-center'>
                               <Space>
@@ -274,7 +301,7 @@ const ModalApprove = (props: {
                                 </Button>
                               </Space>
                             </Col>
-                          )}
+                          )} */}
 
                         {step?.status !== TicketStatusEnum.PENDING && step.histories && step?.histories?.length > 0 && (
                           <Col span={24} className='tw-flex tw-justify-end '>
