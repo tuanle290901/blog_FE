@@ -66,13 +66,14 @@ const Index = () => {
                   <div className='border-top-gradient border-top-gradient-two' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ công tác</div>
                   <Progress
+                    size={150}
                     type='circle'
                     percent={Number(leaveBalanceInfo?.totalBusiness) ? 100 : 0}
                     strokeColor={{
                       '0%': '#ef6f62',
                       '100%': '#f4a66a'
                     }}
-                    strokeWidth={10}
+                    strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
                     format={() => `${Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(1))} giờ `}
@@ -82,24 +83,27 @@ const Index = () => {
               <Col xs={24} lg={6}>
                 <div className='box-container'>
                   <div className='border-top-gradient border-top-gradient-one' />
-                  <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ nghỉ phép còn lại</div>
+                  <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số phút nghỉ phép còn lại</div>
                   <Progress
+                    size={150}
                     type='circle'
                     percent={
-                      (leaveBalanceInfo?.totalRemainLeaveHours /
-                        (leaveBalanceInfo?.totalRemainLeaveHours + leaveBalanceInfo?.totalUsedLeaveHours)) *
+                      (leaveBalanceInfo?.totalRemainLeaveMinutes /
+                        (leaveBalanceInfo?.totalRemainLeaveMinutes + leaveBalanceInfo?.totalUsedLeaveMinutes)) *
                       100
                     }
                     strokeColor={{
                       '0%': '#c259e9',
                       '100%': '#d08ee7'
                     }}
-                    strokeWidth={10}
+                    strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
                     format={() =>
-                      `${Number(leaveBalanceInfo?.totalRemainLeaveHours)?.toFixed(1)}/${Number(
-                        (leaveBalanceInfo?.totalRemainLeaveHours + leaveBalanceInfo?.totalUsedLeaveHours)?.toFixed(1)
+                      `${Number(leaveBalanceInfo?.totalRemainLeaveMinutes)?.toFixed(0)}/${Number(
+                        (leaveBalanceInfo?.totalRemainLeaveMinutes + leaveBalanceInfo?.totalUsedLeaveMinutes)?.toFixed(
+                          0
+                        )
                       )}`
                     }
                   />
@@ -110,13 +114,14 @@ const Index = () => {
                   <div className='border-top-gradient border-top-gradient-four' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số lần đi muộn/ về sớm</div>
                   <Progress
+                    size={150}
                     type='circle'
                     percent={Number(leaveBalanceInfo?.totalViolates) ? 100 : 0}
                     strokeColor={{
                       '0%': '#30A2FF',
                       '100%': '#a5e0f1'
                     }}
-                    strokeWidth={10}
+                    strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
                     format={() => `${Number(leaveBalanceInfo?.totalViolates)} lần `}
@@ -128,13 +133,14 @@ const Index = () => {
                   <div className='border-top-gradient border-top-gradient-three' />
                   <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số giờ làm thêm trong tháng</div>
                   <Progress
+                    size={150}
                     type='circle'
                     percent={Number(leaveBalanceInfo?.totalOverTimeHours) ? 100 : 0}
                     strokeColor={{
                       '0%': '#ecbf38',
                       '100%': 'rgb(238, 229, 172)'
                     }}
-                    strokeWidth={10}
+                    strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
                     format={() => `${Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1))} giờ `}
@@ -151,14 +157,14 @@ const Index = () => {
               </Col>
               <Col xs={24} xl={12} xxl={6}>
                 {renderRow(
-                  'Số giờ nghỉ phép còn lại',
-                  Number((leaveBalanceInfo?.totalRemainLeaveHours ?? 0).toFixed(1)),
-                  'giờ'
+                  'Số phút nghỉ phép còn lại',
+                  Number((leaveBalanceInfo?.totalRemainLeaveMinutes ?? 0).toFixed(0)),
+                  'phút'
                 )}
                 {renderRow(
-                  'Số giờ nghỉ phép đã dùng',
-                  Number((leaveBalanceInfo?.totalUsedLeaveHours ?? 0).toFixed(1)),
-                  'giờ'
+                  'Số phút nghỉ phép đã dùng',
+                  Number((leaveBalanceInfo?.totalUsedLeaveMinutes ?? 0).toFixed(0)),
+                  'phút'
                 )}
               </Col>
               <Col xs={24} xl={12} xxl={6}>

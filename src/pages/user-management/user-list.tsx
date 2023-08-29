@@ -513,9 +513,12 @@ const UserList: React.FC = () => {
             )} */}
 
             {permissionImportUser && (
-              <Dropdown.Button type='primary' menu={{ items }} onClick={openModalCreateUser}>
+              <Dropdown.Button type='primary' menu={{ items }}>
                 <>
-                  <span className='tw-cursor-pointer'> {t('userList.addMember')}</span>
+                  <span className='tw-cursor-pointer' onClick={openModalCreateUser}>
+                    {' '}
+                    {t('userList.addMember')}
+                  </span>
                   <input
                     ref={fileSelect}
                     className='tw-hidden'

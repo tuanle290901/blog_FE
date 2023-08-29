@@ -279,7 +279,7 @@ const ModalApprove = (props: {
                                   departments,
                                   step.groupCodes[0] !== PROCESS_GROUPCODE.START &&
                                     step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER
-                                    ? step.groupCodes[0]
+                                    ? step.histories[0].actualGroup
                                     : ticket.groupCode
                                 )}{' '}
                                 (

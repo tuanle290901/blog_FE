@@ -3,7 +3,11 @@ import TextArea from 'antd/es/input/TextArea'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { createLeaveRequest, editLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
+import {
+  createLeaveRequest,
+  editLeaveRequest,
+  setCreateRequestStatus
+} from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
 import { LeaveTypes } from '~/types/leave-request.interface'
@@ -57,6 +61,7 @@ const LeaveRequestForm: React.FC<{
   }, [data, selectedTicketTypeId])
 
   const handleSubmit = async () => {
+    dispatch(setCreateRequestStatus(false))
     const formValue = form.getFieldsValue()
     const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
 
@@ -81,6 +86,7 @@ const LeaveRequestForm: React.FC<{
       notification.success({
         message: response.message
       })
+      dispatch(setCreateRequestStatus(true))
     } catch (error: any) {
       notification.error({
         message: error.message
