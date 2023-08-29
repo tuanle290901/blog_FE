@@ -378,7 +378,7 @@ const MainLayout: React.FC = () => {
         </div>
       </Sider>
       <Layout>
-        <Header className='header-container'>
+        <Header className='header-container tw-px-[10px] lg:tw-px-[30px]'>
           <div className='header-container__left tw-block lg:tw-hidden'>
             <Menu
               onClick={onMobileMenuClick}
@@ -414,7 +414,7 @@ const MainLayout: React.FC = () => {
                       )
                     }
                   />
-                  <span className='tw-font-bold tw-hidden md:tw-block'>{userInfo?.fullName}</span>
+                  <span className='tw-hidden md:tw-block header-right__username'>{userInfo?.fullName}</span>
                 </Space>
               </div>
             </Dropdown>
