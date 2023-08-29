@@ -32,6 +32,8 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { IHoliday } from '~/types/holiday-schedule'
 import { convertMonthToLocaleVi } from '~/utils/helper'
 import '../index.scss'
+import { REGEX_TRIM } from '~/constants/regex.constant'
+import { useTranslation } from 'react-i18next'
 
 const { confirm } = Modal
 
@@ -108,6 +110,7 @@ const HolidayScheduleConfig = () => {
   const [form] = useForm()
   const holidayList = useAppSelector((item) => item.holidaySchedule.holidayList)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     dispatch(getListHoliday())
@@ -224,10 +227,6 @@ const HolidayScheduleConfig = () => {
     date: Dayjs[]
     note: string
   }) => {
-    if (code.trim() === '' || name.trim() === '' || note.trim() === '') {
-      notification.error({ message: 'Vui lòng nhập các trường bắt buộc' })
-      return
-    }
     try {
       const payload: IHoliday = {
         id,
@@ -294,15 +293,54 @@ const HolidayScheduleConfig = () => {
           onFinishFailed={onFinishFailed}
           autoComplete='off'
         >
-          <Form.Item label='Mã ngày nghỉ' name='code' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+          <Form.Item
+            label='Mã ngày nghỉ'
+            name='code'
+            rules={[
+              {
+                required: true,
+                message: 'Trường bắt buộc'
+              },
+              {
+                pattern: REGEX_TRIM,
+                message: t('rootInit.trim')
+              }
+            ]}
+          >
             <Input placeholder='Nhập mã ngày nghỉ' disabled={form.getFieldValue('id')} />
           </Form.Item>
 
-          <Form.Item label='Tiêu đề' name='name' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+          <Form.Item
+            label='Tiêu đề'
+            name='name'
+            rules={[
+              {
+                required: true,
+                message: 'Trường bắt buộc'
+              },
+              {
+                pattern: REGEX_TRIM,
+                message: t('rootInit.trim')
+              }
+            ]}
+          >
             <Input placeholder='Nhập tiêu đề' />
           </Form.Item>
 
-          <Form.Item label='Thời gian nghỉ' name='date' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+          <Form.Item
+            label='Thời gian nghỉ'
+            name='date'
+            rules={[
+              {
+                required: true,
+                message: 'Trường bắt buộc'
+              },
+              {
+                pattern: REGEX_TRIM,
+                message: t('rootInit.trim')
+              }
+            ]}
+          >
             <RangePicker placeholder={['Ngày bắt đầu', 'Ngày kết thúc']} format={'DD/MM/YYYY'} className='tw-w-full' />
           </Form.Item>
 
