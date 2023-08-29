@@ -54,15 +54,19 @@ const PositionList: React.FC = () => {
     dispatch(startEditingPosition(position.id as string))
   }
   const handleClickDeletePosition = async (position: IPosition) => {
-    await dispatch(deletePosition(position))
-    notification.success({ message: t('position.message.deleteSuccess') })
-    dispatch(
-      searchPosition({
-        paging: searchValue.paging,
-        sorts: searchValue.sorts,
-        query: searchValue.query
-      })
-    )
+    const response = await dispatch(deletePosition(position))
+    if (response?.payload?.status === 200) {
+      notification.success({ message: response?.payload?.message })
+      dispatch(
+        searchPosition({
+          paging: searchValue.paging,
+          sorts: searchValue.sorts,
+          query: searchValue.query
+        })
+      )
+    } else {
+      notification.error({ message: response?.payload?.message })
+    }
   }
   const getSortOrder = (filed: string) => {
     const sort = searchValue.sorts[0]
@@ -115,7 +119,7 @@ const PositionList: React.FC = () => {
       width: '200px',
       render: (_, record) => {
         return (
-          <div className='tw-absolute tw-left-0 tw-w-full'>
+          <div className='tw-w-full'>
             {hasPermission([ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) ? (
               <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
                 <Button

@@ -76,7 +76,7 @@ export const deletePosition = createAsyncThunk('position/delete', async (body: P
   try {
     return (await HttpService.put('org/title/delete?id=' + body.id, {
       signal: thunkAPI.signal
-    })) as IApiResponse<IPosition[]>
+    })) as any
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)
