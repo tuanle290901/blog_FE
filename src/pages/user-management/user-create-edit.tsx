@@ -318,7 +318,7 @@ const UserCreateEdit: React.FC<{
                 {userData?.userName && (
                   <Form.Item
                     initialValue={userData.userName}
-                    style={{ marginBottom: 24 }}
+                    style={{ marginBottom: 20 }}
                     label={t('userList.username')}
                     name='userName'
                   >
@@ -326,7 +326,7 @@ const UserCreateEdit: React.FC<{
                   </Form.Item>
                 )}
                 <Form.Item
-                  style={{ marginBottom: 24 }}
+                  style={{ marginBottom: 20 }}
                   label={t('userList.fullName')}
                   name='fullName'
                   required
@@ -347,7 +347,7 @@ const UserCreateEdit: React.FC<{
                     maxLength={VALIDATE_FORM.MAX_LENGTH_FULLNAME}
                   />
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.gender')} name='genderType'>
+                <Form.Item style={{ marginBottom: 20 }} label={t('userList.gender')} name='genderType'>
                   {/*<Select placeholder={t('userModal.selectGender')}>*/}
                   {/*  <Select.Option value={GENDER.MALE}>{t('userList.male')}</Select.Option>*/}
                   {/*  <Select.Option value={GENDER.FEMALE}>{t('userList.female')}</Select.Option>*/}
@@ -363,7 +363,7 @@ const UserCreateEdit: React.FC<{
                     </div>
                   </Radio.Group>
                 </Form.Item>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateOfBirth')} name='birthday'>
+                <Form.Item style={{ marginBottom: 20 }} label={t('userList.dateOfBirth')} name='birthday'>
                   <DatePicker
                     format='DD/MM/YYYY'
                     disabled={userData?.status === USER_STATUS.DEACTIVE || !checkDisableUpdateUser}
@@ -376,7 +376,7 @@ const UserCreateEdit: React.FC<{
                   />
                 </Form.Item>
                 <Form.Item
-                  style={{ marginBottom: 24 }}
+                  style={{ marginBottom: 20 }}
                   label={t('userList.phoneNumber')}
                   name='phoneNumber'
                   rules={[
@@ -391,7 +391,7 @@ const UserCreateEdit: React.FC<{
                   />
                 </Form.Item>
                 <Form.Item
-                  style={{ marginBottom: 24 }}
+                  style={{ marginBottom: 20 }}
                   label={t('userList.email')}
                   name='email'
                   required
@@ -430,8 +430,8 @@ const UserCreateEdit: React.FC<{
             </Col>
             <Col xs={24} lg={12}>
               <h3 className='tw-py-3 tw-font-semibold tw-text-sm'>{t('userList.workInfo')}</h3>
-              <div className={`tw-p-4 tw-bg-[#FAFAFA] ${userData?.userName ? 'tw-h-[602px]' : 'tw-h-[502px]'}`}>
-                <Form.Item style={{ marginBottom: 24 }} label={t('userList.dateJoin')} name='joinDate' required>
+              <div className={`tw-p-4 tw-bg-[#FAFAFA] ${userData?.userName ? 'tw-h-[564px]' : 'tw-h-[482px]'}`}>
+                <Form.Item style={{ marginBottom: 20 }} label={t('userList.dateJoin')} name='joinDate' required>
                   {userData ? (
                     <DatePicker
                       format='DD/MM/YYYY'
@@ -464,7 +464,7 @@ const UserCreateEdit: React.FC<{
                   )}
                 </Form.Item>
                 <Form.Item
-                  style={{ marginBottom: 24 }}
+                  style={{ marginBottom: 20 }}
                   label={t('userList.officialContractSigningDate')}
                   name='formalDate'
                 >
@@ -488,7 +488,7 @@ const UserCreateEdit: React.FC<{
                       {remainLeaveMinute > 0 && (
                         <span className='tw-text-orange-600 tw-ml-1'>
                           ({(remainLeaveMinute / 60)?.toFixed(2)} {t('timesheet.hour')}
-                          <span className='tw-italic tw-mx-2'>hoặc</span>
+                          <span className='tw-italic tw-mx-2'>=</span>
                           {(remainLeaveMinute / (8 * 60))?.toFixed(2)} {t('timesheet.day')} )
                         </span>
                       )}
@@ -501,7 +501,7 @@ const UserCreateEdit: React.FC<{
                       </p>
                     </div>
                     <Form.Item
-                      style={{ marginBottom: 24 }}
+                      style={{ marginBottom: 20 }}
                       name='createWithRemainLeaveMinutes'
                       required
                       initialValue={userData?.createWithRemainLeaveMinutes || 0}
@@ -538,7 +538,7 @@ const UserCreateEdit: React.FC<{
                           )}
                           <Form.Item
                             {...restField}
-                            style={{ marginBottom: 24 }}
+                            style={{ marginBottom: 20 }}
                             label={t('userList.department')}
                             name={[name, 'groupCode']}
                             required
@@ -553,7 +553,7 @@ const UserCreateEdit: React.FC<{
                           <div className='tw-grid tw-grid-cols-2 tw-gap-2'>
                             <Form.Item
                               {...restField}
-                              style={{ marginBottom: 24 }}
+                              style={{ marginBottom: 20 }}
                               name={[name, 'title']}
                               label={t('userModal.departmentRole')}
                               rules={[{ required: true, message: t('userModal.errorMessage.titleEmpty') }]}

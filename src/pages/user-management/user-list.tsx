@@ -66,10 +66,12 @@ const UserList: React.FC = () => {
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
+    status?: string | null
     paging: IPaging
     sorts: ISort[]
   }>({
     query: '',
+    status: USER_STATUS.ACTIVE,
     paging: {
       page: 0,
       size: 10,
@@ -103,6 +105,13 @@ const UserList: React.FC = () => {
     })
     return [{ value: 'all', label: t('userList.allGroup') }, ...options]
   }, [groups])
+
+  const statusOption = [
+    { value: 'all', label: 'Tất cả trạng thái' },
+    { value: USER_STATUS.ACTIVE, label: 'Kích hoạt' },
+    { value: USER_STATUS.DEACTIVE, label: 'Vô hiệu hóa' }
+  ]
+
   const handleClickEditUser = async (user: IUser) => {
     try {
       await dispatch(startEditingUser(user.id as string))
@@ -113,6 +122,7 @@ const UserList: React.FC = () => {
       resetAndSearchUser()
     }
   }
+
   const handleClickDeleteUser = async (user: IUser) => {
     try {
       await dispatch(deleteUser(user))
@@ -122,16 +132,15 @@ const UserList: React.FC = () => {
           paging: searchValue.paging,
           sorts: searchValue.sorts,
           query: searchValue.query,
-          groupCode: searchValue.group === 'all' ? null : searchValue.group
+          groupCode: searchValue.group === 'all' ? null : searchValue.group,
+          status: searchValue.status === 'all' ? null : searchValue.status
         })
       )
     } catch (e) {
       console.log(e)
     }
   }
-  const handleClickViewUserHistory = (user: IUser) => {
-    navigate('/user/history/' + user.id)
-  }
+
   const handleCloseUserModal = (isCreateUserSuccess: boolean) => {
     setIsOpenUserModal(false)
     dispatch(cancelEditingUser())
@@ -139,11 +148,13 @@ const UserList: React.FC = () => {
       resetAndSearchUser()
     }
   }
+
   const resetAndSearchUser = () => {
     setQuery('')
     setSearchValue((prevState) => {
       return {
         group: 'all',
+        status: USER_STATUS.ACTIVE,
         query: '',
         paging: { ...prevState.paging, page: 0 },
         sorts: [
@@ -180,7 +191,8 @@ const UserList: React.FC = () => {
           paging: searchValue.paging,
           sorts: searchValue.sorts,
           query: searchValue.query,
-          groupCode: searchValue.group === 'all' ? null : searchValue.group
+          groupCode: searchValue.group === 'all' ? null : searchValue.group,
+          status: searchValue.status === 'all' ? null : searchValue.status
         })
       )
     } catch (e) {
@@ -295,7 +307,7 @@ const UserList: React.FC = () => {
             <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
               {record.status !== USER_STATUS.DEACTIVE && (
                 <>
-                  <Tooltip title={'Chỉnh sửa thành viên'}>
+                  <Tooltip title={'Cập nhật thông tin của thành viên'}>
                     <Button
                       size='small'
                       onClick={() => handleClickEditUser(record)}
@@ -365,6 +377,13 @@ const UserList: React.FC = () => {
       return { ...prevState, query: prevState.query, group: value }
     })
   }
+
+  const handleStatusChange = (value: string | null) => {
+    setSearchValue((prevState) => {
+      return { ...prevState, query: prevState.query, status: value }
+    })
+  }
+
   const handleSearchValueChange = (value: string) => {
     setQuery(value)
     if (timerId.current) {
@@ -397,7 +416,8 @@ const UserList: React.FC = () => {
         paging: searchValue.paging,
         sorts: searchValue.sorts,
         query: searchValue.query,
-        groupCode: searchValue.group === 'all' ? null : searchValue.group
+        groupCode: searchValue.group === 'all' ? null : searchValue.group,
+        status: searchValue.status === 'all' ? null : searchValue.status
       })
     )
 
@@ -504,7 +524,7 @@ const UserList: React.FC = () => {
         <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
       </div>
       <Row gutter={[16, 16]} className='tw-mt-4'>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={6}>
           <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
             {/* {permissionAddUser && (
               <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
@@ -531,7 +551,7 @@ const UserList: React.FC = () => {
             )}
           </div>
         </Col>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={18}>
           <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
             <Select
               onChange={handleDepartmentChange}
@@ -540,7 +560,13 @@ const UserList: React.FC = () => {
               value={searchValue.group}
               className='tw-w-full lg:tw-w-[200px]'
             />
-
+            <Select
+              onChange={handleStatusChange}
+              defaultValue={USER_STATUS.ACTIVE}
+              options={statusOption}
+              value={searchValue.status}
+              className='tw-w-full lg:tw-w-[200px]'
+            />
             <Search
               value={query}
               placeholder={t('userList.searchMember')}

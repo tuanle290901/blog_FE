@@ -3,7 +3,7 @@ import { IUser } from '~/types/user.interface.ts'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import HttpService from '~/config/api.ts'
 import { IApiResponse, IPaging, ISort } from '~/types/api-response.interface.ts'
-import { COMMON_ERROR_CODE, EDIT_TYPE } from '~/constants/app.constant.ts'
+import { COMMON_ERROR_CODE, EDIT_TYPE, USER_STATUS } from '~/constants/app.constant.ts'
 
 export interface IUserState {
   userList: IUser[]
@@ -23,13 +23,36 @@ const initialState: IUserState = {
 
 export const searchUser = createAsyncThunk(
   'users/search',
-  async (params: { query: string; groupCode?: string | null; paging: IPaging; sorts: ISort[] }, thunkAPI) => {
+  async (
+    params: { query: string; groupCode?: string | null; status?: string | null; paging: IPaging; sorts: ISort[] },
+    thunkAPI
+  ) => {
     try {
       const body: any = {
         page: params.paging.page,
         size: params.paging.size,
         sort: params.sorts
       }
+      let statusSelected = {
+        field: 'status',
+        operator: 'IS_NOT',
+        value: ''
+      }
+      if (params?.status === USER_STATUS.ACTIVE) {
+        statusSelected = {
+          field: 'status',
+          operator: 'IS_NOT',
+          value: USER_STATUS.DEACTIVE
+        }
+      }
+      if (params?.status === USER_STATUS.DEACTIVE) {
+        statusSelected = {
+          field: 'status',
+          operator: 'IS',
+          value: USER_STATUS.DEACTIVE
+        }
+      }
+
       if (params.query && params.groupCode) {
         body.criteria = [
           {
@@ -59,41 +82,56 @@ export const searchUser = createAsyncThunk(
                 field: 'group_profiles.group_code',
                 operator: 'IS',
                 value: params.groupCode
-              }
+              },
+              statusSelected
             ]
           }
         ]
       } else if (params.query && !params.groupCode) {
         body.criteria = [
           {
-            operator: 'OR_MULTIPLES',
+            operator: 'AND_MULTIPLES',
             children: [
               {
-                field: 'full_name',
-                operator: 'LIKE_IGNORE_CASE',
-                value: params.query
+                operator: 'OR_MULTIPLES',
+                children: [
+                  {
+                    field: 'full_name',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'phone_number',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  },
+                  {
+                    field: 'email',
+                    operator: 'LIKE_IGNORE_CASE',
+                    value: params.query
+                  }
+                ]
               },
-              {
-                field: 'phone_number',
-                operator: 'LIKE_IGNORE_CASE',
-                value: params.query
-              },
-              {
-                field: 'email',
-                operator: 'LIKE_IGNORE_CASE',
-                value: params.query
-              }
+              statusSelected
             ]
           }
         ]
       } else if (params.groupCode && !params.query) {
         body.criteria = [
           {
-            field: 'group_profiles.group_code',
-            operator: 'IS',
-            value: params.groupCode
+            operator: 'AND_MULTIPLES',
+            children: [
+              {
+                field: 'group_profiles.group_code',
+                operator: 'IS',
+                value: params.groupCode
+              },
+              statusSelected
+            ]
           }
         ]
+      } else if (!params.groupCode && !params.query && params.status) {
+        body.criteria = [statusSelected]
       }
       const response: IApiResponse<IUser[]> = await HttpService.post('/system-user/filter', body, {
         signal: thunkAPI.signal
