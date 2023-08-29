@@ -96,7 +96,7 @@ const Timesheet: React.FC = () => {
     query: '',
     paging: {
       page: 0,
-      size: 10,
+      size: 15,
       total: 0,
       totalPage: 0
     },
@@ -671,7 +671,7 @@ const Timesheet: React.FC = () => {
                 columns={columns}
                 dataSource={timesheetSate.timesheetList}
                 loading={timesheetSate.loading}
-                scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+                scroll={{ y: 'calc(100vh - 338px)', x: 800 }}
                 rowClassName={(record: IAttendance) =>
                   record?.reportData?.dateType !== 'WORKING_DATE'
                     ? record?.reportData?.dateType?.toLocaleLowerCase()
@@ -684,7 +684,7 @@ const Timesheet: React.FC = () => {
                   total: timesheetSate?.meta?.total,
                   defaultPageSize: timesheetSate?.meta?.size,
                   pageSize: timesheetSate?.meta?.size,
-                  pageSizeOptions: ['5', '10', '25', '50'],
+                  pageSizeOptions: ['5', '10', '15', '25', '50'],
                   showSizeChanger: true,
                   showQuickJumper: true,
                   locale: {
