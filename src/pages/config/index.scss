@@ -45,6 +45,12 @@
     font-weight: 500;
   }
 
+  .ant-picker-body {
+    td {
+      border-left: 2px solid #f0f0f0;
+    }
+  }
+
   .ant-picker-calendar-date-value {
     font-size: 15px;
   }

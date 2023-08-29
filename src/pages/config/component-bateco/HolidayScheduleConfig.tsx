@@ -167,7 +167,7 @@ const HolidayScheduleConfig = () => {
             })
           } catch (error: any) {
             notification.error({
-              message: error.response.data.message
+              message: error?.response?.data?.message
             })
           }
         }
@@ -224,6 +224,10 @@ const HolidayScheduleConfig = () => {
     date: Dayjs[]
     note: string
   }) => {
+    if (code.trim() === '' || name.trim() === '' || note.trim() === '') {
+      notification.error({ message: 'Vui lòng nhập các trường bắt buộc' })
+      return
+    }
     try {
       const payload: IHoliday = {
         id,
@@ -235,13 +239,22 @@ const HolidayScheduleConfig = () => {
         note
       }
       if (id) {
-        await dispatch(updateHolidaySchedule(payload))
-        notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
+        const response: any = await dispatch(updateHolidaySchedule(payload))
+        if (response?.type?.includes('/rejected')) {
+          notification.error({ message: response?.payload?.response?.data.messsage })
+        } else {
+          await dispatch(getListHoliday())
+          notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
+        }
       } else {
-        await dispatch(addOneHolidaySchedule(payload))
-        notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
+        const response: any = await dispatch(addOneHolidaySchedule(payload))
+        if (response?.type?.includes('/rejected')) {
+          notification.error({ message: response?.payload?.response?.data.message })
+        } else {
+          await dispatch(getListHoliday())
+          notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
+        }
       }
-      await dispatch(getListHoliday())
 
       setIsModalOpen(false)
     } catch (err) {
@@ -262,7 +275,7 @@ const HolidayScheduleConfig = () => {
         onSelect={onSelectDate}
         headerRender={headerRender}
         disabledDate={(date) => {
-          if (date.endOf('d').valueOf() < dayjs().valueOf()) {
+          if (date.endOf('month').valueOf() < dayjs().valueOf()) {
             return true
           }
           return false

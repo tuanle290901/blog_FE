@@ -25,6 +25,7 @@ export interface ILeaveRequestState {
   ticketDefinationType: TicketDefinationResponse[]
   nodeId: number
   countLeaveRequest: ICountLeaveRequest
+  createRequestSuccess?: boolean
 }
 
 export interface TicketRequestPayload {
@@ -53,7 +54,8 @@ const initialState: ILeaveRequestState = {
     approved: 0,
     rejected: 0,
     submitted: 0
-  }
+  },
+  createRequestSuccess: false
 }
 
 export const filterLeaveRequest = createAsyncThunk('tickets/filter', async (params: TicketRequestPayload, thunkAPI) => {
@@ -205,6 +207,9 @@ const leaveRequestSlice = createSlice({
     },
     resetValueFilter: (state) => {
       state.filter = ''
+    },
+    setCreateRequestStatus: (state, action) => {
+      state.createRequestSuccess = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -255,6 +260,6 @@ export const departmentSelectors = {
   selectListData: (state: ILeaveRequestState) => state.listData,
   selectLeaveRequestLoading: (state: ILeaveRequestState) => state.loading
 }
-export const { startEditing, cancelEditing, setValueFilter, resetValueFilter, setNodeIdState } =
+export const { startEditing, cancelEditing, setValueFilter, resetValueFilter, setNodeIdState, setCreateRequestStatus } =
   leaveRequestSlice.actions
 export default leaveRequestSlice.reducer
