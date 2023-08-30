@@ -14,7 +14,7 @@ import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
 import menuIconReport from '../assets/images/menu/icon_group.png'
 import menuIconSetting from '../assets/images/menu/setting.png'
 import menuIconRequest from '../assets/images/menu/icon_request.png'
-import menuIconDashboard from '../assets/images/menu/icon_chart.png'
+// import menuIconDashboard from '../assets/images/menu/icon_chart.png'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import defaultImg from '~/assets/images/default-img.png'
@@ -361,12 +361,8 @@ const MainLayout: React.FC = () => {
             <>
               <div className='bottom-main-text'>Employee Management System</div>
               <div className='tw-flex tw-items-center'>
-                <span className='bottom-extra-text tw-mr-2'>Powered by</span>
-
-                <span className='bottom-main-text tw-font-bold tw-flex tw-items-center'>
-                  <img src={logoHtsc} alt='' className='tw-h-[20px] tw-mr-1' />
-                  HTSC
-                </span>
+                <span className='bottom-extra-text tw-mr-1'>Powered by</span>
+                <img src={logoHtsc} alt='' className='tw-h-[23px]' />
               </div>
             </>
           )}
