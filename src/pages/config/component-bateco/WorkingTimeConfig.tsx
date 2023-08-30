@@ -59,8 +59,12 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg?: st
           )}
           {type === 'doubleComma' && (
             <>
-              <span className='tw-font-bold'>,</span>
-              <div className='time-box'>{secondArg}</div>
+              <span className='tw-font-bold' style={{ visibility: secondArg ? 'visible' : 'hidden' }}>
+                ,
+              </span>
+              <div className='time-box' style={{ visibility: secondArg ? 'visible' : 'hidden' }}>
+                {secondArg}
+              </div>
               <div className='time-circle'>{thirdArg}</div>
             </>
           )}
@@ -280,6 +284,7 @@ const WorkingTimeConfig = () => {
                   `x${workingTimeInfo?.timeWorkSetup?.weekendTimeSetups[0]?.coefficient}`
                 )}
               </div>
+              <div className='tw-mt-[30px]'>{renderRow('doubleComma', '3. Ngày nghỉ lễ', 'Ngày lễ', '', `x3`)}</div>
             </div>
           </div>
         )}
