@@ -569,10 +569,14 @@ const LeaveRequest: React.FC = () => {
         <>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} lg={8} className='leave-request-count-title'>
-              Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
-              <span>
-                {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
-              </span>
+              <Tooltip title='Không bao gồm trạng thái Đã hủy và Đang xử lý'>
+                <>
+                  Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
+                  <span>
+                    {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
+                  </span>
+                </>
+              </Tooltip>
             </Col>
             <Col xs={24} lg={16} className='leave-request-count-detail'>
               <div
