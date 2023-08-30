@@ -520,6 +520,7 @@ const UserCreateEdit: React.FC<{
                         placeholder={t('userModal.enterRemainLeaveMinute')}
                         type='number'
                         min={0}
+                        max={99999}
                         onChange={(e) => setRemainLeaveMinute(Number(e?.target?.value))}
                       />
                     </Form.Item>
