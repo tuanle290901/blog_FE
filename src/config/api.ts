@@ -17,7 +17,7 @@ function getRootURL(url: string) {
 }
 
 const HttpService = axios.create({
-  baseURL: getRootURL(window.location.href),
+  baseURL: process.env.NODE_ENV === 'production' ? getRootURL(window.location.href) : API_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
