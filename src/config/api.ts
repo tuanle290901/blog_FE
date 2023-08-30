@@ -10,14 +10,16 @@ let isShowNotification = false
 
 function getRootURL(url: string) {
   const parsedURL = new URL(url)
+  const parsedAPI_URL = new URL(API_URL)
   const protocol = parsedURL.protocol
   const hostname = parsedURL.hostname
+  const pathname = parsedAPI_URL.pathname
   const port = parsedURL.port ? `:${parsedURL.port}` : ''
-  return `${protocol}//${hostname}${port}`
+  return `${protocol}//${hostname}${port}${pathname}`
 }
 
 const HttpService = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? getRootURL(window.location.href) : API_URL,
+  baseURL: getRootURL(window.location.href),
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
