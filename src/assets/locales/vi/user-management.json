@@ -51,7 +51,7 @@
     "departmentRole": "Vai trò trong tổ chức",
     "systemRole": "Vai trò trong hệ thống",
     "remainLeaveMinute": "Số phút nghỉ phép còn lại",
-    "enterRemainLeaveMinute": "Ví dụ: 10.25",
+    "enterRemainLeaveMinute": "Ví dụ: 5760",
     "errorMessage": {
       "fullNameIsEmpty": "Họ và tên không được để trống",
       "groupEmpty": "Tổ chức không được để trống",
@@ -63,7 +63,7 @@
       "invalidPhoneNumber": "Số điện thoại không đúng định dạng",
       "passwordIsEmpty": "Mật khẩu không được để trống",
       "remainLeaveMinuteIsEmpty": "Số phút nghỉ phép còn lại không được để trống",
-      "remainLeaveMinuteIsPositive": "Số phút nghỉ phép còn lại phải lớn hơn 0"
+      "remainLeaveMinuteIsPositive": "Số phút nghỉ phép còn lại phải là số nguyên dương, có tối đa 5 chữ số"
     }
   }
 }
