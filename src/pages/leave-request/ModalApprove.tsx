@@ -73,7 +73,7 @@ const ModalApprove = (props: {
     if (!value) return '--'
     switch (type) {
       case INPUT_TYPE.DATETIME: {
-        return dayjs(value).format('DD/MM/YYYY HH:mm:ss')
+        return dayjs(value).format('DD/MM/YYYY HH:mm:00')
       }
       case INPUT_TYPE.SINGLE_SELECT: {
         return LEAVE_TYPE_MAP[value]
@@ -92,7 +92,7 @@ const ModalApprove = (props: {
   ) => {
     for (const prop in attributes) {
       if (dayjs.isDayjs(attributes[prop])) {
-        attributes[prop] = attributes[prop].format('YYYY-MM-DD HH:mm:ss')
+        attributes[prop] = attributes[prop].format('YYYY-MM-DD HH:mm:00')
       }
     }
     confirm({
@@ -318,7 +318,7 @@ const ModalApprove = (props: {
                                 )}{' '}
                                 (
                                 {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
-                                  'DD/MM/YYYY HH:mm:ss'
+                                  'DD/MM/YYYY HH:mm:00'
                                 )}
                                 )
                               </span>
