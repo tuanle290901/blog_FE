@@ -92,6 +92,7 @@ const Index = () => {
               <Space>
                 <span>Nhân viên:</span>
                 <Select
+                  showSearch
                   value={currenSelectUser}
                   onChange={(val) => setCurrentSelectUser(val)}
                   className='tw-min-w-[200px]'
@@ -121,7 +122,7 @@ const Index = () => {
                     strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
-                    format={() => `${Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(1))} giờ `}
+                    format={() => `${Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(2))} giờ `}
                   />
                 </div>
               </Col>
@@ -188,7 +189,7 @@ const Index = () => {
                     strokeWidth={8}
                     strokeLinecap='round'
                     status={'normal'}
-                    format={() => `${Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1))} giờ `}
+                    format={() => `${Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(2))} giờ `}
                   />
                 </div>
               </Col>
@@ -198,7 +199,7 @@ const Index = () => {
             </div>
             <Row align={'top'} gutter={[32, 16]}>
               <Col xs={24} xl={12} xxl={6}>
-                {renderRow('Số giờ công tác', Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(1)), 'giờ')}
+                {renderRow('Số giờ công tác', Number((leaveBalanceInfo?.totalBusiness ?? 0).toFixed(2)), 'giờ')}
               </Col>
               <Col xs={24} xl={12} xxl={6}>
                 {renderRow(
@@ -218,7 +219,7 @@ const Index = () => {
                 {renderRow('Về sớm:', leaveBalanceInfo?.totalEarlyBack, 'lần', 'child')}
               </Col>
               <Col xs={24} xl={12} xxl={6}>
-                {renderRow('Số giờ làm thêm', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(1)), 'giờ')}
+                {renderRow('Số giờ làm thêm', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(2)), 'giờ')}
                 {leaveBalanceInfo?.overTimeInfoList?.map((item, index) => {
                   return <div key={index}>{renderRow(mappingOvertimeKey(item.key), item.value, 'giờ', 'child')}</div>
                 })}
