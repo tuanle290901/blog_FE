@@ -1,8 +1,11 @@
-import { useEffect } from 'react'
-import { Col, Progress, Row } from 'antd'
+import { useEffect, useState } from 'react'
+import { Col, Progress, Row, Select, Space } from 'antd'
 import './style.scss'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { getLeaveBalance } from '~/stores/features/leave-balance/leave-balance.slice'
+import { findLeaveBalance, getLeaveBalance } from '~/stores/features/leave-balance/leave-balance.slice'
+import { searchUser } from '~/stores/features/user/user.slice'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
 
 const mappingOvertimeKey = (key: string) => {
   switch (key) {
@@ -44,18 +47,60 @@ const renderRow = (title: string, firstArg: string | number, secondArg: string, 
 const Index = () => {
   const dispatch = useAppDispatch()
   const leaveBalanceInfo = useAppSelector((item) => item.leaveBalacnce.leaveBalanceData)
+  console.log(leaveBalanceInfo, 'test')
+  const userList = useAppSelector((item) => item.user.userList)
+  const { userInfo } = useUserInfo()
+  const [currenSelectUser, setCurrentSelectUser] = useState<string>('')
+  const isSystemAdmin = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
 
   useEffect(() => {
-    dispatch(getLeaveBalance())
+    dispatch(
+      searchUser({
+        paging: { page: 0, size: 100000, total: 100000, totalPage: 100000 },
+        sorts: [],
+        query: '',
+        groupCode: null,
+        status: null
+      })
+    )
   }, [])
+
+  useEffect(() => {
+    if (userInfo && userInfo.userName) {
+      setCurrentSelectUser(userInfo.userName)
+    }
+  }, [userInfo])
+
+  useEffect(() => {
+    if (currenSelectUser) {
+      dispatch(findLeaveBalance(currenSelectUser))
+    }
+  }, [currenSelectUser])
 
   return (
     <div className='statistical-wrapper'>
       <div className='statistical-container'>
         <div className='report-title tw-text-lg tw-font-semibold'>Thống kê thông tin dữ liệu trong tháng</div>
-        <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
-          Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
-        </div>
+        <Row justify='space-between'>
+          <Col>
+            <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
+              Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
+            </div>
+          </Col>
+          {isSystemAdmin && (
+            <Col>
+              <Space>
+                <span>Nhân viên:</span>
+                <Select
+                  value={currenSelectUser}
+                  onChange={(val) => setCurrentSelectUser(val)}
+                  className='tw-min-w-[200px]'
+                  options={userList.map((item) => ({ label: item?.fullName, value: item?.userName }))}
+                />
+              </Space>
+            </Col>
+          )}
+        </Row>
 
         {leaveBalanceInfo && (
           <>

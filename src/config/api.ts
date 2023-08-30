@@ -7,6 +7,7 @@ import { clearLocalStorage } from '~/stores/features/auth/auth.slice.ts'
 
 let isShowModal = false
 let isShowNotification = false
+console.log(window.location.href, 'href')
 const HttpService = axios.create({
   baseURL: API_URL,
   headers: {

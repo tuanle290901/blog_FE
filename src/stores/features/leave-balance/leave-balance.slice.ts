@@ -52,13 +52,34 @@ export const getLeaveBalance = createAsyncThunk('time-attendance/getLeaveBalance
   }
 })
 
+export const findLeaveBalance = createAsyncThunk(
+  'time-attendance/getLeaveBalance',
+  async (userName: string, thunkAPI) => {
+    try {
+      const response: any = await HttpService.post(
+        'time-attendance/leave-balance/find',
+        { userName },
+        {
+          signal: thunkAPI.signal
+        }
+      )
+      return response.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
 const leaveBalanceSlice = createSlice({
   name: 'leaveBalance',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getLeaveBalance.fulfilled, (state, action) => {
+      // .addCase(getLeaveBalance.fulfilled, (state, action) => {
+      //   state.leaveBalanceData = action.payload
+      // })
+      .addCase(findLeaveBalance.fulfilled, (state, action) => {
         state.leaveBalanceData = action.payload
       })
       .addMatcher<PendingAction>(
