@@ -7,9 +7,17 @@ import { clearLocalStorage } from '~/stores/features/auth/auth.slice.ts'
 
 let isShowModal = false
 let isShowNotification = false
-console.log(window.location.href, 'href')
+
+function getRootURL(url: string) {
+  const parsedURL = new URL(url)
+  const protocol = parsedURL.protocol
+  const hostname = parsedURL.hostname
+  const port = parsedURL.port ? `:${parsedURL.port}` : ''
+  return `${protocol}//${hostname}${port}`
+}
+
 const HttpService = axios.create({
-  baseURL: API_URL,
+  baseURL: getRootURL(window.location.href),
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
