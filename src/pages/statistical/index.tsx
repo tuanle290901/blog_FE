@@ -92,6 +92,7 @@ const Index = () => {
               <Space>
                 <span>Nhân viên:</span>
                 <Select
+                  showSearch
                   value={currenSelectUser}
                   onChange={(val) => setCurrentSelectUser(val)}
                   className='tw-min-w-[200px]'
