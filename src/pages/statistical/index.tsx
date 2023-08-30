@@ -221,7 +221,16 @@ const Index = () => {
               <Col xs={24} xl={12} xxl={6}>
                 {renderRow('Số giờ làm thêm', Number((leaveBalanceInfo?.totalOverTimeHours ?? 0).toFixed(2)), 'giờ')}
                 {leaveBalanceInfo?.overTimeInfoList?.map((item, index) => {
-                  return <div key={index}>{renderRow(mappingOvertimeKey(item.key), item.value, 'giờ', 'child')}</div>
+                  return (
+                    <div key={index}>
+                      {renderRow(
+                        mappingOvertimeKey(item.key),
+                        Number(item.value ?? 0).toFixed(item.value ? 2 : 0),
+                        'giờ',
+                        'child'
+                      )}
+                    </div>
+                  )
                 })}
               </Col>
             </Row>
