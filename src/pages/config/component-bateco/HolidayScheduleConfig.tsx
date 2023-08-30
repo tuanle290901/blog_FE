@@ -240,7 +240,7 @@ const HolidayScheduleConfig = () => {
       if (id) {
         const response: any = await dispatch(updateHolidaySchedule(payload))
         if (response?.type?.includes('/rejected')) {
-          notification.error({ message: response?.payload?.response?.data.messsage })
+          notification.error({ message: response?.payload?.response?.data?.message })
         } else {
           await dispatch(getListHoliday())
           notification.success({ message: 'Cập nhật ngày nghỉ thành công' })
@@ -248,7 +248,7 @@ const HolidayScheduleConfig = () => {
       } else {
         const response: any = await dispatch(addOneHolidaySchedule(payload))
         if (response?.type?.includes('/rejected')) {
-          notification.error({ message: response?.payload?.response?.data.message })
+          notification.error({ message: response?.payload?.response?.data?.message })
         } else {
           await dispatch(getListHoliday())
           notification.success({ message: 'Thêm mới ngày nghỉ thành công' })
