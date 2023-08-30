@@ -303,7 +303,7 @@ const UserList: React.FC = () => {
       width: '120px',
       render: (_, record) => {
         return (
-          <div className='tw-absolute tw-left-0 tw-bottom-[12px] tw-w-full'>
+          <div className='tw-bottom-[12px] tw-w-full'>
             <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
               {record.status !== USER_STATUS.DEACTIVE && (
                 <>
