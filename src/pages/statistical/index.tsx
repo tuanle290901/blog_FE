@@ -93,6 +93,10 @@ const Index = () => {
                   value={currenSelectUser}
                   onChange={(val) => setCurrentSelectUser(val)}
                   className='tw-min-w-[380px]'
+                  optionFilterProp='children'
+                  filterOption={(input, option) => {
+                    return (option?.label + '').toLowerCase().includes(input.toLowerCase())
+                  }}
                   options={userList.map((user) => {
                     return {
                       label: user?.fullName + ' (' + user?.userName + ')',
