@@ -463,19 +463,20 @@ const Department: React.FC = () => {
           icon={<IconBackSVG width={11} height={16} fill='' />}
         />
         <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-2xl'>
-          {dataRender?.listDataTitle.map((item: any, index) => {
-            return (
-              <span
-                key={item.code}
-                onClick={() => {
-                  onRendered(item)
-                }}
-                className='tw-ml-[5px] pointer'
-              >
-                {` ${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? ' ->  ' : ' '}`}
-              </span>
-            )
-          })}
+          {dataRender?.listData?.length > 0 &&
+            dataRender?.listDataTitle.map((item: any, index) => {
+              return (
+                <span
+                  key={item.code}
+                  onClick={() => {
+                    onRendered(item)
+                  }}
+                  className='tw-ml-[5px] pointer'
+                >
+                  {` ${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? ' ->  ' : ' '}`}
+                </span>
+              )
+            })}
         </h1>
       </Row>
       <div className='tw-flex tw-flex-col md:tw-flex-row tw-my-[20px] tw-justify-between tw-flex-wrap tw-gap-4'>
@@ -502,7 +503,7 @@ const Department: React.FC = () => {
           icon={<PlusOutlined className='tw-text-600' />}
           title={`${t('department.add')}`}
         />
-        <div>
+        <div className='md:tw-ml-auto'>
           <Input.Search
             className='tw-w-full'
             placeholder={`${t('department.pleaseEnterSearch')}`}
@@ -531,24 +532,22 @@ const Department: React.FC = () => {
           dataParent={[]}
         />
       )}
-      <Row className='tw-w-100' gutter={[12, 12]}>
-        <Table
-          dataSource={renderTreeRows(dataRender.listData, true)}
-          columns={columns}
-          loading={isLoading}
-          expandable={expandableConfig}
-          pagination={false}
-          style={{ width: '100%' }}
-          className='pointer'
-          scroll={{ y: 'calc(100vh - 360px)' }}
-          rowKey={(record: DataType) => record.code}
-          onRow={(record) => {
-            return {
-              onClick: () => setUseSelect(record)
-            }
-          }}
-        />
-      </Row>
+      <Table
+        dataSource={renderTreeRows(dataRender.listData, true)}
+        columns={columns}
+        loading={isLoading}
+        expandable={expandableConfig}
+        pagination={false}
+        style={{ width: '100%' }}
+        className='pointer'
+        scroll={{ y: 'calc(100vh - 360px)' }}
+        rowKey={(record: DataType) => record.code}
+        onRow={(record) => {
+          return {
+            onClick: () => setUseSelect(record)
+          }
+        }}
+      />
     </div>
   )
 }
