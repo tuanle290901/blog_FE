@@ -272,13 +272,16 @@ const ModalApprove = (props: {
                                     (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
                                       <Col span={24} className='tw-flex tw-justify-center'>
                                         <Space>
-                                          <Button
-                                            danger
-                                            onClick={() => onReject(mainIndex)}
-                                            disabled={isAnyRequiredFieldEmpty(step)}
-                                          >
-                                            Từ chối
-                                          </Button>
+                                          {step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER && (
+                                            <Button
+                                              danger
+                                              onClick={() => onReject(mainIndex)}
+                                              disabled={isAnyRequiredFieldEmpty(step)}
+                                            >
+                                              Từ chối
+                                            </Button>
+                                          )}
+
                                           <Button
                                             type='primary'
                                             onClick={() => onApprove(mainIndex)}
@@ -293,20 +296,6 @@ const ModalApprove = (props: {
                               )
                             }
                           })}
-
-                        {/* {(step.status === TicketStatusEnum.PENDING || step.status === TicketStatusEnum.PROCESSING) &&
-                          (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
-                            <Col span={24} className='tw-flex tw-justify-center'>
-                              <Space>
-                                <Button danger onClick={() => onReject(mainIndex)}>
-                                  Từ chối
-                                </Button>
-                                <Button type='primary' onClick={() => onApprove(mainIndex)}>
-                                  Đồng ý
-                                </Button>
-                              </Space>
-                            </Col>
-                          )} */}
 
                         {step?.status !== TicketStatusEnum.PENDING && step.histories && step?.histories?.length > 0 && (
                           <Col span={24} className='tw-flex tw-justify-end '>
