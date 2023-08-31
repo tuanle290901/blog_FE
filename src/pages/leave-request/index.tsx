@@ -495,7 +495,7 @@ const LeaveRequest: React.FC = () => {
     const percent =
       (amount / (countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted)) *
       100
-    return percent?.toFixed(0) || 0
+    return percent?.toFixed(3) || 0
   }
 
   const onFasFilter = (status: TicketStatusEnum.SUBMITTED | TicketStatusEnum.REJECTED | TicketStatusEnum.CONFIRMED) => {
@@ -583,17 +583,15 @@ const LeaveRequest: React.FC = () => {
       {isSystemAdmin && (
         <>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
-            <Col xs={24} lg={8} className='leave-request-count-title'>
+            <Col xs={24} sm={7} className='leave-request-count-title'>
               <Tooltip title='Không bao gồm trạng thái Đã hủy và Đang xử lý'>
-                <>
-                  Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
-                  <span>
-                    {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
-                  </span>
-                </>
+                Số yêu cầu trong tháng {dayjs(dateFilter).format('MM/YYYY')}
+                <span className='leave-request-count-title__amount'>
+                  {countLeaveRequestSate.approved + countLeaveRequestSate.rejected + countLeaveRequestSate.submitted}
+                </span>
               </Tooltip>
             </Col>
-            <Col xs={24} lg={16} className='leave-request-count-detail'>
+            <Col xs={24} sm={17} className='leave-request-count-detail'>
               <div
                 className='leave-request-count-detail__item leave-request-count-detail__item--submitted'
                 onClick={() => onFasFilter(TicketStatusEnum.SUBMITTED)}

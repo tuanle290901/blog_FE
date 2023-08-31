@@ -334,7 +334,7 @@ const WorkingTimeConfig = () => {
             {renderRow(
               'single',
               'Số ngày nghỉ phép mặc định của năm',
-              `${workingTimeInfo?.policySetup?.defaultLeaveDay * 24 * 60}`
+              `${workingTimeInfo?.policySetup?.defaultLeaveDay * 8 * 60}`
             )}
             <div className='tw-ml-2'>phút ({workingTimeInfo?.policySetup?.defaultLeaveDay} ngày)</div>
           </div>

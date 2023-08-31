@@ -274,3 +274,7 @@
     flex-direction: column;
   }
 }
+
+.rc-virtual-list-scrollbar.rc-virtual-list-scrollbar-show {
+  display: block !important;
+}
