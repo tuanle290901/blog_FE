@@ -34,6 +34,7 @@ import {
   getTicketDetail,
   resetLeaveRequest,
   resetValueFilter,
+  onUpdateRequestStatus,
   setValueFilter,
   startEditing
 } from '~/stores/features/leave-request/leave-request.slice'
@@ -101,7 +102,7 @@ const LeaveRequest: React.FC = () => {
   const isManagerDepartment = userInfo?.groupProfiles.find(
     (gr) => gr.role === ROLE.MANAGER || gr.role === ROLE.SUB_MANAGER
   )
-  const isCreateRequestSuccess = useAppSelector((item: any) => item.leaveRequest.createRequestSuccess)
+  const isisUpdateRequestStatusSuccess = useAppSelector((item: any) => item.leaveRequest.isUpdateRequestStatusSuccess)
 
   const meta: IPaging = useAppSelector((state) => state.leaveRequest.meta)
 
@@ -121,11 +122,13 @@ const LeaveRequest: React.FC = () => {
 
   const handleClickReset = async (record: ILeaveRequest) => {
     try {
+      dispatch(onUpdateRequestStatus(false))
       const response = await dispatch(resetLeaveRequest(record.id)).unwrap()
       await dispatch(filterLeaveRequest(searchValue))
       notification.success({
         message: response.message
       })
+      dispatch(onUpdateRequestStatus(true))
     } catch (error: any) {
       notification.error({
         message: error.message
@@ -239,10 +242,10 @@ const LeaveRequest: React.FC = () => {
   }, [queryParameters])
 
   useEffect(() => {
-    if (isCreateRequestSuccess) {
+    if (isisUpdateRequestStatusSuccess) {
       dispatch(countLeaveRequest(dateFilter))
     }
-  }, [isCreateRequestSuccess])
+  }, [isisUpdateRequestStatusSuccess])
 
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
@@ -384,7 +387,9 @@ const LeaveRequest: React.FC = () => {
                       size='small'
                       onClick={() => handleClickUpdate('update', record)}
                       icon={<EditOutlined className='tw-text-blue-600' />}
-                      disabled={record.createdBy !== userInfo?.userName}
+                      disabled={
+                        record.createdBy !== userInfo?.userName || record.status === TicketStatusEnum.PROCESSING
+                      }
                     />
                   </Tooltip>
                 )}
@@ -399,12 +404,18 @@ const LeaveRequest: React.FC = () => {
                       onConfirm={() => handleClickDelete(record)}
                       okText={t('common.yes')}
                       cancelText={t('common.no')}
-                      disabled={record.createdBy !== userInfo?.userName}
+                      disabled={
+                        record.createdBy !== userInfo?.userName ||
+                        record.createdBy !== userInfo?.userName ||
+                        record.status === TicketStatusEnum.PROCESSING
+                      }
                     >
                       <Button
                         size='small'
                         icon={<DeleteOutlined className='tw-text-red-600' />}
-                        disabled={record.createdBy !== userInfo?.userName}
+                        disabled={
+                          record.createdBy !== userInfo?.userName || record.status === TicketStatusEnum.PROCESSING
+                        }
                       />
                     </Popconfirm>
                   </Tooltip>
@@ -527,9 +538,13 @@ const LeaveRequest: React.FC = () => {
           {(isSystemAdmin || isManagerDepartment) && (
             <Select
               onChange={(val) => onChangeRequest('requestBy', val)}
+              optionFilterProp='children'
+              filterOption={(input, option) => {
+                return (option?.label + '').toLowerCase().includes(input.toLowerCase())
+              }}
               mode='multiple'
               placeholder='Người yêu cầu'
-              style={{ minWidth: 200 }}
+              style={{ minWidth: 380 }}
               options={users.map((user) => {
                 return {
                   label: user?.fullName + ' (' + user?.userName + ')',
@@ -621,22 +636,6 @@ const LeaveRequest: React.FC = () => {
       )}
 
       <div>
-        {/* <div style={{ marginBottom: 16 }}>
-          <span>Show Columns:</span>
-          <Select
-            mode='multiple'
-            style={{ width: '100%' }}
-            placeholder='Select columns'
-            value={visibleColumns}
-            onChange={onChangeColumnVisibility}
-            options={columns.map((col: any) => {
-              return {
-                label: col.title,
-                value: col.key
-              }
-            })}
-          />
-        </div> */}
         <Table
           columns={columns.filter((col: any) => visibleColumns.includes(col.key))}
           dataSource={listData}
