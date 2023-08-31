@@ -65,6 +65,7 @@
     "absenceType": "Loại công nghỉ",
     "titleForUser": "Xác nhận ngày công của tôi",
     "titleForAdmin": "Xác nhận ngày công",
-    "exportData": "Xuất dữ liệu"
+    "exportData": "Xuất dữ liệu",
+    "tableNote": "Lưu ý: Số giờ chấm công và Số giờ tính lương sẽ được tính tự động sau 19:30 hàng ngày"
   }
 }
