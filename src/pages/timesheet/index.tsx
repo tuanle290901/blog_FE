@@ -665,6 +665,7 @@ const Timesheet: React.FC = () => {
                 </Col>
               </Row>
             </div>
+            <div className='tw-text-yellow-600 tw-mt-[10px] tw-text-[13px]'>{t('timesheet.tableNote')}</div>
             <div className='timesheet-table'>
               <Table
                 rowKey='id'
