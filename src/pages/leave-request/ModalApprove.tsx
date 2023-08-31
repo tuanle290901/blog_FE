@@ -3,7 +3,7 @@ import { AutoComplete, Button, Col, DatePicker, Modal, Row, Space, Tag, notifica
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { memo, useEffect, useState } from 'react'
-import { setCreateRequestStatus, updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
+import { onUpdateRequestStatus, updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { DataType } from '~/types/department.interface'
@@ -114,7 +114,7 @@ const ModalApprove = (props: {
     ticketId: string,
     nodeId: number
   ) => {
-    dispatch(setCreateRequestStatus(false))
+    dispatch(onUpdateRequestStatus(false))
     const payload: ILeaveRequestUpdateStatusForm = {
       attrs: attributes,
       nodeId: nodeId,
@@ -128,7 +128,7 @@ const ModalApprove = (props: {
       notification.success({
         message: response.message
       })
-      dispatch(setCreateRequestStatus(true))
+      dispatch(onUpdateRequestStatus(true))
     } catch (error: any) {
       notification.error({
         message: error.message
@@ -240,7 +240,12 @@ const ModalApprove = (props: {
                                             }}
                                             placeholder={item.description}
                                             className='tw-w-full'
-                                            showTime={{ format: 'HH:mm' }}
+                                            showTime={{
+                                              hideDisabledOptions: true,
+                                              defaultValue: dayjs('08:00:00', 'HH:mm:ss'),
+                                              format: 'HH:mm',
+                                              minuteStep: 5
+                                            }}
                                             format='DD/MM/YYYY HH:mm'
                                           />
                                         )}

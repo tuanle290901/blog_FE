@@ -80,12 +80,9 @@ const Index = () => {
   return (
     <div className='statistical-wrapper'>
       <div className='statistical-container'>
-        <div className='report-title tw-text-lg tw-font-semibold'>Thống kê thông tin dữ liệu trong tháng</div>
         <Row justify='space-between'>
           <Col>
-            <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
-              Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
-            </div>
+            <div className='report-title tw-text-lg tw-font-semibold'>Thống kê thông tin dữ liệu trong tháng</div>
           </Col>
           {isSystemAdmin && (
             <Col>
@@ -95,13 +92,22 @@ const Index = () => {
                   showSearch
                   value={currenSelectUser}
                   onChange={(val) => setCurrentSelectUser(val)}
-                  className='tw-min-w-[200px]'
-                  options={userList.map((item) => ({ label: item?.fullName, value: item?.userName }))}
+                  className='tw-min-w-[380px]'
+                  options={userList.map((user) => {
+                    return {
+                      label: user?.fullName + ' (' + user?.userName + ')',
+                      value: user?.userName
+                    }
+                  })}
                 />
               </Space>
             </Col>
           )}
         </Row>
+
+        <div className='report-description tw-text-md tw-mt-2 tw-italic tw-text-sky-700'>
+          Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
+        </div>
 
         {leaveBalanceInfo && (
           <>

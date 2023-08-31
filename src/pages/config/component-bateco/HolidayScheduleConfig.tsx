@@ -201,6 +201,7 @@ const HolidayScheduleConfig = () => {
 
   const onSelectDate = (date: Dayjs, { source }: SelectInfo) => {
     if (source === 'date') {
+      form.resetFields()
       const formattedDate = date.format('YYYY-MM-DD')
       const existedDate = holidayList.find((item) => formattedDate >= item.startAt && formattedDate <= item.endAt)
       form.setFieldsValue({
