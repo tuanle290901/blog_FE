@@ -46,7 +46,7 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg?: st
   return (
     <Row className='tw-text-md' align={'middle'} gutter={[16, 16]}>
       <Col>
-        <div className='tw-text-md tw-w-[300px]'>{title}</div>
+        <div className='tw-text-md tw-w-[400px]'>{title}</div>
       </Col>
       <Col>
         <Space>
@@ -257,7 +257,7 @@ const WorkingTimeConfig = () => {
             <div className='tw-mt-4'>
               <Row align={'middle'}>
                 <Col>
-                  <div className='tw-text-md tw-mb-2 tw-w-[300px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
+                  <div className='tw-text-md tw-mb-2 tw-w-[400px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
                 </Col>
 
                 <Col>

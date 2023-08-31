@@ -319,11 +319,6 @@ const ModalApprove = (props: {
                                   step?.histories?.length > 0
                                     ? step?.histories[step?.histories?.length - 1].actualGroup
                                     : ticket.groupCode
-                                  // step.groupCodes[0] !== PROCESS_GROUPCODE.START &&
-                                  //   step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER &&
-                                  //   step?.histories.length > 0
-                                  //   ? step.histories[0].actualGroup
-                                  //   : ticket.groupCode
                                 )}{' '}
                                 (
                                 {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
