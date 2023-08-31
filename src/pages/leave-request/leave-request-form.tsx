@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import {
   createLeaveRequest,
   editLeaveRequest,
-  setCreateRequestStatus
+  onUpdateRequestStatus
 } from '~/stores/features/leave-request/leave-request.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
@@ -61,7 +61,7 @@ const LeaveRequestForm: React.FC<{
   }, [data, selectedTicketTypeId])
 
   const handleSubmit = async () => {
-    dispatch(setCreateRequestStatus(false))
+    dispatch(onUpdateRequestStatus(false))
     const formValue = form.getFieldsValue()
     const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
 
@@ -86,7 +86,7 @@ const LeaveRequestForm: React.FC<{
       notification.success({
         message: response.message
       })
-      dispatch(setCreateRequestStatus(true))
+      dispatch(onUpdateRequestStatus(true))
     } catch (error: any) {
       notification.error({
         message: error.message
@@ -190,10 +190,14 @@ const LeaveRequestForm: React.FC<{
                       disabled={!canUpdateForm}
                       placeholder={item.description}
                       className='tw-w-full'
-                      showTime={{ format: 'HH:mm' }}
+                      showTime={{
+                        hideDisabledOptions: true,
+                        defaultValue: dayjs('08:00:00', 'HH:mm:ss'),
+                        format: 'HH:mm',
+                        minuteStep: 5
+                      }}
                       format='DD/MM/YYYY HH:mm'
                       disabledDate={(val) => disabledDate(val, item)}
-                      // disabledTime={() => disabledDateTime(item)}
                     />
                   )}
                   {item.type === INPUT_TYPE.BOOLEAN && (
