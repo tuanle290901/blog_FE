@@ -49,8 +49,8 @@ import ModalApprove from './ModalApprove'
 import './style.scss'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
-  startDate: '',
-  endDate: '',
+  startDate: dayjs.utc().startOf('month').format(),
+  endDate: dayjs.utc().format(),
   page: 0,
   size: 10,
   sort: [
