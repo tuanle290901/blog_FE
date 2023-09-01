@@ -543,7 +543,7 @@ const UserList: React.FC = () => {
                     ref={fileSelect}
                     className='tw-hidden'
                     type='file'
-                    accept='.xlxs,.xls'
+                    accept='.xlsx,.xls'
                     onChange={(event) => handleFileChange(event.target.files)}
                   />
                 </>
