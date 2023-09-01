@@ -67,7 +67,7 @@ export const getWorkingTimeSettingInfo = createAsyncThunk(
   'workingTimeConfig/getByYear',
   async (year: string, thunkAPI) => {
     try {
-      const response = await HttpService.get(`/group-working-time-setup/get-by-year/${year}`, {
+      const response = await HttpService.get(`/group-working-time-setup/get-by-year?year=${year}`, {
         signal: thunkAPI.signal
       })
       return response.data
