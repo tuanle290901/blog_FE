@@ -375,7 +375,7 @@ const MainLayout: React.FC = () => {
       </Sider>
       <Layout>
         <Header className='header-container tw-px-[10px] lg:tw-px-[30px]'>
-          <div className='header-container__left tw-block lg:tw-hidden'>
+          <div className='header-container__left tw-block xl:tw-hidden'>
             <Menu
               onClick={onMobileMenuClick}
               selectedKeys={[currentMobileItem]}

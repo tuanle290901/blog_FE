@@ -63,19 +63,22 @@ export const getAllWorkingTimeSetting = createAsyncThunk('workingTimeConfig/getA
   }
 })
 
-export const getWorkingTimeSettingInfo = createAsyncThunk('workingTimeConfig/getByYear', async (_, thunkAPI) => {
-  try {
-    const response = await HttpService.get('/group-working-time-setup/get-by-year', {
-      signal: thunkAPI.signal
-    })
-    return response.data
-  } catch (error: any) {
-    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
-      return thunkAPI.rejectWithValue(error.response.data)
+export const getWorkingTimeSettingInfo = createAsyncThunk(
+  'workingTimeConfig/getByYear',
+  async (year: string, thunkAPI) => {
+    try {
+      const response = await HttpService.get(`/group-working-time-setup/get-by-year/${year}`, {
+        signal: thunkAPI.signal
+      })
+      return response.data
+    } catch (error: any) {
+      if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+        return thunkAPI.rejectWithValue(error.response.data)
+      }
+      throw error
     }
-    throw error
   }
-})
+)
 
 export const updateWorkingTime = createAsyncThunk(
   'workingTimeConfig/updateOne',

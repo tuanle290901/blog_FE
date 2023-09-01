@@ -1,5 +1,5 @@
 import type { RadioChangeEvent } from 'antd'
-import { Button, Checkbox, Col, Radio, Row, Space, notification } from 'antd'
+import { Button, Checkbox, Col, Radio, Row, Select, Space, notification } from 'antd'
 import { UpOutlined, DownOutlined } from '@ant-design/icons'
 import type { CheckboxValueType } from 'antd/es/checkbox/Group'
 import dayjs from 'dayjs'
@@ -42,7 +42,14 @@ const renderTitle = (title: string) => {
   )
 }
 
-const renderRow = (type: string, title: string, firstArg: string, secondArg?: string, thirdArg?: string) => {
+const renderRow = (
+  type: string,
+  title: string,
+  firstArg: string,
+  secondArg?: string,
+  thirdArg?: string,
+  fourArg?: string
+) => {
   return (
     <Row className='tw-text-md' align={'middle'} gutter={[16, 16]}>
       <Col>
@@ -68,6 +75,7 @@ const renderRow = (type: string, title: string, firstArg: string, secondArg?: st
               <div className='time-circle'>{thirdArg}</div>
             </>
           )}
+          {fourArg && <div>{fourArg}</div>}
         </Space>
       </Col>
     </Row>
@@ -83,6 +91,7 @@ const WorkingTimeConfig = () => {
   const [saturdayList, setSaturdayList] = useState<SaturdayWorkingConfig[]>([])
   const [saturdayListFilter, setSaturdayListFilter] = useState<string[]>([])
   const [collapseRow, setCollapseRow] = useState<boolean[]>([false, false, false, false])
+  const [yearSelected, setYearSelected] = useState<string>(dayjs().format('YYYY'))
 
   const overtimeOptions: DailyOverTimeSetup[] = workingTimeInfo?.timeWorkSetup?.dailyOverTimeSetups || []
 
@@ -134,6 +143,7 @@ const WorkingTimeConfig = () => {
       })
       const payload = JSON.parse(JSON.stringify(workingTimeInfo))
       payload.timeWorkSetup.timeWorkQuaterSetups = newTimeWorkQuarterSetup
+      payload.year = yearSelected
       const response: any = await dispatch(updateWorkingTime(payload))
       if (response.type.includes('/rejected')) {
         notification.error({ message: response.error.message })
@@ -143,12 +153,16 @@ const WorkingTimeConfig = () => {
     } catch (err: any) {
       notification.error({ message: err.message })
     }
-    dispatch(getWorkingTimeSettingInfo())
+    dispatch(getWorkingTimeSettingInfo(yearSelected))
+  }
+
+  const onChangeYear = (year: string) => {
+    setYearSelected(year)
   }
 
   useEffect(() => {
-    dispatch(getWorkingTimeSettingInfo())
-  }, [dispatch])
+    dispatch(getWorkingTimeSettingInfo(yearSelected))
+  }, [dispatch, yearSelected])
 
   useEffect(() => {
     if (workingTimeInfo?.timeWorkSetup?.timeWorkQuaterSetups?.length > 0) {
@@ -203,15 +217,29 @@ const WorkingTimeConfig = () => {
                   )}
                 </Col>
                 <Col>
-                  <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
-                    {quarterOptions.map((opt, index) => {
-                      return (
-                        <Radio.Button key={index} value={opt.value}>
-                          {convertQuarterName(opt.value)}
-                        </Radio.Button>
-                      )
-                    })}
-                  </Radio.Group>
+                  <Space direction={window.innerWidth <= 576 ? 'vertical' : 'horizontal'}>
+                    <Select
+                      className='tw-min-w-[120px]'
+                      onChange={onChangeYear}
+                      value={yearSelected}
+                      options={[
+                        { label: ` Năm ${dayjs().format('YYYY')}`, value: dayjs().format('YYYY') },
+                        {
+                          label: ` Năm ${dayjs().add(1, 'year').format('YYYY')}`,
+                          value: dayjs().add(1, 'year').format('YYYY')
+                        }
+                      ]}
+                    ></Select>
+                    <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
+                      {quarterOptions.map((opt, index) => {
+                        return (
+                          <Radio.Button key={index} value={opt.value}>
+                            {convertQuarterName(opt.value)}
+                          </Radio.Button>
+                        )
+                      })}
+                    </Radio.Group>
+                  </Space>
                 </Col>
               </Row>
 
@@ -311,7 +339,7 @@ const WorkingTimeConfig = () => {
             <div className='tw-mt-4'>
               {renderRow(
                 'single',
-                '2. Thông báo ngày công của tháng',
+                '2. Thông báo "Báo cáo công" vào mùng 1 đầu tháng',
                 workingTimeInfo?.policySetup?.reportMonthlyStatisticTime
               )}
             </div>
@@ -334,9 +362,11 @@ const WorkingTimeConfig = () => {
             {renderRow(
               'single',
               'Số ngày nghỉ phép mặc định của năm',
-              `${workingTimeInfo?.policySetup?.defaultLeaveDay * 8 * 60}`
+              `${workingTimeInfo?.policySetup?.defaultLeaveDay * 8 * 60}`,
+              '',
+              '',
+              `phút (${workingTimeInfo?.policySetup?.defaultLeaveDay} ngày)`
             )}
-            <div className='tw-ml-2'>phút ({workingTimeInfo?.policySetup?.defaultLeaveDay} ngày)</div>
           </div>
         )}
       </section>
