@@ -50,7 +50,7 @@ import './style.scss'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: dayjs.utc().startOf('month').format(),
-  endDate: dayjs.utc().format(),
+  endDate: dayjs.utc().endOf('day').format(),
   page: 0,
   size: 10,
   sort: [
