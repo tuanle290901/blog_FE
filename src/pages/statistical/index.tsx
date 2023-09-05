@@ -94,6 +94,7 @@ const Index = () => {
                   onChange={(val) => setCurrentSelectUser(val)}
                   className='tw-min-w-[380px]'
                   optionFilterProp='children'
+                  allowClear
                   filterOption={(input, option) => {
                     return (option?.label + '').toLowerCase().includes(input.toLowerCase())
                   }}
