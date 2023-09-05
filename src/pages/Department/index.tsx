@@ -455,14 +455,14 @@ const Department: React.FC = () => {
 
   return (
     <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
-      <Row className='tw-w-100'>
+      <Row className='tw-w-100 tw-items-center'>
         <Button
           size='large'
           className='tw-mr-[15px]'
           onClick={() => onBackPageSize()}
           icon={<IconBackSVG width={11} height={16} fill='' />}
         />
-        <h1 className='tw-flex tw-items-center tw-justify-center tw-font-medium tw-text-2xl'>
+        <h1 className='department-title'>
           {dataRender?.listData?.length > 0 &&
             dataRender?.listDataTitle.map((item: any, index) => {
               return (
@@ -471,7 +471,7 @@ const Department: React.FC = () => {
                   onClick={() => {
                     onRendered(item)
                   }}
-                  className='tw-ml-[5px] pointer'
+                  className='department-title__item'
                 >
                   {` ${item.name} ${dataRender?.listDataTitle.length - 1 !== index ? ' ->  ' : ' '}`}
                 </span>

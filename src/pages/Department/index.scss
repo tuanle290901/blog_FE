@@ -11,6 +11,21 @@
       color: white !important;
     }
   }
+
+  .department-title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 500;
+    width: calc(100% - 55px);
+    height: 35px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    &__item {
+      cursor: pointer;
+      width: 100%;
+    }
+  }
 }
 
 .ant-picker-input input {
