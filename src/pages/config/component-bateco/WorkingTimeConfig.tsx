@@ -111,14 +111,16 @@ const WorkingTimeConfig = () => {
 
   const splitSaturdaysByQuarter = (saturdayList: CheckboxValueType[]) => {
     const quarters: CheckboxValueType[][] = [[], [], [], []]
-
-    saturdayList.forEach((saturday) => {
-      const date = dayjs(saturday.toString())
-      if (date.year() === dayjs().year()) {
-        const quarter = Math.floor((date.month() + 3) / 3) - 1
-        quarters[quarter].push(saturday)
-      }
-    })
+    if (saturdayList?.length > 0) {
+      const firstSaturday: any = saturdayList[0]
+      saturdayList.forEach((saturday) => {
+        const date = dayjs(saturday.toString())
+        if (date.year() === dayjs(firstSaturday).year()) {
+          const quarter = Math.floor((date.month() + 3) / 3) - 1
+          quarters[quarter].push(saturday)
+        }
+      })
+    }
 
     return quarters
   }
