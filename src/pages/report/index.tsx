@@ -58,7 +58,7 @@ const Index = () => {
   // const departments = useAppSelector((item) => item.department.listData)
   // const [treeData, setTreeData] = useState<any[]>([])
   const [isSubmit, setIsSubmit] = useState<boolean>(false)
-  const [timeReport, setTimReport] = useState<Dayjs | null>(null)
+  const [timeReport, setTimReport] = useState<Dayjs | null>(dayjs().add(-1, 'month'))
   const [isDownloadFinished, setIsDownloadFinished] = useState({
     status: false,
     msg: ''
@@ -120,14 +120,13 @@ const Index = () => {
   // }
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
-    return current && (current < dayjs().startOf('year') || current.isAfter(new Date()))
+    return current && (current < dayjs().startOf('year') || current.isAfter(dayjs().add(-1, 'month')))
   }
 
   useEffect(() => {
     const promise = dispatch(getGroupRootName())
-    setTimReport(dayjs())
     reportForm.setFieldsValue({
-      time: dayjs()
+      time: dayjs().add(-1, 'month')
     })
     return () => {
       promise.abort()
