@@ -185,6 +185,20 @@ const WorkingTimeConfig = () => {
 
   return (
     <div className='tw-h-[calc(100%-48px)] tw-m-3 tw-p-3 '>
+      <div className='woking-time-config__select-year'>
+        <Select
+          className='tw-min-w-[120px]'
+          onChange={onChangeYear}
+          value={yearSelected}
+          options={[
+            { label: ` Năm ${dayjs().format('YYYY')}`, value: dayjs().format('YYYY') },
+            {
+              label: ` Năm ${dayjs().add(1, 'year').format('YYYY')}`,
+              value: dayjs().add(1, 'year').format('YYYY')
+            }
+          ]}
+        />
+      </div>
       <div className='tw-bg-white tw-p-4 tw-rounded-md tw-mb-4 box-style'>
         <div className='tw-flex tw-items-center tw-justify-between'>
           {renderTitle('I. Thời gian làm hành chính')}{' '}
@@ -218,18 +232,6 @@ const WorkingTimeConfig = () => {
                 </Col>
                 <Col>
                   <Space direction={window.innerWidth <= 576 ? 'vertical' : 'horizontal'}>
-                    <Select
-                      className='tw-min-w-[120px]'
-                      onChange={onChangeYear}
-                      value={yearSelected}
-                      options={[
-                        { label: ` Năm ${dayjs().format('YYYY')}`, value: dayjs().format('YYYY') },
-                        {
-                          label: ` Năm ${dayjs().add(1, 'year').format('YYYY')}`,
-                          value: dayjs().add(1, 'year').format('YYYY')
-                        }
-                      ]}
-                    ></Select>
                     <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
                       {quarterOptions.map((opt, index) => {
                         return (

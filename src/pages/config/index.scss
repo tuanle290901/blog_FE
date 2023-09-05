@@ -4,6 +4,16 @@
   }
 }
 
+.woking-time-config__select-year {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  .ant-select-selection-item {
+    color: #3a79fc;
+    // font-weight: 500;
+  }
+}
+
 .box-style {
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   border-left: 3px solid #156deb;
