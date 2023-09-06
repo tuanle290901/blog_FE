@@ -269,6 +269,11 @@ const WorkingTimeConfig = () => {
                 </Checkbox.Group>
               </div>
             </div>
+            <div className='tw-flex tw-justify-end tw-mt-3'>
+              <Button type='primary' onClick={updateQuarter}>
+                Lưu cấu hình
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -374,17 +379,6 @@ const WorkingTimeConfig = () => {
           </div>
         )}
       </section>
-
-      <div className='tw-w-full '>
-        <Space className=' tw-float-right tw-mb-[20px]'>
-          <Button type='default' onClick={() => navigate('/')}>
-            Quay lại
-          </Button>
-          <Button type='primary' onClick={updateQuarter}>
-            Lưu cấu hình
-          </Button>
-        </Space>
-      </div>
     </div>
   )
 }
