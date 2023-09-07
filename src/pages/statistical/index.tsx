@@ -47,7 +47,6 @@ const renderRow = (title: string, firstArg: string | number, secondArg: string, 
 const Index = () => {
   const dispatch = useAppDispatch()
   const leaveBalanceInfo = useAppSelector((item) => item.leaveBalacnce.leaveBalanceData)
-  console.log(leaveBalanceInfo, 'test')
   const userList = useAppSelector((item) => item.user.userList)
   const { userInfo } = useUserInfo()
   const [currenSelectUser, setCurrentSelectUser] = useState<string>('')
@@ -140,7 +139,9 @@ const Index = () => {
               <Col xs={24} lg={6}>
                 <div className='box-container'>
                   <div className='border-top-gradient border-top-gradient-one' />
-                  <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>Số phút nghỉ phép còn lại</div>
+                  <div className='tw-mb-[30px] tw-font-bold tw-text-sm tw-text-center'>
+                    Số phút còn lại / Tổng số phút nghỉ phép năm
+                  </div>
                   <Progress
                     size={150}
                     type='circle'

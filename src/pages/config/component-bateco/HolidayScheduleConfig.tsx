@@ -20,7 +20,7 @@ import TextArea from 'antd/es/input/TextArea'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import type { CellRenderInfo } from 'rc-picker/lib/interface'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import {
   addOneHolidaySchedule,
@@ -111,6 +111,7 @@ const HolidayScheduleConfig = () => {
   const holidayList = useAppSelector((item) => item.holidaySchedule.holidayList)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const { t } = useTranslation()
+  const selectedHolidayCode = useRef<string>('')
 
   useEffect(() => {
     dispatch(getListHoliday())
@@ -118,12 +119,12 @@ const HolidayScheduleConfig = () => {
 
   const getListData = (value: Dayjs) => {
     const formattedDate = value.format('YYYY-MM-DD')
-    const listData: { type: string; content: string }[] = []
+    const listData: { code: string; type: string; content: string }[] = []
     holidayList.forEach((holiday) => {
       const start = dayjs(holiday.startAt).format('YYYY-MM-DD')
       const end = dayjs(holiday.endAt).format('YYYY-MM-DD')
       if (formattedDate >= start && formattedDate <= end) {
-        listData.push({ type: 'error', content: holiday.name })
+        listData.push({ code: holiday.code, type: 'error', content: holiday.name })
       }
     })
     return listData
@@ -181,12 +182,18 @@ const HolidayScheduleConfig = () => {
     })
   }
 
+  const onClickContent = (data: any) => {
+    if (data && data.code) {
+      selectedHolidayCode.current = data.code
+    }
+  }
+
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value)
     return (
       <ul className='events'>
         {listData.map((item) => (
-          <li key={item.content}>
+          <li key={item.content} onClick={() => onClickContent(item)}>
             <Badge status={item.type as BadgeProps['status']} text={item.content} />
           </li>
         ))}
@@ -203,7 +210,8 @@ const HolidayScheduleConfig = () => {
     if (source === 'date') {
       form.resetFields()
       const formattedDate = date.format('YYYY-MM-DD')
-      const existedDate = holidayList.find((item) => formattedDate >= item.startAt && formattedDate <= item.endAt)
+      const listOfHoliday = holidayList.filter((item) => formattedDate >= item.startAt && formattedDate <= item.endAt)
+      const existedDate = listOfHoliday.find((item) => item.code === selectedHolidayCode.current)
       form.setFieldsValue({
         id: existedDate ? existedDate.id : null,
         code: existedDate ? existedDate.code : '',
