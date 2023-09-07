@@ -131,7 +131,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
           `${t('department.departmentAdd')}`
         ) : (
           <span>
-            {t('department.departmentUpdate')}:<span className='tw-italic tw-ml-2'>{data?.name}</span>
+            {t('department.departmentUpdate')}:<span className='tw-italic tw-ml-1'>{data?.name}</span>
           </span>
         )
       }

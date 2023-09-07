@@ -48,9 +48,21 @@ export const createDepartment = createAsyncThunk('departments/create', async (bo
     return error
   }
 })
+
 export const updateDepartment = createAsyncThunk('departments/update', async (body: IDepartment, thunkAPI) => {
   try {
     const response: IApiResponse<DataType> = await HttpService.post('/org/group/update/info', body, {
+      signal: thunkAPI.signal
+    })
+    return response
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
+export const deleteDepartment = createAsyncThunk('departments/delete', async (departmentCode: string, thunkAPI) => {
+  try {
+    const response: IApiResponse<DataType> = await HttpService.delete(`/org/group/delete/${departmentCode}`, {
       signal: thunkAPI.signal
     })
     return response

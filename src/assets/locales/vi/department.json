@@ -24,8 +24,10 @@
     "manager": "Quản lý",
     "tooltip": {
       "update": "Cập nhật thông tin phòng ban",
-      "delete": "Xóa thông tin phòng ban",
+      "delete": "Xóa phòng ban",
       "member": "Danh sách cán bộ quản lý"
-    }
+    },
+    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa phòng ban này không?",
+    "confirmDeleteDeviceTitle": "Xóa phòng ban: {{departmentName}}"
   }
 }

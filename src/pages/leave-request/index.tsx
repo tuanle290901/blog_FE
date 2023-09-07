@@ -43,7 +43,7 @@ import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
 import { ILeaveRequest } from '~/types/leave-request'
-import { TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/Constant'
+import { LEAVE_TYPE_MAP, TICKET_STATUS, TICKET_STATUS_FILTER, TicketStatusEnum } from '~/utils/Constant'
 import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
 import ModalApprove from './ModalApprove'
 import './style.scss'
@@ -247,6 +247,15 @@ const LeaveRequest: React.FC = () => {
     }
   }, [isisUpdateRequestStatusSuccess])
 
+  const handleGetAbsenceTypeName = (record: any) => {
+    if (record?.processStatus?.[0]?.attributes?.type) {
+      return LEAVE_TYPE_MAP[record?.processStatus?.[0]?.attributes?.type]
+    } else {
+      const result = ticketDifinations.find((ticket) => ticket.id === record?.ticketDefinitionId)
+      return result?.name
+    }
+  }
+
   const columns = useMemo(() => {
     const columns: TableColumnsType<ILeaveRequest> = [
       {
@@ -262,39 +271,39 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'ticketDefinitionId',
         title: 'Loại yêu cầu',
-        width: 150,
+        width: 160,
         dataIndex: 'ticketDefinitionId',
         sorter: false,
         showSorterTooltip: false,
         sortOrder: getSortOrder('ticketDefinitionId'),
         ellipsis: true,
-        render: (item) => {
-          return ticketDifinations.find((ticket) => ticket.id === item)?.name
+        render: (item, record) => {
+          return handleGetAbsenceTypeName(record)
         }
         // fixed: 'left'
       },
       {
         key: 'startDate',
         title: t('leaveRequest.startDate'),
-        width: 160,
+        width: 140,
         sorter: false,
         dataIndex: 'processStatus',
         ellipsis: true,
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
-          return dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')
+          return dayjs(startDate).format('DD/MM/YYYY HH:mm')
         }
       },
       {
         key: 'endDate',
         title: t('leaveRequest.endDate'),
-        width: 160,
+        width: 140,
         dataIndex: 'processStatus',
         ellipsis: false,
         sorter: false,
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
-          return dayjs(endDate).format('DD/MM/YYYY HH:mm:ss')
+          return dayjs(endDate).format('DD/MM/YYYY HH:mm')
         }
       },
       {
@@ -312,12 +321,12 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'createdAt',
         title: t('leaveRequest.requestDate'),
-        width: 160,
+        width: 140,
         dataIndex: 'createdAt',
         sorter: true,
         ellipsis: true,
         render: (requestDate) => {
-          return dayjs(requestDate).format('DD/MM/YYYY HH:mm:ss')
+          return dayjs(requestDate).format('DD/MM/YYYY HH:mm')
         }
       },
       {
