@@ -43,6 +43,10 @@ const SyncTimeAttendanceModal: React.FC<{ open: boolean; handleClose: () => void
         message: response?.message
       })
       onSyncSuccess()
+    } else {
+      notification.error({
+        message: t('timesheet.syncTimeAttendanceError')
+      })
     }
     handleClose()
   }

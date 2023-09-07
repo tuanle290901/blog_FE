@@ -69,7 +69,10 @@ HttpService.interceptors.response.use(
     if (error instanceof AxiosError && error.code === 'ERR_NETWORK') {
       if (!isShowNotification) {
         isShowNotification = true
-        notification.error({ message: 'Kiểm tra lại kết nối mạng', onClose: () => (isShowNotification = false) })
+        notification.error({
+          message: 'Kiểm tra lại kết nối mạng hoặc kết nối đã vượt quá thời gian quy định',
+          onClose: () => (isShowNotification = false)
+        })
       }
     }
     throw error
