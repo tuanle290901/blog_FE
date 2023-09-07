@@ -7,7 +7,7 @@
 import './index.scss'
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Input, Row, Space, Table, TableColumnsType, Tooltip } from 'antd'
+import { Button, Input, Popconfirm, Row, Space, Table, TableColumnsType, Tooltip, notification } from 'antd'
 import { ExpandableConfig } from 'antd/es/table/interface'
 import dayjs from 'dayjs'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import IconBackSVG from '~/assets/svg/iconback'
 import CommonButton from '~/components/Button/CommonButton'
-import { getListDepartments } from '~/stores/features/department/department.silce'
+import { deleteDepartment, getListDepartments } from '~/stores/features/department/department.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { DataType, IDepartmentTitle, IModelState } from '~/types/department.interface'
 import { ACTION_TYPE, hasPermissionAndGroup } from '~/utils/helper'
@@ -236,8 +236,19 @@ const Department: React.FC = () => {
     }
   }, [])
 
-  const onDelete = (record: DataType) => {
-    // console.log(record.name)
+  const handleDelete = async (record: DataType) => {
+    await dispatch(deleteDepartment(record?.code)).then((response: any) => {
+      if (response?.payload?.status === 200) {
+        notification.success({ message: response?.payload?.message })
+        const promise = dispatch(getListDepartments())
+        return () => {
+          promise.abort()
+        }
+      }
+      if (response?.error) {
+        notification.error({ message: response?.payload?.response?.data?.message })
+      }
+    })
   }
 
   const columns = useMemo(() => {
@@ -265,21 +276,21 @@ const Department: React.FC = () => {
         title: `${t('department.code')}`,
         dataIndex: 'code',
         key: 'code',
-        width: '100px',
+        width: '130px',
         ellipsis: true
       },
       {
         title: `${t('department.address')}`,
         dataIndex: 'address',
         key: 'address',
-        width: '250px',
+        width: '200px',
         ellipsis: true
       },
       {
         title: `${t('department.contactPhoneNumber')}`,
         dataIndex: 'contactPhoneNumber',
         key: 'contactPhoneNumber',
-        width: '150px',
+        width: '160px',
         ellipsis: true
       },
       {
@@ -370,20 +381,23 @@ const Department: React.FC = () => {
               />
             </Tooltip> */}
             <Tooltip placement='topLeft' title={t('department.tooltip.delete')}>
-              <Button
-                size='small'
-                onClick={() => {
-                  onDelete(record)
-                }}
-                icon={<DeleteOutlined className='tw-text-red-600' />}
-              />
+              <Popconfirm
+                title={t('department.confirmDeleteDeviceTitle', { departmentName: record?.name })}
+                description={t('department.confirmDeleteDevice')}
+                onConfirm={() => handleDelete(record)}
+                okText={t('common.yes')}
+                cancelText={t('common.no')}
+                placement='topLeft'
+              >
+                <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+              </Popconfirm>
             </Tooltip>
           </Space>
         )
       })
     }
     return dataRenderColumns
-  }, [setShowModal, onDelete, t, hasPermissionAndGroup])
+  }, [setShowModal, handleDelete, t, hasPermissionAndGroup])
 
   const onRendered = async (item: DataType) => {
     if (item.code === listDataDepartments[0].code) {
