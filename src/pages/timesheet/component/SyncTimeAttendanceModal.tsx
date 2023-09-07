@@ -48,7 +48,8 @@ const SyncTimeAttendanceModal: React.FC<{
         message: response?.message
       })
       onSyncSuccess()
-    } else {
+    }
+    if (response?.status === 504) {
       notification.error({
         message: t('timesheet.syncTimeAttendanceError')
       })
