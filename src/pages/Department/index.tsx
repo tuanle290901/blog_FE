@@ -24,6 +24,7 @@ import { ROLE } from '~/constants/app.constant'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import DepartmentMemberModal from './DepartmentMemberModal'
 import DepartmentModal from './DepartmentModal'
+import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
 
 const Department: React.FC = () => {
   const { t } = useTranslation()
@@ -241,8 +242,10 @@ const Department: React.FC = () => {
       if (response?.payload?.status === 200) {
         notification.success({ message: response?.payload?.message })
         const promise = dispatch(getListDepartments())
+        const getAllGroups = dispatch(getAllGroup())
         return () => {
           promise.abort()
+          getAllGroups.abort()
         }
       }
       if (response?.error) {
