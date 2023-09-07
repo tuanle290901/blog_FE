@@ -111,14 +111,16 @@ const WorkingTimeConfig = () => {
 
   const splitSaturdaysByQuarter = (saturdayList: CheckboxValueType[]) => {
     const quarters: CheckboxValueType[][] = [[], [], [], []]
-
-    saturdayList.forEach((saturday) => {
-      const date = dayjs(saturday.toString())
-      if (date.year() === dayjs().year()) {
-        const quarter = Math.floor((date.month() + 3) / 3) - 1
-        quarters[quarter].push(saturday)
-      }
-    })
+    if (saturdayList?.length > 0) {
+      const firstSaturday: any = saturdayList[0]
+      saturdayList.forEach((saturday) => {
+        const date = dayjs(saturday.toString())
+        if (date.year() === dayjs(firstSaturday).year()) {
+          const quarter = Math.floor((date.month() + 3) / 3) - 1
+          quarters[quarter].push(saturday)
+        }
+      })
+    }
 
     return quarters
   }
@@ -185,6 +187,20 @@ const WorkingTimeConfig = () => {
 
   return (
     <div className='tw-h-[calc(100%-48px)] tw-m-3 tw-p-3 '>
+      <div className='woking-time-config__select-year'>
+        <Select
+          className='tw-min-w-[120px]'
+          onChange={onChangeYear}
+          value={yearSelected}
+          options={[
+            { label: ` Năm ${dayjs().format('YYYY')}`, value: dayjs().format('YYYY') },
+            {
+              label: ` Năm ${dayjs().add(1, 'year').format('YYYY')}`,
+              value: dayjs().add(1, 'year').format('YYYY')
+            }
+          ]}
+        />
+      </div>
       <div className='tw-bg-white tw-p-4 tw-rounded-md tw-mb-4 box-style'>
         <div className='tw-flex tw-items-center tw-justify-between'>
           {renderTitle('I. Thời gian làm hành chính')}{' '}
@@ -218,18 +234,6 @@ const WorkingTimeConfig = () => {
                 </Col>
                 <Col>
                   <Space direction={window.innerWidth <= 576 ? 'vertical' : 'horizontal'}>
-                    <Select
-                      className='tw-min-w-[120px]'
-                      onChange={onChangeYear}
-                      value={yearSelected}
-                      options={[
-                        { label: ` Năm ${dayjs().format('YYYY')}`, value: dayjs().format('YYYY') },
-                        {
-                          label: ` Năm ${dayjs().add(1, 'year').format('YYYY')}`,
-                          value: dayjs().add(1, 'year').format('YYYY')
-                        }
-                      ]}
-                    ></Select>
                     <Radio.Group onChange={onChangeQuarter} defaultValue={currentQuater} buttonStyle='solid'>
                       {quarterOptions.map((opt, index) => {
                         return (
@@ -264,6 +268,11 @@ const WorkingTimeConfig = () => {
                   </div>
                 </Checkbox.Group>
               </div>
+            </div>
+            <div className='tw-flex tw-justify-end tw-mt-3'>
+              <Button type='primary' onClick={updateQuarter}>
+                Lưu cấu hình
+              </Button>
             </div>
           </div>
         )}
@@ -370,17 +379,6 @@ const WorkingTimeConfig = () => {
           </div>
         )}
       </section>
-
-      <div className='tw-w-full '>
-        <Space className=' tw-float-right tw-mb-[20px]'>
-          <Button type='default' onClick={() => navigate('/')}>
-            Quay lại
-          </Button>
-          <Button type='primary' onClick={updateQuarter}>
-            Lưu cấu hình
-          </Button>
-        </Space>
-      </div>
     </div>
   )
 }

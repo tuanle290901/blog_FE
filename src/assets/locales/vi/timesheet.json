@@ -53,7 +53,8 @@
     "syncTimeAttendanceWarning": "Chỉ được chọn khoảng thời gian tối đa 3 ngày",
     "selectDateWarning": "Ngày kết thúc phải sau ngày bắt đầu",
     "message": {
-      "selectDate": "Chỉ được chọn ngày trong cùng một năm"
+      "selectDate": "Chỉ được chọn ngày trong cùng một năm",
+      "syncTimeAttendanceError": "Đồng bộ dữ liệu không thành công. Vui lòng kiểm tra lại trạng thái của các thiết bị chấm công"
     },
     "enoughWorkingHours": "đủ công",
     "insufficientWorkingHours": "thiếu công",

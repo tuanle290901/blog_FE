@@ -1,18 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { DatePicker, Form, Modal, notification } from 'antd'
 import { useTranslation } from 'react-i18next'
 import dayjs from 'dayjs'
 import { useAppDispatch } from '~/stores/hook'
 import { syncTimeAttendanceManual } from '~/stores/features/timesheet/timesheet.slice'
 
-const SyncTimeAttendanceModal: React.FC<{ open: boolean; handleClose: () => void; onSyncSuccess: () => void }> = ({
-  open,
-  handleClose,
-  onSyncSuccess
-}) => {
+const SyncTimeAttendanceModal: React.FC<{
+  open: boolean
+  handleClose: () => void
+  onSyncSuccess: () => void
+  onProcessingSyncData: (disableButton: boolean) => void
+}> = ({ open, handleClose, onSyncSuccess, onProcessingSyncData }) => {
   const { t } = useTranslation()
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
+  const [disableSubmitButton, setDisableSubmitButton] = useState<boolean>(false)
 
   const handleSubmit = async () => {
     const formValue = { ...form.getFieldsValue() }
@@ -37,14 +39,25 @@ const SyncTimeAttendanceModal: React.FC<{ open: boolean; handleClose: () => void
       })
       return
     }
-    const response = await dispatch(syncTimeAttendanceManual(payload)).unwrap()
-    if (response?.status === 200) {
-      notification.success({
-        message: response?.message
-      })
-      onSyncSuccess()
-    }
+    setDisableSubmitButton(true)
+    onProcessingSyncData(true)
     handleClose()
+    await dispatch(syncTimeAttendanceManual(payload)).then((response: any) => {
+      if (response?.error) {
+        notification.error({
+          message: t('timesheet.message.syncTimeAttendanceError'),
+          duration: 10
+        })
+      }
+      if (response?.payload?.status === 200) {
+        notification.success({
+          message: response?.payload?.message
+        })
+        onSyncSuccess()
+      }
+      setDisableSubmitButton(false)
+      onProcessingSyncData(false)
+    })
   }
   return (
     <Modal
@@ -52,6 +65,7 @@ const SyncTimeAttendanceModal: React.FC<{ open: boolean; handleClose: () => void
       title={t('timesheet.syncTimeAttendance')}
       onCancel={handleClose}
       onOk={handleSubmit}
+      okButtonProps={{ disabled: disableSubmitButton }}
       okText={t('timesheet.sync')}
       cancelText={t('common.cancel')}
       maskClosable={false}
