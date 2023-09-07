@@ -42,20 +42,22 @@ const SyncTimeAttendanceModal: React.FC<{
     setDisableSubmitButton(true)
     onProcessingSyncData(true)
     handleClose()
-    const response = await dispatch(syncTimeAttendanceManual(payload)).unwrap()
-    if (response?.status === 200) {
-      notification.success({
-        message: response?.message
-      })
-      onSyncSuccess()
-    }
-    if (response?.status === 504) {
-      notification.error({
-        message: t('timesheet.syncTimeAttendanceError')
-      })
-    }
-    setDisableSubmitButton(false)
-    onProcessingSyncData(false)
+    await dispatch(syncTimeAttendanceManual(payload)).then((response: any) => {
+      if (response?.error) {
+        notification.error({
+          message: t('timesheet.message.syncTimeAttendanceError'),
+          duration: 10
+        })
+      }
+      if (response?.payload?.status === 200) {
+        notification.success({
+          message: response?.payload?.message
+        })
+        onSyncSuccess()
+      }
+      setDisableSubmitButton(false)
+      onProcessingSyncData(false)
+    })
   }
   return (
     <Modal
