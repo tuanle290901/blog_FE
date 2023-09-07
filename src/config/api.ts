@@ -66,11 +66,14 @@ HttpService.interceptors.response.use(
     if (error.response?.status === 500) {
       notification.error({ message: 'Có một lỗi không xác định xảy ra vui lòng liên hệ bộ phận hỗ trợ kĩ thuật' })
     }
+    if (error.response?.status === 504) {
+      notification.error({ message: 'Kết nối đã vượt quá thời gian quy định' })
+    }
     if (error instanceof AxiosError && error.code === 'ERR_NETWORK') {
       if (!isShowNotification) {
         isShowNotification = true
         notification.error({
-          message: 'Kiểm tra lại kết nối mạng hoặc Kết nối đã vượt quá thời gian quy định',
+          message: 'Kiểm tra lại kết nối mạng',
           onClose: () => (isShowNotification = false)
         })
       }
