@@ -9,6 +9,7 @@ import { IDepartment, IDepartmentModal } from '~/types/department.interface'
 import { ACTION_TYPE } from '~/utils/helper'
 import dayjs from 'dayjs'
 import { RuleObject } from 'antd/lib/form'
+import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
 
 const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
   const { onClose, onOk, showModal, typeModel, data, dataParent } = props
@@ -43,6 +44,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
           setServerError(null)
           form.resetFields()
           await onOk()
+          dispatch(getAllGroup())
         })
         .catch((error) => {
           setServerError(error)
@@ -65,6 +67,7 @@ const DepartmentModal: React.FC<IDepartmentModal> = (props) => {
           await onOk()
           setServerError(null)
           dispatch(getListDepartments())
+          dispatch(getAllGroup())
         })
         .catch((error) => {
           setServerError(error)
