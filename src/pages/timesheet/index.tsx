@@ -63,6 +63,7 @@ const Timesheet: React.FC = () => {
   const timerId = useRef<any>(null)
   const [query, setQuery] = useState<string>('')
   const [selectedTimeRange, setSelectedTimeRange] = useState('')
+  const [disableSyncButton, setDisableSyncButton] = useState<boolean>(false)
 
   const emplWorkingTime = useAppSelector((item) => item.timesheet.empWorkingTime)
   const [chartData, setChartData] = useState<IEmployeeWorkingTime | null>(null)
@@ -610,6 +611,7 @@ const Timesheet: React.FC = () => {
                           <Button
                             icon={<SyncOutlined />}
                             type='primary'
+                            disabled={disableSyncButton}
                             onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
                           >
                             {t('timesheet.syncData')}
@@ -720,6 +722,7 @@ const Timesheet: React.FC = () => {
         open={syncTimeAttendance}
         handleClose={() => setSyncTimeAttendance(!syncTimeAttendance)}
         onSyncSuccess={() => setSyncManualSuccess(!syncManualSuccess)}
+        onProcessingSyncData={(disableButton: boolean) => setDisableSyncButton(disableButton)}
       />
     </Row>
   )
