@@ -100,7 +100,7 @@ const LeaveRequestForm: React.FC<{
   }
 
   const disabledDate = (current: Dayjs, item: any) => {
-    return current && current <= dayjs().startOf('month')
+    return current && current < dayjs().startOf('month')
   }
 
   useEffect(() => {
