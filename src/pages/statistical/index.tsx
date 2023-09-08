@@ -93,7 +93,6 @@ const Index = () => {
                   onChange={(val) => setCurrentSelectUser(val)}
                   className='tw-min-w-[380px]'
                   optionFilterProp='children'
-                  allowClear
                   filterOption={(input, option) => {
                     return (option?.label + '').toLowerCase().includes(input.toLowerCase())
                   }}
@@ -113,9 +112,8 @@ const Index = () => {
           Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
         </div>
 
-        {leaveBalanceInfo && (
+        {leaveBalanceInfo?.totalRemainLeaveMinutes !== undefined && (
           <>
-            {' '}
             <Row className='tw-mt-3' gutter={[32, 16]}>
               <Col xs={24} lg={6}>
                 <div className='box-container'>
