@@ -112,7 +112,7 @@ const Index = () => {
           Tổng hợp thống kê thông tin vi phạm, thông tin phép của nhân viên trong tháng
         </div>
 
-        {leaveBalanceInfo?.totalRemainLeaveMinutes !== null && (
+        {leaveBalanceInfo?.totalRemainLeaveMinutes !== undefined && (
           <>
             <Row className='tw-mt-3' gutter={[32, 16]}>
               <Col xs={24} lg={6}>
