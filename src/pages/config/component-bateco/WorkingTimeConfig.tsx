@@ -92,6 +92,7 @@ const WorkingTimeConfig = () => {
   const [saturdayListFilter, setSaturdayListFilter] = useState<string[]>([])
   const [collapseRow, setCollapseRow] = useState<boolean[]>([false, false, false, false])
   const [yearSelected, setYearSelected] = useState<string>(dayjs().format('YYYY'))
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(true)
 
   const overtimeOptions: DailyOverTimeSetup[] = workingTimeInfo?.timeWorkSetup?.dailyOverTimeSetups || []
 
@@ -106,6 +107,7 @@ const WorkingTimeConfig = () => {
   }
 
   const onChangeSatOptions = (checkedValues: CheckboxValueType[]) => {
+    setDisableSubmit(false)
     setCheckedValues(checkedValues)
   }
 
@@ -270,7 +272,7 @@ const WorkingTimeConfig = () => {
               </div>
             </div>
             <div className='tw-flex tw-justify-end tw-mt-3'>
-              <Button type='primary' onClick={updateQuarter}>
+              <Button type='primary' onClick={updateQuarter} disabled={disableSubmit}>
                 Lưu cấu hình
               </Button>
             </div>
