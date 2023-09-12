@@ -27,7 +27,7 @@
       "delete": "Xóa phòng ban",
       "member": "Danh sách cán bộ quản lý"
     },
-    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa phòng ban này không?",
+    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa không?",
     "confirmDeleteDeviceTitle": "Xóa phòng ban: {{departmentName}}"
   }
 }

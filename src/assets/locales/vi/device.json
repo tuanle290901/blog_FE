@@ -27,9 +27,9 @@
     "INITIAL": "Khởi tạo",
     "ACTIVE": "Kích hoạt",
     "DEACTIVE": "Xóa",
-    "confirmActiveDevice": "Bạn có chắc chắn muốn kích hoạt thiết bị này không?",
+    "confirmActiveDevice": "Bạn có chắc chắn muốn kích hoạt không?",
     "confirmActiveDeviceTitle": "Kích hoạt thiết bị",
-    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa thiết bị này không?",
+    "confirmDeleteDevice": "Bạn có chắc chắn muốn xóa không?",
     "confirmDeleteDeviceTitle": "Xóa thiết bị",
     "searchDeviceByKeyword": "Tìm kiếm thiết bị"
   }

@@ -409,7 +409,7 @@ const LeaveRequest: React.FC = () => {
                   <Tooltip title='Hủy yêu cầu'>
                     <Popconfirm
                       title='Hủy yêu cầu'
-                      description='Bạn có chắc chắn muốn hủy yêu cầu'
+                      description='Bạn có chắc chắn muốn hủy yêu cầu?'
                       onConfirm={() => handleClickDelete(record)}
                       okText={t('common.yes')}
                       cancelText={t('common.no')}
@@ -434,7 +434,7 @@ const LeaveRequest: React.FC = () => {
                 (record?.status === TicketStatusEnum.CONFIRMED || record?.status === TicketStatusEnum.REJECTED) && (
                   <Popconfirm
                     title='Đặt lại yêu cầu'
-                    description='Bạn có chắc chắn muốn đặt lại yêu cầu không?'
+                    description='Bạn có chắc chắn muốn đặt lại yêu cầu?'
                     onConfirm={() => handleClickReset(record)}
                     okText={t('common.yes')}
                     cancelText={t('common.no')}
@@ -553,7 +553,7 @@ const LeaveRequest: React.FC = () => {
               }}
               mode='multiple'
               placeholder='Người yêu cầu'
-              style={{ minWidth: 380 }}
+              style={{ minWidth: 300 }}
               options={users.map((user) => {
                 return {
                   label: user?.fullName + ' (' + user?.userName + ')',
@@ -579,7 +579,7 @@ const LeaveRequest: React.FC = () => {
             onChange={(val) => onChangeRequest('requestStatus', val)}
             mode='multiple'
             placeholder='Trạng thái yêu cầu'
-            style={{ minWidth: 200 }}
+            style={{ minWidth: 150 }}
             options={Object.entries(TICKET_STATUS_FILTER).map((item) => {
               return {
                 label: item[1],
