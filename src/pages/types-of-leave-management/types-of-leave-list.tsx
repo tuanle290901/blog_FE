@@ -263,6 +263,7 @@ const TypesOfLeave: React.FC = () => {
             pageSizeOptions: ['10', '25', '50'],
             showSizeChanger: true,
             showQuickJumper: true,
+            responsive: true,
             locale: {
               items_per_page: `/ ${t('common.page')}`,
               next_page: t('common.nextPage'),

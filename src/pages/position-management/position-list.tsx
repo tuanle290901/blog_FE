@@ -245,7 +245,8 @@ const PositionList: React.FC = () => {
             total: positionState.meta.total,
             pageSizeOptions: [5, 10, 25, 50],
             showSizeChanger: true,
-            showQuickJumper: true
+            showQuickJumper: true,
+            responsive: true
           }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
