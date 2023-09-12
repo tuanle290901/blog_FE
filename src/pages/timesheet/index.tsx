@@ -690,6 +690,7 @@ const Timesheet: React.FC = () => {
                   pageSizeOptions: ['5', '10', '15', '25', '50'],
                   showSizeChanger: true,
                   showQuickJumper: true,
+                  responsive: true,
                   locale: {
                     items_per_page: `/ ${t('common.page')}`,
                     next_page: t('common.nextPage'),

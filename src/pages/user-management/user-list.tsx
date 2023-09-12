@@ -588,7 +588,8 @@ const UserList: React.FC = () => {
             pageSizeOptions: [5, 10, 25, 50],
             showSizeChanger: true,
             showQuickJumper: true,
-            current: searchValue.paging.page + 1
+            current: searchValue.paging.page + 1,
+            responsive: true
           }}
           rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
