@@ -285,10 +285,9 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'startDate',
         title: t('leaveRequest.startDate'),
-        width: 140,
+        width: 150,
         sorter: false,
         dataIndex: 'processStatus',
-        ellipsis: true,
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
           return dayjs(startDate).format('DD/MM/YYYY HH:mm')
@@ -297,10 +296,9 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'endDate',
         title: t('leaveRequest.endDate'),
-        width: 140,
+        width: 150,
         dataIndex: 'processStatus',
         ellipsis: false,
-        sorter: false,
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
           return dayjs(endDate).format('DD/MM/YYYY HH:mm')
@@ -321,10 +319,9 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'createdAt',
         title: t('leaveRequest.requestDate'),
-        width: 140,
+        width: 150,
         dataIndex: 'createdAt',
         sorter: true,
-        ellipsis: true,
         render: (requestDate) => {
           return dayjs(requestDate).format('DD/MM/YYYY HH:mm')
         }
