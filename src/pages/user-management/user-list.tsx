@@ -590,7 +590,8 @@ const UserList: React.FC = () => {
             loading={userState.loading}
             pagination={{
               total: userState.meta.total,
-              defaultPageSize: userState?.meta?.size || 15,
+              defaultPageSize: userState?.meta?.size,
+              pageSize: userState?.meta?.size,
               pageSizeOptions: [5, 10, 15, 25, 50],
               showSizeChanger: true,
               showQuickJumper: true,
