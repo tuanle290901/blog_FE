@@ -518,7 +518,7 @@ const LeaveRequest: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-3 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-m-2 md:tw-m-4 tw-p-4 tw-bg-white'>
       <LeaveRequestForm
         open={isOpenModal}
         data={editingLeaveRequest}
@@ -587,7 +587,7 @@ const LeaveRequest: React.FC = () => {
         </div>
       </div>
       {isSystemAdmin && (
-        <>
+        <div className='tw-mb-7'>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} sm={7} className='leave-request-count-title'>
               <Tooltip title='Không bao gồm trạng thái Đã hủy và Đang xử lý'>
@@ -636,7 +636,7 @@ const LeaveRequest: React.FC = () => {
               className='leave-request-percent__item tw-bg-[#cf1322]'
             ></div>
           </div>
-        </>
+        </div>
       )}
 
       <div>

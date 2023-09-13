@@ -74,7 +74,7 @@ const UserList: React.FC = () => {
     status: USER_STATUS.ACTIVE,
     paging: {
       page: 0,
-      size: 10,
+      size: 15,
       total: 0,
       totalPage: 0
     },
@@ -398,7 +398,7 @@ const UserList: React.FC = () => {
       query: '',
       paging: {
         page: 0,
-        size: 10,
+        size: 15,
         total: 0,
         totalPage: 0
       },
@@ -508,7 +508,7 @@ const UserList: React.FC = () => {
   ]
 
   return (
-    <div className='user-list tw-h-[calc(100vh-112px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-m-2 md:tw-m-4 tw-p-2 md:tw-p-4 tw-bg-white'>
       {(isOpenUserModal || !!userState.editingUser) && (
         <UserCreateEdit
           open={isOpenUserModal || !!userState.editingUser}
@@ -585,14 +585,14 @@ const UserList: React.FC = () => {
           loading={userState.loading}
           pagination={{
             total: userState.meta.total,
-            pageSizeOptions: [5, 10, 25, 50],
+            pageSizeOptions: [5, 10, 15, 25, 50],
             showSizeChanger: true,
             showQuickJumper: true,
             current: searchValue.paging.page + 1,
             responsive: true
           }}
           rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
-          scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+          scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
         />
       </div>

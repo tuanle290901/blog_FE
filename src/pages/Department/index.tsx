@@ -471,7 +471,7 @@ const Department: React.FC = () => {
   }, [valueSearch])
 
   return (
-    <div className='user-list  tw-h-[calc(100%-48px)]  tw-bg-white page-department tw-m-6 tw-p-5'>
+    <div className='user-list tw-h-[calc(100%-32px)] tw-bg-white page-department tw-m-2 tw-p-2 md:tw-m-4 md:tw-p-4'>
       <Row className='tw-w-100 tw-items-center'>
         <Button
           size='large'

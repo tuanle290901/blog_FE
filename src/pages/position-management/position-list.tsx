@@ -207,7 +207,7 @@ const PositionList: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100%-32px)] tw-m-2 tw-p-2 md:tw-m-4 md:tw-p-4 tw-bg-white'>
       <CreateEditPosition
         userInfo={userInfo}
         open={isOpenUserModal || !!positionState.editingPosition}
