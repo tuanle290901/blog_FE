@@ -50,7 +50,7 @@ import './style.scss'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: dayjs.utc().startOf('month').format(),
-  endDate: dayjs.utc().endOf('day').format(),
+  endDate: dayjs.utc().endOf('month').format(),
   page: 0,
   size: 10,
   sort: [
@@ -288,6 +288,7 @@ const LeaveRequest: React.FC = () => {
         width: 150,
         sorter: false,
         dataIndex: 'processStatus',
+        ellipsis: false,
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
           return dayjs(startDate).format('DD/MM/YYYY HH:mm')
@@ -583,6 +584,10 @@ const LeaveRequest: React.FC = () => {
                 value: item[0]
               }
             })}
+            optionFilterProp='children'
+            filterOption={(input, option) => {
+              return (option?.label + '').toLowerCase().includes(input.toLowerCase())
+            }}
           />
         </div>
       </div>
@@ -677,7 +682,7 @@ const LeaveRequest: React.FC = () => {
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
         width='60%'
-        style={{ minWidth: 350 }}
+        style={{ minWidth: 320 }}
         footer={null}
       >
         {selectedTicket && (

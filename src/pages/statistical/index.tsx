@@ -91,7 +91,7 @@ const Index = () => {
                   showSearch
                   value={currenSelectUser}
                   onChange={(val) => setCurrentSelectUser(val)}
-                  className='tw-min-w-[340px]'
+                  className='tw-min-w-[280px]'
                   optionFilterProp='children'
                   filterOption={(input, option) => {
                     return (option?.label + '').toLowerCase().includes(input.toLowerCase())
