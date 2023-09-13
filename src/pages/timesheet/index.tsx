@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Table, Tooltip, notification } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Input, Row, Select, Space, Table, Tooltip, notification } from 'antd'
 import './style.scss'
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import { useTranslation } from 'react-i18next'
@@ -280,7 +280,7 @@ const Timesheet: React.FC = () => {
       dataIndex: 'fullName',
       key: 'fullName',
       ellipsis: true,
-      width: '160px',
+      width: '150px',
       sortOrder: getSortOrder('fullName'),
       fixed: 'left'
     },
@@ -497,7 +497,7 @@ const Timesheet: React.FC = () => {
   }, [searchValue, clickUpdateButton, syncManualSuccess])
 
   return (
-    <Row className='timesheet tw-p-2'>
+    <Row className='timesheet tw-p-2 md:tw-p-4'>
       {/* {isAllowedAccess && (
         <div className='timesheet-chart-container tw-flex tw-w-full tw-bg-white tw-mb-2'>
           {chartData?.arrivalTime && chartData?.arrivalTime?.workingDate?.length > 0 && (
@@ -537,14 +537,14 @@ const Timesheet: React.FC = () => {
             {/* {!isAllowedAccess && <TimesheetChartForAdmin data={timesheetSate.timesheetList} />} */}
             <div className='timesheet-filter'>
               <Row gutter={[12, 16]} className='timesheet-filter-time'>
-                <Col xs={24} lg={10} xl={8}>
+                <Col xs={24} lg={8} xl={8}>
                   <div className='tw-text-[24px]'>
                     {!isAllowedAccess ? t('timesheet.titleForUser') : t('timesheet.titleForAdmin')} (
                     {timesheetSate?.meta?.total})
                   </div>
                 </Col>
-                <Col xs={24} lg={14} xl={16}>
-                  <Row gutter={[12, 16]} className='tw-flex lg:tw-justify-end'>
+                <Col xs={24} lg={16} xl={16}>
+                  <Row gutter={[12, 16]} className='tw-flex md:tw-justify-end'>
                     <Col>
                       <RangePicker
                         onChange={handleSelectDate}
@@ -584,41 +584,41 @@ const Timesheet: React.FC = () => {
                       />
                     </Col>
                     <Col>
-                      <Button
-                        icon={<UploadOutlined />}
-                        className='timesheet-filter__export'
-                        onClick={() =>
-                          dispatch(
-                            exportTimesheet({
-                              paging: searchValue.paging,
-                              sorts: searchValue.sorts,
-                              query: searchValue.query,
-                              groupCode: searchValue.group,
-                              startDate: searchValue.startDate,
-                              endDate: searchValue.endDate,
-                              userName: searchValue.userName,
-                              onlyShowWorkingDay: searchValue.onlyShowWorkingDay
-                            })
-                          )
-                        }
-                      >
-                        {t('timesheet.exportData')}
-                      </Button>
+                      <Space>
+                        <Button
+                          icon={<UploadOutlined />}
+                          className='timesheet-filter__export'
+                          onClick={() =>
+                            dispatch(
+                              exportTimesheet({
+                                paging: searchValue.paging,
+                                sorts: searchValue.sorts,
+                                query: searchValue.query,
+                                groupCode: searchValue.group,
+                                startDate: searchValue.startDate,
+                                endDate: searchValue.endDate,
+                                userName: searchValue.userName,
+                                onlyShowWorkingDay: searchValue.onlyShowWorkingDay
+                              })
+                            )
+                          }
+                        >
+                          {t('timesheet.exportData')}
+                        </Button>
+                        {isAllowedAccess && (
+                          <div className='timesheet__sync-button'>
+                            <Button
+                              icon={<SyncOutlined />}
+                              type='primary'
+                              disabled={disableSyncButton}
+                              onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
+                            >
+                              {t('timesheet.syncData')}
+                            </Button>
+                          </div>
+                        )}
+                      </Space>
                     </Col>
-                    {isAllowedAccess && (
-                      <Col>
-                        <div className='timesheet__sync-button'>
-                          <Button
-                            icon={<SyncOutlined />}
-                            type='primary'
-                            disabled={disableSyncButton}
-                            onClick={() => setSyncTimeAttendance(!syncTimeAttendance)}
-                          >
-                            {t('timesheet.syncData')}
-                          </Button>
-                        </div>
-                      </Col>
-                    )}
                   </Row>
                 </Col>
               </Row>
@@ -674,7 +674,7 @@ const Timesheet: React.FC = () => {
                 columns={columns}
                 dataSource={timesheetSate.timesheetList}
                 loading={timesheetSate.loading}
-                scroll={{ y: 'calc(100vh - 338px)', x: 800 }}
+                scroll={{ y: 'calc(100vh - 348px)', x: 800 }}
                 rowClassName={(record: IAttendance) =>
                   record?.reportData?.dateType !== 'WORKING_DATE'
                     ? record?.reportData?.dateType?.toLocaleLowerCase()
@@ -690,6 +690,7 @@ const Timesheet: React.FC = () => {
                   pageSizeOptions: ['5', '10', '15', '25', '50'],
                   showSizeChanger: true,
                   showQuickJumper: true,
+                  responsive: true,
                   locale: {
                     items_per_page: `/ ${t('common.page')}`,
                     next_page: t('common.nextPage'),

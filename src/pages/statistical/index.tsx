@@ -77,15 +77,15 @@ const Index = () => {
   }, [currenSelectUser])
 
   return (
-    <div className='statistical-wrapper'>
-      <div className='statistical-container'>
+    <div className='statistical-wrapper tw-p-2 md:tw-p-4'>
+      <div className='statistical-container tw-p-2 sm:tw-p-4'>
         <Row justify='space-between'>
           <Col>
             <div className='report-title tw-text-lg tw-font-semibold'>Thống kê thông tin dữ liệu trong tháng</div>
           </Col>
           {isSystemAdmin && (
             <Col>
-              <Space>
+              <div className='tw-my-2 tw-flex md:tw-items-center tw-gap-2 md:tw-my-0 tw-flex-col md:tw-flex-row'>
                 <span>Nhân viên:</span>
                 <Select
                   showSearch
@@ -103,7 +103,7 @@ const Index = () => {
                     }
                   })}
                 />
-              </Space>
+              </div>
             </Col>
           )}
         </Row>

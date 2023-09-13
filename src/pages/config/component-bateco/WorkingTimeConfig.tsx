@@ -53,7 +53,7 @@ const renderRow = (
   return (
     <Row className='tw-text-md' align={'middle'} gutter={[16, 16]}>
       <Col>
-        <div className='tw-text-md tw-w-[400px]'>{title}</div>
+        <div className='tw-text-md tw-w-[280px] md:tw-w-[400px]'>{title}</div>
       </Col>
       <Col>
         <Space>
@@ -92,6 +92,7 @@ const WorkingTimeConfig = () => {
   const [saturdayListFilter, setSaturdayListFilter] = useState<string[]>([])
   const [collapseRow, setCollapseRow] = useState<boolean[]>([false, false, false, false])
   const [yearSelected, setYearSelected] = useState<string>(dayjs().format('YYYY'))
+  const [disableSubmit, setDisableSubmit] = useState<boolean>(true)
 
   const overtimeOptions: DailyOverTimeSetup[] = workingTimeInfo?.timeWorkSetup?.dailyOverTimeSetups || []
 
@@ -106,6 +107,7 @@ const WorkingTimeConfig = () => {
   }
 
   const onChangeSatOptions = (checkedValues: CheckboxValueType[]) => {
+    setDisableSubmit(false)
     setCheckedValues(checkedValues)
   }
 
@@ -186,7 +188,7 @@ const WorkingTimeConfig = () => {
   }, [workingTimeInfo, selectedQuarter])
 
   return (
-    <div className='tw-h-[calc(100%-48px)] tw-m-3 tw-p-3 '>
+    <div className='tw-h-[calc(100%-32px)] tw-m-2 md:tw-m-4'>
       <div className='woking-time-config__select-year'>
         <Select
           className='tw-min-w-[120px]'
@@ -270,7 +272,7 @@ const WorkingTimeConfig = () => {
               </div>
             </div>
             <div className='tw-flex tw-justify-end tw-mt-3'>
-              <Button type='primary' onClick={updateQuarter}>
+              <Button type='primary' onClick={updateQuarter} disabled={disableSubmit}>
                 Lưu cấu hình
               </Button>
             </div>
@@ -294,14 +296,14 @@ const WorkingTimeConfig = () => {
             <div className='tw-mt-4'>
               <Row align={'middle'}>
                 <Col>
-                  <div className='tw-text-md tw-mb-2 tw-w-[400px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
+                  <div className='tw-text-md tw-mb-2 md:tw-w-[400px]'>1. Giờ làm thêm trong tuần (Thứ 2- Thứ 6)</div>
                 </Col>
 
                 <Col>
                   <div className='tw-flex tw-flex-col tw-justify-center tw-gap-[15px]'>
                     {overtimeOptions.map((item, index) => {
                       return (
-                        <Space key={index} className='tw-ml-4'>
+                        <Space key={index} className='sm:tw-ml-4'>
                           <div className='time-box'>{item?.overTimeShift?.startTime}</div>
                           <span className='tw-font-bold'>-</span>
                           <div className='time-box'>{item?.overTimeShift?.endTime}</div>

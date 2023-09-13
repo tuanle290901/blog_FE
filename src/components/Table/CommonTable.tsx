@@ -187,6 +187,7 @@ const CommondTable: React.FC<IPropsTableCommon> = (props) => {
               pageSizeOptions: ['10', '25', '50'],
               showSizeChanger: true,
               showQuickJumper: true,
+              responsive: true,
               locale: {
                 items_per_page: `/ ${t('pagination.page')}`,
                 next_page: t('pagination.nextPage'),

@@ -109,6 +109,14 @@ const LeaveRequestForm: React.FC<{
     }
   }, [open])
 
+  const handleDatePickerClose = () => {
+    const okButtons = document.querySelectorAll('.ant-picker-ok button') as NodeListOf<HTMLButtonElement>
+
+    okButtons.forEach((okButton) => {
+      okButton.click()
+    })
+  }
+
   return (
     <Modal
       open={open}
@@ -188,7 +196,7 @@ const LeaveRequestForm: React.FC<{
                   {item.type === INPUT_TYPE.DATETIME && (
                     <DatePicker
                       disabled={!canUpdateForm}
-                      placeholder={item.description}
+                      placeholder={'DD/MM/YYYY HH:mm'}
                       className='tw-w-full'
                       showTime={{
                         hideDisabledOptions: true,
@@ -198,6 +206,11 @@ const LeaveRequestForm: React.FC<{
                       }}
                       format='DD/MM/YYYY HH:mm'
                       disabledDate={(val) => disabledDate(val, item)}
+                      onOpenChange={(status) => {
+                        if (!status) {
+                          handleDatePickerClose()
+                        }
+                      }}
                     />
                   )}
                   {item.type === INPUT_TYPE.BOOLEAN && (

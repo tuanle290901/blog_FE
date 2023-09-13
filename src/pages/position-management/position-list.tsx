@@ -207,7 +207,7 @@ const PositionList: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100%-32px)] tw-m-2 tw-p-2 md:tw-m-4 md:tw-p-4 tw-bg-white'>
       <CreateEditPosition
         userInfo={userInfo}
         open={isOpenUserModal || !!positionState.editingPosition}
@@ -245,7 +245,8 @@ const PositionList: React.FC = () => {
             total: positionState.meta.total,
             pageSizeOptions: [5, 10, 25, 50],
             showSizeChanger: true,
-            showQuickJumper: true
+            showQuickJumper: true,
+            responsive: true
           }}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}

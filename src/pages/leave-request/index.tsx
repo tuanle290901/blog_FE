@@ -285,7 +285,7 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'startDate',
         title: t('leaveRequest.startDate'),
-        width: 140,
+        width: 150,
         sorter: false,
         dataIndex: 'processStatus',
         ellipsis: false,
@@ -297,10 +297,9 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'endDate',
         title: t('leaveRequest.endDate'),
-        width: 140,
+        width: 150,
         dataIndex: 'processStatus',
         ellipsis: false,
-        sorter: false,
         render: (item) => {
           const endDate = item['0']?.attributes?.end_time
           return dayjs(endDate).format('DD/MM/YYYY HH:mm')
@@ -321,10 +320,9 @@ const LeaveRequest: React.FC = () => {
       {
         key: 'createdAt',
         title: t('leaveRequest.requestDate'),
-        width: 140,
+        width: 150,
         dataIndex: 'createdAt',
         sorter: true,
-        ellipsis: true,
         render: (requestDate) => {
           return dayjs(requestDate).format('DD/MM/YYYY HH:mm')
         }
@@ -409,7 +407,7 @@ const LeaveRequest: React.FC = () => {
                   <Tooltip title='Hủy yêu cầu'>
                     <Popconfirm
                       title='Hủy yêu cầu'
-                      description='Bạn có chắc chắn muốn hủy yêu cầu'
+                      description='Bạn có chắc chắn muốn hủy yêu cầu?'
                       onConfirm={() => handleClickDelete(record)}
                       okText={t('common.yes')}
                       cancelText={t('common.no')}
@@ -434,7 +432,7 @@ const LeaveRequest: React.FC = () => {
                 (record?.status === TicketStatusEnum.CONFIRMED || record?.status === TicketStatusEnum.REJECTED) && (
                   <Popconfirm
                     title='Đặt lại yêu cầu'
-                    description='Bạn có chắc chắn muốn đặt lại yêu cầu không?'
+                    description='Bạn có chắc chắn muốn đặt lại yêu cầu?'
                     onConfirm={() => handleClickReset(record)}
                     okText={t('common.yes')}
                     cancelText={t('common.no')}
@@ -521,7 +519,7 @@ const LeaveRequest: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-3 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-m-2 md:tw-m-4 tw-p-4 tw-bg-white'>
       <LeaveRequestForm
         open={isOpenModal}
         data={editingLeaveRequest}
@@ -553,7 +551,7 @@ const LeaveRequest: React.FC = () => {
               }}
               mode='multiple'
               placeholder='Người yêu cầu'
-              style={{ minWidth: 320 }}
+              style={{ minWidth: 300 }}
               options={users.map((user) => {
                 return {
                   label: user?.fullName + ' (' + user?.userName + ')',
@@ -579,7 +577,7 @@ const LeaveRequest: React.FC = () => {
             onChange={(val) => onChangeRequest('requestStatus', val)}
             mode='multiple'
             placeholder='Trạng thái yêu cầu'
-            style={{ minWidth: 200 }}
+            style={{ minWidth: 150 }}
             options={Object.entries(TICKET_STATUS_FILTER).map((item) => {
               return {
                 label: item[1],
@@ -594,7 +592,7 @@ const LeaveRequest: React.FC = () => {
         </div>
       </div>
       {isSystemAdmin && (
-        <>
+        <div className='tw-mb-7'>
           <Row gutter={[16, 16]} className='leave-request-count tw-hidden md:tw-flex'>
             <Col xs={24} sm={7} className='leave-request-count-title'>
               <Tooltip title='Không bao gồm trạng thái Đã hủy và Đang xử lý'>
@@ -643,7 +641,7 @@ const LeaveRequest: React.FC = () => {
               className='leave-request-percent__item tw-bg-[#cf1322]'
             ></div>
           </div>
-        </>
+        </div>
       )}
 
       <div>
@@ -662,6 +660,7 @@ const LeaveRequest: React.FC = () => {
             pageSizeOptions: ['10', '25', '50'],
             showSizeChanger: true,
             showQuickJumper: true,
+            responsive: true,
             locale: {
               items_per_page: `/ ${t('common.page')}`,
               next_page: t('common.nextPage'),

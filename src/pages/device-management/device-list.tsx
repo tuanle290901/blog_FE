@@ -324,7 +324,7 @@ const DeviceList: React.FC = () => {
   }
 
   return (
-    <div className='user-list tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white'>
+    <div className='user-list tw-h-[calc(100%-32px)] tw-m-2 tw-p-2 md:tw-m-4 md:tw-p-4 tw-bg-white'>
       <CreateEditDevice
         open={isOpenModal.openModel}
         deviceData={editingDevice}
@@ -375,6 +375,7 @@ const DeviceList: React.FC = () => {
             pageSizeOptions: ['10', '25', '50'],
             showSizeChanger: true,
             showQuickJumper: true,
+            responsive: true,
             locale: {
               items_per_page: `/ ${t('common.page')}`,
               next_page: t('common.nextPage'),
