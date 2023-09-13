@@ -18,7 +18,7 @@ const initialState: IUserState = {
   editingUser: null,
   loading: false,
   currentRequestId: null,
-  meta: { page: 0, size: 10, total: 0, totalPage: 0 }
+  meta: { page: 0, size: 15, total: 0, totalPage: 0 }
 }
 
 export const searchUser = createAsyncThunk(

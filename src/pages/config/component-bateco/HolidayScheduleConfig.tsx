@@ -275,7 +275,7 @@ const HolidayScheduleConfig = () => {
   }
 
   return (
-    <div className='tw-h-[calc(100%-48px)] tw-m-6 tw-p-5 tw-bg-white holiday-schedule-container'>
+    <div className='tw-h-[calc(100%-32px)] tw-m-2 tw-p-2 md:tw-m-4 md:tw-p-4 tw-bg-white holiday-schedule-container'>
       <h1 className='tw-text-2xl tw-font-semibold'>Cấu hình danh sách ngày nghỉ lễ</h1>
       <Calendar
         mode='month'
