@@ -303,7 +303,7 @@ const WorkingTimeConfig = () => {
                   <div className='tw-flex tw-flex-col tw-justify-center tw-gap-[15px]'>
                     {overtimeOptions.map((item, index) => {
                       return (
-                        <Space key={index} className='tw-ml-4'>
+                        <Space key={index} className='sm:tw-ml-4'>
                           <div className='time-box'>{item?.overTimeShift?.startTime}</div>
                           <span className='tw-font-bold'>-</span>
                           <div className='time-box'>{item?.overTimeShift?.endTime}</div>
