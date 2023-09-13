@@ -288,7 +288,7 @@ const LeaveRequest: React.FC = () => {
         width: 140,
         sorter: false,
         dataIndex: 'processStatus',
-        ellipsis: true,
+        ellipsis: false,
         render: (item) => {
           const startDate = item['0']?.attributes?.start_time
           return dayjs(startDate).format('DD/MM/YYYY HH:mm')
@@ -586,6 +586,10 @@ const LeaveRequest: React.FC = () => {
                 value: item[0]
               }
             })}
+            optionFilterProp='children'
+            filterOption={(input, option) => {
+              return (option?.label + '').toLowerCase().includes(input.toLowerCase())
+            }}
           />
         </div>
       </div>
