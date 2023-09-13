@@ -316,14 +316,18 @@ const UserList: React.FC = () => {
                   </Tooltip>
                   {hasPermission([ROLE.HR, ROLE.SYSTEM_ADMIN], userInfo?.groupProfiles) && (
                     <>
-                      <Tooltip title='Vô hiệu hóa tài khoản'>
-                        <Popconfirm
-                          title='Xác nhận vô hiệu hóa tài khoản'
-                          onConfirm={() => handleClickDeleteUser(record)}
-                        >
-                          <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-                        </Popconfirm>
-                      </Tooltip>
+                      {record?.userName === 'admin' || record?.userName === userInfo?.userName ? (
+                        ''
+                      ) : (
+                        <Tooltip title='Vô hiệu hóa tài khoản'>
+                          <Popconfirm
+                            title='Xác nhận vô hiệu hóa tài khoản'
+                            onConfirm={() => handleClickDeleteUser(record)}
+                          >
+                            <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                          </Popconfirm>
+                        </Tooltip>
+                      )}
                       <Tooltip title='Đặt lại mật khẩu'>
                         <Popconfirm
                           title={t('userList.descriptionConfirmResetPassword', {
