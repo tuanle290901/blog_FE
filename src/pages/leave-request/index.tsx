@@ -50,7 +50,7 @@ import './style.scss'
 const { RangePicker } = DatePicker
 const initialPayload: TicketRequestPayload = {
   startDate: dayjs.utc().startOf('month').format(),
-  endDate: dayjs.utc().endOf('day').format(),
+  endDate: dayjs.utc().endOf('month').format(),
   page: 0,
   size: 10,
   sort: [
@@ -553,7 +553,7 @@ const LeaveRequest: React.FC = () => {
               }}
               mode='multiple'
               placeholder='Người yêu cầu'
-              style={{ minWidth: 380 }}
+              style={{ minWidth: 320 }}
               options={users.map((user) => {
                 return {
                   label: user?.fullName + ' (' + user?.userName + ')',
@@ -679,7 +679,7 @@ const LeaveRequest: React.FC = () => {
         onOk={handleModalAprroveOk}
         onCancel={handleModalAprroveCancel}
         width='60%'
-        style={{ minWidth: 350 }}
+        style={{ minWidth: 320 }}
         footer={null}
       >
         {selectedTicket && (
