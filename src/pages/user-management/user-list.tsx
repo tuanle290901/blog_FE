@@ -508,93 +508,96 @@ const UserList: React.FC = () => {
   ]
 
   return (
-    <div className='user-list tw-m-2 md:tw-m-4 tw-p-2 md:tw-p-4 tw-bg-white'>
-      {(isOpenUserModal || !!userState.editingUser) && (
-        <UserCreateEdit
-          open={isOpenUserModal || !!userState.editingUser}
-          userData={userState.editingUser}
-          handleClose={handleCloseUserModal}
-          resetPageUser={resetPageUser}
-        />
-      )}
-      <div>
-        <h1 className='tw-text-2xl tw-font-semibold'>
-          {t('userList.member')} ({userState.meta.total})
-        </h1>
-        <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
-      </div>
-      <Row gutter={[16, 16]} className='tw-mt-4'>
-        <Col xs={24} md={6}>
-          <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
-            {/* {permissionAddUser && (
-              <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
-                {t('userList.addMember')}
-              </Button>
-            )} */}
+    <div className='tw-min-h-[calc(100%-32px)] tw-bg-white tw-m-2 md:tw-m-4'>
+      <div className='user-list tw-p-2 md:tw-p-4'>
+        {(isOpenUserModal || !!userState.editingUser) && (
+          <UserCreateEdit
+            open={isOpenUserModal || !!userState.editingUser}
+            userData={userState.editingUser}
+            handleClose={handleCloseUserModal}
+            resetPageUser={resetPageUser}
+          />
+        )}
+        <div>
+          <h1 className='tw-text-2xl tw-font-semibold'>
+            {t('userList.member')} ({userState.meta.total})
+          </h1>
+          <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
+        </div>
+        <Row gutter={[16, 16]} className='tw-mt-4'>
+          <Col xs={24} md={6}>
+            <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
+              {/* {permissionAddUser && (
+                <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
+                  {t('userList.addMember')}
+                </Button>
+              )} */}
 
-            {permissionImportUser && (
-              <Dropdown.Button type='primary' menu={{ items }}>
-                <>
-                  <span className='tw-cursor-pointer' onClick={openModalCreateUser}>
-                    {' '}
-                    {t('userList.addMember')}
-                  </span>
-                  <input
-                    ref={fileSelect}
-                    className='tw-hidden'
-                    type='file'
-                    accept='.xlsx,.xls'
-                    onChange={(event) => handleFileChange(event.target.files)}
-                  />
-                </>
-              </Dropdown.Button>
-            )}
-          </div>
-        </Col>
-        <Col xs={24} md={18}>
-          <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
-            <Select
-              onChange={handleDepartmentChange}
-              defaultValue={'all'}
-              options={groupOptions}
-              value={searchValue.group}
-              className='tw-w-full lg:tw-w-[200px]'
-            />
-            <Select
-              onChange={handleStatusChange}
-              defaultValue={USER_STATUS.ACTIVE}
-              options={statusOption}
-              value={searchValue.status}
-              className='tw-w-full lg:tw-w-[200px]'
-            />
-            <Search
-              value={query}
-              placeholder={t('userList.searchMember')}
-              onChange={(event) => handleSearchValueChange(event.target.value)}
-              className='tw-w-full lg:tw-w-[280px]'
-            />
-          </div>
-        </Col>
-      </Row>
+              {permissionImportUser && (
+                <Dropdown.Button type='primary' menu={{ items }}>
+                  <>
+                    <span className='tw-cursor-pointer' onClick={openModalCreateUser}>
+                      {' '}
+                      {t('userList.addMember')}
+                    </span>
+                    <input
+                      ref={fileSelect}
+                      className='tw-hidden'
+                      type='file'
+                      accept='.xlsx,.xls'
+                      onChange={(event) => handleFileChange(event.target.files)}
+                    />
+                  </>
+                </Dropdown.Button>
+              )}
+            </div>
+          </Col>
+          <Col xs={24} md={18}>
+            <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
+              <Select
+                onChange={handleDepartmentChange}
+                defaultValue={'all'}
+                options={groupOptions}
+                value={searchValue.group}
+                className='tw-w-full lg:tw-w-[200px]'
+              />
+              <Select
+                onChange={handleStatusChange}
+                defaultValue={USER_STATUS.ACTIVE}
+                options={statusOption}
+                value={searchValue.status}
+                className='tw-w-full lg:tw-w-[200px]'
+              />
+              <Search
+                value={query}
+                placeholder={t('userList.searchMember')}
+                onChange={(event) => handleSearchValueChange(event.target.value)}
+                className='tw-w-full lg:tw-w-[280px]'
+              />
+            </div>
+          </Col>
+        </Row>
 
-      <div className='tw-mt-6 user-table'>
-        <Table
-          rowKey='id'
-          columns={columns}
-          dataSource={userState.userList}
-          loading={userState.loading}
-          pagination={{
-            total: userState.meta.total,
-            pageSizeOptions: [5, 10, 15, 25, 50],
-            showSizeChanger: true,
-            showQuickJumper: true,
-            current: searchValue.paging.page + 1,
-            responsive: true
-          }}
-          rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
-          scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
-          onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
-        />
+        <div className='tw-mt-6 user-table'>
+          <Table
+            rowKey='id'
+            columns={columns}
+            dataSource={userState.userList}
+            loading={userState.loading}
+            pagination={{
+              total: userState.meta.total,
+              defaultPageSize: userState?.meta?.size || 15,
+              pageSizeOptions: [5, 10, 15, 25, 50],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              current: searchValue.paging.page + 1,
+              responsive: true
+            }}
+            rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
+            scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
+            onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+          />
+        </div>
       </div>
     </div>
   )
