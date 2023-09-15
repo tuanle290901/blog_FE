@@ -90,6 +90,7 @@ const Timesheet: React.FC = () => {
     userName?: string | null
     startDate?: string | null
     endDate?: string | null
+    status?: string | null
     paging: IPaging
     sorts: ISort[]
     onlyShowWorkingDay?: boolean
@@ -206,6 +207,7 @@ const Timesheet: React.FC = () => {
   }
 
   const renderStatusByPayrollAmount = (reportData: IReportData) => {
+    console.log(reportData, 'report data')
     if (reportData?.payrollAmount === null) return
     if (reportData?.payrollAmount < 8 || reportData?.violates?.length > 0) {
       return (
@@ -488,7 +490,8 @@ const Timesheet: React.FC = () => {
         startDate: searchValue.startDate,
         endDate: searchValue.endDate,
         userName: searchValue.userName,
-        onlyShowWorkingDay: searchValue.onlyShowWorkingDay
+        onlyShowWorkingDay: searchValue.onlyShowWorkingDay,
+        status: searchValue.status
       })
     )
     return () => {
@@ -637,7 +640,7 @@ const Timesheet: React.FC = () => {
                     options={groupOptions}
                   />
                 </Col>
-                <Col xs={24} lg={8} xl={10}>
+                <Col xs={24} lg={8} xl={6}>
                   <Select
                     className='tw-w-full tw-max-w-[380px]'
                     showSearch
@@ -652,6 +655,26 @@ const Timesheet: React.FC = () => {
                     defaultValue={selectedUser}
                     onChange={(value) => setSelectedUser(value)}
                     options={userOptions}
+                  />
+                </Col>
+                <Col xs={24} lg={8} xl={4}>
+                  <Select
+                    className='tw-w-full tw-max-w-[380px]'
+                    showSearch
+                    placeholder='Trạng thái'
+                    allowClear
+                    onChange={(value) =>
+                      setSearchValue((prev) => {
+                        return {
+                          ...prev,
+                          status: value
+                        }
+                      })
+                    }
+                    options={[
+                      { label: 'Đủ công', value: 'GREATER_THAN_OR_EQUAL' },
+                      { label: 'Thiếu công', value: 'LESS_THAN' }
+                    ]}
                   />
                 </Col>
                 <Col xs={24} lg={8} xl={10} className='lg:tw-text-right'>
