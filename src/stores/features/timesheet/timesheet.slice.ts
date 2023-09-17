@@ -135,6 +135,7 @@ export const filterTimesheet = createAsyncThunk(
       userName?: string | null
       startDate?: string | null
       endDate?: string | null
+      status?: string | null
       paging: IPaging
       sorts: ISort[]
     },
@@ -263,6 +264,16 @@ export const filterTimesheet = createAsyncThunk(
           value: 'WORKING_DATE'
         })
       }
+
+      if (params.status) {
+        body.criteria[0].children.push({
+          field: 'report_data.payroll_amount',
+          operator: params.status,
+          value: 8,
+          type: 'DOUBLE'
+        })
+      }
+
       if (!params.onlyShowWorkingDay) {
         const index = body.criteria[0].children.findIndex((item: any) => item.field === 'report_data.date_type')
         if (index > -1) {

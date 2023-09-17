@@ -529,6 +529,10 @@ const LeaveRequest: React.FC = () => {
       <div className='tw-flex'>
         <h1 className='tw-text-2xl tw-font-semibold'>{t('leaveRequest.title')}</h1>
       </div>
+      <div className='tw-text-yellow-600 tw-mt-[10px] tw-text-[13px]'>
+        Lưu ý: Tính năng khiếu nại ngày công để phục vụ cho tính công, tính giờ lương. Vui lòng chọn thời gian khiếu nại
+        chỉ trong giờ làm việc từ 8:00 - 17:00
+      </div>
       <div className='tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-gap-[10px] tw-my-5'>
         <Button
           onClick={() => {
@@ -541,6 +545,7 @@ const LeaveRequest: React.FC = () => {
         >
           {t('leaveRequest.createNew')}
         </Button>
+
         <div className='tw-flex tw-flex-col md:tw-flex-row tw-gap-[10px] tw-justify-between'>
           {(isSystemAdmin || isManagerDepartment) && (
             <Select
