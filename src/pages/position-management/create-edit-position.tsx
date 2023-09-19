@@ -40,11 +40,19 @@ const CreateEditPosition: React.FC<{
       await form.validateFields()
       const value = form.getFieldsValue()
       if (!position?.id) {
-        await dispatch(createPosition(value))
-        notification.success({ message: t('position.message.createPositionSuccess') })
+        const response: any = await dispatch(createPosition(value))
+        if (response?.payload?.status === 200) {
+          notification.success({ message: t('position.message.createPositionSuccess') })
+        } else {
+          notification.error({ message: t('position.message.createPositionFail') })
+        }
       } else {
-        await dispatch(updatePosition({ ...value, id: position.id }))
-        notification.success({ message: t('position.message.updatePositionSuccess') })
+        const response: any = await dispatch(updatePosition({ ...value, id: position.id }))
+        if (response?.payload?.status === 200) {
+          notification.success({ message: t('position.message.updatePositionSuccess') })
+        } else {
+          notification.error({ message: t('position.message.updatePositionFail') })
+        }
       }
       finishAndClose(true)
     } catch (e) {

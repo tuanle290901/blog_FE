@@ -11,7 +11,9 @@
     "search": "Tìm kiếm chức vụ",
     "message": {
       "createPositionSuccess": "Tạo mới chức vụ thành công",
+      "createPositionFail": "Tạo mới chức vụ không thành công",
       "updatePositionSuccess": "Cập nhật chức vụ thành công",
+      "updatePositionFail": "Cập nhật chức vụ không thành công",
       "deleteSuccess": "Xóa chức vụ thành công",
       "positionEmpty": "Chức vụ không được để trống",
       "enterPositionName": "Nhập tên chức vụ",
