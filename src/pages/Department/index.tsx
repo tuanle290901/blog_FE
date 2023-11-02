@@ -1,9 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/jsx-no-undef */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import './index.scss'
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'

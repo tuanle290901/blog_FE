@@ -10,6 +10,7 @@ import changePassword from './change-password.json'
 import position from './position.json'
 import leaveRequest from './leave-request.json'
 import dashboard from './dashboard.json'
+import balance from './balance.json'
 
 export const vi = {
   ...common,
@@ -23,5 +24,6 @@ export const vi = {
   ...changePassword,
   ...position,
   ...leaveRequest,
-  ...dashboard
+  ...dashboard,
+  ...balance
 }

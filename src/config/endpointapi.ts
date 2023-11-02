@@ -27,5 +27,12 @@ export const END_POINT_API = {
     getPageSize: () => `/tickets/filter`,
     delete: () => `/tickets/cancel`,
     reset: () => `/tickets/reset`
+  },
+  Balance: {
+    filter: () => `//`,
+    export: () => `//`,
+    import: () => `//`,
+    getAll: () => `//`,
+    update: (name: string) => `//${name}`
   }
 }
