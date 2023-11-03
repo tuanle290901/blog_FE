@@ -28,11 +28,11 @@ export const END_POINT_API = {
     delete: () => `/tickets/cancel`,
     reset: () => `/tickets/reset`
   },
-  Balance: {
-    filter: () => `//`,
-    export: () => `//`,
-    import: () => `//`,
-    getAll: () => `//`,
-    update: (name: string) => `//${name}`
+  Benefit: {
+    filter: () => `/benefit/filter`,
+    export: () => `/benefit/export`,
+    import: () => `/benefit/import`,
+    getAll: () => `/benefit/getall`,
+    update: () => `/benefit/update`
   }
 }

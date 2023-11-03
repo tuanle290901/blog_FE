@@ -10,12 +10,13 @@ import UserList from '~/pages/user-management/user-list.tsx'
 
 import { ROLE } from '~/constants/app.constant.ts'
 import Department from '~/pages/Department'
-import Balance from '~/pages/balance'
+import Balance from '~/pages/benefit'
 import LeaveRequest from '~/pages/leave-request'
 import PositionList from '~/pages/position-management/position-list.tsx'
 import Report from '~/pages/report'
 import Statistical from '~/pages/statistical'
 import TypesOfLeave from '~/pages/types-of-leave-management/types-of-leave-list'
+import Benefit from '~/pages/benefit'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -39,7 +40,7 @@ export const PRIVATE_PATH = {
   config: {
     prefix: '/working-time',
     holidaySchedule: '/holiday-schedule',
-    balance: '/balance'
+    benefit: '/benefit'
   },
   timeManagement: {
     prefix: '/work-time',
@@ -145,9 +146,9 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
-    name: 'balance',
-    path: PRIVATE_PATH.config.balance,
-    component: Balance,
+    name: 'benefit',
+    path: PRIVATE_PATH.config.benefit,
+    component: Benefit,
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   }
 ]

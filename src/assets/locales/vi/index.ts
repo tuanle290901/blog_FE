@@ -10,7 +10,7 @@ import changePassword from './change-password.json'
 import position from './position.json'
 import leaveRequest from './leave-request.json'
 import dashboard from './dashboard.json'
-import balance from './balance.json'
+import benefit from './benefit.json'
 
 export const vi = {
   ...common,
@@ -25,5 +25,5 @@ export const vi = {
   ...position,
   ...leaveRequest,
   ...dashboard,
-  ...balance
+  ...benefit
 }
