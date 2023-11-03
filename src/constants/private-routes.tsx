@@ -5,11 +5,12 @@ import CommonTimeConfigBateco from '~/pages/config/component-bateco/WorkingTimeC
 import HolidayScheduleConfig from '~/pages/config/component-bateco/HolidayScheduleConfig'
 import DeviceList from '~/pages/device-management/device-list.tsx'
 import PersonalWokingTimeRequestList from '~/pages/personal-working-time-management/personal-woking-time-request-list.tsx'
-import TicketDefinationNew from '~/pages/setting/ticket-defination-new'
+import TicketDefinationNew from '~/pages/setting/ticket-defination-new/TicketDefinitionCreate'
 import TicketDefination from '~/pages/setting/ticket-defination'
 import Timesheet from '~/pages/timesheet'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import UserList from '~/pages/user-management/user-list.tsx'
+import TicketDefinitionList from '~/pages/setting/ticket-defination-new'
 
 import PositionList from '~/pages/position-management/position-list.tsx'
 import Department from '~/pages/Department'
@@ -32,7 +33,9 @@ export const PRIVATE_PATH = {
   dashboard: '/dashboard',
   setting: {
     ticketProcessDefinition: 'ticket-process-definition',
-    ticketProcessDefinitionNew: 'ticket-process-definition-new'
+    ticketProcessDefinitionNew: 'ticket-definition',
+    ticketDefinitionById: 'ticket-definition/:id',
+    ticketDefinitionCreate: 'ticket-definition/create'
   },
   department: {
     prefix: 'department'
@@ -72,15 +75,27 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     component: UserList,
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
+  // {
+  //   name: 'ticket-definition-list',
+  //   path: PRIVATE_PATH.setting.ticketProcessDefinition,
+  //   component: TicketDefination,
+  //   allowedRoles: [ROLE.SYSTEM_ADMIN]
+  // },
   {
-    name: 'ticket-definition-list',
-    path: PRIVATE_PATH.setting.ticketProcessDefinition,
-    component: TicketDefination,
+    name: 'ticket-definition',
+    path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
+    component: TicketDefinitionList,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
-    name: 'ticket-definition-new',
-    path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
+    name: 'ticket-definition/:id',
+    path: PRIVATE_PATH.setting.ticketDefinitionById,
+    component: TicketDefinationNew,
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
+  },
+  {
+    name: 'ticket-definition/create',
+    path: PRIVATE_PATH.setting.ticketDefinitionCreate,
     component: TicketDefinationNew,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },

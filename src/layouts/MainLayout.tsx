@@ -196,8 +196,8 @@ const MainLayout: React.FC = () => {
         [
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
-          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices')
-          // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-definition')
           // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
         ]
       )

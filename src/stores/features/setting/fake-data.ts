@@ -2,8 +2,8 @@ export const ticketItem = {
   data: [
     {
       id: 'TD_ABSENT',
-      createdAt: null,
-      createdBy: null,
+      createdAt: '2023-11-01T09:15:14.383Z',
+      createdBy: 'bao.nkg',
       updatedAt: null,
       updatedBy: null,
       name: 'Đăng ký nghỉ',
@@ -12,124 +12,148 @@ export const ticketItem = {
       revisions: [
         {
           rev: 1,
-          processNodes: [
-            {
-              groupCode: '__START__',
+          processNodes: {
+            '1': {
+              nodeIndex: 1,
               attributes: [
                 {
-                  name: 'start_time',
-                  description: 'Thời gian bắt đầu',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'end_time',
-                  description: 'Thời gian kết thúc',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'type',
-                  description: 'Phân loại',
-                  required: true,
-                  type: 'SINGLE_CHOICE',
-                  options: [
-                    'SICK',
-                    'COMPENSATORY',
-                    'ANNUAL',
-                    'UNPAID',
-                    'MATERNITY',
-                    'PATERNITY',
-                    'WORK_FROM_HOME',
-                    'WEDDING',
-                    'UNEXPECTED',
-                    'COMPASSIONATE'
-                  ],
-                  suggestion: null
-                },
-                {
-                  name: 'reason',
-                  description: 'Lí do',
-                  required: true,
+                  name: '1234214',
                   type: 'TEXT',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'supporter',
-                  description: 'Người tiếp quản (hỗ trợ) công việc trong thời gian nghỉ',
-                  required: false,
-                  type: 'TEXT',
-                  options: null,
-                  suggestion: null
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: '__START__',
+              name: 'Khởi tạo phép',
+              type: 'input',
+              position: {
+                x: 0,
+                y: 103
+              }
             },
-            {
-              groupCode: 'manager',
+            '2': {
+              nodeIndex: 2,
+              groupCodes: '__END__',
+              name: 'Trạng thái cuối',
+              type: 'output',
+              position: {
+                x: 900,
+                y: 103
+              }
+            },
+            '3': {
+              nodeIndex: 3,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: false,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 628.514268530972,
+                y: 249.70009704155393
+              }
             },
-            {
-              groupCode: 'vice-director',
+            '4': {
+              nodeIndex: 4,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: false,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'manager',
+              name: 'Quản lý trực tiếp',
+              type: 'selectorNode',
+              position: {
+                x: 306.19948369452777,
+                y: 248.10841909174434
+              }
             },
-            {
-              groupCode: 'hr',
+            '5': {
+              nodeIndex: 5,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: false,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'leadership',
+              name: 'Ban giám đốc',
+              type: 'selectorNode',
+              position: {
+                x: 413.63774530667587,
+                y: -263.61604177204225
+              }
             },
-            {
-              groupCode: '__END__',
-              attributes: null
+            '6': {
+              nodeIndex: 6,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 396.12928785877017,
+                y: 5.377531745780232
+              }
             }
-          ],
+          },
           processFlow: [
             {
-              srcIdx: 0,
-              destIdx: 1
+              srcIdx: 1,
+              destIdx: 4
             },
             {
-              srcIdx: 1,
+              srcIdx: 4,
+              destIdx: 3
+            },
+            {
+              srcIdx: 3,
               destIdx: 2
             },
             {
-              srcIdx: 2,
-              destIdx: 3
+              srcIdx: 1,
+              destIdx: 5
+            },
+            {
+              srcIdx: 5,
+              destIdx: 2
+            },
+            {
+              srcIdx: 1,
+              destIdx: 6
+            },
+            {
+              srcIdx: 6,
+              destIdx: 2
             }
           ],
-          strategy: 'JUDGEMENT_IMMEDIATELY',
-          stopTransferStrategy: 'BY_ONE_RESULT',
-          continueTransferStrategy: 'BY_ALL_RESULT',
           createdAt: '2023-07-13T10:24:37.791637Z',
           createdBy: 'SYSTEM'
         }
@@ -137,8 +161,8 @@ export const ticketItem = {
     },
     {
       id: 'TD_BUSINESS_TRIP',
-      createdAt: null,
-      createdBy: null,
+      createdAt: '2023-11-02T09:15:14.383Z',
+      createdBy: 'hung.pv',
       updatedAt: null,
       updatedBy: null,
       name: 'Đăng ký công tác',
@@ -146,84 +170,148 @@ export const ticketItem = {
       revisions: [
         {
           rev: 1,
-          processNodes: [
-            {
-              groupCode: '__START__',
+          processNodes: {
+            '1': {
+              nodeIndex: 1,
               attributes: [
                 {
-                  name: 'start_time',
-                  description: 'Thời gian bắt đầu',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'end_time',
-                  description: 'Thời gian kết thúc',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'description',
-                  description: 'Mô tả',
-                  required: true,
+                  name: '1234214',
                   type: 'TEXT',
-                  options: null,
-                  suggestion: null
-                }
-              ]
-            },
-            {
-              groupCode: 'manager',
-              attributes: [
-                {
-                  name: 'note',
-                  description: 'Ý kiến',
                   required: true,
-                  type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: '__START__',
+              name: 'Khởi tạo phép',
+              type: 'input',
+              position: {
+                x: 0,
+                y: 103
+              }
             },
-            {
-              groupCode: 'director',
+            '2': {
+              nodeIndex: 2,
+              groupCodes: '__END__',
+              name: 'Trạng thái cuối',
+              type: 'output',
+              position: {
+                x: 900,
+                y: 103
+              }
+            },
+            '3': {
+              nodeIndex: 3,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: false,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 628.514268530972,
+                y: 249.70009704155393
+              }
             },
-            {
-              groupCode: '__END__',
-              attributes: null
+            '4': {
+              nodeIndex: 4,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'manager',
+              name: 'Quản lý trực tiếp',
+              type: 'selectorNode',
+              position: {
+                x: 306.19948369452777,
+                y: 248.10841909174434
+              }
+            },
+            '5': {
+              nodeIndex: 5,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'leadership',
+              name: 'Ban giám đốc',
+              type: 'selectorNode',
+              position: {
+                x: 413.63774530667587,
+                y: -263.61604177204225
+              }
+            },
+            '6': {
+              nodeIndex: 6,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 396.12928785877017,
+                y: 5.377531745780232
+              }
             }
-          ],
+          },
           processFlow: [
             {
-              srcIdx: 0,
-              destIdx: 1
+              srcIdx: 1,
+              destIdx: 4
             },
             {
-              srcIdx: 1,
+              srcIdx: 4,
+              destIdx: 3
+            },
+            {
+              srcIdx: 3,
               destIdx: 2
             },
             {
-              srcIdx: 2,
-              destIdx: 3
+              srcIdx: 1,
+              destIdx: 5
+            },
+            {
+              srcIdx: 5,
+              destIdx: 2
+            },
+            {
+              srcIdx: 1,
+              destIdx: 6
+            },
+            {
+              srcIdx: 6,
+              destIdx: 2
             }
           ],
-          strategy: 'JUDGEMENT_IMMEDIATELY',
-          stopTransferStrategy: 'BY_ONE_RESULT',
-          continueTransferStrategy: 'BY_ALL_RESULT',
           createdAt: '2023-07-13T10:24:37.791672Z',
           createdBy: 'SYSTEM'
         }
@@ -231,8 +319,8 @@ export const ticketItem = {
     },
     {
       id: 'TD_OVERTIME',
-      createdAt: null,
-      createdBy: null,
+      createdAt: '2023-11-03T09:15:14.383Z',
+      createdBy: 'trang.lt',
       updatedAt: null,
       updatedBy: null,
       name: 'Đăng ký làm thêm giờ',
@@ -240,98 +328,148 @@ export const ticketItem = {
       revisions: [
         {
           rev: 1,
-          processNodes: [
-            {
-              groupCode: '__START__',
+          processNodes: {
+            '1': {
+              nodeIndex: 1,
               attributes: [
                 {
-                  name: 'start_time',
-                  description: 'Thời gian bắt đầu',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'end_time',
-                  description: 'Thời gian kết thúc',
-                  required: true,
-                  type: 'DATE_TIME',
-                  options: null,
-                  suggestion: null
-                },
-                {
-                  name: 'description',
-                  description: 'Mô tả',
-                  required: true,
+                  name: '1234214',
                   type: 'TEXT',
-                  options: null,
-                  suggestion: null
-                }
-              ]
-            },
-            {
-              groupCode: 'manager',
-              attributes: [
-                {
-                  name: 'note',
-                  description: 'Ý kiến',
                   required: true,
-                  type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: '__START__',
+              name: 'Khởi tạo phép',
+              type: 'input',
+              position: {
+                x: 0,
+                y: 103
+              }
             },
-
-            {
-              groupCode: 'hr',
+            '2': {
+              nodeIndex: 2,
+              groupCodes: '__END__',
+              name: 'Trạng thái cuối',
+              type: 'output',
+              position: {
+                x: 900,
+                y: 103
+              }
+            },
+            '3': {
+              nodeIndex: 3,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: true,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 628.514268530972,
+                y: 249.70009704155393
+              }
             },
-            {
-              groupCode: 'director',
+            '4': {
+              nodeIndex: 4,
               attributes: [
                 {
                   name: 'note',
-                  description: 'Ý kiến',
-                  required: true,
                   type: 'TEXT',
-                  options: null,
-                  suggestion: ['Tôi đồng ý', 'Tôi không đồng ý']
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
                 }
-              ]
+              ],
+              groupCodes: 'manager',
+              name: 'Quản lý trực tiếp',
+              type: 'selectorNode',
+              position: {
+                x: 306.19948369452777,
+                y: 248.10841909174434
+              }
             },
-            {
-              groupCode: '__END__',
-              attributes: null
+            '5': {
+              nodeIndex: 5,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'leadership',
+              name: 'Ban giám đốc',
+              type: 'selectorNode',
+              position: {
+                x: 413.63774530667587,
+                y: -263.61604177204225
+              }
+            },
+            '6': {
+              nodeIndex: 6,
+              attributes: [
+                {
+                  name: 'note',
+                  type: 'TEXT',
+                  required: true,
+                  options: [],
+                  suggestion: [],
+                  description: null
+                }
+              ],
+              groupCodes: 'hr',
+              name: 'HCNS',
+              type: 'selectorNode',
+              position: {
+                x: 396.12928785877017,
+                y: 5.377531745780232
+              }
             }
-          ],
+          },
           processFlow: [
             {
-              srcIdx: 0,
-              destIdx: 1
+              srcIdx: 1,
+              destIdx: 4
             },
             {
-              srcIdx: 1,
+              srcIdx: 4,
+              destIdx: 3
+            },
+            {
+              srcIdx: 3,
               destIdx: 2
             },
             {
-              srcIdx: 2,
-              destIdx: 3
+              srcIdx: 1,
+              destIdx: 5
+            },
+            {
+              srcIdx: 5,
+              destIdx: 2
+            },
+            {
+              srcIdx: 1,
+              destIdx: 6
+            },
+            {
+              srcIdx: 6,
+              destIdx: 2
             }
           ],
-          strategy: 'JUDGEMENT_IMMEDIATELY',
-          stopTransferStrategy: 'BY_ONE_RESULT',
-          continueTransferStrategy: 'BY_ALL_RESULT',
           createdAt: '2023-07-13T10:24:37.791725Z',
           createdBy: 'SYSTEM'
         }

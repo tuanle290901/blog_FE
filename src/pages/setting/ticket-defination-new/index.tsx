@@ -1,187 +1,160 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
-import ReactFlow, {
-  Background,
-  Controls,
-  addEdge,
-  useEdgesState,
-  useNodesState,
-  ReactFlowProvider,
-  Panel,
-  Position
-} from 'reactflow'
+import { Button, Popconfirm, Table, TableColumnsType, TablePaginationConfig, Tabs, Tooltip } from 'antd'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import { FC, memo, useEffect, useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ROLE } from '~/constants/app.constant'
+import { fetchListTicket } from '~/stores/features/setting/ticket-process.slice'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { IPaging } from '~/types/api-response.interface'
+import { ILeaveRequest } from '~/types/leave-request'
+import { hasPermission } from '~/utils/helper'
+import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 
-import CustomEdge from './component/CustomEdge'
+const Index: FC = memo(function Index() {
+  const { t } = useTranslation()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const listData: ILeaveRequest[] = useAppSelector((state) => state.ticketProcess.tickets)
+  const isLoading = useAppSelector((state) => state.leaveRequest.loading)
+  const meta: IPaging = useAppSelector((state) => state.leaveRequest.meta)
 
-import 'reactflow/dist/style.css'
-import CustomNode from './component/CustomNode'
-import { edgesMockup, nodesMockup } from './mockup/mockup'
-import './style.scss'
-import SourceNode from './component/SourceNodes'
-import { Button, Modal } from 'antd'
-import InitProps from './component/InitProps'
-import { Node } from '../ticket-defination/TicketDefinationCreate'
-
-const initialNodes = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'Khởi tạo phép', value: Node.START },
-    position: { x: 0, y: 103 },
-    sourcePosition: Position.Right
-  },
-  {
-    id: '2',
-    type: 'output',
-    data: { label: 'Trạng thái cuối', value: Node.END },
-    position: { x: 900, y: 103 },
-    targetPosition: Position.Left
+  const goToTicketProcessMap = (data: ILeaveRequest | null, type: 'view' | 'create' | 'update') => {
+    if (data && type === 'view') {
+      navigate(`${data.id}`)
+    } else {
+      navigate('create')
+    }
   }
-]
 
-const Index = () => {
-  const reactFlowWrapper = useRef<any>(null)
-  const nodeIndexRef = useRef<number>(initialNodes.length + 1)
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
-  const [selectedNode, setSelectedNode] = useState<any>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const nodeTypes = useMemo(
-    () => ({
-      selectorNode: CustomNode
-    }),
-    []
-  )
-
-  const edgeTypes = useMemo(
-    () => ({
-      custom: CustomEdge
-    }),
-    []
-  )
-
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges])
-
-  const onDragOver = useCallback((event: any) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-  }, [])
-
-  const onElementClick = useCallback((event: any, element: any) => {
-    setSelectedNode(element)
-  }, [])
-
-  const onDrop = useCallback(
-    (event: any) => {
-      event.preventDefault()
-
-      if (reactFlowWrapper.current) {
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
-        const type = event.dataTransfer.getData('application/reactflow')
-        const id = String(nodeIndexRef.current)
-        const title = event.dataTransfer.getData('title')
-        const groupCode = event.dataTransfer.getData('groupCode')
-
-        if (typeof type === 'undefined' || !type) {
-          return
-        }
-
-        if (reactFlowInstance) {
-          const position = reactFlowInstance.project({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top
-          })
-          const newNode = {
-            id,
-            type,
-            position,
-            data: { label: title, value: groupCode }
-          }
-
-          setNodes((nds) => nds.concat(newNode))
-          nodeIndexRef.current++
+  const columns = useMemo(() => {
+    const columns: TableColumnsType<ILeaveRequest> = [
+      {
+        key: 'name',
+        title: 'Tên quy trình',
+        width: 120,
+        dataIndex: 'name',
+        sorter: false,
+        showSorterTooltip: false,
+        ellipsis: true
+      },
+      {
+        key: 'description',
+        title: 'Mô tả',
+        width: 200,
+        dataIndex: 'description',
+        sorter: false,
+        showSorterTooltip: false,
+        ellipsis: true
+      },
+      {
+        key: 'createdAt',
+        title: 'Ngày tạo',
+        width: 100,
+        dataIndex: 'createdAt',
+        sorter: false,
+        showSorterTooltip: false,
+        ellipsis: true
+      },
+      {
+        key: 'createdBy',
+        title: 'Người tạo',
+        width: 100,
+        dataIndex: 'createdBy',
+        sorter: false,
+        showSorterTooltip: false,
+        ellipsis: true
+      },
+      {
+        title: t('userList.action'),
+        key: 'action',
+        align: 'center',
+        width: '120px',
+        render: (_, record) => {
+          return (
+            <div className='tw-bottom-[12px] tw-w-full'>
+              <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
+                <>
+                  <Tooltip title={'Xem quy trình'}>
+                    <Button
+                      onClick={() => goToTicketProcessMap(record, 'view')}
+                      size='small'
+                      icon={<EyeOutlined className='tw-text-blue-600' />}
+                    />
+                  </Tooltip>
+                  <Tooltip title={'Cập nhật quy trình'}>
+                    <Button
+                      onClick={() => goToTicketProcessMap(record, 'update')}
+                      size='small'
+                      icon={<EditOutlined className='tw-text-blue-600' />}
+                    />
+                  </Tooltip>
+                  <Tooltip title='Xóa quy trình'>
+                    <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => console.log}>
+                      <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                    </Popconfirm>
+                  </Tooltip>
+                </>
+              </div>
+            </div>
+          )
         }
       }
-    },
-    [reactFlowInstance]
-  )
-
-  const showModal = () => {
-    setIsModalOpen(true)
-  }
-
-  const handleOk = () => {
-    setIsModalOpen(false)
-  }
-
-  const handleCancel = () => {
-    setIsModalOpen(false)
-  }
-
-  useEffect(() => {
-    // setNodes(nodesMockup)
-    // setEdges(edgesMockup)
+    ]
+    return columns
   }, [])
 
+  const handleTableChange = (
+    pagination: TablePaginationConfig,
+    filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<ILeaveRequest> | any
+  ) => {
+    //TODO
+  }
+
   useEffect(() => {
-    if (selectedNode?.id) {
-      showModal()
-    }
-  }, [selectedNode])
+    dispatch(fetchListTicket())
+  }, [])
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <ReactFlowProvider>
-        <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
-          <InitProps />
-          {/* <SourceNode /> */}
-        </div>
-
-        <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onNodeDoubleClick={onElementClick}
-            fitView
-            attributionPosition='bottom-right'
-          >
-            <Panel position='top-right'>
-              <Button type='primary' onClick={() => console.log(nodes, edges)}>
-                Lưu thông tin
-              </Button>
-            </Panel>
-
-            <Panel
-              className='source-box-panel tw-w-[90%] tw-h-[60px] tw-bg-white tw-flex tw-items-center tw-justify-center'
-              position='bottom-center'
-            >
-              <SourceNode />
-            </Panel>
-            <Controls />
-            <Background gap={20} size={1} />
-          </ReactFlow>
-        </div>
-      </ReactFlowProvider>
-      <Modal title='Basic Modal' open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        {selectedNode && (
-          <>
-            <div>{selectedNode.id}</div>
-            <div>{selectedNode.data.label}</div>
-            <div>{selectedNode.data.value}</div>
-          </>
-        )}
-      </Modal>
+    <div className='tw-m-2 md:tw-m-4 tw-p-4 tw-bg-white'>
+      <div className='tw-mb-3'>
+        <h1 className='tw-text-2xl tw-font-semibold'>Quy trình phê duyệt</h1>
+        <h5 className='tw-text-sm'>Danh sách tất cả quy trình phê duyệt</h5>
+      </div>
+      <div className='tw-mt-3 tw-mb-3'>
+        <Button onClick={() => goToTicketProcessMap(null, 'view')} type='primary'>
+          Thêm mới quy trình
+        </Button>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={listData}
+        scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+        onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+        loading={isLoading}
+        pagination={{
+          className: 'd-flex justify-content-end align-items-center',
+          current: meta?.page + 1,
+          total: meta?.total,
+          defaultPageSize: meta?.size,
+          pageSize: meta?.size,
+          pageSizeOptions: ['10', '25', '50'],
+          showSizeChanger: true,
+          showQuickJumper: true,
+          responsive: true,
+          locale: {
+            items_per_page: `/ ${t('common.page')}`,
+            next_page: t('common.nextPage'),
+            prev_page: t('common.prevPage'),
+            jump_to: t('common.jumpTo'),
+            page: t('common.page')
+          },
+          position: ['bottomRight']
+        }}
+      />
     </div>
   )
-}
+})
 
 export default Index

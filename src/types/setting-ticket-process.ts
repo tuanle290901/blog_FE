@@ -57,8 +57,8 @@ export interface TicketTransfer {
 }
 
 export interface TicketProcessNode {
-  groupCode: string
-  groupCodes: string[]
+  groupCode?: string
+  groupCodes?: string[]
   attributes: TicketAttribute[]
   name?: string
   histories?: { executorId: string; createdAt: string; actualGroup: string }[]
@@ -66,6 +66,11 @@ export interface TicketProcessNode {
   value?: string
   executors?: string
   createdAt?: string
+  type?: string
+  position: {
+    x: number
+    y: number
+  }
 }
 
 export interface TicketProcessRevision {
