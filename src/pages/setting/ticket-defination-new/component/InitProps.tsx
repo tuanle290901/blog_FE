@@ -1,6 +1,5 @@
+import { Col, Form, Input, Row } from 'antd'
 import { FC } from 'react'
-import { Button, Col, Form, Input, Row } from 'antd'
-import { FormInitProp } from '../../ticket-defination/type/ItemTypes'
 
 const InitProps: FC<any> = function InitProps(props) {
   const { form } = props

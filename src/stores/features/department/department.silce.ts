@@ -11,14 +11,27 @@ export interface IDepartmentState {
   editingDepartment: DataType | null
   loading: boolean
   currentRequestId: string | null
+  listAll: DataType[]
 }
 
 const initialState: IDepartmentState = {
   listData: [],
   editingDepartment: null,
   loading: false,
-  currentRequestId: null
+  currentRequestId: null,
+  listAll: []
 }
+
+export const getAllDepartments = createAsyncThunk('departments/getAlls', async (_, thunkAPI) => {
+  try {
+    const response = await HttpService.get('/org/group/get-all', {
+      signal: thunkAPI.signal
+    })
+    return response?.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
 
 export const getListDepartments = createAsyncThunk('departments/getAll', async (_, thunkAPI) => {
   try {
@@ -97,6 +110,9 @@ const departmentSlice = createSlice({
       })
       .addCase(getListDepartments.fulfilled, (state, action) => {
         state.listData = [action.payload]
+      })
+      .addCase(getAllDepartments.fulfilled, (state, action) => {
+        state.listAll = action.payload
       })
       .addCase(updateDepartment.pending, (state) => {
         state.loading = true
