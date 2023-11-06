@@ -6,28 +6,21 @@ import {
   Button,
   Col,
   DatePicker,
-  Form,
-  FormInstance,
   Input,
-  InputRef,
   Row,
   Space,
   Table,
   TableColumnsType,
   TablePaginationConfig,
-  message,
   notification
 } from 'antd'
-import { useForm } from 'antd/es/form/Form'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
-import { useCompactItemContext } from 'antd/lib/space/Compact'
-import { ColumnsType } from 'antd/lib/table'
 import dayjs from 'dayjs'
 import { saveAs } from 'file-saver'
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { COMMON_ERROR_CODE } from '~/constants/app.constant'
-import { exportBenefit, searchBenefit, updateBenefit } from '~/stores/features/benefit/benefit.silce'
+import { exportBenefit, importBenefit, searchBenefit, updateBenefit } from '~/stores/features/benefit/benefit.silce'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { IPaging, ISort } from '~/types/api-response.interface'
@@ -39,8 +32,17 @@ const Benefit: React.FC = () => {
   const fileSelect = useRef<any>(null)
   const timerId = useRef<any>(null)
   const dispatch = useAppDispatch()
-  const { userInfo } = useUserInfo()
-  const dataBenefit = useAppSelector((state: { benefit: { listData: IBenefit[]; meta: IPaging } }) => state.benefit)
+  const dataBenefit = useAppSelector(
+    (state: { benefit: { listData: IBenefit[]; meta: IPaging; loading: boolean } }) => state.benefit
+  )
+  const [dataRender, setDataRender] = useState<{
+    listData: IBenefit[]
+    loading: boolean
+  }>({
+    listData: [],
+    loading: false
+  })
+
   const [searchValue, setSearchValue] = useState<IBenefitFilter>({
     search: '',
     year: 0,
@@ -109,8 +111,10 @@ const Benefit: React.FC = () => {
           notification.success({
             message: response.message
           })
-        } catch (error) {
-          console.log(error)
+        } catch (error: any) {
+          notification.success({
+            message: e.message
+          })
         }
       }
     }
@@ -156,7 +160,8 @@ const Benefit: React.FC = () => {
               onSaveBanace(e, record)
             }}
             onBlur={(e) => onSaveBanace(e, record)}
-            defaultValue={Number(value)}
+            defaultValue={Number(record.balance)}
+            // value={Number(record.balance)}
             type='number'
             max={5760}
             maxLength={4}
@@ -165,66 +170,7 @@ const Benefit: React.FC = () => {
         )
       }
     }
-    // {
-    //   title: t('Benefit.action'),
-    //   key: 'action',
-    //   align: 'center',
-    //   width: '120px',
-    //   render: (_, record) => {
-    //     return (
-    //       <div className='tw-bottom-[12px] tw-w-full'>
-    //         <div className='tw-flex tw-gap-2 tw-justify-center tw-items-center'>
-    //           <Space>
-    //             {editBenefit.openInput === true &&
-    //             editBenefit.item &&
-    //             record.userName === editBenefit.item?.userName ? (
-    //               <>
-    //                 <Tooltip title='Vô hiệu hóa tài khoản'>
-    //                   <Button size='small' icon={<SaveOutlined className='tw-text-yellow-600' />} />
-    //                 </Tooltip>
-    //                 <Tooltip title='Vô hiệu hóa tài khoản'>
-    //                   <Button
-    //                     size='small'
-    //                     icon={<CloseOutlined className='tw-text-red-600' />}
-    //                     onClick={() => {
-    //                       setEditBenefit({
-    //                         openInput: false,
-    //                         item: null
-    //                       })
-    //                     }}
-    //                   />
-    //                 </Tooltip>
-    //               </>
-    //             ) : (
-    //               <Tooltip title={'Cập nhật thông tin của thành viên'}>
-    //                 <Button
-    //                   size='small'
-    //                   onClick={() =>
-    //                     setEditBenefit({
-    //                       openInput: true,
-    //                       item: record
-    //                     })
-    //                   }
-    //                   icon={<EditOutlined className='tw-text-blue-600' />}
-    //                 />
-    //               </Tooltip>
-    //             )}
-    //           </Space>
-    //         </div>
-    //       </div>
-    //     )
-    //   }
-    // }
   ]
-
-  const handleSearchValueChange = (value: string) => {
-    if (timerId.current) {
-      clearTimeout(timerId.current)
-    }
-    timerId.current = setTimeout(() => {
-      setSearchValue((prevState) => ({ ...prevState, search: value, paging: { ...prevState.paging, page: 0 } }))
-    }, 500)
-  }
 
   const resetPage = () => {
     let yearNumber = dayjs().year()
@@ -243,19 +189,6 @@ const Benefit: React.FC = () => {
         totalPage: 0
       }
     }
-    dispatch(
-      searchBenefit({
-        search: payloadBody.search.trim(),
-        year: payloadBody.year.toString(),
-        paging: payloadBody.paging,
-        sorts: [
-          {
-            field: 'created_at',
-            direction: 'DESC'
-          }
-        ]
-      })
-    )
     setSearchValue({
       search: payloadBody.search,
       year: payloadBody.year,
@@ -279,12 +212,11 @@ const Benefit: React.FC = () => {
           sorts: searchValue.sorts
         })
       )
-
       return () => {
         promise.abort()
       }
     }
-  }, [searchValue])
+  }, [dispatch, searchValue])
 
   function handleTableChange(
     pagination: TablePaginationConfig,
@@ -309,9 +241,6 @@ const Benefit: React.FC = () => {
       return { ...prevState, paging, sorts }
     })
   }
-  const openModalCreateUser = () => {
-    // setIsOpenUserModal(true)
-  }
 
   const handleFileChange = async (files: FileList | null) => {
     if (files && files.length) {
@@ -322,9 +251,13 @@ const Benefit: React.FC = () => {
         notification.error({ message: 'Vui lòng chọn file có định dạng xlsx hoặc xls' })
       } else {
         try {
-          // await dispatch(importUser(file)).unwrap()
-          notification.success({ message: 'Import thành viên thành công' })
-          // resetAndSearchUser()
+          await dispatch(importBenefit(file)).unwrap()
+          notification.success({ message: 'Import số giờ phép thành công' })
+          setDataRender({
+            loading: true,
+            listData: []
+          })
+          resetPage()
         } catch (e: any) {
           if (e.status && !COMMON_ERROR_CODE.includes(e.status)) {
             notification.error({ message: e.message })
@@ -336,6 +269,15 @@ const Benefit: React.FC = () => {
       fileSelect.current.value = ''
     }
   }
+
+  useEffect(() => {
+    if (dataBenefit.loading === false) {
+      setDataRender({
+        loading: false,
+        listData: [...dataBenefit.listData]
+      })
+    }
+  }, [dataBenefit.listData, dataBenefit.loading])
 
   const onDownloadExportBenefit = async () => {
     let yearNumber = dayjs().year()
@@ -377,51 +319,9 @@ const Benefit: React.FC = () => {
     })
   }
 
-  // const handleSave = (row: IBenefit) => {
-  //   console.log(row)
-  //   // const newData = [...dataSource]
-  //   // const index = newData.findIndex((item) => row.key === item.key)
-  //   // const item = newData[index]
-  //   // newData.splice(index, 1, {
-  //   //   ...item,
-  //   //   ...row
-  //   // })
-  //   // setDataSource(newData)
-  // }
-
-  // const components = {
-  //   body: {
-  //     row: EditableRow,
-  //     cell: EditableCell
-  //   }
-  // }
-
-  // const columns = columnsDefault.map((col) => {
-  //   if (!col.editable) {
-  //     return col
-  //   }
-  //   return {
-  //     ...col,
-  //     onCell: (record: IBenefit) => ({
-  //       record,
-  //       editable: col.editable,
-  //       dataIndex: col.dataIndex,
-  //       title: col.title,
-  //       handleSave
-  //     })
-  //   }
-  // })
   return (
     <div className='tw-min-h-[calc(100%-32px)] tw-bg-white tw-m-2 md:tw-m-4'>
       <div className='benefit-list tw-p-2 md:tw-p-4'>
-        {/* {(isOpenUserModal || !!userState.editingUser) && (
-          <UserCreateEdit
-            open={isOpenUserModal || !!userState.editingUser}
-            userData={userState.editingUser}
-            handleClose={handleCloseUserModal}
-            resetPageUser={resetPageUser}
-          />
-        )} */}
         <div>
           <h1 className='tw-text-2xl tw-font-semibold'>
             {t('benefit.member')} ({dataBenefit.meta.total})
@@ -447,11 +347,7 @@ const Benefit: React.FC = () => {
                   />
                 </Button>
 
-                <Button
-                  icon={<VerticalAlignBottomOutlined />}
-                  className='timesheet-filter__export'
-                  onClick={() => onDownloadExportBenefit()}
-                >
+                <Button icon={<VerticalAlignBottomOutlined />} type='primary' onClick={() => onDownloadExportBenefit()}>
                   {t('Xuất thông tin')}
                 </Button>
               </Space>
@@ -474,26 +370,28 @@ const Benefit: React.FC = () => {
         </Row>
 
         <div className='tw-mt-6 benefit-table'>
-          <Table
-            columns={columns}
-            dataSource={dataBenefit.listData}
-            loading={dataBenefit.loading}
-            className='benefit-table-antd'
-            rowClassName={() => 'editable-row'}
-            rowKey={(record) => record.userName}
-            pagination={{
-              total: dataBenefit.meta.total,
-              defaultPageSize: dataBenefit?.meta?.size,
-              pageSize: dataBenefit?.meta?.size,
-              pageSizeOptions: [5, 10, 15, 25, 50],
-              showSizeChanger: true,
-              showQuickJumper: true,
-              current: searchValue.paging.page + 1,
-              responsive: true
-            }}
-            scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
-            onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
-          />
+          {dataRender.loading === false && (
+            <Table
+              columns={columns}
+              dataSource={dataRender.listData}
+              loading={dataRender.loading}
+              className='benefit-table-antd'
+              rowClassName={() => 'editable-row'}
+              rowKey={(record) => record.userName}
+              pagination={{
+                total: dataBenefit.meta.total,
+                defaultPageSize: dataBenefit?.meta?.size,
+                pageSize: dataBenefit?.meta?.size,
+                pageSizeOptions: [5, 10, 15, 25, 50],
+                showSizeChanger: true,
+                showQuickJumper: true,
+                current: searchValue.paging.page + 1,
+                responsive: true
+              }}
+              scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
+              onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { Benefit } from '~/pages/benefit'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import HttpService from '~/config/api'
 import { END_POINT_API } from '~/config/endpointapi'
@@ -104,6 +103,25 @@ export const exportBenefit = async (payload: { year: string; paging: IPaging; so
   return response
 }
 
+export const importBenefit = createAsyncThunk('benefit/importBenefit', async (payload: File, thunkAPI) => {
+  try {
+    const form = new FormData()
+    form.append('file', payload)
+    await HttpService.post(END_POINT_API.Benefit.import(), form, {
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    // return response
+  } catch (error: any) {
+    if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
+      return thunkAPI.rejectWithValue(error.response.data)
+    }
+    throw error
+  }
+})
+
 const BenefitSlice = createSlice({
   name: 'benefit',
   initialState,
@@ -119,7 +137,11 @@ const BenefitSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(searchBenefit.pending, (state, action) => {
+        state.loading = true
+      })
       .addCase(searchBenefit.fulfilled, (state, action) => {
+        state.loading = false
         state.listData = action.payload.data
         state.meta = action.payload.meta
       })
