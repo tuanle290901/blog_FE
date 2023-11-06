@@ -25,6 +25,7 @@ export interface ITicketDef {
   approvalSteps: IApprovalStep[]
   currentRequestId: string | null
   tickets: any[]
+  listRevisionsByTicketType: any[]
   ticketSelected: TicketDefRevisionCreateReq | null
 }
 
@@ -74,7 +75,9 @@ export interface TicketProcessNode {
 }
 
 export interface TicketProcessRevision {
-  rev?: number
+  rev?: string
+  applyFromDate: string
+  applyToDate?: string
   startNodeIndex?: number
   endNodeIndex?: number
   continueTransferStrategy?: string[]
@@ -90,8 +93,15 @@ export interface TicketProcessRevision {
 
 export interface TicketDefRevisionCreateReq {
   id?: string
-  name: string
+  ticketType: string
+  name?: string
   description?: string
   revision: TicketProcessRevision
   ticketDefId: string
+  revisions?: TicketProcessRevision[]
+}
+
+export interface SearchPayload {
+  rev?: string | null
+  ticketType?: string | null
 }

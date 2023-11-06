@@ -17,29 +17,33 @@ import CustomEdge from './component/CustomEdge'
 import { Button, Form } from 'antd'
 import 'reactflow/dist/style.css'
 import { TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
-import { Node } from '../ticket-defination/TicketDefinationCreate'
 import ModalInitAttr from '../ticket-defination/component/ModalInitAttrr'
 import CustomNode from './component/CustomNode'
 import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
-import { edgesMockup, nodesMockup } from './mockup/mockup'
 import './style.scss'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { getTicketById } from '~/stores/features/setting/ticket-process.slice'
+import { createRevision, getTicketById } from '~/stores/features/setting/ticket-process.slice'
+import { getAllDepartments } from '~/stores/features/department/department.silce'
+
+export const NodeItem = {
+  START: 'START',
+  END: 'END'
+}
 
 const initialNodes = [
   {
     id: '1',
     type: 'input',
-    data: { label: 'Khởi tạo', value: Node.START },
+    data: { label: 'Khởi tạo', value: NodeItem.START },
     position: { x: 0, y: 103 },
     sourcePosition: Position.Right
   },
   {
     id: '2',
     type: 'output',
-    data: { label: 'Trạng thái cuối', value: Node.END },
+    data: { label: 'Trạng thái cuối', value: NodeItem.END },
     position: { x: 900, y: 103 },
     targetPosition: Position.Left
   }
@@ -48,7 +52,7 @@ const initialNodes = [
 const Index = () => {
   const { id } = useParams()
   const dispatch = useAppDispatch()
-  const ticketSelected = useAppSelector((state) => state.ticketProcess.ticketSelected)
+  const { ticketType } = useParams()
   const reactFlowWrapper = useRef<any>(null)
   const nodeIndexRef = useRef<number>(initialNodes.length + 1)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
@@ -206,9 +210,14 @@ const Index = () => {
     const ticketRevision: TicketProcessRevision = Object.create(null)
 
     const { name, description } = initPropForm.getFieldsValue()
-    ticketReq.name = name
-    ticketReq.description = description
+    if (ticketType) {
+      ticketReq.ticketType = ticketType
+      ticketReq.description = '1235'
+    }
 
+    ticketRevision.applyFromDate = '2023-11-03T13:21:46.244Z'
+    ticketRevision.applyToDate = ''
+    ticketRevision.rev = 'v1.3.0'
     ticketRevision.processFlow = edges.map((edge) => {
       return {
         srcIdx: Number(edge.source),
@@ -227,7 +236,7 @@ const Index = () => {
       const value = {
         nodeIndex: Number(array[i].id),
         attributes: array[i].data?.initAttr,
-        groupCodes: array[i].data?.value,
+        groupCode: array[i].data?.value,
         name: array[i].data?.label,
         type: array[i].type,
         position: array[i].position
@@ -260,7 +269,8 @@ const Index = () => {
   }
 
   const onSave = () => {
-    console.log(JSON.stringify(mappingPayload(nodes, edges)))
+    const payload = mappingPayload(nodes, edges)
+    dispatch(createRevision(payload))
   }
 
   useEffect(() => {
@@ -270,23 +280,20 @@ const Index = () => {
   }, [selectedNode])
 
   useEffect(() => {
-    dispatch(getTicketById({ id }))
-  }, [id])
-
-  useEffect(() => {
-    if (ticketSelected) {
-      mappingResponse(ticketSelected)
+    if (id) {
+      dispatch(getTicketById({ id }))
     }
-  }, [ticketSelected])
+  }, [id])
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ReactFlowProvider>
-        <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
-          <InitProps form={initPropForm} />
+        <div className='ticket-top-control tw-bg-white tw-h-[10%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
+          {/* <InitProps form={initPropForm} /> */}
+          <h2 className='tw-text-lg tw-font-semibold'>Tạo mới phiên bản</h2>
         </div>
 
-        <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
+        <div className='ticket-bottom-control reactflow-wrapper tw-h-[90%] tw-w-full' ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
