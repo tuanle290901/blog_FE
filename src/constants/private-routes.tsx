@@ -35,7 +35,8 @@ export const PRIVATE_PATH = {
     ticketProcessDefinition: 'ticket-process-definition',
     ticketProcessDefinitionNew: 'ticket-definition',
     ticketDefinitionById: 'ticket-definition/:id',
-    ticketDefinitionCreate: 'ticket-definition/create-revison/:ticketType'
+    ticketDefinitionCreate: 'ticket-definition/create-revison/:ticketType',
+    ticketDefinitionView: 'ticket-definition/view-revison/:ticketType/:rev'
   },
   department: {
     prefix: 'department'
@@ -96,6 +97,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: 'ticket-definition/create-revision',
     path: PRIVATE_PATH.setting.ticketDefinitionCreate,
+    component: TicketDefinationNew,
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
+  },
+  {
+    name: 'ticket-definition/view-revision',
+    path: PRIVATE_PATH.setting.ticketDefinitionView,
     component: TicketDefinationNew,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },

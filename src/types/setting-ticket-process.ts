@@ -27,6 +27,7 @@ export interface ITicketDef {
   tickets: any[]
   listRevisionsByTicketType: any[]
   ticketSelected: TicketDefRevisionCreateReq | null
+  revisionSelected: TicketProcessRevision | null
 }
 
 export interface DragItem {
@@ -59,7 +60,7 @@ export interface TicketTransfer {
 
 export interface TicketProcessNode {
   groupCode?: string
-  groupCodes?: string[]
+  groupCodes?: string[] | any
   attributes: TicketAttribute[]
   name?: string
   histories?: { executorId: string; createdAt: string; actualGroup: string }[]
@@ -75,6 +76,7 @@ export interface TicketProcessNode {
 }
 
 export interface TicketProcessRevision {
+  id?: string
   rev?: string
   applyFromDate: string
   applyToDate?: string
