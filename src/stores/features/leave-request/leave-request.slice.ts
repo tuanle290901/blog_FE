@@ -14,6 +14,7 @@ import {
 } from '~/types/leave-request'
 import { TicketDefinationResponse } from '~/types/leave-request.interface'
 import dayjs, { Dayjs } from 'dayjs'
+import { ticketItem } from '../setting/fake-data'
 export interface ILeaveRequestState {
   listData: ILeaveRequest[]
   ticketItemSelected: ILeaveRequest
@@ -163,8 +164,8 @@ export const resetLeaveRequest = createAsyncThunk('leave-request/reset', async (
 
 export const getAllDefinationType = createAsyncThunk('tickets/definitions', async (_, thunkAPI) => {
   try {
-    const response: IApiResponse<TicketDefinationResponse> = await HttpService.get('tickets/definitions')
-    return response.data
+    // const response: IApiResponse<TicketDefinationResponse> = await HttpService.get('tickets/definitions')
+    return ticketItem.data
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)

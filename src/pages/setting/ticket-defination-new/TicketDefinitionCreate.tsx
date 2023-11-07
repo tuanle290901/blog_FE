@@ -306,7 +306,7 @@ const Index = () => {
     if (rev && ticketType) {
       const payload: SearchPayload = Object.create(null)
       payload.ticketType = ticketType
-      payload.rev = rev
+      payload.rev = replaceRouterString(rev, 'dash')
       dispatch(approvalRevision(payload))
       notification.success({ message: 'Thao tác thành công' })
     }

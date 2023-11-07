@@ -28,6 +28,7 @@ export interface ITicketDef {
   listRevisionsByTicketType: any[]
   ticketSelected: TicketDefRevisionCreateReq | null
   revisionSelected: TicketProcessRevision | null
+  currentRevision: TicketDefRevisionCreateReq | null
 }
 
 export interface DragItem {
