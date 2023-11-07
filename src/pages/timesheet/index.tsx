@@ -207,7 +207,6 @@ const Timesheet: React.FC = () => {
   }
 
   const renderStatusByPayrollAmount = (reportData: IReportData) => {
-    console.log(reportData, 'report data')
     if (reportData?.payrollAmount === null) return
     if (reportData?.payrollAmount < 8 || reportData?.violates?.length > 0) {
       return (

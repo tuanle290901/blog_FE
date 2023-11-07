@@ -1,0 +1,10 @@
+{
+  "benefit": {
+    "userName": "Tên đăng nhập",
+    "joinDate": "Ngày gia nhập",
+    "balance": "Tổng thời gia được sử dụng",
+    "action": "Hành động",
+    "member": "Số thành viên",
+    "memberList": "Danh sách tất cả các thành viên"
+  }
+}
