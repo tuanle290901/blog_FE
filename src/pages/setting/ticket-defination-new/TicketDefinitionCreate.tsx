@@ -14,18 +14,18 @@ import ReactFlow, {
 
 import CustomEdge from './component/CustomEdge'
 
-import { Button, Form } from 'antd'
+import { Button, Col, Form, Input, Row } from 'antd'
+import { useNavigate, useParams } from 'react-router-dom'
 import 'reactflow/dist/style.css'
-import { TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
+import { createRevision, getOneRevisionByKey } from '~/stores/features/setting/ticket-process.slice'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { SearchPayload, TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
 import ModalInitAttr from '../ticket-defination/component/ModalInitAttrr'
 import CustomNode from './component/CustomNode'
-import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
 import './style.scss'
-import { useParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { createRevision, getTicketById } from '~/stores/features/setting/ticket-process.slice'
-import { getAllDepartments } from '~/stores/features/department/department.silce'
+import { replaceRouterString } from '~/utils/helper'
+import InitProps from './component/InitProps'
 
 export const NodeItem = {
   START: 'START',
@@ -50,15 +50,16 @@ const initialNodes = [
 ]
 
 const Index = () => {
-  const { id } = useParams()
   const dispatch = useAppDispatch()
-  const { ticketType } = useParams()
+  const navigate = useNavigate()
+  const { ticketType, rev } = useParams()
   const reactFlowWrapper = useRef<any>(null)
   const nodeIndexRef = useRef<number>(initialNodes.length + 1)
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<any>(null)
+  const revisionSelected = useAppSelector((state) => state.ticketProcess.revisionSelected)
 
   const [initAttrForm] = Form.useForm()
   const [initPropForm] = Form.useForm()
@@ -187,10 +188,10 @@ const Index = () => {
 
   const mappingResponse = (response: any) => {
     if (response && response.id) {
-      const processFlow = response.revisions[0].processFlow
-      const processNodes = response.revisions[0].processNodes
+      const processFlow = response.revision.processFlow
+      const processNodes = response.revision.processNodes
 
-      const nodes = convertObjToArray(processNodes)
+      const nodes: any = convertObjToArray(processNodes)
       const edges = processFlow.map((e: any) => {
         return {
           source: String(e.srcIdx),
@@ -248,19 +249,21 @@ const Index = () => {
 
   const convertObjToArray = (obj: any) => {
     return Object.keys(obj).map((key) => {
+      const isInput = obj[key].nodeIndex === '1'
+      const isOutput = obj[key].nodeIndex === '2'
       return {
         id: String(obj[key].nodeIndex),
-        type: obj[key].type,
+        type: isInput ? 'input' : isOutput ? 'output' : 'selectorNode',
         data: {
           label: obj[key].name,
           value: obj[key].groupCodes,
           initAttr: obj[key].attributes
         },
         position: obj[key].position,
-        sourcePosition: obj[key].type === 'input' ? 'right' : null,
-        targetPosition: obj[key].type === 'output' ? 'left' : null,
-        with: obj[key].type === 'input' || obj[key].type === 'output' ? 150 : 140,
-        height: obj[key].type === 'input' || obj[key].type === 'output' ? 34 : 140,
+        sourcePosition: isInput ? 'right' : null,
+        targetPosition: isOutput ? 'left' : null,
+        with: isInput || isOutput ? 150 : 140,
+        height: isInput || isOutput ? 34 : 140,
         selected: false,
         dragging: false,
         positionAbsolute: obj[key].position
@@ -280,20 +283,28 @@ const Index = () => {
   }, [selectedNode])
 
   useEffect(() => {
-    if (id) {
-      dispatch(getTicketById({ id }))
+    if (ticketType && rev) {
+      const payload: SearchPayload = Object.create(null)
+      payload.ticketType = ticketType
+      payload.rev = replaceRouterString(rev, 'dash')
+      dispatch(getOneRevisionByKey(payload))
     }
-  }, [id])
+  }, [ticketType, rev, dispatch])
+
+  useEffect(() => {
+    if (revisionSelected && revisionSelected.id) {
+      mappingResponse(revisionSelected)
+    }
+  }, [revisionSelected])
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ReactFlowProvider>
-        <div className='ticket-top-control tw-bg-white tw-h-[10%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
-          {/* <InitProps form={initPropForm} /> */}
-          <h2 className='tw-text-lg tw-font-semibold'>Tạo mới phiên bản</h2>
+        <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
+          <InitProps form={initPropForm} />
         </div>
 
-        <div className='ticket-bottom-control reactflow-wrapper tw-h-[90%] tw-w-full' ref={reactFlowWrapper}>
+        <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -310,6 +321,11 @@ const Index = () => {
             selectionOnDrag={true}
             attributionPosition='bottom-right'
           >
+            <Panel position='top-left'>
+              <Button type='default' onClick={() => navigate('/ticket-definition')}>
+                Quay lại
+              </Button>
+            </Panel>
             <Panel position='top-right'>
               <Button type='primary' onClick={() => onSave()}>
                 Lưu thông tin

@@ -1,10 +1,16 @@
 import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Popconfirm, Table, TableColumnsType, Tooltip } from 'antd'
+import { Button, Popconfirm, Table, TableColumnsType, Tooltip, notification } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { deleteRevision } from '~/stores/features/setting/ticket-process.slice'
+import {
+  deleteRevision,
+  fetchListTicket,
+  getListRevisionByTicketType,
+  getTicketById
+} from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { SearchPayload, TicketProcessRevision } from '~/types/setting-ticket-process'
+import { replaceRouterString } from '~/utils/helper'
 
 const TabItems = () => {
   const navigate = useNavigate()
@@ -13,20 +19,22 @@ const TabItems = () => {
   const listRevByTicketType = useAppSelector((state) => state.ticketProcess.listRevisionsByTicketType)
   const isLoading = useAppSelector((state) => state.ticketProcess.loading)
 
-  const goToTicketProcessMap = (type: 'view' | 'create' | 'update') => {
-    if (type === 'view') {
-      navigate(`create-revison/${ticketSelected?.id}`)
+  const goToTicketProcessMap = (data: any, type: 'view' | 'create' | 'update') => {
+    if (type === 'view' && data && data.rev && data.ticketType) {
+      navigate(`view-revison/${data?.ticketType}/${replaceRouterString(data.rev, 'dot')}`)
     } else {
       navigate(`create-revison/${ticketSelected?.id}`)
     }
   }
 
-  const deleteRev = (record: any) => {
+  const deleteRev = async (record: any) => {
     if (record && record.rev) {
       const payload: SearchPayload = Object.create(null)
       payload.rev = record.rev
       payload.ticketType = record.ticketType
-      dispatch(deleteRevision(payload))
+      await dispatch(deleteRevision(payload))
+      await dispatch(getListRevisionByTicketType({ rev: null, ticketType: payload.ticketType }))
+      notification.success({ message: 'Thao tác thành công' })
     }
   }
 
@@ -80,7 +88,7 @@ const TabItems = () => {
                 <>
                   <Tooltip title='Xem phiên bản này'>
                     <Button
-                      onClick={() => goToTicketProcessMap('view')}
+                      onClick={() => goToTicketProcessMap(record, 'view')}
                       size='small'
                       icon={<EyeOutlined className='tw-text-blue-600' />}
                     />
@@ -106,7 +114,7 @@ const TabItems = () => {
   return (
     <div>
       <div className='tw-mb-2 tw-flex tw-items-center'>
-        <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap('view')}>
+        <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
           Tạo phiên bản mới
         </Button>
       </div>

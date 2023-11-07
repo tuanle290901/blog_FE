@@ -9,7 +9,6 @@ import { getAllDepartments } from '~/stores/features/department/department.silce
 export const SourceNode = () => {
   const dispatch = useAppDispatch()
   const listDepartment = useAppSelector((state) => state.department.listAll)
-  console.log(listDepartment, 'sss')
   const onDragStart = (event: any, nodeType: any, item: any) => {
     event.dataTransfer.setData('application/reactflow', nodeType)
     event.dataTransfer.setData('id', uuidv4())

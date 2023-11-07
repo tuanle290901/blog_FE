@@ -13,6 +13,7 @@ const initialState: ITicketDef = {
   createRevisionSuccess: false,
   currentRequestId: null,
   listRevisionsByTicketType: [],
+  revisionSelected: null,
   approvalSteps: [
     {
       index: 0,
@@ -64,6 +65,16 @@ export const getListRevisionByTicketType = createAsyncThunk(
   'tickets_definitions/getAll',
   async (payload: SearchPayload, thunkAPI) => {
     const response = await HttpService.post<any[]>('/tickets_definitions/search', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
+  }
+)
+
+export const getOneRevisionByKey = createAsyncThunk(
+  'tickets_definitions/get_one_by_key',
+  async (payload: SearchPayload, thunkAPI) => {
+    const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload, {
       signal: thunkAPI.signal
     })
     return response
@@ -164,6 +175,9 @@ const ticketProcessSlice = createSlice({
       })
       .addCase(getListRevisionByTicketType.fulfilled, (state: ITicketDef, action) => {
         state.listRevisionsByTicketType = action.payload.data
+      })
+      .addCase(getOneRevisionByKey.fulfilled, (state: ITicketDef, action) => {
+        state.revisionSelected = action.payload.data
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),
