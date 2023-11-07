@@ -12,37 +12,49 @@ import ReactFlow, {
   useNodesState
 } from 'reactflow'
 
+import dayjs from 'dayjs'
 import CustomEdge from './component/CustomEdge'
 
-import { Button, Col, Form, Input, Row } from 'antd'
+import { Button, Form, Popconfirm, notification } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import 'reactflow/dist/style.css'
-import { createRevision, getOneRevisionByKey } from '~/stores/features/setting/ticket-process.slice'
+import {
+  approvalRevision,
+  createRevision,
+  getOneRevisionByKey,
+  resetRevisionSelected
+} from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { SearchPayload, TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
+import { replaceRouterString } from '~/utils/helper'
 import ModalInitAttr from '../ticket-defination/component/ModalInitAttrr'
 import CustomNode from './component/CustomNode'
+import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
 import './style.scss'
-import { replaceRouterString } from '~/utils/helper'
-import InitProps from './component/InitProps'
 
 export const NodeItem = {
   START: 'START',
   END: 'END'
 }
 
+export const NodeItemType = {
+  INPUT: 'input',
+  OUTPUT: 'output',
+  SELECTOR: 'selectorNode'
+}
+
 const initialNodes = [
   {
     id: '1',
-    type: 'input',
+    type: NodeItemType.INPUT,
     data: { label: 'Khởi tạo', value: NodeItem.START },
     position: { x: 0, y: 103 },
     sourcePosition: Position.Right
   },
   {
     id: '2',
-    type: 'output',
+    type: NodeItemType.OUTPUT,
     data: { label: 'Trạng thái cuối', value: NodeItem.END },
     position: { x: 900, y: 103 },
     targetPosition: Position.Left
@@ -188,6 +200,14 @@ const Index = () => {
 
   const mappingResponse = (response: any) => {
     if (response && response.id) {
+      initPropForm.setFieldsValue({
+        rev: response.revision.rev,
+        applyFromDate: dayjs(response.revision.applyFromDate)
+      })
+
+      if (response.revision.applyToDate) {
+        initPropForm.setFieldValue('applyToDate', dayjs(response.revision.applyToDate))
+      }
       const processFlow = response.revision.processFlow
       const processNodes = response.revision.processNodes
 
@@ -210,15 +230,14 @@ const Index = () => {
     const ticketReq: TicketDefRevisionCreateReq = Object.create(null)
     const ticketRevision: TicketProcessRevision = Object.create(null)
 
-    const { name, description } = initPropForm.getFieldsValue()
+    const { rev, applyFromDate, applyToDate } = initPropForm.getFieldsValue()
     if (ticketType) {
       ticketReq.ticketType = ticketType
-      ticketReq.description = '1235'
     }
 
-    ticketRevision.applyFromDate = '2023-11-03T13:21:46.244Z'
-    ticketRevision.applyToDate = ''
-    ticketRevision.rev = 'v1.3.0'
+    ticketRevision.applyFromDate = applyFromDate
+    ticketRevision.applyToDate = applyToDate
+    ticketRevision.rev = rev
     ticketRevision.processFlow = edges.map((edge) => {
       return {
         srcIdx: Number(edge.source),
@@ -253,7 +272,7 @@ const Index = () => {
       const isOutput = obj[key].nodeIndex === '2'
       return {
         id: String(obj[key].nodeIndex),
-        type: isInput ? 'input' : isOutput ? 'output' : 'selectorNode',
+        type: isInput ? NodeItemType.INPUT : isOutput ? NodeItemType.OUTPUT : NodeItemType.SELECTOR,
         data: {
           label: obj[key].name,
           value: obj[key].groupCodes,
@@ -271,9 +290,26 @@ const Index = () => {
     })
   }
 
-  const onSave = () => {
+  const onSave = async () => {
+    const { rev, applyFromDate } = initPropForm.getFieldsValue()
+    if (!rev || !applyFromDate) {
+      notification.warning({ message: 'Vui lòng nhập các thông tin bắt buộc' })
+      return
+    }
     const payload = mappingPayload(nodes, edges)
-    dispatch(createRevision(payload))
+    await dispatch(createRevision(payload))
+    navigate(`../ticket-definition/view-revison/${payload.ticketType}/${payload.revision.rev}`)
+    notification.success({ message: 'Thao tác thành công' })
+  }
+
+  const onApprove = () => {
+    if (rev && ticketType) {
+      const payload: SearchPayload = Object.create(null)
+      payload.ticketType = ticketType
+      payload.rev = rev
+      dispatch(approvalRevision(payload))
+      notification.success({ message: 'Thao tác thành công' })
+    }
   }
 
   useEffect(() => {
@@ -289,11 +325,15 @@ const Index = () => {
       payload.rev = replaceRouterString(rev, 'dash')
       dispatch(getOneRevisionByKey(payload))
     }
-  }, [ticketType, rev, dispatch])
+  }, [ticketType, rev])
 
   useEffect(() => {
     if (revisionSelected && revisionSelected.id) {
       mappingResponse(revisionSelected)
+    }
+
+    return () => {
+      dispatch(resetRevisionSelected())
     }
   }, [revisionSelected])
 
@@ -327,9 +367,23 @@ const Index = () => {
               </Button>
             </Panel>
             <Panel position='top-right'>
-              <Button type='primary' onClick={() => onSave()}>
-                Lưu thông tin
-              </Button>
+              {rev && ticketType && (
+                <Popconfirm
+                  title='Duyệt quy trình'
+                  description='Bạn có chắc chắn thực hiện?'
+                  onConfirm={onApprove}
+                  okText='Đồng ý'
+                  cancelText='Hủy'
+                >
+                  <Button type='primary'>Duyệt yêu cầu</Button>
+                </Popconfirm>
+              )}
+
+              {(!rev || !ticketType) && (
+                <Button type='primary' onClick={() => onSave()}>
+                  Lưu thông tin
+                </Button>
+              )}
             </Panel>
 
             <Panel

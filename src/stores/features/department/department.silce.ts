@@ -112,7 +112,11 @@ const departmentSlice = createSlice({
         state.listData = [action.payload]
       })
       .addCase(getAllDepartments.fulfilled, (state, action) => {
-        state.listAll = action.payload
+        const requester = {
+          code: '__REQUESTER_GROUP__',
+          name: 'Requester'
+        }
+        state.listAll = [...action.payload, requester]
       })
       .addCase(updateDepartment.pending, (state) => {
         state.loading = true

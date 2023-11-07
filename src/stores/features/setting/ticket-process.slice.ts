@@ -101,10 +101,23 @@ export const deleteRevision = createAsyncThunk(
   }
 )
 
+export const approvalRevision = createAsyncThunk(
+  'tickets_definitions/approveRevision',
+  async (payload: SearchPayload, thunkAPI) => {
+    const response = await HttpService.post('tickets_definitions/approval_one', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
+  }
+)
+
 const ticketProcessSlice = createSlice({
   name: 'ticketProcess',
   initialState,
   reducers: {
+    resetRevisionSelected: (state) => {
+      state.revisionSelected = null
+    },
     getTicketById: (state, action) => {
       const { id } = action.payload
       if (id) {
@@ -204,7 +217,8 @@ export const {
   addNewApprovalStep,
   removeApprovalStep,
   getTicketById,
-  setDroppedItem
+  setDroppedItem,
+  resetRevisionSelected
 } = ticketProcessSlice.actions
 export { fetchDepartments, createRevision, fetchListTicket }
 export default ticketProcessSlice.reducer
