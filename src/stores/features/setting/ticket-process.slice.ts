@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { notification } from 'antd'
 import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
-import { DragItem, ITicketDef, Ticket, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
+import { DragItem, ITicketDef, SearchPayload, Ticket, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 import { ticketItem } from './fake-data'
 
 const initialState: ITicketDef = {
@@ -12,6 +12,8 @@ const initialState: ITicketDef = {
   ticketSelected: null,
   createRevisionSuccess: false,
   currentRequestId: null,
+  listRevisionsByTicketType: [],
+  revisionSelected: null,
   approvalSteps: [
     {
       index: 0,
@@ -31,20 +33,12 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
       resolve({
         data: [
           {
-            id: 'manager',
+            id: 'MANAGER',
             name: 'Quản lý trực tiếp'
           },
           {
-            id: 'hr',
+            id: 'HR',
             name: 'HCNS'
-          },
-          {
-            id: 'vice-director',
-            name: 'Phó giám đốc'
-          },
-          {
-            id: 'director',
-            name: 'Giám đốc'
           }
         ],
         message: 'Lấy dữ liệu thành công.',
@@ -55,8 +49,8 @@ const fetchDepartments = createAsyncThunk('auth/departments', async (_, thunkAPI
   return await response
 })
 
-const fetchListTicket = createAsyncThunk('tickets/getTickets', async (_, thunkAPI) => {
-  // const response = await HttpService.post<{ accessToken: string }>('/auth/login', payload, {
+const fetchListTicket = createAsyncThunk('tickets/getAll', async (_, thunkAPI) => {
+  // const response = await HttpService.get<{ accessToken: string }>('/tickets/definitions', {
   //   signal: thunkAPI.signal
   // })
   const response = new Promise<any>((resolve, reject) => {
@@ -64,16 +58,46 @@ const fetchListTicket = createAsyncThunk('tickets/getTickets', async (_, thunkAP
       resolve(ticketItem)
     }, 100)
   })
-  return await response
+  return response
 })
 
-const createRevision = createAsyncThunk(
-  'tickets/definitions',
-  async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
-    const response = await HttpService.post<ITicketDef>('/tickets/definitions', payload, {
+export const getListRevisionByTicketType = createAsyncThunk(
+  'tickets_definitions/getAll',
+  async (payload: SearchPayload, thunkAPI) => {
+    const response = await HttpService.post<any[]>('/tickets_definitions/search', payload, {
       signal: thunkAPI.signal
     })
-    return await response
+    return response
+  }
+)
+
+export const getOneRevisionByKey = createAsyncThunk(
+  'tickets_definitions/get_one_by_key',
+  async (payload: SearchPayload, thunkAPI) => {
+    const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
+  }
+)
+
+const createRevision = createAsyncThunk(
+  'tickets_definitions/createRevision',
+  async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
+    const response = await HttpService.post('tickets_definitions/save_one', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
+  }
+)
+
+export const deleteRevision = createAsyncThunk(
+  'tickets_definitions/deleteRevision',
+  async (payload: SearchPayload, thunkAPI) => {
+    const response = await HttpService.post('tickets_definitions/delete_one', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
   }
 )
 
@@ -148,6 +172,12 @@ const ticketProcessSlice = createSlice({
       })
       .addCase(fetchListTicket.fulfilled, (state: ITicketDef, action) => {
         state.tickets = action.payload.data
+      })
+      .addCase(getListRevisionByTicketType.fulfilled, (state: ITicketDef, action) => {
+        state.listRevisionsByTicketType = action.payload.data
+      })
+      .addCase(getOneRevisionByKey.fulfilled, (state: ITicketDef, action) => {
+        state.revisionSelected = action.payload.data
       })
       .addMatcher<PendingAction>(
         (action): action is PendingAction => action.type.endsWith('/pending'),

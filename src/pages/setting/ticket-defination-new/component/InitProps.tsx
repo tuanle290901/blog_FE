@@ -1,22 +1,31 @@
+import { Col, DatePicker, Form, Input, Row } from 'antd'
 import { FC } from 'react'
-import { Button, Col, Form, Input, Row } from 'antd'
-import { FormInitProp } from '../../ticket-defination/type/ItemTypes'
 
 const InitProps: FC<any> = function InitProps(props) {
   const { form } = props
   return (
     <div className='tw-w-full'>
-      <div className='tw-text-md tw-font-semibold tw-mb-4 tw-mt-4'>Thiết lập quy trình xử lý yêu cầu</div>
+      <div className='tw-text-md tw-font-semibold tw-mb-4 tw-mt-4'>Quy trình xử lý yêu cầu</div>
       <Form form={form} layout='horizontal'>
         <Row align='middle'>
-          <Col span={8}>
-            <Form.Item label='Biểu mẫu yêu cầu' name='name'>
-              <Input placeholder='Biểu mẫu yêu cầu' />
+          <Col span={4}>
+            <Form.Item label='Phiên bản' name='rev' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+              <Input placeholder='Nhập tên phiên bản' />
             </Form.Item>
           </Col>
-          <Col span={15} offset={1}>
-            <Form.Item label='Mô tả' name='description'>
-              <Input placeholder='Mô tả' />
+          <Col span={9} offset={1}>
+            <Form.Item
+              label='Ngày áp dụng'
+              name='applyFromDate'
+              rules={[{ required: true, message: 'Trường bắt buộc' }]}
+            >
+              <DatePicker className='tw-w-full' placeholder='Chọn ngày áp dụng' format='DD/MM/YYYY' />
+            </Form.Item>
+          </Col>
+
+          <Col span={9} offset={1}>
+            <Form.Item label='Ngày kết thúc' name='applyToDate'>
+              <DatePicker className='tw-w-full' placeholder='Chọn ngày kết thúc' format='DD/MM/YYYY' />
             </Form.Item>
           </Col>
         </Row>

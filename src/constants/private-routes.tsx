@@ -2,21 +2,20 @@ import { IRoutes } from '~/constants/public-routes.tsx'
 import HolidayScheduleConfig from '~/pages/config/component-bateco/HolidayScheduleConfig'
 import CommonTimeConfigBateco from '~/pages/config/component-bateco/WorkingTimeConfig'
 import DeviceList from '~/pages/device-management/device-list.tsx'
-import TicketDefination from '~/pages/setting/ticket-defination'
-import TicketDefinationNew from '~/pages/setting/ticket-defination-new'
+import TicketDefinitionList from '~/pages/setting/ticket-defination-new'
+import TicketDefinationNew from '~/pages/setting/ticket-defination-new/TicketDefinitionCreate'
 import Timesheet from '~/pages/timesheet'
 import UserHistory from '~/pages/user-management/user-history.tsx'
 import UserList from '~/pages/user-management/user-list.tsx'
 
 import { ROLE } from '~/constants/app.constant.ts'
 import Department from '~/pages/Department'
-import Balance from '~/pages/benefit'
+import Benefit from '~/pages/benefit'
 import LeaveRequest from '~/pages/leave-request'
 import PositionList from '~/pages/position-management/position-list.tsx'
 import Report from '~/pages/report'
 import Statistical from '~/pages/statistical'
 import TypesOfLeave from '~/pages/types-of-leave-management/types-of-leave-list'
-import Benefit from '~/pages/benefit'
 
 export const PRIVATE_PATH = {
   home: '/',
@@ -31,7 +30,10 @@ export const PRIVATE_PATH = {
   dashboard: '/dashboard',
   setting: {
     ticketProcessDefinition: 'ticket-process-definition',
-    ticketProcessDefinitionNew: 'ticket-process-definition-new'
+    ticketProcessDefinitionNew: 'ticket-definition',
+    ticketDefinitionById: 'ticket-definition/:id',
+    ticketDefinitionCreate: 'ticket-definition/create-revison/:ticketType',
+    ticketDefinitionView: 'ticket-definition/view-revison/:ticketType/:rev'
   },
   department: {
     prefix: 'department'
@@ -72,15 +74,33 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     component: UserList,
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
+  // {
+  //   name: 'ticket-definition-list',
+  //   path: PRIVATE_PATH.setting.ticketProcessDefinition,
+  //   component: TicketDefination,
+  //   allowedRoles: [ROLE.SYSTEM_ADMIN]
+  // },
   {
-    name: 'ticket-definition-list',
-    path: PRIVATE_PATH.setting.ticketProcessDefinition,
-    component: TicketDefination,
+    name: 'ticket-definition',
+    path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
+    component: TicketDefinitionList,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },
   {
-    name: 'ticket-definition-new',
-    path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
+    name: 'ticket-definition/:id',
+    path: PRIVATE_PATH.setting.ticketDefinitionById,
+    component: TicketDefinationNew,
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
+  },
+  {
+    name: 'ticket-definition/create-revision',
+    path: PRIVATE_PATH.setting.ticketDefinitionCreate,
+    component: TicketDefinationNew,
+    allowedRoles: [ROLE.SYSTEM_ADMIN]
+  },
+  {
+    name: 'ticket-definition/view-revision',
+    path: PRIVATE_PATH.setting.ticketDefinitionView,
     component: TicketDefinationNew,
     allowedRoles: [ROLE.SYSTEM_ADMIN]
   },

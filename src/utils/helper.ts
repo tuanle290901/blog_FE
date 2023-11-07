@@ -155,3 +155,11 @@ export const mappingDepartmentByCode = (departments: DataType[], code?: string) 
 
   return null
 }
+
+export const replaceRouterString = (route: string, type: 'dot' | 'dash') => {
+  if (type === 'dot') {
+    return route.replace(/\./g, '-').toLowerCase()
+  } else {
+    return route.replace(/-/g, '.').toLowerCase()
+  }
+}

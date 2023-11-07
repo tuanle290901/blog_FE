@@ -25,7 +25,9 @@ export interface ITicketDef {
   approvalSteps: IApprovalStep[]
   currentRequestId: string | null
   tickets: any[]
+  listRevisionsByTicketType: any[]
   ticketSelected: TicketDefRevisionCreateReq | null
+  revisionSelected: TicketProcessRevision | null
 }
 
 export interface DragItem {
@@ -57,8 +59,8 @@ export interface TicketTransfer {
 }
 
 export interface TicketProcessNode {
-  groupCode: string
-  groupCodes: string[]
+  groupCode?: string
+  groupCodes?: string[] | any
   attributes: TicketAttribute[]
   name?: string
   histories?: { executorId: string; createdAt: string; actualGroup: string }[]
@@ -66,10 +68,18 @@ export interface TicketProcessNode {
   value?: string
   executors?: string
   createdAt?: string
+  type?: string
+  position: {
+    x: number
+    y: number
+  }
 }
 
 export interface TicketProcessRevision {
-  rev?: number
+  id?: string
+  rev?: string
+  applyFromDate: string
+  applyToDate?: string
   startNodeIndex?: number
   endNodeIndex?: number
   continueTransferStrategy?: string[]
@@ -85,8 +95,15 @@ export interface TicketProcessRevision {
 
 export interface TicketDefRevisionCreateReq {
   id?: string
-  name: string
+  ticketType: string
+  name?: string
   description?: string
   revision: TicketProcessRevision
   ticketDefId: string
+  revisions?: TicketProcessRevision[]
+}
+
+export interface SearchPayload {
+  rev?: string | null
+  ticketType?: string | null
 }

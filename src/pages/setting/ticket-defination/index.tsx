@@ -47,7 +47,7 @@ const Index: FC = memo(function Index() {
           return {
             label: item.name,
             key: id,
-            children: <TicketDefinationCreate key={id} id={tabActive} />
+            children: <TicketDefinationCreate key={id} />
           }
         })}
       />

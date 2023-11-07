@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { DoubleRightOutlined, LoginOutlined, LockOutlined, DoubleLeftOutlined } from '@ant-design/icons'
+import { DoubleLeftOutlined, DoubleRightOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Avatar, Dropdown, Layout, Menu, Space, Tooltip } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 
-import logo from '../assets/images/logo.png'
-import logoHtsc from '../assets/images/logo-htsc.png'
 import logoIcon from '../assets/images/logo-ems-icon.png'
-import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
-import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
+import logoHtsc from '../assets/images/logo-htsc.png'
+import logo from '../assets/images/logo.png'
 import menuIconReport from '../assets/images/menu/icon_group.png'
-import menuIconSetting from '../assets/images/menu/setting.png'
+import menuIconEmployee from '../assets/images/menu/icon_human_resource.png'
 import menuIconRequest from '../assets/images/menu/icon_request.png'
+import menuIconTimeKeeping from '../assets/images/menu/icon_timesheet.png'
+import menuIconSetting from '../assets/images/menu/setting.png'
 // import menuIconDashboard from '../assets/images/menu/icon_chart.png'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -25,9 +25,9 @@ import { logout } from '~/stores/features/auth/auth.slice'
 import { getAllGroup } from '~/stores/features/master-data/master-data.slice'
 import { useAppDispatch } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { LOCAL_STORAGE } from '~/utils/Constant'
 import { hasPermission } from '~/utils/helper'
 import './style.scss'
-import { LOCAL_STORAGE } from '~/utils/Constant'
 
 const { Header, Content, Sider } = Layout
 type MenuItem = Required<MenuProps>['items'][number]
@@ -197,7 +197,7 @@ const MainLayout: React.FC = () => {
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian làm việc', 'working-time'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Ngày nghỉ lễ', 'holiday-schedule'),
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thiết bị chấm công', 'devices'),
-          // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-process-definition'),
+          getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Quy trình phê duyệt phép', 'ticket-definition'),
           // getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Loại nghỉ phép', 'types-of-leave')
           getItemIfAllowed([ROLE.SYSTEM_ADMIN], 'Thời gian nghỉ phép', 'benefit')
         ]
