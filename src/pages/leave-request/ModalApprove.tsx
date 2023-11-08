@@ -4,14 +4,15 @@ import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
 import { memo, useEffect, useState } from 'react'
 import { onUpdateRequestStatus, updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
+import { getOneRevisionByKey } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { DataType } from '~/types/department.interface'
 import { ILeaveRequest, ILeaveRequestUpdateStatusForm } from '~/types/leave-request'
-import { TicketAttribute, TicketProcessNode } from '~/types/setting-ticket-process'
+import { SearchPayload, TicketAttribute, TicketProcessNode } from '~/types/setting-ticket-process'
 import { GroupProfile } from '~/types/user.interface'
 import { INPUT_TYPE, LEAVE_TYPE_MAP, TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
-import { mappingDepartmentByCode, tagColorMapping } from '~/utils/helper'
+import { mappingDepartmentByCode, replaceRouterString, tagColorMapping } from '~/utils/helper'
 const { confirm } = Modal
 export enum PROCESS_GROUPCODE {
   START = '__START__',
@@ -30,9 +31,8 @@ const ModalApprove = (props: {
   const dispatch = useAppDispatch()
   const { userInfo } = useUserInfo()
 
-  const listOfDefinition = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
-  const ticketDefinition = listOfDefinition.find((item) => item.id === ticket.ticketDefinitionId)
-  const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revisions[0]?.processNodes || [])
+  const ticketDefinition = useAppSelector((state) => state.ticketProcess.revisionSelected)
+  const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revision?.processNodes || [])
 
   const sortedProcessNodes = Object.entries(ticketProcessNodes)
     .map(([key, value]) => ({ key: parseInt(key), value }))
@@ -153,6 +153,15 @@ const ModalApprove = (props: {
   useEffect(() => {
     if (ticket) {
       setFieldValues({})
+    }
+  }, [ticket])
+
+  useEffect(() => {
+    if (ticket && ticket.ticketDefinitionId && ticket.definitionRevision) {
+      const payload: SearchPayload = Object.create(null)
+      payload.ticketType = ticket.ticketDefinitionId
+      payload.rev = replaceRouterString(String(ticket.definitionRevision), 'dash')
+      dispatch(getOneRevisionByKey(payload))
     }
   }, [ticket])
 

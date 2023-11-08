@@ -17,7 +17,7 @@ export interface ILeaveRequest {
 export interface ILeaveRequestForm {
   id?: string
   initialAttrs: { [key: string]: string }
-  revision: number
+  revision: number | string
   ticketDefinitionId: string
 }
 

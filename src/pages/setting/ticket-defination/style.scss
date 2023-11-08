@@ -107,10 +107,10 @@
     padding: 15px 20px;
   }
   .dynamic-form-item-container {
-    border: 1px dashed #7a7474;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 30px;
+    border: 1px dashed #7a7474 !important;
+    border-radius: 5px !important;
+    padding: 15px !important;
+    margin-bottom: 30px !important;
     position: relative;
 
     .dynamic-form-item-icon-close {

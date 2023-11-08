@@ -44,22 +44,22 @@ const LeaveRequestForm: React.FC<{
   const [selectedTicketTypeId, setSelectedTicketTypeId] = useState<string>('')
   const selectedTicketType = useAppSelector((state) => state.ticketProcess.currentRevision)
 
-  // useEffect(() => {
-  //   if (data) {
-  //     setSelectedTicketTypeId(data.ticketDefinitionId)
-  //     form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
-  //     const attributesProperties = selectedTicketType?.revisions[0].processNodes['0'].attributes
-  //     const attributesData = data?.processStatus['0']?.attributes
+  useEffect(() => {
+    if (data) {
+      setSelectedTicketTypeId(data.ticketDefinitionId)
+      form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
+      const attributesProperties = selectedTicketType?.revision?.processNodes['1'].attributes
+      const attributesData = data?.processStatus['0']?.attributes
 
-  //     attributesProperties?.forEach((item) => {
-  //       if (item.type === INPUT_TYPE.DATETIME) {
-  //         form.setFieldValue(item.name, dayjs(attributesData[item.name]))
-  //       } else {
-  //         form.setFieldValue(item.name, attributesData[item.name])
-  //       }
-  //     })
-  //   }
-  // }, [data, selectedTicketTypeId])
+      attributesProperties?.forEach((item) => {
+        if (item.type === INPUT_TYPE.DATETIME) {
+          form.setFieldValue(item.name, dayjs(attributesData[item.name]))
+        } else {
+          form.setFieldValue(item.name, attributesData[item.name])
+        }
+      })
+    }
+  }, [data, selectedTicketTypeId])
 
   const handleSubmit = async () => {
     dispatch(onUpdateRequestStatus(false))
@@ -72,7 +72,11 @@ const LeaveRequestForm: React.FC<{
 
     const payload: ILeaveRequestForm | ILeaveRequestEditForm = data
       ? { attrs: transformedFormValue, id: data.id }
-      : { initialAttrs: transformedFormValue, revision: 1, ticketDefinitionId: formValue.typeOfLeave }
+      : {
+          initialAttrs: transformedFormValue,
+          revision: String(selectedTicketType?.revision.rev),
+          ticketDefinitionId: formValue.typeOfLeave
+        }
 
     try {
       const response = await (data

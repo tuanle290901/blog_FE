@@ -6,6 +6,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { useState, type FC } from 'react'
 import { INPUT_TYPE } from '~/utils/Constant'
 import { ModalInitAttrProp } from '../type/ItemTypes'
+import './../style.scss'
 
 const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
   const {
@@ -151,7 +152,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
                         </>
                       )}
 
-                      {index !== 0 && (
+                      {/* {index !== 0 && (
                         <div
                           className='dynamic-form-item-icon-close'
                           onClick={() => {
@@ -161,7 +162,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
                         >
                           <MinusCircleFilled className='tw-text-xl tw-text-red-600' />
                         </div>
-                      )}
+                      )} */}
                     </Row>
                   ))}
                   <Form.Item>
