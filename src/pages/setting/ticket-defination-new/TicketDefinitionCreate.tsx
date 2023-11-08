@@ -14,7 +14,7 @@ import ReactFlow, {
 
 import CustomEdge from './component/CustomEdge'
 
-import { Button, Col, Form, Input, Row } from 'antd'
+import { Button, Col, Form, Image, Input, Row } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import 'reactflow/dist/style.css'
 import { createRevision, getOneRevisionByKey } from '~/stores/features/setting/ticket-process.slice'
@@ -26,7 +26,7 @@ import SourceNode from './component/SourceNodes'
 import './style.scss'
 import { replaceRouterString } from '~/utils/helper'
 import InitProps from './component/InitProps'
-
+import { toPng } from 'html-to-image'
 export const NodeItem = {
   START: 'START',
   END: 'END'
@@ -60,7 +60,7 @@ const Index = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<any>(null)
   const revisionSelected = useAppSelector((state) => state.ticketProcess.revisionSelected)
-
+  const ref = useRef<any>(null)
   const [initAttrForm] = Form.useForm()
   const [initPropForm] = Form.useForm()
   const [isModalInitAttrOpen, setIsModalInitAttrOpen] = useState<{ key: string; status: boolean }>({
@@ -288,6 +288,12 @@ const Index = () => {
       payload.ticketType = ticketType
       payload.rev = replaceRouterString(rev, 'dash')
       dispatch(getOneRevisionByKey(payload))
+        .unwrap()
+        .then((response) => {
+          setTimeout(() => {
+            htmlToImageConvert()
+          }, 100)
+        })
     }
   }, [ticketType, rev, dispatch])
 
@@ -297,15 +303,34 @@ const Index = () => {
     }
   }, [revisionSelected])
 
+  const [image, setImage] = useState('')
+  const htmlToImageConvert = () => {
+    toPng(ref.current, { cacheBust: false })
+      .then((dataUrl) => {
+        console.log(dataUrl)
+        setImage(dataUrl)
+        // const link = document.createElement('a')
+        // link.download = 'my-image-name.png'
+        // link.href = dataUrl
+        // link.click()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ReactFlowProvider>
         <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
           <InitProps form={initPropForm} />
         </div>
-
-        <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
+        <div className='ticket-bottom-control reactflow-wrapper tw-h-[5%] tw-w-full'>
+          <Image src={`${image}`} height={500} width={500} />
+        </div>
+        <div className='ticket-bottom-control reactflow-wrapper tw-h-[80%] tw-w-full' ref={reactFlowWrapper}>
           <ReactFlow
+            ref={ref}
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
@@ -318,8 +343,14 @@ const Index = () => {
             onDragOver={onDragOver}
             onNodeDoubleClick={onElementClick}
             fitView
-            selectionOnDrag={true}
-            attributionPosition='bottom-right'
+            // selectionOnDrag={true}
+            // edgesUpdatable={true}
+            // edgesFocusable={true}
+            // nodesDraggable={true}
+            // nodesConnectable={true}
+            // nodesFocusable={true}
+            // elementsSelectable={true}
+            // attributionPosition='bottom-right'
           >
             <Panel position='top-left'>
               <Button type='default' onClick={() => navigate('/ticket-definition')}>

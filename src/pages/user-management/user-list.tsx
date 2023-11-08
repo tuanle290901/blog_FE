@@ -1,35 +1,33 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DeleteOutlined, EditOutlined, EyeOutlined, LockOutlined, UndoOutlined } from '@ant-design/icons'
 import {
   Button,
+  Checkbox,
+  Col,
+  Dropdown,
+  Image,
   Input,
-  notification,
+  MenuProps,
   Popconfirm,
+  Row,
   Select,
   Table,
   TablePaginationConfig,
   Tooltip,
-  Row,
-  Col,
-  Image,
-  Dropdown,
-  MenuProps
+  notification
 } from 'antd'
-import {
-  DownloadOutlined,
-  DeleteOutlined,
-  DownOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  UndoOutlined,
-  LockOutlined
-} from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
 import { ColumnsType } from 'antd/es/table'
-import { IUser } from '~/types/user.interface.ts'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import dayjs from 'dayjs'
+import { saveAs } from 'file-saver'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import defaultImg from '~/assets/images/default-img.png'
+import CommonButton from '~/components/Button/CommonButton'
+import { COMMON_ERROR_CODE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
 import UserCreateEdit from '~/pages/user-management/user-create-edit.tsx'
-import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
+import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
 import {
   cancelEditingUser,
   deleteUser,
@@ -40,25 +38,26 @@ import {
   startEditingUser,
   startResetPassworkUser
 } from '~/stores/features/user/user.slice.ts'
-import { useNavigate } from 'react-router-dom'
-import dayjs from 'dayjs'
-import { getAllGroup, getTitle } from '~/stores/features/master-data/master-data.slice.ts'
-import { IPaging, ISort } from '~/types/api-response.interface.ts'
-import { FilterValue, SorterResult } from 'antd/es/table/interface'
+import { useAppDispatch, useAppSelector } from '~/stores/hook.ts'
 import { useUserInfo } from '~/stores/hooks/useUserProfile.tsx'
-import { COMMON_ERROR_CODE, GENDER, ROLE, USER_STATUS } from '~/constants/app.constant.ts'
+import { IPaging, ISort } from '~/types/api-response.interface.ts'
+import { IUser } from '~/types/user.interface.ts'
 import { hasPermission } from '~/utils/helper.ts'
-import { saveAs } from 'file-saver'
 import './style.scss'
 
 const { Search } = Input
-
+const CheckboxGroup = Checkbox.Group
 const UserList: React.FC = () => {
   const { t } = useTranslation()
   const [isOpenUserModal, setIsOpenUserModal] = useState(false)
   const dispatch = useAppDispatch()
-  const { userInfo, setUserProfileInfo } = useUserInfo()
-  const navigate = useNavigate()
+  const { userInfo } = useUserInfo()
+  const columnOptions = [
+    { label: t('userList.joinDate'), value: 'joinDate' },
+    { label: t('userList.workForTime'), value: 'workForTime' }
+  ]
+  const [showMoreColumn, setShowMoreColumn] = useState(false)
+  const [checkedList, setCheckedList] = useState<string[]>([])
   const userState = useAppSelector((state) => state.user)
   const groups = useAppSelector((state) => state.masterData.groups)
   const [query, setQuery] = useState<string>('')
@@ -195,108 +194,135 @@ const UserList: React.FC = () => {
           status: searchValue.status === 'all' ? null : searchValue.status
         })
       )
-    } catch (e) {
-      console.log(e)
+    } catch (e: any) {
+      notification.error({ message: e.messager })
     }
   }
 
-  const columns: ColumnsType<IUser> = [
-    {
-      title: t('userList.fullName'),
-      dataIndex: 'fullName',
-      key: 'fullName',
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder('fullName'),
-      width: '200px',
-      fixed: 'left',
-      render: (text, record) => {
-        return (
-          <div className='tw-flex tw-items-center'>
-            <Image
-              className='user-table__img'
-              alt='avatar'
-              src={record.avatarBase64 ? `data:image/png;base64,${record.avatarBase64}` : defaultImg}
-            />
-            <span className='tw-ml-2'>{text}</span>
-          </div>
-        )
+  const columns = useMemo(() => {
+    const columns: ColumnsType<IUser> = [
+      {
+        title: t('userList.fullName'),
+        dataIndex: 'fullName',
+        key: 'fullName',
+        sorter: true,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('fullName'),
+        width: '200px',
+        render: (text, record) => {
+          return (
+            <div className='tw-flex tw-items-center'>
+              <Image
+                className='user-table__img'
+                alt='avatar'
+                src={record.avatarBase64 ? `data:image/png;base64,${record.avatarBase64}` : defaultImg}
+              />
+              <span className='tw-ml-2'>{text}</span>
+            </div>
+          )
+        },
+        ellipsis: true
       },
-      ellipsis: true
-    },
-    {
-      title: t('userList.userName'),
-      dataIndex: 'userName',
-      key: 'userName',
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder('userName'),
-      width: '150px',
-      ellipsis: true
-    },
-    {
-      title: t('userList.dateOfBirth'),
-      dataIndex: 'birthday',
-      key: 'birthday',
-      sorter: true,
-      sortOrder: getSortOrder('birthday'),
-      showSorterTooltip: false,
-      width: '150px',
-      align: 'center',
-      render: (text) => {
-        if (text) {
-          const date = dayjs(text).format('DD/MM/YYYY')
-          return date
+      {
+        title: t('userList.userName'),
+        dataIndex: 'userName',
+        key: 'userName',
+        sorter: true,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('userName'),
+        width: '150px',
+        ellipsis: true
+      },
+      {
+        title: t('userList.dateOfBirth'),
+        dataIndex: 'birthday',
+        key: 'birthday',
+        sorter: true,
+        sortOrder: getSortOrder('birthday'),
+        showSorterTooltip: false,
+        width: '150px',
+        align: 'center',
+        render: (text) => {
+          if (text) {
+            const date = dayjs(text).format('DD/MM/YYYY')
+            return date
+          }
         }
-      }
-    },
-    {
-      title: t('userList.gender'),
-      dataIndex: 'genderType',
-      key: 'genderType',
-      sorter: true,
-      width: '120px',
-      align: 'center',
-      sortOrder: getSortOrder('genderType'),
-      showSorterTooltip: false,
-      render: (text, _) => {
-        return text ? t(text === GENDER.MALE ? 'userList.male' : 'userList.female') : ''
-      }
-    },
-    {
-      title: t('userList.department'),
-      dataIndex: 'groupProfiles',
-      key: 'groupProfiles',
-      width: '250px',
-      render: (text, record) => {
-        return record.groupProfiles
-          .map((item) => {
-            return `${item.groupName} (${t(`common.role.${item.role.toLowerCase()}`)})`
-          })
-          .join(',')
       },
-      ellipsis: true
-    },
-    {
-      title: t('userList.phoneNumber'),
-      dataIndex: 'phoneNumber',
-      key: 'phoneNumber',
-      sorter: true,
-      width: '150px',
-      sortOrder: getSortOrder('phoneNumber'),
-      showSorterTooltip: false
-    },
-    {
-      title: t('userList.email'),
-      dataIndex: 'email',
-      key: 'email',
-      sorter: true,
-      showSorterTooltip: false,
-      sortOrder: getSortOrder('email'),
-      width: '200px',
-      ellipsis: true
-    },
-    {
+      {
+        title: t('userList.gender'),
+        dataIndex: 'genderType',
+        key: 'genderType',
+        sorter: true,
+        width: '120px',
+        align: 'center',
+        sortOrder: getSortOrder('genderType'),
+        showSorterTooltip: false,
+        render: (text, _) => {
+          return text ? t(text === GENDER.MALE ? 'userList.male' : 'userList.female') : ''
+        }
+      },
+      {
+        title: t('userList.department'),
+        dataIndex: 'groupProfiles',
+        key: 'groupProfiles',
+        width: '250px',
+        render: (text, record) => {
+          return record.groupProfiles
+            .map((item) => {
+              return `${item.groupName} (${t(`common.role.${item.role.toLowerCase()}`)})`
+            })
+            .join(',')
+        },
+        ellipsis: true
+      },
+      {
+        title: t('userList.phoneNumber'),
+        dataIndex: 'phoneNumber',
+        key: 'phoneNumber',
+        sorter: true,
+        width: '150px',
+        sortOrder: getSortOrder('phoneNumber'),
+        showSorterTooltip: false
+      },
+      {
+        title: t('userList.email'),
+        dataIndex: 'email',
+        key: 'email',
+        sorter: true,
+        showSorterTooltip: false,
+        sortOrder: getSortOrder('email'),
+        width: '200px',
+        ellipsis: true
+      }
+    ]
+
+    if (checkedList.includes('joinDate')) {
+      columns.push({
+        title: t('userList.joinDate'),
+        dataIndex: 'joinDate',
+        key: 'joinDate',
+        width: '200px',
+        ellipsis: true,
+        render: (text) => {
+          if (text) {
+            const date = dayjs(text).format('DD/MM/YYYY')
+            return date
+          }
+        }
+      })
+    }
+
+    if (checkedList.includes('workForTime')) {
+      columns.push({
+        title: t('userList.workForTime'),
+        dataIndex: 'workForTime',
+        key: 'workForTime',
+        width: '200px',
+        ellipsis: true
+      })
+    }
+    columns.push({
       title: t('userList.action'),
       key: 'action',
       align: 'center',
@@ -374,8 +400,20 @@ const UserList: React.FC = () => {
           </div>
         )
       }
-    }
-  ]
+    })
+    return columns
+  }, [
+    checkedList,
+    getSortOrder,
+    handleClickDeleteUser,
+    handleClickEditUser,
+    handleClickResetPasswordUser,
+    handleRestoreUser,
+    t,
+    userInfo?.groupProfiles,
+    userInfo?.userName
+  ])
+
   const handleDepartmentChange = (value: string | null) => {
     setSearchValue((prevState) => {
       return { ...prevState, query: prevState.query, group: value }
@@ -428,7 +466,7 @@ const UserList: React.FC = () => {
     return () => {
       promise.abort()
     }
-  }, [searchValue])
+  }, [dispatch, searchValue])
 
   function handleTableChange(
     pagination: TablePaginationConfig,
@@ -511,6 +549,10 @@ const UserList: React.FC = () => {
     }
   ]
 
+  const handleColumn = (list: any) => {
+    setCheckedList(list)
+  }
+
   return (
     <div className='tw-min-h-[calc(100%-32px)] tw-bg-white tw-m-2 md:tw-m-4'>
       <div className='user-list tw-p-2 md:tw-p-4'>
@@ -528,8 +570,8 @@ const UserList: React.FC = () => {
           </h1>
           <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
         </div>
-        <Row gutter={[16, 16]} className='tw-mt-4'>
-          <Col xs={24} md={6}>
+        <Row gutter={[8, 16]} className='tw-mt-4'>
+          <Col xs={24} md={6} lg={4} xl={4}>
             <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
               {/* {permissionAddUser && (
                 <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
@@ -556,7 +598,7 @@ const UserList: React.FC = () => {
               )}
             </div>
           </Col>
-          <Col xs={24} md={18}>
+          <Col xs={24} md={12} lg={16} xl={18} className='tw-flex tw-justify-end'>
             <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
               <Select
                 onChange={handleDepartmentChange}
@@ -580,6 +622,33 @@ const UserList: React.FC = () => {
               />
             </div>
           </Col>
+          <Col xs={24} md={6} lg={4} xl={2} className='tw-flex tw-justify-end'>
+            <div className='show-column'>
+              <CommonButton
+                typeProps={{}}
+                onClick={() => setShowMoreColumn(!showMoreColumn)}
+                icon={null}
+                title={t('userList.showMoreColumn')}
+                classNameProps={''}
+                loading={false}
+              />
+              {showMoreColumn && (
+                <div className='column-option'>
+                  <CheckboxGroup options={columnOptions} value={checkedList} onChange={handleColumn} />
+                  <div className='tw-flex tw-justify-center'>
+                    <CommonButton
+                      typeProps={{}}
+                      classNameProps={''}
+                      onClick={() => setShowMoreColumn(!showMoreColumn)}
+                      title={t('close')}
+                      icon={undefined}
+                      loading={false}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </Col>
         </Row>
 
         <div className='tw-mt-6 user-table'>
@@ -598,7 +667,9 @@ const UserList: React.FC = () => {
               current: searchValue.paging.page + 1,
               responsive: true
             }}
-            rowClassName={(record) => (record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : '')}
+            rowClassName={(record, index) =>
+              record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : index % 2 === 0 ? 'tw-bg-blue-100' : ''
+            }
             scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
             onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
           />

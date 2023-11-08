@@ -45,6 +45,7 @@ const UserCreateEdit: React.FC<{
       return { value: item.code, label: item.nameTitle }
     })
   }, [userTitle])
+
   const { userInfo, setUserProfileInfo } = useUserInfo()
   const roleOptions: { value: string; label: string }[] = [
     {
@@ -64,6 +65,7 @@ const UserCreateEdit: React.FC<{
       value: ROLE.SYSTEM_ADMIN
     }
   ]
+
   const groupProfiles: any[] = useMemo(() => {
     if (userData?.groupProfiles) {
       return userData.groupProfiles.map((item, index) => {
@@ -127,7 +129,8 @@ const UserCreateEdit: React.FC<{
       form.resetFields()
       setAvatarBase64('')
     }
-  }, [userData])
+  }, [form, userData, userInfo?.groupProfiles, userInfo?.userName])
+
   const handleSubmit = async () => {
     try {
       setAvtError(!avatarBase64)

@@ -143,7 +143,7 @@ const Benefit: React.FC = () => {
       align: 'center'
     },
     {
-      title: t('benefit.benefit'),
+      title: t('benefit.balance'),
       dataIndex: 'balance',
       key: 'balance',
       sorter: true,
@@ -258,10 +258,21 @@ const Benefit: React.FC = () => {
             listData: []
           })
           resetPage()
-        } catch (e: any) {
-          if (e.status && !COMMON_ERROR_CODE.includes(e.status)) {
-            notification.error({ message: e.message })
+        } catch (error: any) {
+          if (error.status && !COMMON_ERROR_CODE.includes(error.status)) {
+            if (error.data.length > 0) {
+              notification.error({
+                message: error.data
+                  .map((item: { message: string; rowNo: string }) => {
+                    return item.message + '' + item.rowNo
+                  })
+                  .join(', ')
+              })
+            }
           }
+          // if (e.status && !COMMON_ERROR_CODE.includes(e.status)) {
+          //   notification.error({ message: e.message })
+          // }
         }
       }
     }
@@ -376,7 +387,7 @@ const Benefit: React.FC = () => {
               dataSource={dataRender.listData}
               loading={dataRender.loading}
               className='benefit-table-antd'
-              rowClassName={() => 'editable-row'}
+              // rowClassName={() => 'editable-row'}
               rowKey={(record) => record.userName}
               pagination={{
                 total: dataBenefit.meta.total,
@@ -389,6 +400,7 @@ const Benefit: React.FC = () => {
                 responsive: true
               }}
               scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
+              rowClassName={(record, index) => (index % 2 === 0 ? 'tw-bg-blue-100' : '')}
               onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
             />
           )}
