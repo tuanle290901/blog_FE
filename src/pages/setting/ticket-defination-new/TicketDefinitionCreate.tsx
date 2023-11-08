@@ -34,8 +34,8 @@ import SourceNode from './component/SourceNodes'
 import './style.scss'
 
 export const NodeItem = {
-  START: 'START',
-  END: 'END'
+  START: '__START__',
+  END: '__END__'
 }
 
 export const NodeItemType = {
@@ -201,9 +201,12 @@ const Index = () => {
   const mappingResponse = (response: any) => {
     if (response && response.id) {
       initPropForm.setFieldsValue({
-        rev: response.revision.rev,
-        applyFromDate: dayjs(response.revision.applyFromDate)
+        rev: response.revision.rev
       })
+
+      if (response.revision.applyFromDate) {
+        initPropForm.setFieldValue('applyFromDate', dayjs(response.revision.applyFromDate))
+      }
 
       if (response.revision.applyToDate) {
         initPropForm.setFieldValue('applyToDate', dayjs(response.revision.applyToDate))
@@ -268,10 +271,10 @@ const Index = () => {
 
   const convertObjToArray = (obj: any) => {
     return Object.keys(obj).map((key) => {
-      const isInput = obj[key].nodeIndex === '1'
-      const isOutput = obj[key].nodeIndex === '2'
+      const isInput = obj[key].groupCodes.includes(NodeItem.START)
+      const isOutput = obj[key].groupCodes.includes(NodeItem.END)
       return {
-        id: String(obj[key].nodeIndex),
+        id: String(key),
         type: isInput ? NodeItemType.INPUT : isOutput ? NodeItemType.OUTPUT : NodeItemType.SELECTOR,
         data: {
           label: obj[key].name,
