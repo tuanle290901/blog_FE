@@ -284,8 +284,6 @@ const Index = () => {
         position: obj[key].position,
         sourcePosition: isInput ? 'right' : null,
         targetPosition: isOutput ? 'left' : null,
-        with: isInput || isOutput ? 150 : 140,
-        height: isInput || isOutput ? 34 : 140,
         selected: false,
         dragging: false,
         positionAbsolute: obj[key].position
