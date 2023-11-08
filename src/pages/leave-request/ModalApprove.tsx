@@ -279,7 +279,7 @@ const ModalApprove = (props: {
                                     (step.status === TicketStatusEnum.PENDING ||
                                       step.status === TicketStatusEnum.PROCESSING) &&
                                     (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
-                                      <Col span={24} className='tw-flex tw-justify-center'>
+                                      <Col span={24} className='tw-flex tw-justify-center tw-mt-3'>
                                         <Space>
                                           {step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER && (
                                             <Button
