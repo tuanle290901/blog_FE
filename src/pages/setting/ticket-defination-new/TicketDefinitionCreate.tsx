@@ -378,7 +378,7 @@ const Index = () => {
                   okText='Đồng ý'
                   cancelText='Hủy'
                 >
-                  <Button type='primary'>Duyệt yêu cầu</Button>
+                  <Button type='primary'>Duyệt quy trình</Button>
                 </Popconfirm>
               )}
 

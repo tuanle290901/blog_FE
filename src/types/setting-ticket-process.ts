@@ -27,7 +27,7 @@ export interface ITicketDef {
   tickets: any[]
   listRevisionsByTicketType: any[]
   ticketSelected: TicketDefRevisionCreateReq | null
-  revisionSelected: TicketProcessRevision | null
+  revisionSelected: TicketDefRevisionCreateReq | null
   currentRevision: TicketDefRevisionCreateReq | null
 }
 

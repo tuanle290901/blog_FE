@@ -10,7 +10,7 @@ const InitProps: FC<any> = function InitProps(props) {
         <Row align='middle'>
           <Col span={4}>
             <Form.Item label='Phiên bản' name='rev' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
-              <Input placeholder='Nhập tên phiên bản' />
+              <Input disabled placeholder='Nhập tên phiên bản' />
             </Form.Item>
           </Col>
           <Col span={9} offset={1}>
@@ -19,13 +19,13 @@ const InitProps: FC<any> = function InitProps(props) {
               name='applyFromDate'
               rules={[{ required: true, message: 'Trường bắt buộc' }]}
             >
-              <DatePicker className='tw-w-full' placeholder='Chọn ngày áp dụng' format='DD/MM/YYYY' />
+              <DatePicker disabled className='tw-w-full' placeholder='Chọn ngày áp dụng' format='DD/MM/YYYY' />
             </Form.Item>
           </Col>
 
           <Col span={9} offset={1}>
             <Form.Item label='Ngày kết thúc' name='applyToDate'>
-              <DatePicker className='tw-w-full' placeholder='Chọn ngày kết thúc' format='DD/MM/YYYY' />
+              <DatePicker disabled className='tw-w-full' placeholder='Chọn ngày kết thúc' format='DD/MM/YYYY' />
             </Form.Item>
           </Col>
         </Row>
