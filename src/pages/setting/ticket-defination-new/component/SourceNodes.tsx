@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
-import { sourceNodes } from '../mockup/mockup'
-import '../style.scss'
 import { Space } from 'antd'
+import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { getAllDepartments } from '~/stores/features/department/department.silce'
+import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import '../style.scss'
 
 export const SourceNode = () => {
   const dispatch = useAppDispatch()

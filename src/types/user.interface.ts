@@ -20,6 +20,7 @@ export interface IUser {
   editType: EDIT_TYPE
   status: USER_STATUS
   createWithRemainLeaveMinutes: number
+  workForTime: string
 }
 export interface GroupProfile {
   title: string

@@ -107,17 +107,19 @@ export const importBenefit = createAsyncThunk('benefit/importBenefit', async (pa
   try {
     const form = new FormData()
     form.append('file', payload)
-    await HttpService.post(END_POINT_API.Benefit.import(), form, {
+    const response = await HttpService.post(END_POINT_API.Benefit.import(), form, {
       headers: {
         Accept: '*/*',
         'Content-Type': 'multipart/form-data'
       }
     })
-    // return response
+    console.log(response)
+    return response.data
   } catch (error: any) {
     if (error.name === 'AxiosError' && !COMMON_ERROR_CODE.includes(error.response.status)) {
       return thunkAPI.rejectWithValue(error.response.data)
     }
+    console.log(error)
     throw error
   }
 })
@@ -144,6 +146,9 @@ const BenefitSlice = createSlice({
         state.loading = false
         state.listData = action.payload.data
         state.meta = action.payload.meta
+      })
+      .addCase(importBenefit.fulfilled, (state, action) => {
+        //
       })
       .addCase(updateBenefit.fulfilled, (state, action) => {
         const dataUpdate = action.payload.data

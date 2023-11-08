@@ -4,7 +4,7 @@
     "memberList": "Danh sách tất cả các thành viên",
     "searchMember": "Tìm kiếm theo họ tên, SĐT, email",
     "addMember": "Thêm thành viên",
-    "editMember":"Chỉnh sửa thông tin",
+    "editMember": "Chỉnh sửa thông tin",
     "username": "Tên đăng nhập",
     "fullName": "Họ và tên",
     "userName": "Tên đăng nhập",
@@ -24,8 +24,12 @@
     "workInfo": "Thông tin làm việc",
     "allGroup": "Tất cả phòng ban",
     "password": "Mật khẩu",
-    "titleConfirmResetPassword":"Đặt lại mật khẩu",
-    "descriptionConfirmResetPassword":"Xác nhận đặt lại mật khẩu tài khoản '{{account}}'"
+    "titleConfirmResetPassword": "Đặt lại mật khẩu",
+    "descriptionConfirmResetPassword": "Xác nhận đặt lại mật khẩu tài khoản '{{account}}'",
+    "showMoreColumn": "Xem thêm cột",
+    "joinDate": "Ngày gia nhập",
+    "workForTime": "Thời gian làm việc",
+    "close": "Đóng"
   },
   "userModal": {
     "updateAvatar": "Cập nhật ảnh đại diện",
@@ -48,8 +52,8 @@
     "avatarAccept": "Lưu ý: Ảnh đại diện sẽ dùng để chấm công, nên phải là ảnh khuôn mặt được chụp trực diện, rõ mặt (có thể đeo kính cận hoặc không)",
     "enterPassword": "Nhập mật khẩu",
     "addRole": "Thêm vị trí",
-    "departmentRole": "Vai trò trong tổ chức",
-    "systemRole": "Vai trò trong hệ thống",
+    "departmentRole": "Vai trò trong tổ chức/phòng ban",
+    "systemRole": "Vai trò trong hệ thống phần mềm",
     "remainLeaveMinute": "Số phút nghỉ phép còn lại",
     "enterRemainLeaveMinute": "Ví dụ: 5760",
     "errorMessage": {
