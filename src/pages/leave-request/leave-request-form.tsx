@@ -8,6 +8,7 @@ import {
   editLeaveRequest,
   onUpdateRequestStatus
 } from '~/stores/features/leave-request/leave-request.slice'
+import { getRevisionApplied } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { ILeaveRequestEditForm, ILeaveRequestForm } from '~/types/leave-request'
 import { LeaveTypes } from '~/types/leave-request.interface'
@@ -41,32 +42,29 @@ const LeaveRequestForm: React.FC<{
   const dispatch = useAppDispatch()
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const [selectedTicketTypeId, setSelectedTicketTypeId] = useState<string>('')
-  const selectedTicketType = ticketDifinations.find((ticket) => ticket.id === selectedTicketTypeId)
+  const selectedTicketType = useAppSelector((state) => state.ticketProcess.currentRevision)
 
-  useEffect(() => {
-    if (data) {
-      setSelectedTicketTypeId(data.ticketDefinitionId)
-      form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
-      const attributesProperties = selectedTicketType?.revisions[0].processNodes['0'].attributes
-      const attributesData = data?.processStatus['0']?.attributes
+  // useEffect(() => {
+  //   if (data) {
+  //     setSelectedTicketTypeId(data.ticketDefinitionId)
+  //     form.setFieldValue('typeOfLeave', data.ticketDefinitionId)
+  //     const attributesProperties = selectedTicketType?.revisions[0].processNodes['0'].attributes
+  //     const attributesData = data?.processStatus['0']?.attributes
 
-      attributesProperties?.forEach((item) => {
-        if (item.type === INPUT_TYPE.DATETIME) {
-          form.setFieldValue(item.name, dayjs(attributesData[item.name]))
-        } else {
-          form.setFieldValue(item.name, attributesData[item.name])
-        }
-      })
-    }
-  }, [data, selectedTicketTypeId])
+  //     attributesProperties?.forEach((item) => {
+  //       if (item.type === INPUT_TYPE.DATETIME) {
+  //         form.setFieldValue(item.name, dayjs(attributesData[item.name]))
+  //       } else {
+  //         form.setFieldValue(item.name, attributesData[item.name])
+  //       }
+  //     })
+  //   }
+  // }, [data, selectedTicketTypeId])
 
   const handleSubmit = async () => {
     dispatch(onUpdateRequestStatus(false))
     const formValue = form.getFieldsValue()
-    const selectedTicket = ticketDifinations.find((item) => item.id === formValue.typeOfLeave)
-
-    const processNodesAttributes = selectedTicket?.revisions[0]?.processNodes['0']?.attributes
-
+    const processNodesAttributes = selectedTicketType?.revision?.processNodes['1']?.attributes
     const transformedFormValue = Object.keys(formValue).reduce((acc, key) => {
       const transformedValue = transformData(key, formValue, processNodesAttributes)
       return { ...acc, [key]: transformedValue }
@@ -103,11 +101,9 @@ const LeaveRequestForm: React.FC<{
     return current && current < dayjs().startOf('month')
   }
 
-  useEffect(() => {
-    if (!open) {
-      setSelectedTicketTypeId('')
-    }
-  }, [open])
+  const onChangeTicketType = (type: string) => {
+    dispatch(getRevisionApplied({ ticketType: type }))
+  }
 
   const handleDatePickerClose = () => {
     const okButtons = document.querySelectorAll('.ant-picker-ok button') as NodeListOf<HTMLButtonElement>
@@ -116,6 +112,12 @@ const LeaveRequestForm: React.FC<{
       okButton.click()
     })
   }
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedTicketTypeId('')
+    }
+  }, [open])
 
   return (
     <Modal
@@ -144,7 +146,7 @@ const LeaveRequestForm: React.FC<{
               }}
               allowClear
               onClear={() => void {}}
-              onChange={(id) => setSelectedTicketTypeId(id)}
+              onChange={(id) => onChangeTicketType(id)}
               options={ticketDifinations.map((item) => {
                 return {
                   label: item.name,
@@ -155,7 +157,7 @@ const LeaveRequestForm: React.FC<{
           </Form.Item>
 
           {selectedTicketType?.id &&
-            selectedTicketType?.revisions[0]?.processNodes['0']?.attributes?.map((item, index) => {
+            selectedTicketType?.revision?.processNodes['1']?.attributes?.map((item, index) => {
               return (
                 <Form.Item
                   key={index}
