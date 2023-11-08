@@ -32,6 +32,7 @@ import CustomNode from './component/CustomNode'
 import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
 import './style.scss'
+
 export const NodeItem = {
   START: '__START__',
   END: '__END__'
@@ -71,7 +72,7 @@ const Index = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<any>(null)
   const revisionSelected = useAppSelector((state) => state.ticketProcess.revisionSelected)
-  const ref = useRef<any>(null)
+
   const [initAttrForm] = Form.useForm()
   const [initPropForm] = Form.useForm()
   const [isModalInitAttrOpen, setIsModalInitAttrOpen] = useState<{ key: string; status: boolean }>({
@@ -325,7 +326,7 @@ const Index = () => {
       const payload: SearchPayload = Object.create(null)
       payload.ticketType = ticketType
       payload.rev = replaceRouterString(rev, 'dash')
-      dispatch(getOneRevisionByKey(payload)).unwrap()
+      dispatch(getOneRevisionByKey(payload))
     }
   }, [ticketType, rev])
 
@@ -345,6 +346,7 @@ const Index = () => {
         <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
           <InitProps form={initPropForm} />
         </div>
+
         <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
@@ -359,6 +361,8 @@ const Index = () => {
             onDragOver={onDragOver}
             onNodeDoubleClick={onElementClick}
             fitView
+            selectionOnDrag={true}
+            attributionPosition='bottom-right'
           >
             <Panel position='top-left'>
               <Button type='default' onClick={() => navigate('/ticket-definition')}>
@@ -374,7 +378,7 @@ const Index = () => {
                   okText='Đồng ý'
                   cancelText='Hủy'
                 >
-                  <Button type='primary'>Duyệt yêu cầu</Button>
+                  <Button type='primary'>Duyệt quy trình</Button>
                 </Popconfirm>
               )}
 
