@@ -50,31 +50,33 @@ const ModalApprove = (props: {
     .sort((a, b) => a.key - b.key)
     .map(({ value }) => value)
 
-  const mappedSteps: TicketProcessNode[] = sortedProcessSteps.map((step: any, index) => {
-    const matchingNode = sortedProcessNodes[index]
-    const attributes = step.attributes || {}
-    const attributesWithValues =
-      matchingNode?.attributes?.map((item) => ({
-        ...item,
-        value: attributes[item.name] || null
-      })) || []
+  const mappedSteps: TicketProcessNode[] = sortedProcessSteps
+    .map((step: any, index) => {
+      const matchingNode = sortedProcessNodes[index]
+      const attributes = step.attributes || {}
+      const attributesWithValues =
+        matchingNode?.attributes?.map((item) => ({
+          ...item,
+          value: attributes[item.name] || null
+        })) || []
 
-    return {
-      ...step,
-      name: matchingNode?.name || '',
-      attributes: attributesWithValues
-    }
-  })
-  const filteredSteps = mappedSteps
-    .filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
-    .filter((step, index) => {
-      if (index === 0) {
-        return true
-      } else {
-        const previousStep = mappedSteps[index - 1]
-        return previousStep.status === TicketStatusEnum.FINISHED
+      return {
+        ...step,
+        name: matchingNode?.name || '',
+        attributes: attributesWithValues,
+        nodeIndex: matchingNode?.nodeIndex
       }
     })
+    .filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
+
+  const filteredSteps = mappedSteps.filter((step, index) => {
+    if (index === 0) {
+      return true
+    } else {
+      const previousStep = mappedSteps[index - 1]
+      return previousStep.status === TicketStatusEnum.FINISHED
+    }
+  })
 
   filteredSteps.sort((a, b) => {
     if (a.status === TicketStatusEnum.FINISHED && b.status !== TicketStatusEnum.FINISHED) return -1
@@ -102,7 +104,7 @@ const ModalApprove = (props: {
     status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED,
     attributes: any,
     ticketId: string,
-    nodeId: number
+    nodeId: number | string | undefined
   ) => {
     for (const prop in attributes) {
       if (dayjs.isDayjs(attributes[prop])) {
@@ -126,7 +128,7 @@ const ModalApprove = (props: {
     status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED,
     attributes: any,
     ticketId: string,
-    nodeId: number
+    nodeId: number | string | undefined
   ) => {
     dispatch(onUpdateRequestStatus(false))
     const payload: ILeaveRequestUpdateStatusForm = {
@@ -150,12 +152,12 @@ const ModalApprove = (props: {
     }
   }
 
-  const onApprove = (nodeId: number) => {
+  const onApprove = (nodeId: string | number | undefined) => {
     onUpdateSuccess(false)
     showConfirm(TicketStatusEnum.FINISHED, fieldValues, ticket.id, nodeId)
   }
 
-  const onReject = (nodeId: number) => {
+  const onReject = (nodeId: string | number | undefined) => {
     onUpdateSuccess(false)
     showConfirm(TicketStatusEnum.REJECTED, fieldValues, ticket.id, nodeId)
   }
@@ -309,7 +311,7 @@ const ModalApprove = (props: {
                                             {step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER && (
                                               <Button
                                                 danger
-                                                onClick={() => onReject(mainIndex)}
+                                                onClick={() => onReject(step?.nodeIndex)}
                                                 disabled={isAnyRequiredFieldEmpty(step)}
                                               >
                                                 Từ chối
@@ -318,7 +320,7 @@ const ModalApprove = (props: {
 
                                             <Button
                                               type='primary'
-                                              onClick={() => onApprove(mainIndex)}
+                                              onClick={() => onApprove(step?.nodeIndex)}
                                               disabled={isAnyRequiredFieldEmpty(step)}
                                             >
                                               Đồng ý
