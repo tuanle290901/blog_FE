@@ -552,6 +552,7 @@ const Department: React.FC = () => {
         style={{ width: '100%' }}
         className='pointer'
         scroll={{ y: 'calc(100vh - 360px)' }}
+        rowClassName={(record, index) => (index % 2 === 0 ? 'tw-bg-sky-50' : '')}
         rowKey={(record: DataType) => record.code}
         onRow={(record) => {
           return {
