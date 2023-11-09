@@ -28,7 +28,7 @@ export interface ILeaveRequestEditForm {
 
 export interface ILeaveRequestUpdateStatusForm {
   ticketId: string
-  nodeId: number
+  nodeId: number | string | undefined
   attrs: { [key: string]: string }
   status: TicketStatusEnum.FINISHED | TicketStatusEnum.REJECTED
 }

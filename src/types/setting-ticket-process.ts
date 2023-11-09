@@ -63,6 +63,7 @@ export interface TicketProcessNode {
   groupCode?: string
   groupCodes?: string[] | any
   attributes: TicketAttribute[]
+  nodeIndex?: number | string | undefined
   name?: string
   histories?: { executorId: string; createdAt: string; actualGroup: string }[]
   status?: string
