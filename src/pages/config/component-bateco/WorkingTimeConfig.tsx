@@ -17,6 +17,8 @@ import {
 } from '~/types/working-time.interface'
 import '../index.scss'
 import { useNavigate } from 'react-router-dom'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
 
 const currentQuater = `Q${Math.floor((new Date().getMonth() + 3) / 3)}`
 const quarterOptions: { value: string }[] = [{ value: 'Q1' }, { value: 'Q2' }, { value: 'Q3' }, { value: 'Q4' }]
@@ -85,6 +87,8 @@ const renderRow = (
 const WorkingTimeConfig = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { userInfo } = useUserInfo()
+  const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const workingTimeInfo: IWorkingInfo = useAppSelector((item) => item.workingTime.workingTimeInfo)
   const [checkedValues, setCheckedValues] = useState<CheckboxValueType[]>([])
   const [selectedQuarter, setSelectedQuarter] = useState<string>(currentQuater)
@@ -250,7 +254,12 @@ const WorkingTimeConfig = () => {
               </Row>
 
               <div className='tw-mt-2'>
-                <Checkbox.Group value={checkedValues} onChange={onChangeSatOptions} className='tw-w-full'>
+                <Checkbox.Group
+                  disabled={systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
+                  value={checkedValues}
+                  onChange={onChangeSatOptions}
+                  className='tw-w-full'
+                >
                   <div className='tw-flex tw-flex-wrap tw-w-full'>
                     {saturdayList.map((option, index) => {
                       return (
@@ -272,7 +281,11 @@ const WorkingTimeConfig = () => {
               </div>
             </div>
             <div className='tw-flex tw-justify-end tw-mt-3'>
-              <Button type='primary' onClick={updateQuarter} disabled={disableSubmit}>
+              <Button
+                type='primary'
+                onClick={updateQuarter}
+                disabled={disableSubmit || systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
+              >
                 Lưu cấu hình
               </Button>
             </div>

@@ -206,12 +206,18 @@ const ModalApprove = (props: {
                       key={mainIndex}
                       dot={
                         step.groupCodes.includes(NodeItem.START) ? (
-                          <ClockCircleOutlined className='timeline-clock-icon' />
+                          <UpCircleOutlined className='timeline-clock-icon tw-text-xl' />
                         ) : (
-                          <UpCircleOutlined className='timeline-clock-icon' />
+                          <UpCircleOutlined className='timeline-clock-icon tw-text-xl' />
                         )
                       }
-                      color={step.status === TicketStatusEnum.FINISHED ? 'green' : 'blue'}
+                      color={
+                        step.status === TicketStatusEnum.FINISHED
+                          ? 'green'
+                          : step.status === TicketStatusEnum.REJECTED
+                          ? 'red'
+                          : 'blue'
+                      }
                     >
                       <div className='feature-container'>
                         <Row gutter={[0, 16]}>

@@ -32,6 +32,8 @@ import CustomNode from './component/CustomNode'
 import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
 import './style.scss'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
 
 export const NodeItem = {
   START: '__START__',
@@ -64,6 +66,8 @@ const initialNodes = [
 const Index = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { userInfo } = useUserInfo()
+  const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const { ticketType, rev } = useParams()
   const reactFlowWrapper = useRef<any>(null)
   const nodeIndexRef = useRef<number>(initialNodes.length + 1)
@@ -361,38 +365,53 @@ const Index = () => {
             fitView
             selectionOnDrag={true}
             attributionPosition='bottom-right'
+            edgesUpdatable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            edgesFocusable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            nodesConnectable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            nodesFocusable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            draggable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            panOnDrag={true}
+            elementsSelectable={true}
+            deleteKeyCode={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN ? ['Delete', 'Backspace'] : []}
           >
             <Panel position='top-left'>
               <Button type='default' onClick={() => navigate('/ticket-definition')}>
                 Quay lại
               </Button>
             </Panel>
-            <Panel position='top-right'>
-              {rev && ticketType && (
-                <Popconfirm
-                  title='Duyệt quy trình'
-                  description='Bạn có chắc chắn thực hiện?'
-                  onConfirm={onApprove}
-                  okText='Đồng ý'
-                  cancelText='Hủy'
+
+            {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+              <>
+                (
+                <Panel position='top-right'>
+                  {rev && ticketType && (
+                    <Popconfirm
+                      title='Duyệt quy trình'
+                      description='Bạn có chắc chắn thực hiện?'
+                      onConfirm={onApprove}
+                      okText='Đồng ý'
+                      cancelText='Hủy'
+                    >
+                      <Button type='primary'>Áp dụng quy trình này</Button>
+                    </Popconfirm>
+                  )}
+
+                  {(!rev || !ticketType) && (
+                    <Button type='primary' onClick={() => onSave()}>
+                      Lưu thông tin
+                    </Button>
+                  )}
+                </Panel>
+                <Panel
+                  className='source-box-panel tw-w-[90%] tw-h-[60px] tw-bg-white tw-flex tw-items-center tw-justify-center'
+                  position='bottom-center'
                 >
-                  <Button type='primary'>Duyệt quy trình</Button>
-                </Popconfirm>
-              )}
+                  <SourceNode />
+                </Panel>
+                )
+              </>
+            )}
 
-              {(!rev || !ticketType) && (
-                <Button type='primary' onClick={() => onSave()}>
-                  Lưu thông tin
-                </Button>
-              )}
-            </Panel>
-
-            <Panel
-              className='source-box-panel tw-w-[90%] tw-h-[60px] tw-bg-white tw-flex tw-items-center tw-justify-center'
-              position='bottom-center'
-            >
-              <SourceNode />
-            </Panel>
             <Controls />
             <Background gap={20} size={1} />
           </ReactFlow>

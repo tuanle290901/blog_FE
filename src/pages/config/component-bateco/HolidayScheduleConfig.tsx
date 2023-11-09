@@ -34,6 +34,8 @@ import { convertMonthToLocaleVi } from '~/utils/helper'
 import '../index.scss'
 import { REGEX_TRIM } from '~/constants/regex.constant'
 import { useTranslation } from 'react-i18next'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
 
 const { confirm } = Modal
 
@@ -108,6 +110,8 @@ const headerRender = ({ value, onChange }: any) => {
 const HolidayScheduleConfig = () => {
   const dispatch = useAppDispatch()
   const [form] = useForm()
+  const { userInfo } = useUserInfo()
+  const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const holidayList = useAppSelector((item) => item.holidaySchedule.holidayList)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const { t } = useTranslation()
@@ -301,6 +305,7 @@ const HolidayScheduleConfig = () => {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete='off'
+          disabled={systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
         >
           <Form.Item
             label='Mã ngày nghỉ'
