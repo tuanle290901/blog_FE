@@ -382,7 +382,6 @@ const Index = () => {
 
             {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
               <>
-                (
                 <Panel position='top-right'>
                   {rev && ticketType && (
                     <Popconfirm
@@ -408,7 +407,6 @@ const Index = () => {
                 >
                   <SourceNode />
                 </Panel>
-                )
               </>
             )}
 

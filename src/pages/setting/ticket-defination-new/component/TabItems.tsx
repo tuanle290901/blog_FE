@@ -126,13 +126,13 @@ const TabItems = () => {
 
   return (
     <div>
-      {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+      {/* {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
         <div className='tw-mb-2 tw-flex tw-items-center'>
           <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
             Tạo phiên bản mới
           </Button>
         </div>
-      )}
+      )} */}
 
       <Table
         columns={columns}
