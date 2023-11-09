@@ -1,6 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DeleteOutlined, EditOutlined, EyeOutlined, LockOutlined, UndoOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  LockOutlined,
+  UndoOutlined,
+  UnorderedListOutlined
+} from '@ant-design/icons'
 import {
   Button,
   Checkbox,
@@ -62,6 +69,7 @@ const UserList: React.FC = () => {
   const groups = useAppSelector((state) => state.masterData.groups)
   const [query, setQuery] = useState<string>('')
   const fileSelect = useRef<any>(null)
+  const wrapperRef = useRef(null)
   const [searchValue, setSearchValue] = useState<{
     query: string
     group?: string | null
@@ -553,6 +561,19 @@ const UserList: React.FC = () => {
     setCheckedList(list)
   }
 
+  const handleClickOutside = async (event: { target: any }) => {
+    if (wrapperRef.current && !(wrapperRef.current as HTMLElement).contains(event.target)) {
+      await setShowMoreColumn(false)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+    }
+  }, [])
+
   return (
     <div className='tw-min-h-[calc(100%-32px)] tw-bg-white tw-m-2 md:tw-m-4'>
       <div className='user-list tw-p-2 md:tw-p-4'>
@@ -570,8 +591,9 @@ const UserList: React.FC = () => {
           </h1>
           <h5 className='tw-text-sm'>{t('userList.memberList')}</h5>
         </div>
-        <Row gutter={[8, 16]} className='tw-mt-4'>
-          <Col xs={24} md={6} lg={4} xl={4}>
+        <Row gutter={[16, 16]} className='tw-mt-4'>
+          {/* <Col xs={24} md={6} lg={4} xl={4}> */}
+          <Col xs={24} md={6} lg={6} xl={6}>
             <div className='tw-float-right tw-flex tw-flex-col md:tw-flex-row tw-w-full tw-gap-[10px]'>
               {/* {permissionAddUser && (
                 <Button onClick={openModalCreateUser} type='primary' icon={<PlusOutlined />}>
@@ -598,7 +620,8 @@ const UserList: React.FC = () => {
               )}
             </div>
           </Col>
-          <Col xs={24} md={12} lg={16} xl={18} className='tw-flex tw-justify-end'>
+          {/* <Col xs={24} md={12} lg={16} xl={18} className='tw-flex tw-justify-end'> */}
+          <Col xs={24} md={18} lg={18} xl={18} className='tw-flex tw-justify-end'>
             <div className='tw-flex tw-flex-col lg:tw-flex-row md:tw-justify-end tw-w-full tw-gap-[10px]'>
               <Select
                 onChange={handleDepartmentChange}
@@ -622,36 +645,37 @@ const UserList: React.FC = () => {
               />
             </div>
           </Col>
-          <Col xs={24} md={6} lg={4} xl={2} className='tw-flex tw-justify-end'>
-            <div className='show-column'>
+          {/* <Col xs={24} md={6} lg={4} xl={2} className='tw-flex tw-justify-end'> */}
+          <Col xs={24} md={24} lg={24} xl={24} className='tw-flex tw-justify-end'>
+            <div className='show-column min-width-button-120 height-input-36'>
               <CommonButton
-                typeProps={{}}
+                typeProps={{ size: 'large' }}
                 onClick={() => setShowMoreColumn(!showMoreColumn)}
-                icon={null}
+                icon={<UnorderedListOutlined />}
                 title={t('userList.showMoreColumn')}
                 classNameProps={''}
                 loading={false}
               />
               {showMoreColumn && (
-                <div className='column-option'>
+                <div className='column-option' ref={wrapperRef}>
                   <CheckboxGroup options={columnOptions} value={checkedList} onChange={handleColumn} />
-                  <div className='tw-flex tw-justify-center'>
+                  {/* <div className='tw-flex tw-justify-center tw-my-2'>
                     <CommonButton
-                      typeProps={{}}
+                      typeProps={{ size: 'large' }}
                       classNameProps={''}
                       onClick={() => setShowMoreColumn(!showMoreColumn)}
-                      title={t('close')}
-                      icon={undefined}
+                      title={t('userList.close')}
+                      icon={null}
                       loading={false}
                     />
-                  </div>
+                  </div> */}
                 </div>
               )}
             </div>
           </Col>
         </Row>
 
-        <div className='tw-mt-6 user-table'>
+        <div className='tw-mt-4 user-table'>
           <Table
             rowKey='id'
             columns={columns}
@@ -668,7 +692,7 @@ const UserList: React.FC = () => {
               responsive: true
             }}
             rowClassName={(record, index) =>
-              record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : index % 2 === 0 ? 'tw-bg-blue-100' : ''
+              record.status === USER_STATUS.DEACTIVE ? 'tw-bg-gray-100' : index % 2 === 0 ? 'tw-bg-sky-50' : ''
             }
             scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
             onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}

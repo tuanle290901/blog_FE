@@ -654,6 +654,7 @@ const LeaveRequest: React.FC = () => {
           columns={columns.filter((col: any) => visibleColumns.includes(col.key))}
           dataSource={listData}
           scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
+          rowClassName={(record, index) => (index % 2 === 0 ? 'tw-bg-sky-50' : '')}
           onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
           loading={isLoading}
           pagination={{

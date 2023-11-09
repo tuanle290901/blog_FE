@@ -28,7 +28,7 @@
     "descriptionConfirmResetPassword": "Xác nhận đặt lại mật khẩu tài khoản '{{account}}'",
     "showMoreColumn": "Xem thêm cột",
     "joinDate": "Ngày gia nhập",
-    "workForTime": "Thời gian làm việc",
+    "workForTime": "Thâm niên công tác",
     "close": "Đóng"
   },
   "userModal": {
@@ -40,7 +40,7 @@
     "enterAddress": "Nhập địa chỉ thành viên",
     "selectDOB": "Chọn ngày sinh thành viên",
     "selectDepartment": "Chọn tổ chức",
-    "selectPosition": "Chọn vai trò trong tổ chức",
+    "selectPosition": "Chọn chức vụ trong tổ chức",
     "selectFunction": "Chọn vai trò trong hệ thống",
     "enterPhoneNumber": "Nhập số điện thoại thành viên",
     "enterEmail": "Nhập email thành viên",
@@ -52,7 +52,7 @@
     "avatarAccept": "Lưu ý: Ảnh đại diện sẽ dùng để chấm công, nên phải là ảnh khuôn mặt được chụp trực diện, rõ mặt (có thể đeo kính cận hoặc không)",
     "enterPassword": "Nhập mật khẩu",
     "addRole": "Thêm vị trí",
-    "departmentRole": "Vai trò trong tổ chức/phòng ban",
+    "departmentRole": "Chức vụ trong tổ chức/phòng ban",
     "systemRole": "Vai trò trong hệ thống phần mềm",
     "remainLeaveMinute": "Số phút nghỉ phép còn lại",
     "enterRemainLeaveMinute": "Ví dụ: 5760",
