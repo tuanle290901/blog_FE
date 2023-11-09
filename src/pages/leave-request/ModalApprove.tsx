@@ -63,7 +63,16 @@ const ModalApprove = (props: {
       attributes: attributesWithValues
     }
   })
-  const filteredSteps = mappedSteps.filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
+  const filteredSteps = mappedSteps
+    .filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
+    .filter((step, index) => {
+      if (index === 0) {
+        return true
+      } else {
+        const previousStep = mappedSteps[index - 1]
+        return previousStep.status === TicketStatusEnum.FINISHED
+      }
+    })
 
   filteredSteps.sort((a, b) => {
     if (a.status === TicketStatusEnum.FINISHED && b.status !== TicketStatusEnum.FINISHED) return -1
