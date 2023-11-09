@@ -400,7 +400,7 @@ const Benefit: React.FC = () => {
                 responsive: true
               }}
               scroll={{ y: 'calc(100vh - 368px)', x: 800 }}
-              rowClassName={(record, index) => (index % 2 === 0 ? 'tw-bg-blue-100' : '')}
+              rowClassName={(record, index) => (index % 2 === 0 ? 'tw-bg-sky-50' : '')}
               onChange={(pagination, filters, sorter) => handleTableChange(pagination, filters, sorter)}
             />
           )}

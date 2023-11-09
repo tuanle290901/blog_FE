@@ -1,29 +1,64 @@
+@import './styles/variables.scss';
+
 .user-list {
   .ant-table-body {
     overflow: auto !important;
   }
 }
+
 .ant-modal-content {
   padding: 0 !important;
   border-radius: 0 !important;
+
   .ant-modal-header {
     padding: 16px 24px;
     margin: 0;
   }
+
   .ant-modal-body {
     @apply tw-border-y tw-border-solid tw-border-[#eee];
     padding: 16px 24px;
   }
+
   .ant-modal-footer {
     padding: 16px 24px;
     margin: 0;
   }
 }
 
+.min-width-button-120 {
+  .ant-btn {
+    justify-content: center;
+    min-width: $min-width-button;
+    border-radius: 0px;
+    color: $main-color;
+    border: 1px solid $main-color;
+  }
+}
+
+.height-input-36 {
+  .ant-input,
+  .ant-picker,
+  .ant-btn,
+  .ant-select-selection-search-input,
+  .ant-select-selector,
+  .ant-select-selection-placeholder {
+    height: $height-element !important;
+    line-height: $height-element !important;
+  }
+
+  .height-auto {
+    height: auto !important;
+    line-height: auto !important;
+  }
+}
+
 /* width */
 ::-webkit-scrollbar {
-  height: 5px; /* height of horizontal scrollbar ← You're missing this */
-  width: 5px; /* width of vertical scrollbar */
+  height: 5px;
+  /* height of horizontal scrollbar ← You're missing this */
+  width: 5px;
+  /* width of vertical scrollbar */
   border: 1px solid #bdbdbd;
 }
 
@@ -41,6 +76,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #428bbe;
 }
+
 * {
   scrollbar-width: thin;
 }

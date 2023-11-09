@@ -35,7 +35,9 @@ const ModalApprove = (props: {
   const { userInfo } = useUserInfo()
 
   const ticketDefinition = useAppSelector((state) => state.ticketProcess.revisionSelected)
-  const ticketProcessNodes: TicketProcessNode[] = Object.values(ticketDefinition?.revision?.processNodes || [])
+  const ticketProcessNodes: TicketProcessNode[] = Object.values(
+    (ticketDefinition?.revision && ticketDefinition?.revision?.processNodes) || []
+  )
 
   const sortedProcessNodes = Object.entries(ticketProcessNodes)
     .map(([key, value]) => ({ key: parseInt(key), value }))
