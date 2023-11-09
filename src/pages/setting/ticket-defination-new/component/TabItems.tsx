@@ -2,17 +2,18 @@ import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-de
 import { Button, Popconfirm, Table, TableColumnsType, Tooltip, notification } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  deleteRevision,
-  fetchListTicket,
-  getListRevisionByTicketType,
-  getTicketById
-} from '~/stores/features/setting/ticket-process.slice'
+import { deleteRevision, getListRevisionByTicketType } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { SearchPayload, TicketProcessRevision } from '~/types/setting-ticket-process'
 import { replaceRouterString } from '~/utils/helper'
 
+import dayjs from 'dayjs'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
+
 const TabItems = () => {
+  const { userInfo } = useUserInfo()
+  const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const ticketSelected = useAppSelector((state) => state.ticketProcess.ticketSelected)
@@ -56,7 +57,11 @@ const TabItems = () => {
         dataIndex: 'applyFromDate',
         sorter: false,
         showSorterTooltip: false,
-        ellipsis: true
+        ellipsis: true,
+        render(value) {
+          if (!value) return null
+          return dayjs(value).format('DD/MM/YYYY')
+        }
       },
       {
         key: 'applyToDate',
@@ -65,7 +70,11 @@ const TabItems = () => {
         dataIndex: 'applyToDate',
         sorter: false,
         showSorterTooltip: false,
-        ellipsis: true
+        ellipsis: true,
+        render(value) {
+          if (!value) return null
+          return dayjs(value).format('DD/MM/YYYY')
+        }
       },
       {
         key: 'status',
@@ -93,14 +102,18 @@ const TabItems = () => {
                       icon={<EyeOutlined className='tw-text-blue-600' />}
                     />
                   </Tooltip>
-                  <Tooltip title='Sao chép từ phiên bản này'>
-                    <Button size='small' icon={<CopyOutlined className='tw-text-blue-600' />} />
-                  </Tooltip>
-                  <Tooltip title='Xóa phiên bản'>
-                    <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => deleteRev(record)}>
-                      <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
-                    </Popconfirm>
-                  </Tooltip>
+                  {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+                    <>
+                      <Tooltip title='Sao chép từ phiên bản này'>
+                        <Button size='small' icon={<CopyOutlined className='tw-text-blue-600' />} />
+                      </Tooltip>
+                      <Tooltip title='Xóa phiên bản'>
+                        <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => deleteRev(record)}>
+                          <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
+                        </Popconfirm>
+                      </Tooltip>
+                    </>
+                  )}
                 </>
               </div>
             </div>
@@ -113,11 +126,13 @@ const TabItems = () => {
 
   return (
     <div>
-      <div className='tw-mb-2 tw-flex tw-items-center'>
-        <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
-          Tạo phiên bản mới
-        </Button>
-      </div>
+      {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+        <div className='tw-mb-2 tw-flex tw-items-center'>
+          <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
+            Tạo phiên bản mới
+          </Button>
+        </div>
+      )}
 
       <Table
         columns={columns}

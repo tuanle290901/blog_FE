@@ -7,6 +7,8 @@ import { useState, type FC } from 'react'
 import { INPUT_TYPE } from '~/utils/Constant'
 import { ModalInitAttrProp } from '../type/ItemTypes'
 import './../style.scss'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { ROLE } from '~/constants/app.constant'
 
 const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
   const {
@@ -19,6 +21,8 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
   } = props
 
   const [collapsed, setCollapsed] = useState<boolean[]>([true])
+  const { userInfo } = useUserInfo()
+  const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
 
   return (
     <Modal
@@ -41,6 +45,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
         initialValues={{
           initAttr: [{ name: null, type: null, required: null, options: [], suggestion: [], description: null }]
         }}
+        disabled={systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
       >
         <Form.List name='initAttr'>
           {(fields, { add, remove }) => {

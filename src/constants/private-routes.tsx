@@ -84,13 +84,13 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'ticket-definition',
     path: PRIVATE_PATH.setting.ticketProcessDefinitionNew,
     component: TicketDefinitionList,
-    allowedRoles: [ROLE.SYSTEM_ADMIN]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'ticket-definition/:id',
     path: PRIVATE_PATH.setting.ticketDefinitionById,
     component: TicketDefinationNew,
-    allowedRoles: [ROLE.SYSTEM_ADMIN]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'ticket-definition/create-revision',
@@ -102,7 +102,7 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'ticket-definition/view-revision',
     path: PRIVATE_PATH.setting.ticketDefinitionView,
     component: TicketDefinationNew,
-    allowedRoles: [ROLE.SYSTEM_ADMIN]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'userHistory',
@@ -127,13 +127,13 @@ export const PRIVATE_ROUTES: IRoutes[] = [
     name: 'working-time',
     path: PRIVATE_PATH.config.prefix,
     component: CommonTimeConfigBateco,
-    allowedRoles: [ROLE.SYSTEM_ADMIN]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'holiday-schedule',
     path: PRIVATE_PATH.config.holidaySchedule,
     component: HolidayScheduleConfig,
-    allowedRoles: [ROLE.SYSTEM_ADMIN]
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },
   {
     name: 'positions',

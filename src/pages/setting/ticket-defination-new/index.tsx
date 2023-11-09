@@ -1,17 +1,11 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
-import { Button, Divider, Empty, Popconfirm, TableColumnsType, TablePaginationConfig, Tabs, Tooltip } from 'antd'
-import { FilterValue, SorterResult } from 'antd/es/table/interface'
-import { FC, memo, useEffect, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { Divider, Empty, Tabs } from 'antd'
+import { FC, memo, useEffect } from 'react'
 import {
   fetchListTicket,
   getListRevisionByTicketType,
   getTicketById
 } from '~/stores/features/setting/ticket-process.slice'
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
-import { IPaging } from '~/types/api-response.interface'
-import { ILeaveRequest } from '~/types/leave-request'
 import { SearchPayload, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 import TabItems from './component/TabItems'
 
