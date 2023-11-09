@@ -1,6 +1,7 @@
-import { ExclamationCircleFilled } from '@ant-design/icons'
-import { AutoComplete, Button, Col, DatePicker, Modal, Row, Space, Tag, notification } from 'antd'
+import { ExclamationCircleFilled, ClockCircleOutlined, UpCircleOutlined } from '@ant-design/icons'
+import { AutoComplete, Button, Col, DatePicker, Modal, Row, Space, Tag, notification, Timeline } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import TimelineItem from 'antd/es/timeline/TimelineItem'
 import dayjs from 'dayjs'
 import { memo, useEffect, useState } from 'react'
 import { onUpdateRequestStatus, updateLeaveRequest } from '~/stores/features/leave-request/leave-request.slice'
@@ -13,6 +14,8 @@ import { SearchPayload, TicketAttribute, TicketProcessNode } from '~/types/setti
 import { GroupProfile } from '~/types/user.interface'
 import { INPUT_TYPE, LEAVE_TYPE_MAP, TICKET_STATUS, TicketStatusEnum } from '~/utils/Constant'
 import { mappingDepartmentByCode, replaceRouterString, tagColorMapping } from '~/utils/helper'
+import { NodeItem } from '../setting/ticket-defination-new/TicketDefinitionCreate'
+import { STATUS_CODES } from 'http'
 const { confirm } = Modal
 export enum PROCESS_GROUPCODE {
   START = '__START__',
@@ -62,7 +65,16 @@ const ModalApprove = (props: {
       attributes: attributesWithValues
     }
   })
-  const filteredSteps = mappedSteps.filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
+  const filteredSteps = mappedSteps
+    .filter((step) => step.groupCodes[0] !== PROCESS_GROUPCODE.END)
+    .filter((step, index) => {
+      if (index === 0) {
+        return true
+      } else {
+        const previousStep = mappedSteps[index - 1]
+        return previousStep.status === TicketStatusEnum.FINISHED
+      }
+    })
 
   filteredSteps.sort((a, b) => {
     if (a.status === TicketStatusEnum.FINISHED && b.status !== TicketStatusEnum.FINISHED) return -1
@@ -183,158 +195,173 @@ const ModalApprove = (props: {
 
       <Row gutter={[0, 16]}>
         <Col span={24}>
-          {filteredSteps &&
-            filteredSteps.length > 0 &&
-            filteredSteps.map((step, mainIndex) => {
-              return (
-                <>
-                  {step.status && (
-                    <div className='feature-container' key={mainIndex}>
-                      <Row gutter={[0, 16]}>
-                        <Col span={24} className='tw-flex'>
-                          <div className='tw-font-semibold'>{step.name}</div>
-                        </Col>
+          {filteredSteps && filteredSteps.length > 0 && (
+            <Timeline mode='left' reverse={true}>
+              {filteredSteps.map((step, mainIndex) => {
+                return (
+                  step.status && (
+                    <TimelineItem
+                      key={mainIndex}
+                      dot={
+                        step.groupCodes.includes(NodeItem.START) ? (
+                          <ClockCircleOutlined className='timeline-clock-icon' />
+                        ) : (
+                          <UpCircleOutlined className='timeline-clock-icon' />
+                        )
+                      }
+                      color={step.status === TicketStatusEnum.FINISHED ? 'green' : 'blue'}
+                    >
+                      <div className='feature-container'>
+                        <Row gutter={[0, 16]}>
+                          <Col span={24} className='tw-flex'>
+                            <div className='tw-font-semibold'>{step.name}</div>
+                          </Col>
 
-                        {step.attributes &&
-                          step.attributes.length > 0 &&
-                          step.attributes.map((item, index) => {
-                            if (
-                              step.status === TicketStatusEnum.FINISHED ||
-                              step.status === TicketStatusEnum.REJECTED
-                            ) {
-                              return (
-                                <Col xs={24} lg={12} className='tw-flex' key={index}>
-                                  <div className='lg:tw-min-w-[200px]'>{item.description}:</div>
-                                  <div className='tw-font-medium tw-ml-[4px]'>{mappingValueByType(item)}</div>
-                                </Col>
-                              )
-                            } else if (
-                              step.status === TicketStatusEnum.PENDING ||
-                              step.status === TicketStatusEnum.PROCESSING
-                            ) {
-                              return (
-                                <>
-                                  <Col span={24} className='tw-flex tw-items-center' key={index}>
-                                    {(isSystemAdmin ||
-                                      userInfo.userName === (step?.executors && step.executors[0])) && (
-                                      <>
-                                        <div className='lg:tw-min-w-[200px]'>
-                                          {item?.required && <span className='tw-text-red-600'>* </span>}
-                                          {item.description}:
-                                        </div>
-                                        {item.type === INPUT_TYPE.TEXT && (
-                                          <AutoComplete
-                                            className='tw-w-full'
-                                            value={fieldValues[item.name] || ''}
-                                            onChange={(data) => {
-                                              const newValue = {
-                                                ...fieldValues,
-                                                [item.name]: data
-                                              }
-                                              setFieldValues(newValue)
-                                            }}
-                                            options={item?.suggestion?.map((value) => ({ value }))}
-                                          >
-                                            <TextArea placeholder={item.description} />
-                                          </AutoComplete>
-                                        )}
-
-                                        {item.type === INPUT_TYPE.DATETIME && (
-                                          <DatePicker
-                                            value={fieldValues[item.name] ? dayjs(fieldValues[item.name]) : null}
-                                            onChange={(date) => {
-                                              const newValue = {
-                                                ...fieldValues,
-                                                [item.name]: date
-                                              }
-                                              setFieldValues(newValue)
-                                            }}
-                                            placeholder={item.description}
-                                            className='tw-w-full'
-                                            showTime={{
-                                              hideDisabledOptions: true,
-                                              defaultValue: dayjs('08:00:00', 'HH:mm:ss'),
-                                              format: 'HH:mm',
-                                              minuteStep: 5
-                                            }}
-                                            format='DD/MM/YYYY HH:mm'
-                                          />
-                                        )}
-                                      </>
-                                    )}
-
-                                    {index === 0 &&
-                                      !isSystemAdmin &&
-                                      userInfo.userName !== (step?.executors && step.executors[0]) && (
-                                        <div>
-                                          <span className='tw-mr-3'>Trạng thái:</span>
-                                          <Tag
-                                            style={{ minWidth: 80, textAlign: 'center' }}
-                                            color={tagColorMapping(TicketStatusEnum.PROCESSING)}
-                                          >
-                                            {TICKET_STATUS[TicketStatusEnum.PROCESSING]}
-                                          </Tag>
-                                        </div>
-                                      )}
+                          {step.attributes &&
+                            step.attributes.length > 0 &&
+                            step.attributes.map((item, index) => {
+                              if (
+                                step.status === TicketStatusEnum.FINISHED ||
+                                step.status === TicketStatusEnum.REJECTED
+                              ) {
+                                return (
+                                  <Col xs={24} lg={12} className='tw-flex' key={index}>
+                                    <div className='lg:tw-min-w-[200px]'>{item.description}:</div>
+                                    <div className='tw-font-medium tw-ml-[4px]'>{mappingValueByType(item)}</div>
                                   </Col>
-                                  {index === step?.attributes?.length - 1 &&
-                                    (step.status === TicketStatusEnum.PENDING ||
-                                      step.status === TicketStatusEnum.PROCESSING) &&
-                                    (isSystemAdmin || userInfo.userName === (step?.executors && step.executors[0])) && (
-                                      <Col span={24} className='tw-flex tw-justify-center'>
-                                        <Space>
-                                          {step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER && (
-                                            <Button
-                                              danger
-                                              onClick={() => onReject(mainIndex)}
-                                              disabled={isAnyRequiredFieldEmpty(step)}
+                                )
+                              } else if (
+                                step.status === TicketStatusEnum.PENDING ||
+                                step.status === TicketStatusEnum.PROCESSING
+                              ) {
+                                return (
+                                  <>
+                                    <Col span={24} className='tw-flex tw-items-center' key={index}>
+                                      {(isSystemAdmin ||
+                                        userInfo.userName === (step?.executors && step.executors[0])) && (
+                                        <>
+                                          <div className='lg:tw-min-w-[200px]'>
+                                            {item?.required && <span className='tw-text-red-600'>* </span>}
+                                            {item.description}:
+                                          </div>
+                                          {item.type === INPUT_TYPE.TEXT && (
+                                            <AutoComplete
+                                              className='tw-w-full'
+                                              value={fieldValues[item.name] || ''}
+                                              onChange={(data) => {
+                                                const newValue = {
+                                                  ...fieldValues,
+                                                  [item.name]: data
+                                                }
+                                                setFieldValues(newValue)
+                                              }}
+                                              options={item?.suggestion?.map((value) => ({ value }))}
                                             >
-                                              Từ chối
-                                            </Button>
+                                              <TextArea placeholder={item.description} />
+                                            </AutoComplete>
                                           )}
 
-                                          <Button
-                                            type='primary'
-                                            onClick={() => onApprove(mainIndex)}
-                                            disabled={isAnyRequiredFieldEmpty(step)}
-                                          >
-                                            Đồng ý
-                                          </Button>
-                                        </Space>
-                                      </Col>
-                                    )}
-                                </>
-                              )
-                            }
-                          })}
+                                          {item.type === INPUT_TYPE.DATETIME && (
+                                            <DatePicker
+                                              value={fieldValues[item.name] ? dayjs(fieldValues[item.name]) : null}
+                                              onChange={(date) => {
+                                                const newValue = {
+                                                  ...fieldValues,
+                                                  [item.name]: date
+                                                }
+                                                setFieldValues(newValue)
+                                              }}
+                                              placeholder={item.description}
+                                              className='tw-w-full'
+                                              showTime={{
+                                                hideDisabledOptions: true,
+                                                defaultValue: dayjs('08:00:00', 'HH:mm:ss'),
+                                                format: 'HH:mm',
+                                                minuteStep: 5
+                                              }}
+                                              format='DD/MM/YYYY HH:mm'
+                                            />
+                                          )}
+                                        </>
+                                      )}
 
-                        {step?.status !== TicketStatusEnum.PENDING && step.histories && step?.histories?.length > 0 && (
-                          <Col span={24} className='tw-flex tw-justify-end '>
-                            <div>
-                              <span className='tw-mr-2'>bởi</span>
-                              <span className='tw-text-sky-700 tw-italic'>
-                                {step?.histories[step?.histories?.length - 1].executorId} -{' '}
-                                {mappingDepartmentByCode(
-                                  departments,
-                                  step?.histories?.length > 0
-                                    ? step?.histories[step?.histories?.length - 1].actualGroup
-                                    : ticket.groupCode
-                                )}{' '}
-                                (
-                                {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
-                                  'DD/MM/YYYY HH:mm:00'
-                                )}
+                                      {index === 0 &&
+                                        !isSystemAdmin &&
+                                        userInfo.userName !== (step?.executors && step.executors[0]) && (
+                                          <div>
+                                            <span className='tw-mr-3'>Trạng thái:</span>
+                                            <Tag
+                                              style={{ minWidth: 80, textAlign: 'center' }}
+                                              color={tagColorMapping(TicketStatusEnum.PROCESSING)}
+                                            >
+                                              {TICKET_STATUS[TicketStatusEnum.PROCESSING]}
+                                            </Tag>
+                                          </div>
+                                        )}
+                                    </Col>
+                                    {index === step?.attributes?.length - 1 &&
+                                      (step.status === TicketStatusEnum.PENDING ||
+                                        step.status === TicketStatusEnum.PROCESSING) &&
+                                      (isSystemAdmin ||
+                                        userInfo.userName === (step?.executors && step.executors[0])) && (
+                                        <Col span={24} className='tw-flex tw-justify-center tw-mt-3'>
+                                          <Space>
+                                            {step.groupCodes[0] !== PROCESS_GROUPCODE.REQUESTER && (
+                                              <Button
+                                                danger
+                                                onClick={() => onReject(mainIndex)}
+                                                disabled={isAnyRequiredFieldEmpty(step)}
+                                              >
+                                                Từ chối
+                                              </Button>
+                                            )}
+
+                                            <Button
+                                              type='primary'
+                                              onClick={() => onApprove(mainIndex)}
+                                              disabled={isAnyRequiredFieldEmpty(step)}
+                                            >
+                                              Đồng ý
+                                            </Button>
+                                          </Space>
+                                        </Col>
+                                      )}
+                                  </>
                                 )
-                              </span>
-                            </div>
-                          </Col>
-                        )}
-                      </Row>
-                    </div>
-                  )}
-                </>
-              )
-            })}
+                              }
+                            })}
+
+                          {step?.status !== TicketStatusEnum.PENDING &&
+                            step.histories &&
+                            step?.histories?.length > 0 && (
+                              <Col span={24} className='tw-flex tw-justify-end '>
+                                <div>
+                                  <span className='tw-mr-2'>bởi</span>
+                                  <span className='tw-text-sky-700 tw-italic'>
+                                    {step?.histories[step?.histories?.length - 1].executorId} -{' '}
+                                    {mappingDepartmentByCode(
+                                      departments,
+                                      step?.histories?.length > 0
+                                        ? step?.histories[step?.histories?.length - 1].actualGroup
+                                        : ticket.groupCode
+                                    )}
+                                    (
+                                    {dayjs(step?.histories[step?.histories?.length - 1].createdAt).format(
+                                      'DD/MM/YYYY HH:mm:00'
+                                    )}
+                                    )
+                                  </span>
+                                </div>
+                              </Col>
+                            )}
+                        </Row>
+                      </div>
+                    </TimelineItem>
+                  )
+                )
+              })}
+            </Timeline>
+          )}
         </Col>
       </Row>
     </div>
