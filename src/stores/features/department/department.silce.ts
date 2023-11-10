@@ -114,7 +114,7 @@ const departmentSlice = createSlice({
       .addCase(getAllDepartments.fulfilled, (state, action) => {
         const requester = {
           code: '__REQUESTER_GROUP__',
-          name: 'Requester'
+          name: 'Quản lý trực tiếp'
         }
         state.listAll = [...action.payload, requester]
       })

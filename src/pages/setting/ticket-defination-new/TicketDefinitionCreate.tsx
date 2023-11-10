@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, {
   Background,
@@ -15,16 +16,14 @@ import ReactFlow, {
 import dayjs from 'dayjs'
 import CustomEdge from './component/CustomEdge'
 
-import { Button, Form, Popconfirm, notification } from 'antd'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Button, Col, Form, Modal, Popconfirm, Row, notification } from 'antd'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import 'reactflow/dist/style.css'
-import {
-  approvalRevision,
-  createRevision,
-  getOneRevisionByKey,
-  resetRevisionSelected
-} from '~/stores/features/setting/ticket-process.slice'
-import { useAppDispatch, useAppSelector } from '~/stores/hook'
+import { ROLE } from '~/constants/app.constant'
+import { approvalRevision, createRevision, getOneRevisionByKey1 } from '~/stores/features/setting/ticket-process.slice'
+import { TICKET_PROPS_ATTR_INIT } from '~/stores/features/setting/ultil-data'
+import { useAppDispatch } from '~/stores/hook'
+import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { SearchPayload, TicketDefRevisionCreateReq, TicketProcessRevision } from '~/types/setting-ticket-process'
 import { replaceRouterString } from '~/utils/helper'
 import ModalInitAttr from '../ticket-defination/component/ModalInitAttrr'
@@ -32,8 +31,6 @@ import CustomNode from './component/CustomNode'
 import InitProps from './component/InitProps'
 import SourceNode from './component/SourceNodes'
 import './style.scss'
-import { useUserInfo } from '~/stores/hooks/useUserProfile'
-import { ROLE } from '~/constants/app.constant'
 
 export const NodeItem = {
   START: '__START__',
@@ -64,6 +61,8 @@ const initialNodes = [
 ]
 
 const Index = () => {
+  const location = useLocation()
+  const currentURL = location.pathname
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { userInfo } = useUserInfo()
@@ -75,7 +74,8 @@ const Index = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<any>(null)
-  const revisionSelected = useAppSelector((state) => state.ticketProcess.revisionSelected)
+  const [revisionSelected, setRevisionSelected] = useState<TicketDefRevisionCreateReq>()
+  const [openModalInfo, setOpenModalInfo] = useState(false)
 
   const [initAttrForm] = Form.useForm()
   const [initPropForm] = Form.useForm()
@@ -242,6 +242,8 @@ const Index = () => {
       ticketReq.ticketType = ticketType
     }
 
+    ticketReq.name = TICKET_PROPS_ATTR_INIT.find((t) => t.ticketType === ticketType)?.name
+    ticketReq.description = TICKET_PROPS_ATTR_INIT.find((t) => t.ticketType === ticketType)?.description
     ticketRevision.applyFromDate = applyFromDate
     ticketRevision.applyToDate = applyToDate
     ticketRevision.rev = rev
@@ -263,7 +265,7 @@ const Index = () => {
       const value = {
         nodeIndex: Number(array[i].id),
         attributes: array[i].data?.initAttr,
-        groupCode: array[i].data?.value,
+        groupCodes: [array[i].data?.value],
         name: array[i].data?.label,
         type: array[i].type,
         position: array[i].position
@@ -317,6 +319,14 @@ const Index = () => {
     }
   }
 
+  const showModalInfo = () => {
+    setOpenModalInfo(true)
+  }
+
+  const onCloseModalInfo = () => {
+    setOpenModalInfo(false)
+  }
+
   useEffect(() => {
     if (selectedNode?.id) {
       showModal()
@@ -328,7 +338,42 @@ const Index = () => {
       const payload: SearchPayload = Object.create(null)
       payload.ticketType = ticketType
       payload.rev = replaceRouterString(rev, 'dash')
-      dispatch(getOneRevisionByKey(payload))
+      const fetchData = async () => {
+        if (ticketType && rev) {
+          const payload: SearchPayload = Object.create(null)
+          payload.ticketType = ticketType
+          payload.rev = replaceRouterString(rev, 'dash')
+
+          try {
+            const response = await getOneRevisionByKey1(payload)
+            if (response && response.data) {
+              setRevisionSelected(response.data)
+            }
+          } catch (error) {
+            console.error('Error fetching data:', error)
+          }
+        }
+      }
+
+      fetchData()
+    }
+
+    if (ticketType && currentURL && currentURL.includes('create-revison')) {
+      const foundedTicket = TICKET_PROPS_ATTR_INIT.find((t) => t.ticketType === ticketType)
+      const updatedNodes = nodes.map((node) => {
+        if (node.id === '1') {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              initAttr: foundedTicket?.revision.processNodes['1'].attributes
+            }
+          }
+        }
+        return node
+      })
+
+      setNodes(updatedNodes)
     }
   }, [ticketType, rev])
 
@@ -336,17 +381,18 @@ const Index = () => {
     if (revisionSelected && revisionSelected.id) {
       mappingResponse(revisionSelected)
     }
-
-    return () => {
-      dispatch(resetRevisionSelected())
-    }
   }, [revisionSelected])
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ReactFlowProvider>
-        <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center tw-gap-3'>
+        <div className='ticket-top-control tw-bg-white tw-h-[15%] tw-w-full tw-p-3 tw-flex tw-flex-col tw-justify-center'>
           <InitProps form={initPropForm} />
+          <div className='tw-text-right tw-mb-3'>
+            <span className=' tw-text-sky-700 tw-cursor-pointer' onClick={showModalInfo}>
+              Xem thêm
+            </span>
+          </div>
         </div>
 
         <div className='ticket-bottom-control reactflow-wrapper tw-h-[85%] tw-w-full' ref={reactFlowWrapper}>
@@ -366,10 +412,8 @@ const Index = () => {
             selectionOnDrag={true}
             attributionPosition='bottom-right'
             edgesUpdatable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
-            edgesFocusable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
             nodesConnectable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
-            nodesFocusable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
-            draggable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
+            // draggable={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN}
             panOnDrag={true}
             elementsSelectable={true}
             deleteKeyCode={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN ? ['Delete', 'Backspace'] : []}
@@ -432,6 +476,44 @@ const Index = () => {
         onFinishInitAttrFail={onCloseModalFail}
         onChangeType={onChangeType}
       />
+
+      <Modal
+        title='Thông tin quy trình'
+        open={openModalInfo}
+        onOk={onCloseModalInfo}
+        onCancel={onCloseModalInfo}
+        footer={[]}
+      >
+        <Row gutter={[16, 16]}>
+          <Col className='ticket-prop-label' span={8}>
+            <div>Tên quy trình:</div>
+          </Col>
+          <Col className='ticket-prop-value' span={16}>
+            <div>{revisionSelected?.name}</div>
+          </Col>
+
+          <Col className='ticket-prop-label' span={8}>
+            <div>Mô tả:</div>
+          </Col>
+          <Col className='ticket-prop-value' span={16}>
+            <div>{revisionSelected?.description}</div>
+          </Col>
+
+          <Col className='ticket-prop-label' span={8}>
+            <div>Người tạo:</div>
+          </Col>
+          <Col className='ticket-prop-value' span={16}>
+            <div>{revisionSelected?.createdBy}</div>
+          </Col>
+
+          <Col className='ticket-prop-label' span={8}>
+            <div>Ngày tạo:</div>
+          </Col>
+          <Col className='ticket-prop-value' span={16}>
+            <div>{dayjs(revisionSelected?.createdAt).format('DD/MM/YYYY')}</div>
+          </Col>
+        </Row>
+      </Modal>
     </div>
   )
 }

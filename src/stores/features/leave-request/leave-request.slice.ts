@@ -14,7 +14,7 @@ import {
 } from '~/types/leave-request'
 import { TicketDefinationResponse } from '~/types/leave-request.interface'
 import dayjs, { Dayjs } from 'dayjs'
-import { ticketItem } from '../setting/fake-data'
+import { ticketItem } from '../setting/ultil-data'
 export interface ILeaveRequestState {
   listData: ILeaveRequest[]
   ticketItemSelected: ILeaveRequest
