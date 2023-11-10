@@ -3,8 +3,9 @@ import { notification } from 'antd'
 import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { DragItem, ITicketDef, SearchPayload, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
-import { ticketItem } from './fake-data'
+import { ticketItem } from './ultil-data'
 import dayjs from 'dayjs'
+import axios from 'axios'
 
 const initialState: ITicketDef = {
   loading: false,
@@ -48,10 +49,25 @@ export const getOneRevisionByKey = createAsyncThunk(
   }
 )
 
+export const getOneRevisionByKey1 = async (payload: SearchPayload) => {
+  const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload)
+  return response
+}
+
 const createRevision = createAsyncThunk(
   'tickets_definitions/createRevision',
   async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
     const response = await HttpService.post('tickets_definitions/save_one', payload, {
+      signal: thunkAPI.signal
+    })
+    return response
+  }
+)
+
+export const updateRevision = createAsyncThunk(
+  'tickets_definitions/updateRevision',
+  async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
+    const response = await HttpService.post('tickets_definitions/update_one', payload, {
       signal: thunkAPI.signal
     })
     return response

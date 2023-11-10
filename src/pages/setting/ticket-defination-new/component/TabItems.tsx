@@ -111,9 +111,9 @@ const TabItems = () => {
                   </Tooltip>
                   {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
                     <>
-                      {/* <Tooltip title='Sao chép từ phiên bản này'>
+                      <Tooltip title='Sao chép từ phiên bản này'>
                         <Button size='small' icon={<CopyOutlined className='tw-text-blue-600' />} />
-                      </Tooltip> */}
+                      </Tooltip>
                       <Tooltip title='Xóa phiên bản'>
                         <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => deleteRev(record)}>
                           <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
@@ -133,13 +133,13 @@ const TabItems = () => {
 
   return (
     <div>
-      {/* {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+      {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
         <div className='tw-mb-2 tw-flex tw-items-center'>
           <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
             Tạo phiên bản mới
           </Button>
         </div>
-      )} */}
+      )}
 
       <Table
         columns={columns}

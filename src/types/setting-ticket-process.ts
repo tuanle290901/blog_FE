@@ -106,6 +106,8 @@ export interface TicketDefRevisionCreateReq {
   revision: TicketProcessRevision
   ticketDefId: string
   revisions?: TicketProcessRevision[]
+  createdAt?: string
+  createdBy?: string
 }
 
 export interface SearchPayload {
