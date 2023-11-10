@@ -4,6 +4,7 @@ import HttpService from '~/config/api'
 import { FulfilledAction, PendingAction, RejectedAction } from '~/stores/async-thunk.type.ts'
 import { DragItem, ITicketDef, SearchPayload, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 import { ticketItem } from './fake-data'
+import dayjs from 'dayjs'
 
 const initialState: ITicketDef = {
   loading: false,
@@ -160,7 +161,28 @@ const ticketProcessSlice = createSlice({
         state.tickets = action.payload.data
       })
       .addCase(getListRevisionByTicketType.fulfilled, (state: ITicketDef, action) => {
-        state.listRevisionsByTicketType = action.payload.data
+        const listRawData = action.payload.data
+        listRawData.reduce((acc, current) => {
+          const currentDate = dayjs(current.approvedAt).valueOf()
+          const accDate = acc?.approvedAt ? dayjs(acc.approvedAt).valueOf() : null
+
+          if (!acc || (accDate && currentDate > accDate)) {
+            if (acc) {
+              acc.status = false
+            }
+            if (current?.approvedAt) {
+              current.status = true
+            } else {
+              current.status = false
+            }
+            return current
+          }
+
+          current.status = false
+
+          return acc
+        }, null)
+        state.listRevisionsByTicketType = listRawData
       })
       .addCase(getOneRevisionByKey.fulfilled, (state: ITicketDef, action) => {
         state.revisionSelected = action.payload.data

@@ -83,6 +83,8 @@ export interface TicketProcessRevision {
   applyFromDate: string
   applyToDate?: string
   startNodeIndex?: number
+  approvedAt?: string
+  approvedBy?: string
   endNodeIndex?: number
   continueTransferStrategy?: string[]
   stopTransferStrategy?: string
@@ -93,6 +95,7 @@ export interface TicketProcessRevision {
   processNodes: {
     [id: string]: TicketProcessNode
   }
+  status?: boolean
 }
 
 export interface TicketDefRevisionCreateReq {

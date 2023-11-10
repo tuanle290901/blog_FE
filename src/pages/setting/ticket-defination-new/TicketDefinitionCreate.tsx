@@ -375,14 +375,22 @@ const Index = () => {
             deleteKeyCode={systemAdminInfo?.role === ROLE.SYSTEM_ADMIN ? ['Delete', 'Backspace'] : []}
           >
             <Panel position='top-left'>
-              <Button type='default' onClick={() => navigate('/ticket-definition')}>
+              <Button
+                type='default'
+                onClick={() =>
+                  navigate('/ticket-definition', {
+                    state: {
+                      ticketType
+                    }
+                  })
+                }
+              >
                 Quay lại
               </Button>
             </Panel>
 
             {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
               <>
-                (
                 <Panel position='top-right'>
                   {rev && ticketType && (
                     <Popconfirm
@@ -408,7 +416,6 @@ const Index = () => {
                 >
                   <SourceNode />
                 </Panel>
-                )
               </>
             )}
 

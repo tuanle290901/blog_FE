@@ -1,5 +1,5 @@
 import { CopyOutlined, DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Popconfirm, Table, TableColumnsType, Tooltip, notification } from 'antd'
+import { Button, Popconfirm, Table, TableColumnsType, Tag, Tooltip, notification } from 'antd'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { deleteRevision, getListRevisionByTicketType } from '~/stores/features/setting/ticket-process.slice'
@@ -83,7 +83,14 @@ const TabItems = () => {
         dataIndex: 'status',
         sorter: false,
         showSorterTooltip: false,
-        ellipsis: true
+        ellipsis: true,
+        render: (_, record) => {
+          return (
+            <div className='tw-text-center'>
+              {record?.approvedAt ? <Tag color='green'>Đã phê duyệt</Tag> : <Tag color='red'>Đợi phê duyệt</Tag>}
+            </div>
+          )
+        }
       },
       {
         title: 'Hành động',
@@ -104,9 +111,9 @@ const TabItems = () => {
                   </Tooltip>
                   {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
                     <>
-                      <Tooltip title='Sao chép từ phiên bản này'>
+                      {/* <Tooltip title='Sao chép từ phiên bản này'>
                         <Button size='small' icon={<CopyOutlined className='tw-text-blue-600' />} />
-                      </Tooltip>
+                      </Tooltip> */}
                       <Tooltip title='Xóa phiên bản'>
                         <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => deleteRev(record)}>
                           <Button size='small' icon={<DeleteOutlined className='tw-text-red-600' />} />
@@ -126,19 +133,20 @@ const TabItems = () => {
 
   return (
     <div>
-      {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
+      {/* {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
         <div className='tw-mb-2 tw-flex tw-items-center'>
           <Button type='primary' icon={<PlusOutlined />} onClick={() => goToTicketProcessMap(null, 'view')}>
             Tạo phiên bản mới
           </Button>
         </div>
-      )}
+      )} */}
 
       <Table
         columns={columns}
         dataSource={listRevByTicketType}
         scroll={{ y: 'calc(100vh - 390px)', x: 800 }}
         loading={isLoading}
+        rowClassName={(record) => (record?.status ? 'highlighted-row' : '')}
       />
     </div>
   )
