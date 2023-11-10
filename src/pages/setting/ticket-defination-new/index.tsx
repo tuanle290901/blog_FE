@@ -1,5 +1,5 @@
 import { Divider, Empty, Tabs } from 'antd'
-import { FC, memo, useEffect } from 'react'
+import { FC, memo, useEffect, useState } from 'react'
 import {
   fetchListTicket,
   getListRevisionByTicketType,
@@ -8,13 +8,17 @@ import {
 import { useAppDispatch, useAppSelector } from '~/stores/hook'
 import { SearchPayload, TicketDefRevisionCreateReq } from '~/types/setting-ticket-process'
 import TabItems from './component/TabItems'
+import { useLocation } from 'react-router-dom'
 
 const Index: FC = memo(function Index() {
   const dispatch = useAppDispatch()
   const listData: TicketDefRevisionCreateReq[] = useAppSelector((state) => state.ticketProcess.tickets)
+  const [activeTab, setActiveTab] = useState('')
+  const { state } = useLocation()
 
   const onChangeTab = (tabId: string) => {
     if (tabId) {
+      setActiveTab(tabId)
       dispatch(getTicketById({ id: tabId }))
       const payload: SearchPayload = Object.create(null)
       payload.ticketType = tabId
@@ -28,12 +32,20 @@ const Index: FC = memo(function Index() {
 
   useEffect(() => {
     if (listData.length > 0) {
-      dispatch(getTicketById({ id: listData[0].id }))
+      const idTab = listData[0].id as string
+      dispatch(getTicketById({ id: idTab }))
+      setActiveTab(idTab)
       const payload: SearchPayload = Object.create(null)
-      payload.ticketType = listData[0].id
+      payload.ticketType = idTab
       dispatch(getListRevisionByTicketType(payload))
     }
   }, [dispatch, listData])
+
+  useEffect(() => {
+    if (state?.ticketType) {
+      setActiveTab(state?.ticketType)
+    }
+  }, [])
 
   return (
     <div className='tw-m-2 md:tw-m-4 tw-p-4 tw-bg-white tw-h-[95%]'>
@@ -49,10 +61,10 @@ const Index: FC = memo(function Index() {
       <Divider />
       {listData.length > 0 && (
         <Tabs
-          defaultActiveKey='1'
           tabPosition='left'
           style={{ height: '70vh' }}
           onChange={onChangeTab}
+          activeKey={activeTab}
           items={listData.map((data, i) => {
             const id = String(data.id)
             return {

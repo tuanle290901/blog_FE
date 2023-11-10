@@ -170,7 +170,11 @@ const ticketProcessSlice = createSlice({
             if (acc) {
               acc.status = false
             }
-            current.status = true
+            if (current?.approvedAt) {
+              current.status = true
+            } else {
+              current.status = false
+            }
             return current
           }
 
