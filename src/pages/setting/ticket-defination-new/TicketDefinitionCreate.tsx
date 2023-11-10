@@ -16,11 +16,16 @@ import ReactFlow, {
 import dayjs from 'dayjs'
 import CustomEdge from './component/CustomEdge'
 
-import { Button, Col, Form, Modal, Popconfirm, Row, notification } from 'antd'
+import { Button, Col, Form, Modal, Popconfirm, Row, Space, notification } from 'antd'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import 'reactflow/dist/style.css'
 import { ROLE } from '~/constants/app.constant'
-import { approvalRevision, createRevision, getOneRevisionByKey1 } from '~/stores/features/setting/ticket-process.slice'
+import {
+  approvalRevision,
+  createRevision,
+  getOneRevisionByKey1,
+  updateRevision
+} from '~/stores/features/setting/ticket-process.slice'
 import { TICKET_PROPS_ATTR_INIT } from '~/stores/features/setting/ultil-data'
 import { useAppDispatch } from '~/stores/hook'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
@@ -304,7 +309,13 @@ const Index = () => {
       return
     }
     const payload = mappingPayload(nodes, edges)
-    await dispatch(createRevision(payload))
+    if (revisionSelected?.id) {
+      payload.id = revisionSelected.id
+      await dispatch(updateRevision(payload))
+    } else {
+      await dispatch(createRevision(payload))
+    }
+
     navigate(`../ticket-definition/view-revison/${payload.ticketType}/${payload.revision.rev}`)
     notification.success({ message: 'Thao tác thành công' })
   }
@@ -436,23 +447,25 @@ const Index = () => {
             {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
               <>
                 <Panel position='top-right'>
-                  {rev && ticketType && (
-                    <Popconfirm
-                      title='Duyệt quy trình'
-                      description='Bạn có chắc chắn thực hiện?'
-                      onConfirm={onApprove}
-                      okText='Đồng ý'
-                      cancelText='Hủy'
-                    >
-                      <Button type='primary'>Áp dụng quy trình này</Button>
-                    </Popconfirm>
-                  )}
+                  <Space>
+                    {rev && ticketType && (
+                      <Popconfirm
+                        title='Duyệt quy trình'
+                        description='Bạn có chắc chắn thực hiện?'
+                        onConfirm={onApprove}
+                        okText='Đồng ý'
+                        cancelText='Hủy'
+                      >
+                        <Button type='ghost' className='tw-bg-green-500 tw-text-white'>
+                          Áp dụng quy trình này
+                        </Button>
+                      </Popconfirm>
+                    )}
 
-                  {(!rev || !ticketType) && (
                     <Button type='primary' onClick={() => onSave()}>
-                      Lưu thông tin
+                      {revisionSelected?.id ? ' Cập nhật quy trình' : 'Lưu quy trình'}
                     </Button>
-                  )}
+                  </Space>
                 </Panel>
                 <Panel
                   className='source-box-panel tw-w-[90%] tw-h-[60px] tw-bg-white tw-flex tw-items-center tw-justify-center'
