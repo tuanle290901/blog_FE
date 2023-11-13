@@ -486,7 +486,7 @@ const Index = () => {
                         okText='Đồng ý'
                         cancelText='Hủy'
                       >
-                        <Button type='ghost' className='tw-bg-green-500 tw-text-white'>
+                        <Button type='default' className='tw-bg-green-500 tw-text-white'>
                           Áp dụng quy trình
                         </Button>
                       </Popconfirm>
