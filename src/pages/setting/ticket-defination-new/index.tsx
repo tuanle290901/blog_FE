@@ -45,6 +45,10 @@ const Index: FC = memo(function Index() {
     if (state?.ticketType) {
       setActiveTab(state?.ticketType)
     }
+
+    return () => {
+      window.history.replaceState({ rev: '', ticketType: '' }, document.title)
+    }
   }, [])
 
   return (

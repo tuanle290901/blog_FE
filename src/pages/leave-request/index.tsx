@@ -20,7 +20,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { ROLE } from '~/constants/app.constant'
 import LeaveRequestForm from '~/pages/leave-request/leave-request-form'
 import { getListDepartments } from '~/stores/features/department/department.silce'
@@ -80,7 +80,7 @@ const LeaveRequest: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const { userInfo } = useUserInfo()
-  const [queryParameters] = useSearchParams()
+  const { code } = useParams()
 
   const ticketDifinations = useAppSelector((item) => item.leaveRequest.ticketDefinationType)
   const listData: ILeaveRequest[] = useAppSelector((state) => state.leaveRequest.listData)
@@ -229,9 +229,9 @@ const LeaveRequest: React.FC = () => {
   }, [isApprovedSuccess])
 
   useEffect(() => {
-    if (queryParameters.get('code')) {
+    if (code) {
       const getDetail = async () => {
-        const ticketSelected = await getTicketDetail(queryParameters.get('code') ?? '')
+        const ticketSelected = await getTicketDetail(code ?? '')
         if (ticketSelected) {
           setSelectedTicket(ticketSelected)
           setIsOpenModalApprove(true)
@@ -239,7 +239,7 @@ const LeaveRequest: React.FC = () => {
       }
       getDetail()
     }
-  }, [queryParameters])
+  }, [code])
 
   useEffect(() => {
     if (isisUpdateRequestStatusSuccess) {

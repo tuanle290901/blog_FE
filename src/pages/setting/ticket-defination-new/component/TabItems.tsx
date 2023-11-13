@@ -20,9 +20,16 @@ const TabItems = () => {
   const listRevByTicketType = useAppSelector((state) => state.ticketProcess.listRevisionsByTicketType)
   const isLoading = useAppSelector((state) => state.ticketProcess.loading)
 
-  const goToTicketProcessMap = (data: any, type: 'view' | 'create' | 'update') => {
+  const goToTicketProcessMap = (data: any, type: 'view' | 'create' | 'update' | 'copy') => {
     if (type === 'view' && data && data.rev && data.ticketType) {
       navigate(`view-revison/${data?.ticketType}/${replaceRouterString(data.rev, 'dot')}`)
+    } else if (type === 'copy') {
+      navigate(`create-revison/${data?.ticketType}`, {
+        state: {
+          ticketType: data.ticketType,
+          rev: data.rev
+        }
+      })
     } else {
       navigate(`create-revison/${ticketSelected?.id}`)
     }
@@ -33,9 +40,15 @@ const TabItems = () => {
       const payload: SearchPayload = Object.create(null)
       payload.rev = record.rev
       payload.ticketType = record.ticketType
-      await dispatch(deleteRevision(payload))
-      await dispatch(getListRevisionByTicketType({ rev: null, ticketType: payload.ticketType }))
-      notification.success({ message: 'Thao tác thành công' })
+      try {
+        await dispatch(deleteRevision(payload))
+        await dispatch(getListRevisionByTicketType({ rev: null, ticketType: payload.ticketType }))
+        notification.success({ message: 'Thao tác thành công' })
+      } catch (err: any) {
+        notification.error({
+          message: err?.response?.data?.message
+        })
+      }
     }
   }
 
@@ -112,7 +125,11 @@ const TabItems = () => {
                   {systemAdminInfo?.role === ROLE.SYSTEM_ADMIN && (
                     <>
                       <Tooltip title='Sao chép từ phiên bản này'>
-                        <Button size='small' icon={<CopyOutlined className='tw-text-blue-600' />} />
+                        <Button
+                          size='small'
+                          icon={<CopyOutlined className='tw-text-blue-600' />}
+                          onClick={() => goToTicketProcessMap(record, 'copy')}
+                        />
                       </Tooltip>
                       <Tooltip title='Xóa phiên bản'>
                         <Popconfirm title='Bạn có chắc chắn xóa?' onConfirm={() => deleteRev(record)}>

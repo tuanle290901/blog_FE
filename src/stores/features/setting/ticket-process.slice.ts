@@ -42,65 +42,93 @@ export const getListRevisionByTicketType = createAsyncThunk(
 export const getOneRevisionByKey = createAsyncThunk(
   'tickets_definitions/get_one_by_key',
   async (payload: SearchPayload, thunkAPI) => {
-    const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 
 export const getOneRevisionByKey1 = async (payload: SearchPayload) => {
-  const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload)
-  return response
+  try {
+    const response = await HttpService.post<any>('/tickets_definitions/get_one_by_key', payload)
+    return response
+  } catch (err: any) {
+    throw new Error(err)
+  }
 }
 
 const createRevision = createAsyncThunk(
   'tickets_definitions/createRevision',
   async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
-    const response = await HttpService.post('tickets_definitions/save_one', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post('tickets_definitions/save_one', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 
 export const updateRevision = createAsyncThunk(
   'tickets_definitions/updateRevision',
   async (payload: TicketDefRevisionCreateReq, thunkAPI) => {
-    const response = await HttpService.post('tickets_definitions/update_one', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post('tickets_definitions/update_one', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 
 export const deleteRevision = createAsyncThunk(
   'tickets_definitions/deleteRevision',
   async (payload: SearchPayload, thunkAPI) => {
-    const response = await HttpService.post('tickets_definitions/delete_one', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post('tickets_definitions/delete_one', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 
 export const approvalRevision = createAsyncThunk(
   'tickets_definitions/approveRevision',
   async (payload: SearchPayload, thunkAPI) => {
-    const response = await HttpService.post('tickets_definitions/approval_one', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post('tickets_definitions/approval_one', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 
 export const getRevisionApplied = createAsyncThunk(
   'tickets_definitions/getRevisionApplied',
   async (payload: { ticketType: string }, thunkAPI) => {
-    const response = await HttpService.post('tickets_definitions/get_one_being_applied', payload, {
-      signal: thunkAPI.signal
-    })
-    return response
+    try {
+      const response = await HttpService.post('tickets_definitions/get_one_being_applied', payload, {
+        signal: thunkAPI.signal
+      })
+      return response
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )
 

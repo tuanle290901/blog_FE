@@ -52,14 +52,14 @@ const initialNodes = [
   {
     id: '1',
     type: NodeItemType.INPUT,
-    data: { label: 'Khởi tạo', value: NodeItem.START },
+    data: { label: 'Khởi tạo', value: [NodeItem.START] },
     position: { x: 0, y: 103 },
     sourcePosition: Position.Right
   },
   {
     id: '2',
     type: NodeItemType.OUTPUT,
-    data: { label: 'Trạng thái cuối', value: NodeItem.END },
+    data: { label: 'Trạng thái cuối', value: [NodeItem.END] },
     position: { x: 900, y: 103 },
     targetPosition: Position.Left
   }
@@ -138,7 +138,7 @@ const Index = () => {
             id,
             type,
             position,
-            data: { label: title, value: groupCode }
+            data: { label: title, value: [groupCode] }
           }
 
           setNodes((nds) => nds.concat(newNode))
@@ -151,6 +151,11 @@ const Index = () => {
 
   const showModal = () => {
     const nodeFound: any = nodes.find((n) => n.id === selectedNode.id)
+    if (nodeFound && nodeFound.type === 'input') {
+      initAttrForm.setFieldsValue({ _isDisabled: true })
+    } else {
+      initAttrForm.setFieldsValue({ _isDisabled: false })
+    }
     const { data } = nodeFound
     if (data?.initAttr?.length > 0) {
       initAttrForm.setFieldsValue({ initAttr: data.initAttr })
@@ -270,7 +275,7 @@ const Index = () => {
       const value = {
         nodeIndex: Number(array[i].id),
         attributes: array[i].data?.initAttr,
-        groupCodes: [array[i].data?.value],
+        groupCodes: array[i].data?.value,
         name: array[i].data?.label,
         type: array[i].type,
         position: array[i].position
@@ -309,15 +314,28 @@ const Index = () => {
       return
     }
     const payload = mappingPayload(nodes, edges)
-    if (revisionSelected?.id) {
+    if (currentURL.includes('view-revison') && revisionSelected?.id) {
       payload.id = revisionSelected.id
-      await dispatch(updateRevision(payload))
+      try {
+        await dispatch(updateRevision(payload)).unwrap()
+        navigate(`../ticket-definition/view-revison/${payload.ticketType}/${payload.revision.rev}`)
+        notification.success({ message: 'Thao tác thành công' })
+      } catch (error: any) {
+        notification.error({
+          message: error?.response?.data?.message
+        })
+      }
     } else {
-      await dispatch(createRevision(payload))
+      try {
+        await dispatch(createRevision(payload)).unwrap()
+        navigate(`../ticket-definition/view-revison/${payload.ticketType}/${payload.revision.rev}`)
+        notification.success({ message: 'Thao tác thành công' })
+      } catch (error: any) {
+        notification.error({
+          message: error?.response?.data?.message
+        })
+      }
     }
-
-    navigate(`../ticket-definition/view-revison/${payload.ticketType}/${payload.revision.rev}`)
-    notification.success({ message: 'Thao tác thành công' })
   }
 
   const onApprove = () => {
@@ -325,8 +343,14 @@ const Index = () => {
       const payload: SearchPayload = Object.create(null)
       payload.ticketType = ticketType
       payload.rev = replaceRouterString(rev, 'dash')
-      dispatch(approvalRevision(payload))
-      notification.success({ message: 'Thao tác thành công' })
+      try {
+        dispatch(approvalRevision(payload))
+        notification.success({ message: 'Thao tác thành công' })
+      } catch (err: any) {
+        notification.error({
+          message: err?.response?.data?.message
+        })
+      }
     }
   }
 
@@ -345,24 +369,24 @@ const Index = () => {
   }, [selectedNode])
 
   useEffect(() => {
-    if (ticketType && rev) {
+    const revCurrent = (location.state?.rev ? location.state?.rev : rev) as string
+    const ticketTypeCurrent = (location.state?.ticketType ? location.state?.ticketType : ticketType) as string
+    if (revCurrent && ticketTypeCurrent) {
       const payload: SearchPayload = Object.create(null)
-      payload.ticketType = ticketType
-      payload.rev = replaceRouterString(rev, 'dash')
+      payload.ticketType = ticketTypeCurrent
+      payload.rev = replaceRouterString(revCurrent, 'dash')
       const fetchData = async () => {
-        if (ticketType && rev) {
-          const payload: SearchPayload = Object.create(null)
-          payload.ticketType = ticketType
-          payload.rev = replaceRouterString(rev, 'dash')
+        const payload: SearchPayload = Object.create(null)
+        payload.ticketType = ticketTypeCurrent
+        payload.rev = replaceRouterString(revCurrent, 'dash')
 
-          try {
-            const response = await getOneRevisionByKey1(payload)
-            if (response && response.data) {
-              setRevisionSelected(response.data)
-            }
-          } catch (error) {
-            console.error('Error fetching data:', error)
+        try {
+          const response = await getOneRevisionByKey1(payload)
+          if (response && response.data) {
+            setRevisionSelected(response.data)
           }
+        } catch (error) {
+          console.error('Error fetching data:', error)
         }
       }
 
@@ -386,13 +410,19 @@ const Index = () => {
 
       setNodes(updatedNodes)
     }
-  }, [ticketType, rev])
+  }, [ticketType, rev, location.state])
 
   useEffect(() => {
     if (revisionSelected && revisionSelected.id) {
       mappingResponse(revisionSelected)
     }
   }, [revisionSelected])
+
+  useEffect(() => {
+    return () => {
+      window.history.replaceState({ rev: '', ticketType: '' }, document.title)
+    }
+  }, [])
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -457,13 +487,13 @@ const Index = () => {
                         cancelText='Hủy'
                       >
                         <Button type='ghost' className='tw-bg-green-500 tw-text-white'>
-                          Áp dụng quy trình này
+                          Áp dụng quy trình
                         </Button>
                       </Popconfirm>
                     )}
 
                     <Button type='primary' onClick={() => onSave()}>
-                      {revisionSelected?.id ? ' Cập nhật quy trình' : 'Lưu quy trình'}
+                      {currentURL.includes('view-revison') ? ' Cập nhật quy trình' : 'Lưu quy trình'}
                     </Button>
                   </Space>
                 </Panel>
