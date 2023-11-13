@@ -1,10 +1,12 @@
 import { Col, DatePicker, Form, Input, Row } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { ROLE } from '~/constants/app.constant'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
+import { useLocation } from 'react-router-dom'
 
 const InitProps: FC<any> = function InitProps(props) {
+  const location = useLocation()
   const { form } = props
   const { userInfo } = useUserInfo()
   const systemAdminInfo = userInfo?.groupProfiles.find((gr) => gr.role === ROLE.SYSTEM_ADMIN)
@@ -13,6 +15,14 @@ const InitProps: FC<any> = function InitProps(props) {
   const onChangeDisabled = () => {
     setDisabledForm(!disabledForm)
   }
+
+  useEffect(() => {
+    if (location.pathname && location.pathname.includes('view-revison')) {
+      setDisabledForm(true)
+    } else {
+      setDisabledForm(false)
+    }
+  }, [location.pathname])
 
   return (
     <div className='tw-w-full'>
@@ -28,7 +38,7 @@ const InitProps: FC<any> = function InitProps(props) {
         <Row align='middle'>
           <Col span={4}>
             <Form.Item label='Phiên bản' name='rev' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
-              <Input placeholder='Nhập tên phiên bản' />
+              <Input disabled={location.pathname.includes('view-revison')} placeholder='Nhập tên phiên bản' />
             </Form.Item>
           </Col>
           <Col span={9} offset={1}>

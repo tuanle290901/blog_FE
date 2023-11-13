@@ -52,6 +52,7 @@ export const PRIVATE_PATH = {
   typesOfleave: '/types-of-leave',
   report: 'report',
   leaveRequest: '/request',
+  requestDetail: '/request/:code',
   statistical: 'statistical'
 }
 
@@ -156,6 +157,12 @@ export const PRIVATE_ROUTES: IRoutes[] = [
   {
     name: 'leaveRequest',
     path: PRIVATE_PATH.leaveRequest,
+    component: LeaveRequest,
+    allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
+  },
+  {
+    name: 'requestDetail',
+    path: PRIVATE_PATH.requestDetail,
     component: LeaveRequest,
     allowedRoles: [ROLE.SYSTEM_ADMIN, ROLE.MANAGER, ROLE.SUB_MANAGER, ROLE.OFFICER]
   },

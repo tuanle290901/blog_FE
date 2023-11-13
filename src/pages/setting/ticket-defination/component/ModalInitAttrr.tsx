@@ -45,7 +45,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
         initialValues={{
           initAttr: [{ name: null, type: null, required: null, options: [], suggestion: [], description: null }]
         }}
-        disabled={systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
+        disabled={initAttrForm.getFieldValue('_isDisabled') || systemAdminInfo?.role !== ROLE.SYSTEM_ADMIN}
       >
         <Form.List name='initAttr'>
           {(fields, { add, remove }) => {
