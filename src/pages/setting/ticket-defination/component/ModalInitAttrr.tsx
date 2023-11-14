@@ -157,7 +157,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
                         </>
                       )}
 
-                      {/* {index !== 0 && (
+                      {index !== 0 && (
                         <div
                           className='dynamic-form-item-icon-close'
                           onClick={() => {
@@ -167,7 +167,7 @@ const ModalInitAttr: FC<ModalInitAttrProp> = function ModalInitAttr(props) {
                         >
                           <MinusCircleFilled className='tw-text-xl tw-text-red-600' />
                         </div>
-                      )} */}
+                      )}
                     </Row>
                   ))}
                   <Form.Item>

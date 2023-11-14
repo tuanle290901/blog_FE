@@ -4,6 +4,9 @@ import { FC, useEffect, useState } from 'react'
 import { ROLE } from '~/constants/app.constant'
 import { useUserInfo } from '~/stores/hooks/useUserProfile'
 import { useLocation } from 'react-router-dom'
+import { REGEX_SPECIAL_CHARS } from '~/constants/regex.constant'
+import dayjs from 'dayjs'
+import { RangePickerProps } from 'antd/es/date-picker'
 
 const InitProps: FC<any> = function InitProps(props) {
   const location = useLocation()
@@ -24,6 +27,15 @@ const InitProps: FC<any> = function InitProps(props) {
     }
   }, [location.pathname])
 
+  const isEndDateDisabled: RangePickerProps['disabledDate'] = (current) => {
+    const startDate = form.getFieldValue('applyFromDate')
+    return startDate && current && current <= startDate.endOf('day')
+  }
+  const isStartDateDisabled: RangePickerProps['disabledDate'] = (current) => {
+    const startDate = form.getFieldValue('applyToDate')
+    return startDate && current && current >= startDate.endOf('day')
+  }
+
   return (
     <div className='tw-w-full'>
       <div className='tw-text-md tw-font-semibold tw-mb-4 tw-mt-4'>
@@ -37,7 +49,17 @@ const InitProps: FC<any> = function InitProps(props) {
       <Form form={form} layout='horizontal' disabled={disabledForm}>
         <Row align='middle'>
           <Col span={4}>
-            <Form.Item label='Phiên bản' name='rev' rules={[{ required: true, message: 'Trường bắt buộc' }]}>
+            <Form.Item
+              label='Phiên bản'
+              name='rev'
+              rules={[
+                { required: true, message: 'Trường bắt buộc' },
+                {
+                  pattern: REGEX_SPECIAL_CHARS,
+                  message: 'Tên không chưa các ký tự đặc biệt'
+                }
+              ]}
+            >
               <Input disabled={location.pathname.includes('view-revison')} placeholder='Nhập tên phiên bản' />
             </Form.Item>
           </Col>
@@ -47,13 +69,23 @@ const InitProps: FC<any> = function InitProps(props) {
               name='applyFromDate'
               rules={[{ required: true, message: 'Trường bắt buộc' }]}
             >
-              <DatePicker className='tw-w-full' placeholder='Chọn ngày áp dụng' format='DD/MM/YYYY' />
+              <DatePicker
+                disabledDate={isStartDateDisabled}
+                className='tw-w-full'
+                placeholder='Chọn ngày áp dụng'
+                format='DD/MM/YYYY'
+              />
             </Form.Item>
           </Col>
 
           <Col span={9} offset={1}>
             <Form.Item label='Ngày kết thúc' name='applyToDate'>
-              <DatePicker className='tw-w-full' placeholder='Chọn ngày kết thúc' format='DD/MM/YYYY' />
+              <DatePicker
+                disabledDate={isEndDateDisabled}
+                className='tw-w-full'
+                placeholder='Chọn ngày kết thúc'
+                format='DD/MM/YYYY'
+              />
             </Form.Item>
           </Col>
         </Row>
