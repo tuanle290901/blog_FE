@@ -134,11 +134,21 @@ const Index = () => {
             x: event.clientX - reactFlowBounds.left,
             y: event.clientY - reactFlowBounds.top
           })
+          const initAttrDefault = [
+            {
+              name: 'note',
+              type: 'TEXT',
+              required: false,
+              options: [],
+              suggestion: ['Tôi đồng ý', 'Tôi không đồng ý'],
+              description: `Duyệt bởi ${title}`
+            }
+          ]
           const newNode = {
             id,
             type,
             position,
-            data: { label: title, value: [groupCode] }
+            data: { label: title, value: [groupCode], initAttr: initAttrDefault }
           }
 
           setNodes((nds) => nds.concat(newNode))

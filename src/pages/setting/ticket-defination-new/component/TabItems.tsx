@@ -100,7 +100,13 @@ const TabItems = () => {
         render: (_, record) => {
           return (
             <div className='tw-text-center'>
-              {record?.approvedAt ? <Tag color='green'>Đã phê duyệt</Tag> : <Tag color='red'>Đợi phê duyệt</Tag>}
+              {record?.approvedAt && record?.isNoLongerSupport === false ? (
+                <Tag color='green'>Đang áp dụng</Tag>
+              ) : record?.approvedAt && record?.isNoLongerSupport === true ? (
+                <Tag color='red'>Hết hiệu lực</Tag>
+              ) : (
+                <Tag color='red'>Chưa phê duyệt</Tag>
+              )}
             </div>
           )
         }

@@ -96,6 +96,7 @@ export interface TicketProcessRevision {
     [id: string]: TicketProcessNode
   }
   status?: boolean
+  isNoLongerSupport?: boolean
 }
 
 export interface TicketDefRevisionCreateReq {
